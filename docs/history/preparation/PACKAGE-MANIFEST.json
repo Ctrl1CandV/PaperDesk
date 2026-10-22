@@ -1,0 +1,160 @@
+{
+  "format": "paperdesk-preparation-manifest",
+  "version": "1.1",
+  "preparedDate": "2026-10-21",
+  "hashAlgorithm": "SHA-256",
+  "manifestExcludedFromFiles": true,
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 193,
+      "sha256": "bdc5a905230365dca9ed131aa3a6233ce0bc58f463f1b1823e801332a3014b97"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 3897,
+      "sha256": "b3e6cb0d161d1dbdf02ab74914b223f99bf12f5695ab1be5a92d57510d74a699"
+    },
+    {
+      "path": "HANDOFF.md",
+      "bytes": 4739,
+      "sha256": "af3a8ddf37d4e6e213a8c632a95b7929541b71e4ecf07c6ef6f298f743cb4292"
+    },
+    {
+      "path": "IMPLEMENTATION-PROMPT.txt",
+      "bytes": 1271,
+      "sha256": "69ced916ecff6adf56aef20f8348422945e3afdbb0d6c2547e1c5ba2e1005134"
+    },
+    {
+      "path": "PROJECT-STATE.md",
+      "bytes": 1352,
+      "sha256": "14c0d686df7f3d6f8319c7169ab4f039e3928d366e12ffff48f9a923a8741a2f"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3081,
+      "sha256": "ea4c7fb83148461b2700979d8565b1622c9848450b6daf6685c591dbae1c08ef"
+    },
+    {
+      "path": "START-HERE.md",
+      "bytes": 2125,
+      "sha256": "a57710196f2900f787089380e92745938c319a6ab1cbbbc1c1a734b203353a3c"
+    },
+    {
+      "path": "content/catalog.json",
+      "bytes": 1198,
+      "sha256": "25eaa40ea191dfeaedcbd44c16b6b3a6470fbd84d7e2cca889f68226c9ad2768"
+    },
+    {
+      "path": "content/exploration.json",
+      "bytes": 6047,
+      "sha256": "a6d526168a66a183a1fac473d0e95e3d8fc64c1979af967788767c1d5487a5d5"
+    },
+    {
+      "path": "content/guides/agent-survey.json",
+      "bytes": 5523,
+      "sha256": "1239e65334c2d48e1fa4b6ebae355cd491e425ff9f06cd57c746c7b6c20c6930"
+    },
+    {
+      "path": "content/guides/agent-survey.md",
+      "bytes": 14025,
+      "sha256": "af7ea05e86bb35880a6d3c5a4f5ab1725140b904551f450eba1cda11499585c8"
+    },
+    {
+      "path": "content/guides/helm.json",
+      "bytes": 4918,
+      "sha256": "f7739439d444ef03e85f491fdd50e7efb2691f1a9bf2956abc5ac3a7555789fd"
+    },
+    {
+      "path": "content/guides/helm.md",
+      "bytes": 10252,
+      "sha256": "a612be64f646f9236282aaa59666bd5d7878e340b8d365efd133de97ec712d5c"
+    },
+    {
+      "path": "content/guides/instructgpt.json",
+      "bytes": 5240,
+      "sha256": "a5f33285536ddab6b6b5131689f76fbd5e6e750657b5edf102b7a79a90b932a7"
+    },
+    {
+      "path": "content/guides/instructgpt.md",
+      "bytes": 10874,
+      "sha256": "bc9d7a42cbc55a290f5cc6086b5edd25d07a05f4cd49229100a72b863f01a38a"
+    },
+    {
+      "path": "docs/ACCEPTANCE.md",
+      "bytes": 5839,
+      "sha256": "67bbcee95e1fbbbe151e79c9a9790094c6f97d10c1464c76fd2ce1cfca5d4557"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "bytes": 8819,
+      "sha256": "c60454e7defd678353b708a4c15246da53cddb08ec8c4aa2b67cf9a22a478e2a"
+    },
+    {
+      "path": "docs/CONTENT.md",
+      "bytes": 10061,
+      "sha256": "090e38d3fb430a31a2bd0cff4696f82fe94405abc2f95a23b7dbe8793dc8d59a"
+    },
+    {
+      "path": "docs/EXPLORATION.md",
+      "bytes": 5772,
+      "sha256": "e98bc6fd2d62dec44c49bf54ec70696ba19c1651f99dcd38b4da054d1bdcb410"
+    },
+    {
+      "path": "docs/FUTURE-HOSTING.md",
+      "bytes": 1726,
+      "sha256": "381eed8334d0b3315b364eb632eb77babb0cdc8cf678b44e198a00a522dcad45"
+    },
+    {
+      "path": "docs/IMPLEMENTATION.md",
+      "bytes": 4669,
+      "sha256": "fe089ccf48af6bdb86917ef55a25254df3f5341a4227bc851531ba03a76087ae"
+    },
+    {
+      "path": "docs/MAINTENANCE.md",
+      "bytes": 4511,
+      "sha256": "5ecbf64ec9b990aa4edd72f589795f5a2ac3ea832ad0149b1a5cddc709719654"
+    },
+    {
+      "path": "docs/PRIVACY.md",
+      "bytes": 2182,
+      "sha256": "9d34de556544c5595408419efb22d00c9d9bbf86e2845de28cc8d57d71795197"
+    },
+    {
+      "path": "docs/PRODUCT.md",
+      "bytes": 5346,
+      "sha256": "9b783828e621dc8d6afdd36f930d040ae4b535fc475c7d09c64a7f1882c965d4"
+    },
+    {
+      "path": "docs/REFERENCES.md",
+      "bytes": 2687,
+      "sha256": "f33648292af557a5e69f40a7187b732a21f7d576c073f63daa15d616b20930d4"
+    },
+    {
+      "path": "docs/REVIEW.md",
+      "bytes": 3783,
+      "sha256": "b4cf4266347cec8954b2b3ed688476d4be1c9748236f2acfa09ae094380edad4"
+    },
+    {
+      "path": "docs/UX.md",
+      "bytes": 7802,
+      "sha256": "61809b9ffc6fba4f74430872d1e0c1aa59c43f1ec26d463f526bd6689a6bf7c2"
+    },
+    {
+      "path": "schemas/catalog.schema.json",
+      "bytes": 2723,
+      "sha256": "899a4c201cf19e67f2fcf93f71deaedc180778ad785517bd9c0106269c2a8e9b"
+    },
+    {
+      "path": "schemas/exploration.schema.json",
+      "bytes": 4566,
+      "sha256": "81f1bdf94f0813b36d2bbbf0be55a3329e17ac1f4eb9504224d121fd89d337d5"
+    },
+    {
+      "path": "schemas/guide.schema.json",
+      "bytes": 7483,
+      "sha256": "e61000b7b9c73a9a45cadd01c74d378e21fcc3d07d803d8f38fd22029ab7a275"
+    }
+  ],
+  "handoffRevision": "codex-2026-10-21"
+}

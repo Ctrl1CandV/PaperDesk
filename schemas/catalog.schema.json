@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaperDesk catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "currentRevisions": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1000,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "guideId": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "metadataFile": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:)[A-Za-z0-9_./-]+$",
+            "maxLength": 200
+          },
+          "recommendation": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "rank": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "relation": {
+                "const": "editorial-reading-order"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "rank",
+              "relation",
+              "reason"
+            ]
+          }
+        },
+        "required": [
+          "guideId",
+          "revision",
+          "metadataFile",
+          "recommendation"
+        ]
+      },
+      "maxItems": 10000,
+      "minItems": 1
+    },
+    "exploration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "currentRevision",
+        "revisions"
+      ],
+      "properties": {
+        "currentRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "revisions": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 10000,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:)[A-Za-z0-9_./-]+$",
+            "maxLength": 200
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "currentRevisions",
+    "entries",
+    "exploration"
+  ]
+}

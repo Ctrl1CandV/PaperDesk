@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "id": "agent-survey",
+  "paperId": "arxiv:2308.11432",
+  "revision": 1,
+  "title": "Agent 综述：理解大模型怎样进入环境并持续行动",
+  "paperTitle": "A Survey on Large Language Model based Autonomous Agents",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "先理解 Agent 怎样与环境持续交互，再认识系统构建、应用与评价的关系。",
+  "source": {
+    "id": "arxiv:2308.11432",
+    "version": "v7",
+    "url": "https://arxiv.org/html/2308.11432v7"
+  },
+  "bodyFile": "agent-survey.md",
+  "bodySha256": "af7ea05e86bb35880a6d3c5a4f5ab1725140b904551f450eba1cda11499585c8",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "Agent 的基本视角：主体、环境与行动"
+    },
+    {
+      "id": "u02",
+      "heading": "四个组成部分，分别回应持续任务中的不同需要"
+    },
+    {
+      "id": "u03",
+      "heading": "把组成连接起来，仍要解释能力从哪里来"
+    },
+    {
+      "id": "u04",
+      "heading": "应用不同，“做好了”的含义也不同"
+    },
+    {
+      "id": "u05",
+      "heading": "开放问题来自这些组成之间尚未解决的矛盾"
+    },
+    {
+      "id": "u06",
+      "heading": "这篇怎样成为以后阅读的起点"
+    },
+    {
+      "id": "u07",
+      "heading": "哪些原文值得亲自读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-667b77f9b5",
+      "url": "https://arxiv.org/html/2308.11432v7",
+      "labels": [
+        "原文 v7，§1–2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-f30ec319e7",
+      "url": "https://aima.cs.berkeley.edu/4th-ed/slides-pdf/chapter02.pdf",
+      "labels": [
+        "AIMA 第2章材料"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-3070171262",
+      "url": "https://arxiv.org/html/2308.11432v7#S1",
+      "labels": [
+        "综述 §1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-c0886d9b85",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=4",
+      "labels": [
+        "图2，PDF 第4页",
+        "图2及紧接着的说明，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-1ddebcddd7",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS1",
+      "labels": [
+        "综述 §2.1.1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-664f13edd6",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS2",
+      "labels": [
+        "综述 §2.1.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-efc9ff30e0",
+      "url": "https://arxiv.org/abs/2304.03442",
+      "labels": [
+        "Generative Agents 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-28595c24e9",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS3",
+      "labels": [
+        "综述 §2.1.3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-7647307fe4",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "labels": [
+        "ReAct 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-4ae5305df5",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS4",
+      "labels": [
+        "综述 §2.1.4"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-cb5ee2443f",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS2",
+      "labels": [
+        "综述 §2.2",
+        "§2.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-0f4cdfe7b4",
+      "url": "https://arxiv.org/html/2308.11432v7#S3",
+      "labels": [
+        "综述 §3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-883fb37dfb",
+      "url": "https://arxiv.org/html/2308.11432v7#S4",
+      "labels": [
+        "综述 §4",
+        "§4 的评价"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-5ef23be911",
+      "url": "https://arxiv.org/html/2308.11432v7#S6",
+      "labels": [
+        "综述 §6.1、§6.3–6.4、§6.6",
+        "综述 §6.2、§6.5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1",
+      "§2",
+      "§3",
+      "§4",
+      "§6"
+    ],
+    "figuresViewed": [
+      "Figure 2"
+    ],
+    "limitations": [
+      "Mainline guide; not every subcategory, table or cited work is explained.",
+      "Only Figure 2 was visually checked; no original images are bundled.",
+      "Supplementary ReAct and Generative Agents references use abstract-level background."
+    ],
+    "reviewBasis": "Inherited content/source review; no new source or figure audit during packaging."
+  }
+}

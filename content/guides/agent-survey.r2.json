@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 2,
+  "id": "agent-survey",
+  "paperId": "arxiv:2308.11432",
+  "revision": 2,
+  "title": "Agent 综述：理解大模型怎样进入环境并持续行动",
+  "paperTitle": "A Survey on Large Language Model based Autonomous Agents",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "先理解 Agent 怎样与环境持续交互，再认识系统构建、应用与评价的关系。",
+  "source": {
+    "id": "arxiv:2308.11432",
+    "version": "v7",
+    "url": "https://arxiv.org/html/2308.11432v7"
+  },
+  "bodyFile": "agent-survey.md",
+  "bodySha256": "af7ea05e86bb35880a6d3c5a4f5ab1725140b904551f450eba1cda11499585c8",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "Agent 的基本视角：主体、环境与行动"
+    },
+    {
+      "id": "u02",
+      "heading": "四个组成部分，分别回应持续任务中的不同需要"
+    },
+    {
+      "id": "u03",
+      "heading": "把组成连接起来，仍要解释能力从哪里来"
+    },
+    {
+      "id": "u04",
+      "heading": "应用不同，“做好了”的含义也不同"
+    },
+    {
+      "id": "u05",
+      "heading": "开放问题来自这些组成之间尚未解决的矛盾"
+    },
+    {
+      "id": "u06",
+      "heading": "这篇怎样成为以后阅读的起点"
+    },
+    {
+      "id": "u07",
+      "heading": "哪些原文值得亲自读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-667b77f9b5",
+      "url": "https://arxiv.org/html/2308.11432v7",
+      "labels": [
+        "原文 v7，§1–2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-f30ec319e7",
+      "url": "https://aima.cs.berkeley.edu/4th-ed/slides-pdf/chapter02.pdf",
+      "labels": [
+        "AIMA 第2章材料"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-3070171262",
+      "url": "https://arxiv.org/html/2308.11432v7#S1",
+      "labels": [
+        "综述 §1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-c0886d9b85",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=4",
+      "labels": [
+        "图2，PDF 第4页",
+        "图2及紧接着的说明，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-1ddebcddd7",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS1",
+      "labels": [
+        "综述 §2.1.1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-664f13edd6",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS2",
+      "labels": [
+        "综述 §2.1.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-efc9ff30e0",
+      "url": "https://arxiv.org/abs/2304.03442",
+      "labels": [
+        "Generative Agents 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-28595c24e9",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS3",
+      "labels": [
+        "综述 §2.1.3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-7647307fe4",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "labels": [
+        "ReAct 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-4ae5305df5",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS1.SSS4",
+      "labels": [
+        "综述 §2.1.4"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-cb5ee2443f",
+      "url": "https://arxiv.org/html/2308.11432v7#S2.SS2",
+      "labels": [
+        "综述 §2.2",
+        "§2.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-0f4cdfe7b4",
+      "url": "https://arxiv.org/html/2308.11432v7#S3",
+      "labels": [
+        "综述 §3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-883fb37dfb",
+      "url": "https://arxiv.org/html/2308.11432v7#S4",
+      "labels": [
+        "综述 §4",
+        "§4 的评价"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c-5ef23be911",
+      "url": "https://arxiv.org/html/2308.11432v7#S6",
+      "labels": [
+        "综述 §6.1、§6.3–6.4、§6.6",
+        "综述 §6.2、§6.5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1",
+      "§2",
+      "§3",
+      "§4",
+      "§6"
+    ],
+    "figuresViewed": [
+      "Figure 2"
+    ],
+    "limitations": [
+      "Mainline guide; not every subcategory, table or cited work is explained.",
+      "Only Figure 2 was visually checked; no original images are bundled.",
+      "Supplementary ReAct and Generative Agents references use abstract-level background."
+    ],
+    "reviewBasis": "Inherited content/source review; no new source or figure audit during packaging."
+  },
+  "orientation": {
+    "shortTitle": "Agent 综述：系统、环境与持续行动",
+    "topics": [
+      {
+        "id": "llm-agents",
+        "label": "LLM Agent",
+        "aliases": [
+          "Agent",
+          "Agents",
+          "自主智能体",
+          "智能体"
+        ]
+      },
+      {
+        "id": "agent-architecture",
+        "label": "Agent 系统架构",
+        "aliases": [
+          "记忆",
+          "规划",
+          "工具调用"
+        ]
+      },
+      {
+        "id": "agent-applications",
+        "label": "Agent 应用与评价",
+        "aliases": [
+          "多智能体",
+          "Agent 评估"
+        ]
+      }
+    ],
+    "summary": "以大语言模型驱动的自主 Agent 为对象，梳理角色、记忆、规划与行动怎样组成系统，再连接能力获取、应用场景、评价方式和开放问题。它提供放置具体工作的领域框架。",
+    "value": "适合在阅读具体方法前建立系统视角：辨别一项工作改变了模型参数、输入信息还是行动过程，并把效果放回任务目标与评价条件中理解。",
+    "prerequisites": [
+      "了解语言模型按输入生成文本的基本方式。",
+      "不必预先熟悉 Agent 分类；正文先解释主体、环境与行动的关系。"
+    ],
+    "boundaries": [
+      "覆盖研究主线，未逐项展开所有子分类、表格与被引工作。",
+      "固定阅读 arXiv v7；综述中的挑战不能直接证明今天仍存在同样的研究空白。",
+      "教学示例和编者阅读联系不等于论文实测结果。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Lei Wang",
+        "Chen Ma",
+        "Xueyang Feng",
+        "Zeyu Zhang",
+        "Hao Yang",
+        "Jingsen Zhang",
+        "Zhiyuan Chen",
+        "Jiakai Tang",
+        "Xu Chen",
+        "Yankai Lin",
+        "Wayne Xin Zhao",
+        "Zhewei Wei",
+        "Jirong Wen"
+      ],
+      "year": 2024,
+      "venue": "Frontiers of Computer Science",
+      "publicationKind": "journal",
+      "url": "https://link.springer.com/article/10.1007/s11704-024-40231-1",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "先分清语言模型与包含它的 Agent 系统，建立主体、环境和行动的关系。",
+        "concepts": [
+          "Agent",
+          "Agents",
+          "智能体",
+          "自主智能体",
+          "环境",
+          "行动",
+          "系统"
+        ],
+        "limit": "提供基本视角，不比较具体 Agent 方法的实验效果。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "理解角色、记忆、规划和行动分别解决持续任务中的什么问题。",
+        "concepts": [
+          "记忆",
+          "规划",
+          "工具调用",
+          "角色",
+          "架构",
+          "memory",
+          "planning"
+        ],
+        "limit": "覆盖组件关系与分类思路，不逐项解释所有代表系统。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "把系统架构与能力获取分开，辨别参数更新和运行过程组织的作用。",
+        "concepts": [
+          "能力获取",
+          "微调",
+          "参数更新",
+          "提示",
+          "工作流程"
+        ],
+        "limit": "帮助定位方法类别，不证明某一种组织方式适用于所有任务。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "从应用目标出发区分指标、评价协议和基准，明确系统成功的含义。",
+        "concepts": [
+          "Agent 评价",
+          "Agent 评测",
+          "任务成功率",
+          "应用",
+          "评价协议",
+          "基准",
+          "运行成本"
+        ],
+        "limit": "提供 Agent 评价的框架，不替代具体交互任务中的实验。"
+      }
+    ]
+  }
+}

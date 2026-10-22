@@ -1,0 +1,50 @@
+.reader-action-bar.reading-tools { gap:8px; padding:8px; border-radius:12px; background:var(--surface); box-shadow:0 8px 32px var(--shadow-color); }
+.reading-tools .reading-tool-context { display:flex; flex-direction:column; max-width:240px; padding:0 12px; line-height:1.5; border-right:1px solid var(--line); }
+.reading-tool-context span { font-size:12px; letter-spacing:.02em; color:var(--muted); }
+.reading-tool-context strong { font-size:12px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.reader-action-bar.reading-tools>button { min-height:44px; padding:8px 14px; border-radius:7px; font-size:13px; }
+.reader-action-bar.reading-tools .tool-primary { background:var(--surface-soft); color:var(--ink); border:1px solid var(--line); }
+.reader-action-bar.reading-tools .tool-primary:hover { background:var(--surface-muted); border-color:var(--line-strong); }
+.reader-action-bar.reading-tools .tool-secondary { color:var(--muted); }
+.reader-action-bar.reading-tools .clear-selection { padding:8px; font-size:12px; }
+.reading-identity { display:flex; justify-content:space-between; gap:12px; align-items:center; margin:0 0 22px; color:var(--muted); font-size:12px; }
+.reading-state-trigger { display:flex; flex-wrap:wrap; align-items:center; gap:5px 12px; min-height:44px; border:1px solid var(--line); border-radius:7px; padding:7px 12px; color:var(--accent); text-align:left; }
+.reading-state-trigger:hover { background:var(--surface-muted); }
+.reading-state-trigger strong { font-size:12px; font-weight:500; }
+.reading-state-trigger span { font-size:12px; color:var(--muted); }
+.reading-identity .reading-stage { white-space:nowrap; font-size:12px; letter-spacing:.02em; }
+.reader-mobile-back { display:none; }
+.workspace-dialog .draft-hint { font-size:12px; color:var(--muted); line-height:1.7; }
+.workspace-dialog .other-note-drafts { margin:12px 0; padding:12px 16px; border:1px solid var(--line); border-radius:10px; }
+.other-note-drafts summary { cursor:pointer; font-size:13px; color:var(--accent); min-height:32px; }
+.other-note-drafts ul { list-style:none; padding:0; margin:0; }
+.other-note-drafts li+li { border-top:1px solid var(--line); margin-top:12px; padding-top:12px; }
+.other-note-drafts .draft-quote-preview { margin:0; font-size:12px; line-height:1.8; color:var(--muted); }
+.workspace-dialog .draft-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.workspace-dialog .draft-actions button { min-height:44px; }
+.workspace-dialog .preview-update { padding:13px 16px; border:1px solid var(--line-strong); background:var(--surface-muted); border-radius:7px; margin:16px 0; }
+.workspace-dialog .preview-update p { margin:0 0 8px; font-size:13px; }
+.workspace-dialog .preview-update button { min-height:44px; }
+.workspace-dialog.reading-state-dialog { width:min(480px,calc(100% - 28px)); }
+.workspace-dialog.reader-editor .saved-quote { max-height:180px; overflow:auto; }
+.workspace-dialog .workspace-dialog-heading { position:sticky; top:-26px; background:var(--surface); z-index:2; padding-top:5px; }
+.workspace-dialog button:disabled { cursor:wait; }
+@media(min-width:1800px) {
+  .workspace-dialog.reader-editor { width:520px; max-height:calc(100dvh - 48px); margin:24px 24px 24px auto; }
+}
+@media(max-width:800px) {
+  .reader-action-bar.reading-tools { bottom:10px; left:12px; right:12px; max-width:calc(100% - 24px); transform:none; border-radius:12px; flex-wrap:wrap; justify-content:stretch; gap:6px; padding:7px 8px max(7px,env(safe-area-inset-bottom)); }
+  .reading-tools .reading-tool-context { flex:1 0 calc(100% - 60px); max-width:calc(100% - 60px); border:0; padding:1px 5px; flex-direction:row; align-items:center; gap:8px; }
+  .reading-tool-context span { flex:none; }
+  .reading-tool-context strong { font-size:12px; }
+  .reader-action-bar.reading-tools>button:not(.clear-selection) { flex:1 1 auto; padding:7px 10px; font-size:12px; }
+  .reader-action-bar.reading-tools .clear-selection { order:0; min-height:24px; padding:2px 4px; }
+  .reading-identity { gap:8px; margin-bottom:18px; align-items:flex-start; }
+  .reading-identity .reading-stage { display:none; }
+  .reader-mobile-back { display:inline-block; font-size:12px; color:var(--accent); margin-bottom:12px; }
+  .reading-state-trigger { flex:1; justify-content:space-between; }
+  .workspace-dialog { max-height:calc(100dvh - 20px); }
+  .workspace-dialog .workspace-dialog-heading { top:-18px; }
+  .workspace-dialog.reader-editor .saved-quote { max-height:140px; }
+  .reader-layout { padding-bottom:155px; }
+}

@@ -1,0 +1,43 @@
+import { test, expect } from '@playwright/test';
+import { mkdir } from 'node:fs/promises';
+import catalog from '../content/catalog.json' with { type: 'json' };
+
+test('current reading tools and next-reading panels remain readable at desktop and narrow widths', async ({ page, context }) => {
+  const errors: string[] = [], external: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  context.on('request', request => { if (/^https?:/.test(request.url()) && !request.url().startsWith('http://127.0.0.1:4174/')) external.push(request.url()); });
+  await mkdir('docs/evidence', { recursive: true });
+  const shot = async (name: string) => {
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    await page.screenshot({ path: `docs/evidence/refinement-${name}.png`, animations: 'disabled' });
+  };
+  await page.goto(`/read/agent-survey/${catalog.currentRevisions['agent-survey']}`);
+  await expect(page.locator('.reading-state-trigger')).toBeVisible();
+  await expect(page.locator('.teaching-diagram svg')).toBeAttached();
+  await shot('reader-desktop');
+  await page.getByRole('button', { name: '记笔记', exact: true }).click();
+  await page.getByLabel('我的笔记或问题', { exact: true }).fill('合成视觉检查：理解模型、行动与环境之间的关系。');
+  await shot('note-desktop');
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => scrollTo(0, 0));
+  await shot('reader-narrow');
+  await page.getByRole('button', { name: '记笔记', exact: true }).click();
+  await expect(page.getByLabel('我的笔记或问题', { exact: true })).toHaveValue('合成视觉检查：理解模型、行动与环境之间的关系。');
+  await shot('note-narrow');
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const record = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.saveExploration({ id: crypto.randomUUID(), title: '合成视觉检查：规划与行动', question: '合成测试：Agent 的规划如何与环境反馈连接？', origin: 'reader', status: 'exploring', interpretation: '', unknowns: '', nextAction: null, evidence: [] }, null));
+  await page.goto(`/explore/questions/${record.id}`);
+  await page.getByRole('button', { name: '寻找下一步阅读', exact: true }).click();
+  await page.getByLabel('补充主题词或阅读目标', { exact: true }).fill('Agent 规划');
+  await page.getByRole('button', { name: '查找本库阅读', exact: true }).click();
+  await page.locator('.next-reading-results').scrollIntoViewIfNeeded();
+  await expect(page.locator('#next-reading-preview-agent-survey')).toBeAttached();
+  await expect(page.locator('.next-reading-candidate')).toHaveCount(3);
+  await shot('next-reading-desktop');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('.next-reading-results').scrollIntoViewIfNeeded();
+  await shot('next-reading-narrow');
+  expect(errors).toEqual([]); expect(external).toEqual([]);
+});

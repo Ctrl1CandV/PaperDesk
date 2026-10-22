@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 2,
+  "id": "toolformer",
+  "paperId": "arxiv:2302.04761",
+  "revision": 1,
+  "title": "Toolformer：工具调用怎样成为可学习的行为",
+  "paperTitle": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "deep",
+  "purpose": "把工具使用理解为候选数据、真实执行、损失筛选与微调的完整过程，并从实验条件判断收益。",
+  "source": {
+    "id": "arxiv:2302.04761",
+    "version": "NeurIPS 2023 camera-ready",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf"
+  },
+  "bodyFile": "toolformer.md",
+  "bodySha256": "b2fbdbd38238869fa32ee955cc50bcdbfc993d8cf647d968b7cff9557b34dc54",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "工具提供能力，模型仍要决定如何使用"
+    },
+    {
+      "id": "u02",
+      "heading": "从普通文本构造带有调用的训练材料"
+    },
+    {
+      "id": "u03",
+      "heading": "筛选目标：返回结果是否减少了续写的不确定性"
+    },
+    {
+      "id": "u04",
+      "heading": "微调、推理与零样本评测各有不同职责"
+    },
+    {
+      "id": "u05",
+      "heading": "对照实验把训练材料和实际工具调用分开"
+    },
+    {
+      "id": "u06",
+      "heading": "工具价值取决于底座、反馈和任务边界"
+    },
+    {
+      "id": "u07",
+      "heading": "回到原文与继续研究"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-1a13b0e5e6",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf",
+      "labels": [
+        "主文 §1–2，PDF 第1–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-43ef108031",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=2",
+      "labels": [
+        "主文 §2，PDF 第2–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-099b607c02",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=4",
+      "labels": [
+        "主文 §3，表1，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-b99590626b",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=3",
+      "labels": [
+        "主文 §2，图2–3，PDF 第2–3页",
+        "主文 §2、§4.1，PDF 第3、5页",
+        "主文 §2 及脚注2，PDF 第3页",
+        "方法与筛选，PDF 第3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-b99ca984ba",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Supplemental-Conference.pdf#page=5",
+      "labels": [
+        "补充材料 §E，PDF 第5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-10b103bb27",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=5",
+      "labels": [
+        "主文 §2、§4.1，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-e7132d7d0c",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Supplemental-Conference.pdf#page=1",
+      "labels": [
+        "补充材料 §A.1，PDF 第1页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-edc326c50a",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=6",
+      "labels": [
+        "主文 §4.2，PDF 第5–6页",
+        "主文 §4.1–4.2、表3，PDF 第5–6页",
+        "实验条件与表3，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-b98479e769",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=7",
+      "labels": [
+        "主文 §4.2、表4–5，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-78473bc6c3",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Supplemental-Conference.pdf#page=7",
+      "labels": [
+        "补充材料 §G.2–G.4、表7–8，PDF 第7–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-856ddabba5",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=8",
+      "labels": [
+        "主文 §4.3 及脚注5，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-9538750a25",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Paper-Conference.pdf#page=9",
+      "labels": [
+        "主文 §6，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-3d1cc3ba47",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/d842425e4bf79ba039352da0f658a906-Supplemental-Conference.pdf#page=9",
+      "labels": [
+        "补充表8，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "Main paper §§1–4, 6–7; §5 as positioning background",
+      "Supplement §§A.1, B, C, E, F, G.2–G.4"
+    ],
+    "figuresViewed": [
+      "Main paper Figures 1–2 (PDF p2)",
+      "Main paper Figure 3 (PDF p3)",
+      "Main paper Figure 4 (PDF p8)",
+      "Main paper Tables 3–5 (PDF pp6–7)",
+      "Supplement Table 3 (PDF p5)",
+      "Supplement Tables 7–8 (PDF p9)"
+    ],
+    "limitations": [
+      "研究主线与必要机制讲解；不逐条解释全部提示、缩放实验或补充失败样本。",
+      "没有复现实验；历史数据与工具设定不代表当前模型能力。",
+      "只有所列图表实际查看了像素；不宣称全量图表或全部引用文献已核验。",
+      "教学流程图为原创说明，不是原论文图像。"
+    ],
+    "reviewBasis": "Read the official NeurIPS 2023 main PDF and relevant supplemental sections; visually inspected the listed figures/tables through locally rendered public PDF pages. Checked formulas, selected result cells, decoding restrictions and source locators. Authoring review only; independent integration review follows."
+  },
+  "orientation": {
+    "shortTitle": "Toolformer：让模型学会何时调用工具",
+    "topics": [
+      {
+        "id": "tool-use",
+        "label": "工具调用",
+        "aliases": [
+          "tool use",
+          "API调用",
+          "工具使用",
+          "工具学习"
+        ]
+      },
+      {
+        "id": "self-supervised-learning",
+        "label": "自监督学习",
+        "aliases": [
+          "self-supervised learning",
+          "自监督筛选"
+        ]
+      },
+      {
+        "id": "synthetic-data",
+        "label": "合成训练数据",
+        "aliases": [
+          "synthetic data",
+          "调用数据",
+          "数据筛选"
+        ]
+      }
+    ],
+    "summary": "用少量工具示范生成候选 API 调用，执行后按续写损失筛选，构成微调材料；研究模型如何学习调用位置、请求参数和结果使用。",
+    "value": "帮助把“接入工具”与“学会用工具”分开，理解可计算代理目标、同底座对照和外部组件如何共同决定实际收益。",
+    "prerequisites": [
+      "了解自回归语言模型根据上下文预测下一词元；正文解释所需的损失与概率符号。",
+      "知道提示与参数微调的区别即可，不要求预先掌握强化学习。"
+    ],
+    "boundaries": [
+      "以 NeurIPS 2023 正式版本及补充材料为依据，覆盖方法主线与主要证据。",
+      "主文评测每个输入最多一次 API 调用，不能当作完整长程 Agent 能力证明。",
+      "筛选降低续写损失，不等于保证结果正确或改善所有能力；没有复现实验。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Timo Schick",
+        "Jane Dwivedi-Yu",
+        "Roberto Dessì",
+        "Roberta Raileanu",
+        "Maria Lomeli",
+        "Eric Hambro",
+        "Luke Zettlemoyer",
+        "Nicola Cancedda",
+        "Thomas Scialom"
+      ],
+      "year": 2023,
+      "venue": "NeurIPS 2023 · Advances in Neural Information Processing Systems 36",
+      "publicationKind": "conference",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/d842425e4bf79ba039352da0f658a906-Abstract-Conference.html",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "理解工具示范、候选生成、执行与筛选如何形成训练材料。",
+        "concepts": [
+          "工具学习",
+          "合成数据",
+          "候选调用",
+          "自监督",
+          "API"
+        ],
+        "limit": "自动筛选仍依赖人为接口、示范和规则，不是无需监督的任意工具发现。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "理解筛选公式的两种基准，以及代理损失为什么不等于正确性。",
+        "concepts": [
+          "损失",
+          "筛选",
+          "交叉熵",
+          "负对数似然",
+          "self-supervised learning"
+        ],
+        "limit": "衡量后续文本预测，不直接优化长期任务成功、事实可靠性或调用成本。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "用同底座与关闭API对照，区分训练和真实执行的收益。",
+        "concepts": [
+          "消融",
+          "对照实验",
+          "工具调用",
+          "API调用",
+          "工具使用",
+          "tool use",
+          "实验条件"
+        ],
+        "limit": "选取历史数学结果及问答对照；不代表当前排行榜或通用数学能力。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "检查更强底座、较弱工具和单次调用边界如何改变工具价值。",
+        "concepts": [
+          "工具价值",
+          "工具链",
+          "检索噪声",
+          "长程任务",
+          "模型能力"
+        ],
+        "limit": "由已读实验证据引出比较方法，不宣称已验证新的研究方案。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "format": "paperdesk-refinement-input-integrity",
+  "result": true,
+  "preservedInitialInputs": 10,
+  "unchangedInitialInputs": 10,
+  "note": "The catalog deliberately retains/selects new immutable metadata revisions. The earlier integrity report is historical baseline evidence.",
+  "files": [
+    {
+      "path": "content/catalog.json",
+      "bytes": 2168,
+      "sha256": "bca4bab2c2e9969ef09750fd7218728acfc83ea8a1e3b63d899611b4c9567cf1",
+      "matchesPreparation": false,
+      "deliberateRevisionSelectionChange": true
+    },
+    {
+      "path": "content/exploration.json",
+      "bytes": 6047,
+      "sha256": "a6d526168a66a183a1fac473d0e95e3d8fc64c1979af967788767c1d5487a5d5",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "content/guides/agent-survey.json",
+      "bytes": 5523,
+      "sha256": "1239e65334c2d48e1fa4b6ebae355cd491e425ff9f06cd57c746c7b6c20c6930",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "content/guides/agent-survey.md",
+      "bytes": 14025,
+      "sha256": "af7ea05e86bb35880a6d3c5a4f5ab1725140b904551f450eba1cda11499585c8",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "content/guides/helm.json",
+      "bytes": 4918,
+      "sha256": "f7739439d444ef03e85f491fdd50e7efb2691f1a9bf2956abc5ac3a7555789fd",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "content/guides/helm.md",
+      "bytes": 10252,
+      "sha256": "a612be64f646f9236282aaa59666bd5d7878e340b8d365efd133de97ec712d5c",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "content/guides/instructgpt.json",
+      "bytes": 5240,
+      "sha256": "a5f33285536ddab6b6b5131689f76fbd5e6e750657b5edf102b7a79a90b932a7",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "content/guides/instructgpt.md",
+      "bytes": 10874,
+      "sha256": "bc9d7a42cbc55a290f5cc6086b5edd25d07a05f4cd49229100a72b863f01a38a",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "schemas/catalog.schema.json",
+      "bytes": 2723,
+      "sha256": "899a4c201cf19e67f2fcf93f71deaedc180778ad785517bd9c0106269c2a8e9b",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "schemas/exploration.schema.json",
+      "bytes": 4566,
+      "sha256": "81f1bdf94f0813b36d2bbbf0be55a3329e17ac1f4eb9504224d121fd89d337d5",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    },
+    {
+      "path": "schemas/guide.schema.json",
+      "bytes": 7483,
+      "sha256": "e61000b7b9c73a9a45cadd01c74d378e21fcc3d07d803d8f38fd22029ab7a275",
+      "matchesPreparation": true,
+      "deliberateRevisionSelectionChange": false
+    }
+  ]
+}

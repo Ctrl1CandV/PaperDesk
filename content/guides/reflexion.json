@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 2,
+  "id": "reflexion",
+  "paperId": "arxiv:2303.11366",
+  "revision": 1,
+  "title": "Reflexion：把失败反馈变成下一次行动的经验",
+  "paperTitle": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "理解行动、评价、反思与跨试次记忆怎样形成改进闭环，并检查反馈质量、预算与失败边界。",
+  "source": {
+    "id": "arxiv:2303.11366",
+    "version": "NeurIPS 2023 camera-ready",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf"
+  },
+  "bodyFile": "reflexion.md",
+  "bodySha256": "7e410bb50aaedb979922ecc253294a9058763c61e3fe301c26f8ab676d88ae18",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "改变的是下一次决策的上下文"
+    },
+    {
+      "id": "u02",
+      "heading": "行动者、评价者与反思者怎样接起来"
+    },
+    {
+      "id": "u03",
+      "heading": "不同实验提供了不同强度的反馈"
+    },
+    {
+      "id": "u04",
+      "heading": "反馈错误时，反思也可能放大错误"
+    },
+    {
+      "id": "u05",
+      "heading": "经验记忆的价值与失效边界"
+    },
+    {
+      "id": "u06",
+      "heading": "哪些原文值得亲自读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-7168688031",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf",
+      "labels": [
+        "正式版 §1，PDF 第1–2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-b437363353",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=3",
+      "labels": [
+        "§3，PDF 第3–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-85f1d51a20",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=4",
+      "labels": [
+        "§3 与图2，PDF 第3–5页",
+        "图2与 §3，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-e3651b8509",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=7",
+      "labels": [
+        "§4.2 消融说明，PDF 第7页",
+        "§4.3，PDF 第7页",
+        "表1，PDF 第7页",
+        "表1–3与 §4.3，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-9d1f00c915",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=5",
+      "labels": [
+        "§3–4.1，PDF 第5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-77c60d3d8d",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=6",
+      "labels": [
+        "§4.1–4.2，PDF 第5–6页",
+        "图3–4及实验说明，PDF 第5–7页",
+        "图3–4，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-e5246974d3",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=8",
+      "labels": [
+        "§4.3、表2，PDF 第8页",
+        "表3及消融说明，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-48c535d23a",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=9",
+      "labels": [
+        "§3 与 §5，PDF 第5、9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    },
+    {
+      "id": "c-1a68595c5d",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf#page=14",
+      "labels": [
+        "附录 B.1 与图6，PDF 第14页",
+        "§5 与附录 B.1，PDF 第9、14页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2023 camera-ready"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–3: motivation, components and memory",
+      "§4.1–4.3: task conditions, main results and selected ablations",
+      "§5: limitations",
+      "Appendix B.1: WebShop limitation",
+      "Selected Appendix C programming setup"
+    ],
+    "figuresViewed": [
+      "Figure 2 (PDF p.4)",
+      "Figure 3 (PDF p.6)",
+      "Figure 4 (PDF p.6)",
+      "Figure 6 (PDF p.14)",
+      "Table 1 (PDF p.7)",
+      "Tables 2–3 (PDF p.8)"
+    ],
+    "limitations": [
+      "研究主线及所选实验讲解；未逐项覆盖全部附录轨迹、提示模板或多语言实现。",
+      "没有复现实验；未审计全部代码参数、总调用预算或当前模型表现。",
+      "论文中的多次尝试、反馈来源和最终 pass@1 评价需分开理解；不保证对新任务的迁移。"
+    ],
+    "reviewBasis": "公开 NeurIPS 2023 正式PDF主文及相关附录核验；实际查看图2、3、4、6与表1–3的页面像素。教学图与公式为机制概括，非原图复制。详见 docs/research/reflexion-review.md。"
+  },
+  "orientation": {
+    "shortTitle": "Reflexion：从失败反馈中形成行动经验",
+    "topics": [
+      {
+        "id": "agent-reflection",
+        "label": "Agent 反思",
+        "aliases": [
+          "Reflexion",
+          "自我反思",
+          "self-reflection",
+          "verbal reinforcement"
+        ]
+      },
+      {
+        "id": "episodic-memory",
+        "label": "经验记忆",
+        "aliases": [
+          "episodic memory",
+          "跨试次记忆",
+          "反思记忆"
+        ]
+      },
+      {
+        "id": "feedback-evaluation",
+        "label": "反馈与验证",
+        "aliases": [
+          "反馈质量",
+          "内部测试",
+          "自生成测试"
+        ]
+      }
+    ],
+    "summary": "把一次尝试的轨迹与评价整理成文字经验，存入上下文记忆，再指导下一次回答或行动；通过交互任务、问答和编程实验检查这种闭环何时有效、何时失效。",
+    "value": "把 Agent 架构中的记忆、反馈与行动连接到可检查的机制，并学习区分参数更新、上下文适应、内部测试和最终任务正确率。",
+    "prerequisites": [
+      "了解 Agent 行动后会得到环境观察；不要求预先掌握策略梯度。",
+      "正文解释 Actor、Evaluator、反思和跨试次记忆；编程部分需理解单元测试的基本作用。"
+    ],
+    "boundaries": [
+      "依据 NeurIPS 2023 正式版，重点讲机制与所选实验；没有复现或完整代码审计。",
+      "成功率依赖反馈质量、重试预算、任务和基础模型；反思不保证普遍改进。",
+      "pass@1 是最终提交的评价口径，不表示内部只进行一次模型调用。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Noah Shinn",
+        "Federico Cassano",
+        "Ashwin Gopinath",
+        "Karthik Narasimhan",
+        "Shunyu Yao"
+      ],
+      "year": 2023,
+      "venue": "NeurIPS 2023 · Advances in Neural Information Processing Systems 36",
+      "publicationKind": "conference",
+      "url": "https://papers.nips.cc/paper_files/paper/2023/hash/1b44b878bb782e6954cd888628510e90-Abstract-Conference.html",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "区分固定模型参数与跨试次经验上下文的改变。",
+        "concepts": [
+          "Agent",
+          "上下文学习",
+          "模型参数",
+          "经验记忆",
+          "跨试次记忆"
+        ],
+        "limit": "主要解释同一任务重试，不能据此宣称跨任务能力迁移。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "沿轨迹、评价、反思与记忆看完整闭环。",
+        "concepts": [
+          "反思",
+          "self-reflection",
+          "Actor",
+          "Evaluator",
+          "反馈",
+          "Reflexion"
+        ],
+        "limit": "文字经验仍是对失败原因的推断，不是已经验证的因果结论。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "区分任务反馈来源、重试与最终 pass@1 指标。",
+        "concepts": [
+          "评价",
+          "pass@1",
+          "内部测试",
+          "HumanEval",
+          "HotpotQA",
+          "ALFWorld",
+          "尝试预算"
+        ],
+        "limit": "所选结果不构成等计算预算比较或当前模型排名。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "检查错误反馈如何诱导错误反思，并阅读消融证据。",
+        "concepts": [
+          "失败分析",
+          "反馈质量",
+          "自生成测试",
+          "消融",
+          "MBPP",
+          "测试误判"
+        ],
+        "limit": "消融结论限于论文的 GPT-4 与所选 Rust 任务设置。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "把经验压缩与探索不足的局限转为可检验的问题。",
+        "concepts": [
+          "记忆",
+          "探索",
+          "WebShop",
+          "重试",
+          "失败边界"
+        ],
+        "limit": "比较思路是编辑性建议，不是已验证的研究空白。"
+      }
+    ]
+  }
+}

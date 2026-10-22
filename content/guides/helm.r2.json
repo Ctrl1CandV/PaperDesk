@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 2,
+  "id": "helm",
+  "paperId": "arxiv:2211.09110",
+  "revision": 2,
+  "title": "HELM：把“模型表现”变成一组能够解释的测量",
+  "paperTitle": "Holistic Evaluation of Language Models",
+  "language": "zh-Hans",
+  "type": "evaluation",
+  "mode": "standard",
+  "purpose": "理解场景、适配和指标如何共同决定一次评价能说明什么。",
+  "source": {
+    "id": "arxiv:2211.09110",
+    "version": "v2",
+    "url": "https://arxiv.org/pdf/2211.09110v2"
+  },
+  "bodyFile": "helm.md",
+  "bodySha256": "a612be64f646f9236282aaa59666bd5d7878e340b8d365efd133de97ec712d5c",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "作者先处理了“各自都测过，却难以比较”的问题"
+    },
+    {
+      "id": "u02",
+      "heading": "从一道真实的选择题看懂评价过程"
+    },
+    {
+      "id": "u03",
+      "heading": "七类指标是在表达七种不同要求"
+    },
+    {
+      "id": "u04",
+      "heading": "实际发现揭示了指标和设置之间的关系"
+    },
+    {
+      "id": "u05",
+      "heading": "评价研究的贡献，是让原先含糊的比较变得可解释"
+    },
+    {
+      "id": "u06",
+      "heading": "留下一条能够再次使用的认识"
+    },
+    {
+      "id": "u07",
+      "heading": "哪些原文值得亲自读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-275bffbb9f",
+      "url": "https://arxiv.org/pdf/2211.09110v2",
+      "labels": [
+        "原论文 v2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-24afd45cd0",
+      "url": "https://crfm.stanford.edu/2022/11/17/helm.html",
+      "labels": [
+        "作者对研究背景和原则的说明",
+        "作者对核心与针对性评价的说明"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-6ab4797c22",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=14",
+      "labels": [
+        "图6，PDF 第14页",
+        "图5–7及 §2.1–2.2，PDF 第14–15页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-5720052fd7",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=15",
+      "labels": [
+        "图7，第15页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-aecfd41b18",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=25",
+      "labels": [
+        "原文 §4"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-e9c8addf06",
+      "url": "https://arxiv.org/abs/1706.04599",
+      "labels": [
+        "校准研究的定义与背景"
+      ],
+      "role": "background",
+      "sourceVersion": null
+    },
+    {
+      "id": "c-f0ae265131",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=6",
+      "labels": [
+        "原文 §1.2、§8.1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-cfac7b2d9a",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=9",
+      "labels": [
+        "原文主要发现第23项，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-99dac6832d",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=7",
+      "labels": [
+        "原文 §1.2 的效率与模型规模讨论"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-b93d61cec2",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=48",
+      "labels": [
+        "图24，PDF 第48页",
+        "图24及正文解释，PDF 第48页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-e1bf2395e0",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=3",
+      "labels": [
+        "原文 §1.1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-7f97011fea",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=81",
+      "labels": [
+        "原文 §11，PDF 第81页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    }
+  ],
+  "related": [],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–4",
+      "§7–8",
+      "§11"
+    ],
+    "figuresViewed": [
+      "Figure 5",
+      "Figure 6",
+      "Figure 7",
+      "Figure 24"
+    ],
+    "limitations": [
+      "Evaluation-mainline guide; not every scenario or appendix is explained.",
+      "Historical model results are not current rankings.",
+      "No experiments were reproduced."
+    ],
+    "reviewBasis": "Inherited content/source review; no new source or figure audit during packaging."
+  },
+  "orientation": {
+    "shortTitle": "HELM：怎样全面而可解释地评价语言模型",
+    "topics": [
+      {
+        "id": "language-model-evaluation",
+        "label": "语言模型评价",
+        "aliases": [
+          "评测",
+          "评价",
+          "评估",
+          "evaluation",
+          "benchmark"
+        ]
+      },
+      {
+        "id": "evaluation-design",
+        "label": "场景与适配",
+        "aliases": [
+          "场景",
+          "适配",
+          "提示设置",
+          "实验设计"
+        ]
+      },
+      {
+        "id": "multi-metric-evaluation",
+        "label": "多指标评测",
+        "aliases": [
+          "指标",
+          "校准",
+          "鲁棒性",
+          "公平性",
+          "效率"
+        ]
+      }
+    ],
+    "summary": "将语言模型评价拆成场景、适配和指标，组织多种能力与风险的测量，并通过统一条件下的模型比较，分析分数、提示方式和不同指标之间的关系。",
+    "value": "帮助读者从一个结果追问任务、输入设置和评分规则，判断跨论文比较是否成立，以及准确率之外还遗漏了哪些要求。",
+    "prerequisites": [
+      "了解模型输入、输出和任务样本的基本概念。",
+      "不要求熟记全部指标；正文用选择题和校准示例解释评价接口。"
+    ],
+    "boundaries": [
+      "覆盖评价研究主线与选定结果，不逐项展开所有场景和附录。",
+      "固定版本主要覆盖英语与所选任务，历史结果不代表当前模型榜单。",
+      "语言模型的非交互评测不能直接替代 Agent 的交互任务评价。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Percy Liang",
+        "Rishi Bommasani",
+        "Tony Lee",
+        "Dimitris Tsipras",
+        "Dilara Soylu",
+        "Michihiro Yasunaga",
+        "Yian Zhang",
+        "Deepak Narayanan",
+        "Yuhuai Wu",
+        "Ananya Kumar",
+        "Benjamin Newman",
+        "Binhang Yuan",
+        "Bobby Yan",
+        "Ce Zhang",
+        "Christian Cosgrove",
+        "Christopher D. Manning",
+        "Christopher Ré",
+        "Diana Acosta-Navas",
+        "Drew A. Hudson",
+        "Eric Zelikman",
+        "Esin Durmus",
+        "Faisal Ladhak",
+        "Frieda Rong",
+        "Hongyu Ren",
+        "Huaxiu Yao",
+        "Jue Wang",
+        "Keshav Santhanam",
+        "Laurel Orr",
+        "Lucia Zheng",
+        "Mert Yuksekgonul",
+        "Mirac Suzgun",
+        "Nathan Kim",
+        "Neel Guha",
+        "Niladri Chatterji",
+        "Omar Khattab",
+        "Peter Henderson",
+        "Qian Huang",
+        "Ryan Chi",
+        "Sang Michael Xie",
+        "Shibani Santurkar",
+        "Surya Ganguli",
+        "Tatsunori Hashimoto",
+        "Thomas Icard",
+        "Tianyi Zhang",
+        "Vishrav Chaudhary",
+        "William Wang",
+        "Xuechen Li",
+        "Yifan Mai",
+        "Yuhui Zhang",
+        "Yuta Koreeda"
+      ],
+      "year": 2023,
+      "venue": "Transactions on Machine Learning Research (TMLR)",
+      "publicationKind": "journal",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=1",
+      "preprintYear": 2022
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "用具体选择题理解场景、适配和评分接口怎样共同决定评价结果。",
+        "concepts": [
+          "HELM",
+          "评测",
+          "评价",
+          "评估",
+          "场景",
+          "适配",
+          "提示设置",
+          "实验设计",
+          "evaluation"
+        ],
+        "limit": "提供语言模型评价接口的解释，不能直接据此判断 Agent 交互任务表现。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "区分准确性、校准、鲁棒性、公平性等指标各自表达的要求。",
+        "concepts": [
+          "指标",
+          "准确率",
+          "校准",
+          "鲁棒性",
+          "公平性",
+          "偏见",
+          "毒性",
+          "效率",
+          "calibration",
+          "robustness"
+        ],
+        "limit": "介绍七类要求，不给出适用于所有任务的统一综合分数。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "结合具体实验理解指标关系与提示适配的影响，避免把相关性读成因果。",
+        "concepts": [
+          "实验结果",
+          "跨模型比较",
+          "提示适配",
+          "计算成本",
+          "模型规模"
+        ],
+        "limit": "使用固定版本的历史实验，不能替代新模型或新设置的验证。"
+      }
+    ]
+  }
+}

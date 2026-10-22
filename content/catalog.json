@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "currentRevisions": {
+    "agent-survey": 2,
+    "instructgpt": 2,
+    "helm": 2,
+    "react": 1,
+    "toolformer": 1,
+    "reflexion": 1,
+    "llm-survey": 1,
+    "transformer": 1,
+    "gpt3": 1,
+    "chain-of-thought": 1,
+    "rag": 1
+  },
+  "entries": [
+    {
+      "guideId": "agent-survey",
+      "revision": 1,
+      "metadataFile": "guides/agent-survey.json",
+      "recommendation": {
+        "rank": 1,
+        "relation": "editorial-reading-order",
+        "reason": "先理解 Agent 怎样与环境持续交互，再认识系统构建、应用与评价的关系。"
+      }
+    },
+    {
+      "guideId": "instructgpt",
+      "revision": 1,
+      "metadataFile": "guides/instructgpt.json",
+      "recommendation": {
+        "rank": 2,
+        "relation": "editorial-reading-order",
+        "reason": "理解使用目标怎样转化为人工材料、优化方法和可观察的模型行为。"
+      }
+    },
+    {
+      "guideId": "helm",
+      "revision": 1,
+      "metadataFile": "guides/helm.json",
+      "recommendation": {
+        "rank": 3,
+        "relation": "editorial-reading-order",
+        "reason": "理解场景、适配和指标如何共同决定一次评价能说明什么。"
+      }
+    },
+    {
+      "guideId": "agent-survey",
+      "revision": 2,
+      "metadataFile": "guides/agent-survey.r2.json",
+      "recommendation": {
+        "rank": 1,
+        "relation": "editorial-reading-order",
+        "reason": "先理解 Agent 怎样与环境持续交互，再认识系统构建、应用与评价的关系。"
+      }
+    },
+    {
+      "guideId": "instructgpt",
+      "revision": 2,
+      "metadataFile": "guides/instructgpt.r2.json",
+      "recommendation": {
+        "rank": 2,
+        "relation": "editorial-reading-order",
+        "reason": "理解使用目标怎样转化为人工材料、优化方法和可观察的模型行为。"
+      }
+    },
+    {
+      "guideId": "helm",
+      "revision": 2,
+      "metadataFile": "guides/helm.r2.json",
+      "recommendation": {
+        "rank": 3,
+        "relation": "editorial-reading-order",
+        "reason": "理解场景、适配和指标如何共同决定一次评价能说明什么。"
+      }
+    },
+    {
+      "guideId": "react",
+      "revision": 1,
+      "metadataFile": "guides/react.json",
+      "recommendation": {
+        "rank": 4,
+        "relation": "editorial-reading-order",
+        "reason": "把推理、行动和环境反馈连接为可检查的任务循环。"
+      }
+    },
+    {
+      "guideId": "toolformer",
+      "revision": 1,
+      "metadataFile": "guides/toolformer.json",
+      "recommendation": {
+        "rank": 5,
+        "relation": "editorial-reading-order",
+        "reason": "进一步理解如何从候选调用、真实返回与筛选目标构造工具学习数据。"
+      }
+    },
+    {
+      "guideId": "reflexion",
+      "revision": 1,
+      "metadataFile": "guides/reflexion.json",
+      "recommendation": {
+        "rank": 6,
+        "relation": "editorial-reading-order",
+        "reason": "比较不更新参数时，反馈和文本经验怎样影响下一次尝试。"
+      }
+    },
+    {
+      "guideId": "llm-survey",
+      "revision": 1,
+      "metadataFile": "guides/llm-survey.json",
+      "recommendation": {
+        "rank": 7,
+        "relation": "editorial-reading-order",
+        "reason": "先用综述把预训练、后训练、使用策略与评价放在同一张技术地图上。"
+      }
+    },
+    {
+      "guideId": "transformer",
+      "revision": 1,
+      "metadataFile": "guides/transformer.json",
+      "recommendation": {
+        "rank": 8,
+        "relation": "editorial-reading-order",
+        "reason": "理解注意力、位置和自回归生成如何组成后续大模型的计算基础。"
+      }
+    },
+    {
+      "guideId": "gpt3",
+      "revision": 1,
+      "metadataFile": "guides/gpt3.json",
+      "recommendation": {
+        "rank": 9,
+        "relation": "editorial-reading-order",
+        "reason": "区分预训练得到的参数能力与通过上下文示例临时指定任务的使用方式。"
+      }
+    },
+    {
+      "guideId": "chain-of-thought",
+      "revision": 1,
+      "metadataFile": "guides/chain-of-thought.json",
+      "recommendation": {
+        "rank": 10,
+        "relation": "editorial-reading-order",
+        "reason": "理解中间推理文本怎样改变提示与计算过程，并检查规模与任务条件。"
+      }
+    },
+    {
+      "guideId": "rag",
+      "revision": 1,
+      "metadataFile": "guides/rag.json",
+      "recommendation": {
+        "rank": 11,
+        "relation": "editorial-reading-order",
+        "reason": "区分参数记忆和外部检索，理解知识接入、概率组合与可更新性的边界。"
+      }
+    }
+  ],
+  "exploration": {
+    "currentRevision": 1,
+    "revisions": {
+      "1": "exploration.json"
+    }
+  }
+}

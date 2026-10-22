@@ -1,0 +1,15 @@
+# Documentation
+
+The integrated first version is accepted. [Project state](../PROJECT-STATE.md) records current checks and limitations; [CHANGELOG](../CHANGELOG.md) records delivery.
+
+| Area | Documents |
+|---|---|
+| Start and operate | [Operations](OPERATIONS.md), [Git policy](GIT-POLICY.md) |
+| Product and design | [Product](PRODUCT.md), [Implementation](IMPLEMENTATION.md), [UX](UX.md) |
+| Content and exploration | [Content](CONTENT.md), [Exploration](EXPLORATION.md), [Assisted discovery](ASSISTED-DISCOVERY.md) |
+| Engineering | [Architecture](ARCHITECTURE.md), [Records](RECORDS.md), [Content updates](CONTENT-UPDATES.md), [Maintenance](MAINTENANCE.md) |
+| Boundaries | [Privacy](PRIVACY.md), [Acceptance criteria](ACCEPTANCE.md), [Future hosting](FUTURE-HOSTING.md) |
+| Attribution | [References](REFERENCES.md), [Orientation sources](ORIENTATION-SOURCES.md), [Research reviews](research/) |
+| Evidence and history | [Historical reports](history/README.md), [Compact evidence](evidence/README.md), [Curated images](images/) |
+
+Historical instructions and test counts describe their named milestone. Current commands and repository rules take precedence over superseded paths and feedback gates.

@@ -1,0 +1,85 @@
+{
+  "format": "paperdesk-synthetic-content-browser-check",
+  "directory": ".cache/test-workspaces/content-browser-SeG980",
+  "port": 4175,
+  "node": "v22.23.3",
+  "guideId": "agent-survey",
+  "fromRevision": 2,
+  "toRevision": 3,
+  "fromSeedRevision": 1,
+  "toSeedRevision": 2,
+  "checkpoints": [
+    {
+      "name": "initial-current-with-synthetic-records",
+      "current": 2,
+      "seedRevision": 1,
+      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "completePersonalRecordsUnchanged": true,
+      "retainedGuideRevision": 2,
+      "retainedSeedRevision": 1
+    },
+    {
+      "name": "applied-next-guide-and-seed",
+      "current": 3,
+      "seedRevision": 2,
+      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "completePersonalRecordsUnchanged": true,
+      "retainedGuideRevision": 2,
+      "retainedSeedRevision": 1
+    },
+    {
+      "name": "selection-rollback-retains-new-and-old-revisions",
+      "current": 2,
+      "seedRevision": 1,
+      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "completePersonalRecordsUnchanged": true,
+      "retainedGuideRevision": 2,
+      "retainedSeedRevision": 1
+    },
+    {
+      "name": "reselected-next-revision-after-rollback",
+      "current": 3,
+      "seedRevision": 2,
+      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "completePersonalRecordsUnchanged": true,
+      "retainedGuideRevision": 2,
+      "retainedSeedRevision": 1
+    },
+    {
+      "name": "rejected-same-key-orientation-change",
+      "current": 3,
+      "seedRevision": 2,
+      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "completePersonalRecordsUnchanged": true,
+      "retainedGuideRevision": 2,
+      "retainedSeedRevision": 1
+    },
+    {
+      "name": "interrupted-before-switch-and-recovered",
+      "current": 3,
+      "seedRevision": 2,
+      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "completePersonalRecordsUnchanged": true,
+      "retainedGuideRevision": 2,
+      "retainedSeedRevision": 1
+    }
+  ],
+  "limitations": [
+    "Browser automation, not physical-device testing.",
+    "Interruption is injected at a documented transaction boundary, not a power-loss simulation.",
+    "All personal records are synthetic, created in a fresh context. Reader-route probes use a separate empty context.",
+    "The new revision changes synthetic orientation text only; it does not claim new scholarly content."
+  ],
+  "browser": "156.0.8078.4",
+  "renderedChecks": [
+    "Two-level library selects the current orientation and links to its exact revision.",
+    "Revision 1, the previous current revision and the next revision render the unchanged accepted body.",
+    "Saved exploration retains its original seed lens and two pinned return links after update, rollback and recovery.",
+    "Every complete personal backup is identical across update, rollback, rejection and recovery."
+  ],
+  "result": "pass",
+  "mainContentFilesUnchanged": 27,
+  "acceptedBodySha256": "af7ea05e86bb35880a6d3c5a4f5ab1725140b904551f450eba1cda11499585c8",
+  "unsolicitedExternalRequests": 0,
+  "pageErrors": 0
+}

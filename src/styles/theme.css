@@ -1,0 +1,25 @@
+/* The platform's original quiet grey-green reading palette. */
+:root {
+  --ink: #24453b;
+  --muted: #63705f;
+  --accent: #326d59;
+  --accent-hover: #245440;
+  --surface: #fff;
+  --surface-muted: #f0f4ea;
+  --surface-soft: #fcfdfb;
+  --line: #dce3d6;
+  --line-strong: #9dae92;
+  --focus: #326d59;
+  --danger: #9b463d;
+  --danger-bg: #fff1ef;
+  --warning: #8a6228;
+  --warning-bg: #fff6e7;
+  --success: #326d59;
+  --success-bg: #edf6f0;
+  --shadow-color: #24453b12;
+  --modal-shadow: #24453b2b;
+  --backdrop: #24453b66;
+  --font-display: var(--font-body);
+  --font-body: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+  --font-data: Consolas, 'SFMono-Regular', monospace;
+}

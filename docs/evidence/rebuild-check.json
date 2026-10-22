@@ -1,0 +1,85 @@
+{
+  "format": "paperdesk-final-clean-rebuild-result",
+  "directory": ".tmp-tests/rebuild-check",
+  "sourceSyncTime": "2026-10-21T13:20:14.165Z",
+  "node": "22.23.3",
+  "npm": "10.9.9",
+  "vite": "8.3.5",
+  "frozenFilesSynced": 44,
+  "totalSnapshotSourceFiles": 92,
+  "sourceManifestSha256": "361cf8bb0f2a5edd2b7b73418d377aaa17b3869b79c611a1603f64e1a76ed30d",
+  "lockSha256Before": "ea6fa8fdfe6aa0cf7164020436d11904d4c37d22516a0fedc1cd7ce914fc861a",
+  "lockSha256After": "ea6fa8fdfe6aa0cf7164020436d11904d4c37d22516a0fedc1cd7ce914fc861a",
+  "changedSnapshotSources": [],
+  "currentRuntimeDifferences": [],
+  "commands": [
+    {
+      "command": "npm --userconfig=.npmrc --globalconfig=.npmrc-global-empty --logs-max=0 run validate:content",
+      "exitCode": 0,
+      "result": "3 guides, 23 units, 39 cited URLs, 3 editorial lenses, 12 pinned targets."
+    },
+    {
+      "command": "npm --userconfig=.npmrc --globalconfig=.npmrc-global-empty --logs-max=0 run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "node --test --test-reporter=spec tests/*.test.mjs",
+      "execution": "Approved elevated project-local fixture run for Windows junction tests.",
+      "exitCode": 0,
+      "result": {
+        "tests": 80,
+        "pass": 80,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "command": "npm --userconfig=.npmrc --globalconfig=.npmrc-global-empty --logs-max=0 run build",
+      "exitCode": 0,
+      "result": "2427 modules transformed; production output generated.",
+      "warning": "Some minified chunks exceed 500 kB."
+    }
+  ],
+  "dependencyInstall": "Reused this isolated snapshot installation produced by the earlier locked offline npm ci; package lock unchanged.",
+  "notRun": [
+    "Browser services or browser suites during this final sync",
+    "Final README/documentation review"
+  ],
+  "finalSourceSyncTime": "2026-10-21T13:26:54.818Z",
+  "finalSyncedFiles": [
+    "src/content/labels.ts",
+    "src/library/Library.tsx",
+    "src/reader/Reader.tsx",
+    "src/reader/SourceDialog.tsx",
+    "tests/content-update-browser.mjs"
+  ],
+  "finalRerun": {
+    "command": "node --test --test-reporter=dot tests/*.test.mjs",
+    "execution": "Approved elevated project-local synthetic fixtures after final two-file sync.",
+    "exitCode": 0,
+    "tests": 80,
+    "pass": 80,
+    "fail": 0,
+    "skipped": 0,
+    "buildCommand": "npm --userconfig=.npmrc --globalconfig=.npmrc-global-empty --logs-max=0 run build",
+    "buildExitCode": 0,
+    "includes": "Content validation, typecheck and production bundle."
+  },
+  "finalLabelVerification": {
+    "browserCommand": "node tests/content-update-browser.mjs",
+    "browserExecution": "Approved elevated isolated synthetic browser test on port 4175.",
+    "browserResult": "pass",
+    "browserEvidence": ".tmp-tests/content-browser-9VGcAv/content-browser-results.json",
+    "checks": [
+      "Both synthetic r1/r2 article labels contain selected-section coverage.",
+      "Null source version explicitly displays unspecified source version.",
+      "Complete personal records unchanged through r2/seed2, rejected conflict and injected interruption recovery.",
+      "Eight root approved content files remain unchanged."
+    ],
+    "buildCommand": "npm --userconfig=.npmrc --globalconfig=.npmrc-global-empty --logs-max=0 run build",
+    "buildExitCode": 0,
+    "modulesTransformed": 2428,
+    "includes": "Content validation, typecheck and production bundle.",
+    "unitTests": "The prior 80/80 run is retained; not repeated for this display-only label change as requested."
+  }
+}

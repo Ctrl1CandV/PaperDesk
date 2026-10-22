@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 2,
+  "id": "gpt3",
+  "paperId": "arxiv:2005.14165",
+  "revision": 1,
+  "title": "GPT-3：预训练如何支撑上下文中的少样本学习",
+  "paperTitle": "Language Models are Few-Shot Learners",
+  "language": "zh-CN",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "理解自回归预训练与上下文学习的差异，阅读规模实验、零/单/少样本条件及数据污染边界，再连接指令训练和 Agent 系统。",
+  "source": {
+    "id": "arxiv:2005.14165",
+    "version": "NeurIPS 2020 conference paper",
+    "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf"
+  },
+  "bodyFile": "gpt3.md",
+  "bodySha256": "b1f439f17ab3f95bcbe34ac758b28e436a9fb2df32b3b62f189889994abf5816",
+  "units": [
+    {
+      "id": "intro",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "先学文本分布，再用文本指定任务"
+    },
+    {
+      "id": "u02",
+      "heading": "模型变大，也必须说明数据和架构"
+    },
+    {
+      "id": "u03",
+      "heading": "零样本、单样本和少样本究竟差在哪里"
+    },
+    {
+      "id": "u04",
+      "heading": "上下文学习的证据，需要控制提示和测试条件"
+    },
+    {
+      "id": "u05",
+      "heading": "结果不是一种能力在所有任务上同时增长"
+    },
+    {
+      "id": "u06",
+      "heading": "数据污染为什么不能用一句话排除"
+    },
+    {
+      "id": "u07",
+      "heading": "从会续写到能完成目标，中间还缺什么"
+    },
+    {
+      "id": "u08",
+      "heading": "带着具体问题回到原文"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf",
+      "labels": [
+        "主文 §1–2，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 conference paper"
+    },
+    {
+      "id": "c02",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf#page=3",
+      "labels": [
+        "主文 §2、§5，PDF 第3、8页",
+        "主文 §2.1，PDF 第3页",
+        "主文 §2.2，PDF 第3–4页",
+        "主文 §2，PDF 第3页",
+        "主文 §2，PDF 第3–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 conference paper"
+    },
+    {
+      "id": "c03",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Supplemental.pdf#page=1",
+      "labels": [
+        "补充材料 §A，PDF 第1页",
+        "补充材料 §B，PDF 第1页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 supplemental material"
+    },
+    {
+      "id": "c04",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Supplemental.pdf#page=5",
+      "labels": [
+        "补充材料 §C、表C.1，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 supplemental material"
+    },
+    {
+      "id": "c05",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf#page=4",
+      "labels": [
+        "主文 §2.4，PDF 第4页",
+        "主文 §3.1、表3.1，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 conference paper"
+    },
+    {
+      "id": "c06",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf#page=2",
+      "labels": [
+        "主文 图1.1，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 conference paper"
+    },
+    {
+      "id": "c07",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf#page=5",
+      "labels": [
+        "主文 §3.2、表3.2，PDF 第5页",
+        "主文 表3.2，PDF 第5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 conference paper"
+    },
+    {
+      "id": "c08",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf#page=7",
+      "labels": [
+        "主文 §3.4、表3.5，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 conference paper"
+    },
+    {
+      "id": "c09",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Supplemental.pdf#page=2",
+      "labels": [
+        "补充材料 §C，PDF 第2、5页",
+        "补充材料 §C，PDF 第2–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 supplemental material"
+    },
+    {
+      "id": "c10",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Supplemental.pdf#page=6",
+      "labels": [
+        "补充材料 §C、表C.2，PDF 第4–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 supplemental material"
+    },
+    {
+      "id": "c11",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Supplemental.pdf#page=3",
+      "labels": [
+        "补充材料 §C、图C.2，PDF 第3–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 supplemental material"
+    },
+    {
+      "id": "c12",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf#page=8",
+      "labels": [
+        "主文 §5，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 conference paper"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "transformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "Main §§1–2: motivation, pretraining, architecture and evaluation",
+      "Main §§3.1–3.4: selected positive and negative results",
+      "Main §§4–5: contamination and limitations",
+      "Supplement §§A–C: filtering, training context and contamination analysis"
+    ],
+    "figuresViewed": [
+      "Figure 1.1 — main PDF p2",
+      "Table 3.1 — main PDF p4",
+      "Tables 3.2–3.3 — main PDF p5",
+      "Table 3.5 — main PDF p7",
+      "Figure C.2 — supplemental PDF p3",
+      "Table C.1 — supplemental PDF p5",
+      "Table C.2 — supplemental PDF p6"
+    ],
+    "limitations": [
+      "覆盖预训练与上下文学习主线、部分结果及污染分析，不逐任务讲解全部提示或扩展实验。",
+      "未系统覆盖社会影响分析、全部附录与训练实现，没有复现实验。",
+      "原文对污染检查承认过滤错误和子集分布偏移；不能将较小分数变化写成彻底排除污染。",
+      "历史闭卷问答和 SuperGLUE 条件不证明当前模型排名或完整 Agent 能力。"
+    ],
+    "reviewBasis": "Read the official NeurIPS 2020 main PDF §§1–5 and supplemental §§A–C for the declared scope. Inspected locally rendered pixels of the listed figure/table pages, including test/dev distinctions and contamination-method qualifications. Checked selected results against the fixed main PDF, not differing-seed supplemental rows. Authoring review; independent integration review is separate."
+  },
+  "orientation": {
+    "shortTitle": "GPT-3：理解预训练与上下文学习",
+    "topics": [
+      {
+        "id": "autoregressive-language-modeling",
+        "label": "自回归语言模型",
+        "aliases": [
+          "GPT-3",
+          "GPT3",
+          "语言模型预训练",
+          "autoregressive language modeling",
+          "LLM"
+        ]
+      },
+      {
+        "id": "in-context-learning",
+        "label": "上下文学习",
+        "aliases": [
+          "in-context learning",
+          "ICL",
+          "少样本学习",
+          "few-shot learning",
+          "零样本"
+        ]
+      },
+      {
+        "id": "model-scaling",
+        "label": "模型规模与评价",
+        "aliases": [
+          "model scaling",
+          "规模效应",
+          "数据污染",
+          "预训练数据"
+        ]
+      }
+    ],
+    "summary": "研究大规模自回归语言模型如何在参数固定时利用任务说明和少量示范，并通过不同规模、任务和污染检查揭示这种能力的范围。",
+    "value": "分清预训练、微调和上下文条件变化，读懂少样本成绩背后的信息与测试条件，为指令训练、工具使用和 Agent 系统建立语言模型基础。",
+    "prerequisites": [
+      "了解语言模型根据前缀预测下一词元；正文提供训练目标和上下文学习的教学公式。",
+      "知道 Transformer 注意力的基本用途有帮助，可先读 Transformer；不要求掌握全部训练实现。"
+    ],
+    "boundaries": [
+      "依据 NeurIPS 2020 固定主文及配套补充材料，讨论基础 GPT-3，不等同于后续聊天产品。",
+      "主线覆盖训练数据、上下文学习与关键正负结果；不压缩为一组最高成绩。",
+      "不逐任务覆盖全部附录或社会影响分析，没有实验复现；上下文学习不直接证明自主行动能力。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Tom B. Brown",
+        "Benjamin Mann",
+        "Nick Ryder",
+        "Melanie Subbiah",
+        "Jared Kaplan",
+        "Prafulla Dhariwal",
+        "Arvind Neelakantan",
+        "Pranav Shyam",
+        "Girish Sastry",
+        "Amanda Askell",
+        "Sandhini Agarwal",
+        "Ariel Herbert-Voss",
+        "Gretchen Krueger",
+        "Tom Henighan",
+        "Rewon Child",
+        "Aditya Ramesh",
+        "Daniel M. Ziegler",
+        "Jeffrey Wu",
+        "Clemens Winter",
+        "Christopher Hesse",
+        "Mark Chen",
+        "Eric Sigler",
+        "Mateusz Litwin",
+        "Scott Gray",
+        "Benjamin Chess",
+        "Jack Clark",
+        "Christopher Berner",
+        "Sam McCandlish",
+        "Alec Radford",
+        "Ilya Sutskever",
+        "Dario Amodei"
+      ],
+      "year": 2020,
+      "venue": "NeurIPS 2020 · Advances in Neural Information Processing Systems 33",
+      "publicationKind": "conference",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2020/hash/1457c0d6bfcb4967418bfb8ac142f64a-Abstract.html",
+      "preprintYear": 2020
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "理解下一词元目标如何产生预训练参数，分清训练和条件概率变化。",
+        "concepts": [
+          "自回归",
+          "预训练",
+          "负对数似然",
+          "语言模型"
+        ],
+        "limit": "教学公式解释目标，不主张所有任务能力都能由单一目标直接保证。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "区分零样本、单样本、少样本与微调，理解参数固定的上下文学习。",
+        "concepts": [
+          "ICL",
+          "上下文学习",
+          "few-shot learning",
+          "零样本",
+          "微调"
+        ],
+        "limit": "没有参数更新不代表没有预训练，也不建立持久个人记忆。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "对照问答与 SuperGLUE 的正负结果，辨别任务、提示和信息条件。",
+        "concepts": [
+          "闭卷问答",
+          "SuperGLUE",
+          "评价条件",
+          "少样本",
+          "GPT3",
+          "GPT-3"
+        ],
+        "limit": "1750 亿参数历史模型的特定评测，不是普遍优于微调或当前排行榜。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "理解污染检查为何需要同时考虑重合、答案泄露和子集分布。",
+        "concepts": [
+          "数据污染",
+          "记忆",
+          "评测泄露",
+          "N-gram",
+          "泛化"
+        ],
+        "limit": "过滤失败和子集偏移未被实验完全排除，不声称清除所有污染。"
+      }
+    ]
+  }
+}

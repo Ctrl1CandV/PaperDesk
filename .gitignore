@@ -1,0 +1,33 @@
+# Reinstallable dependencies, builds and local tooling
+/node_modules/
+/dist/
+/.cache/
+
+# Generated browser evidence; curated images live in docs/images/
+/docs/evidence/*.png
+
+# Local configuration and private records
+*.local
+*.log
+.env
+.env.*
+!.env.example
+/private/
+/personal-data/
+/backups/
+paperdesk-backup-*.json
+
+# Authoring packages and recovery receipts never form part of the app source
+/incoming/
+/.content-update/
+/.source-review/
+
+# Older tooling locations (safe for existing local checkouts)
+/.npm-cache/
+/.playwright/
+/.tmp-tests/
+/test-results/
+/playwright-report/
+/tests/.tmp/
+.DS_Store
+Thumbs.db

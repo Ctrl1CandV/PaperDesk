@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 2,
+  "id": "react",
+  "paperId": "arxiv:2210.03629",
+  "revision": 1,
+  "title": "ReAct：让推理、行动与环境反馈形成循环",
+  "paperTitle": "ReAct: Synergizing Reasoning and Acting in Language Models",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "理解推理文字如何指导环境行动，观察如何改变下一步，以及这些连接在不同任务中的证据与代价。",
+  "source": {
+    "id": "arxiv:2210.03629",
+    "version": "v3",
+    "url": "https://arxiv.org/pdf/2210.03629v3"
+  },
+  "bodyFile": "react.md",
+  "bodySha256": "740349ec9116e7e8ba256a90c4eaab6ecf0f4b12b7989fc47b8392928076f36b",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从生成文字到选择行动，中间需要明确的接口"
+    },
+    {
+      "id": "u02",
+      "heading": "推理与行动的联系，在观察之后才真正成立"
+    },
+    {
+      "id": "u03",
+      "heading": "问答实验说明了收益，也暴露了检索的代价"
+    },
+    {
+      "id": "u04",
+      "heading": "长任务中的收益来自子目标管理，而不只是查到事实"
+    },
+    {
+      "id": "u05",
+      "heading": "把可检查的轨迹与可靠的推理区分开"
+    },
+    {
+      "id": "u06",
+      "heading": "带着明确目的回到原文"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-09bd32b2ae",
+      "url": "https://arxiv.org/pdf/2210.03629v3",
+      "labels": [
+        "原论文 v3，§1–2，PDF 第1–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-13f9530ad4",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=3",
+      "labels": [
+        "§2，PDF 第3页",
+        "§2–3.2，PDF 第3–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-5fbd36caa0",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=4",
+      "labels": [
+        "§3.1，PDF 第4页",
+        "§3.1–3.2，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-6e78e10944",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=2",
+      "labels": [
+        "图1及说明，PDF 第2页",
+        "图1，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-84524523c2",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=5",
+      "labels": [
+        "表1与对照设置，PDF 第5页",
+        "§3.2、表1、图2，PDF 第5页",
+        "表1、图2及分析，PDF 第5–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-f365ebd24b",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=6",
+      "labels": [
+        "§3.3、表2，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-a2025233c8",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=7",
+      "labels": [
+        "§4，PDF 第7页",
+        "§3.3、图3，PDF 第6–7页",
+        "§4，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-ff5de5cf9b",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=8",
+      "labels": [
+        "表3及提示条件，PDF 第7–8页",
+        "§4、表4及伦理说明，PDF 第8–10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–4",
+      "§6",
+      "Ethics and reproducibility statements"
+    ],
+    "figuresViewed": [
+      "Figure 1",
+      "Figure 2",
+      "Figure 3",
+      "Tables 1–4"
+    ],
+    "limitations": [
+      "解释方法、主要提示实验与关键失败条件；未逐条展开附录中的所有提示和轨迹。",
+      "未复现实验；历史模型和基准结果不代表当前模型表现。",
+      "讨论可检查的行为轨迹，不认证模型内部推理的忠实性或开放环境可靠性。"
+    ],
+    "reviewBasis": "Read arXiv 2210.03629v3 main methods/results and relevant limits. Locally rendered and visually inspected PDF pages 2, 5, 6, 7 and 8 (Figures 1–3 and Tables 1–4). No experimental reproduction; source fragment handling is viewer-dependent."
+  },
+  "orientation": {
+    "shortTitle": "ReAct：推理与行动怎样互相支持",
+    "topics": [
+      {
+        "id": "reasoning-and-acting",
+        "label": "Agent 推理与行动",
+        "aliases": [
+          "Agent",
+          "ReAct",
+          "reasoning and acting",
+          "推理行动"
+        ]
+      },
+      {
+        "id": "tool-interaction",
+        "label": "环境交互",
+        "aliases": [
+          "工具调用",
+          "环境反馈",
+          "交互决策"
+        ]
+      }
+    ],
+    "summary": "让模型在推理文字、执行动作和外部观察之间往返，用信息获取支持推理，也用推理决定下一步操作；在知识问答与交互任务中检查这种循环的收益与失败。",
+    "value": "把综述中的规划、行动和环境反馈落实为可检查的执行过程，并学会区分方法收益、工具条件和不同推理预算。",
+    "prerequisites": [
+      "了解语言模型根据上下文生成文字；正文会解释策略、动作与观察的区别。",
+      "知道提示示范与参数微调是两种不同的适配方式，不要求预先掌握强化学习算法。"
+    ],
+    "boundaries": [
+      "覆盖研究主线、关键图表与主要对照，未展开全部附录轨迹或复现实验。",
+      "方法没有在所有任务上胜过纯推理；检索失败、重复行动和上下文容量都影响效果。",
+      "论文中可读的轨迹不等于对内部推理忠实性或实际系统可靠性的认证。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Shunyu Yao",
+        "Jeffrey Zhao",
+        "Dian Yu",
+        "Nan Du",
+        "Izhak Shafran",
+        "Karthik Narasimhan",
+        "Yuan Cao"
+      ],
+      "year": 2023,
+      "venue": "ICLR 2023 · International Conference on Learning Representations",
+      "publicationKind": "conference",
+      "url": "https://arxiv.org/abs/2210.03629v3",
+      "preprintYear": 2022
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "区分推理文字、环境动作和真实观察，并理解动作空间及工具接口。",
+        "concepts": [
+          "Agent",
+          "ReAct",
+          "工具调用",
+          "动作空间",
+          "策略"
+        ],
+        "limit": "解释论文限定的动作接口，不提供通用执行器或开放环境保证。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "看清推理怎样改变行动，新的观察怎样更新后续判断。",
+        "concepts": [
+          "推理",
+          "规划",
+          "环境反馈",
+          "推理行动",
+          "reasoning and acting"
+        ],
+        "limit": "教学循环不要求每步都长篇思考，也不证明思考文字忠实于内部计算。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "根据对照和失败案例判断外部检索的收益、代价与采样预算。",
+        "concepts": [
+          "HotpotQA",
+          "FEVER",
+          "检索",
+          "对照实验",
+          "CoT",
+          "幻觉"
+        ],
+        "limit": "具体结论限于论文的模型、输入和工具设定，不能当作当前排行榜。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "区别长任务的平均与最好提示结果，以及属性分数与完整成功率。",
+        "concepts": [
+          "ALFWorld",
+          "WebShop",
+          "交互决策",
+          "子目标",
+          "成功率"
+        ],
+        "limit": "研究基准中的操作不同于任意真实网站或物理环境。"
+      }
+    ]
+  }
+}

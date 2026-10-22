@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 2,
+  "id": "llm-survey",
+  "paperId": "doi:10.1007/s11704-026-60308-3",
+  "revision": 1,
+  "title": "大语言模型综述：从训练、使用到 Agent 的知识地图",
+  "paperTitle": "A Survey of Large Language Models",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "deep",
+  "purpose": "建立预训练、后训练、上下文使用和评测之间的关系，再把检索、工具与 Agent 放入可比较的机制框架。",
+  "source": {
+    "id": "doi:10.1007/s11704-026-60308-3",
+    "version": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)",
+    "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf"
+  },
+  "bodyFile": "llm-survey.md",
+  "bodySha256": "83865e05cb57e0770b01255230ebd54b0c7873f428dfde81272edd5e6b998757",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "用四个层次组织问题，而不是记一串技术名称"
+    },
+    {
+      "id": "u02",
+      "heading": "从下一词元预测理解模型的能力与边界"
+    },
+    {
+      "id": "u03",
+      "heading": "数据、规模和中训练决定能力形成的条件"
+    },
+    {
+      "id": "u04",
+      "heading": "后训练把行为目标变成可以学习的信号"
+    },
+    {
+      "id": "u05",
+      "heading": "使用时的学习、推理与训练更新需要分开"
+    },
+    {
+      "id": "u06",
+      "heading": "检索与工具改变信息和行动的来源"
+    },
+    {
+      "id": "u07",
+      "heading": "从模型输出走向 Agent，需要闭环与状态"
+    },
+    {
+      "id": "u08",
+      "heading": "评测应解释能力在什么条件下成立"
+    },
+    {
+      "id": "u09",
+      "heading": "回到原文，按理解依赖继续阅读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf",
+      "labels": [
+        "正式论文与版本说明，§1，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c02",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=3",
+      "labels": [
+        "§2 与图2，PDF 第3–4页",
+        "§2 训练范式，PDF 第3–4页",
+        "总览图2"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c03",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=6",
+      "labels": [
+        "§2、§3.2.1 与表1，PDF 第3、6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c04",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=7",
+      "labels": [
+        "§3.2，PDF 第6–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c05",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=4",
+      "labels": [
+        "§3.1 与图3，PDF 第4–6页",
+        "§2 规模规律与代表性能力，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c06",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=11",
+      "labels": [
+        "§3.4，PDF 第11–12页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c07",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=9",
+      "labels": [
+        "§3.3，PDF 第9–11页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c08",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=12",
+      "labels": [
+        "§4.1、图4，PDF 第12–13页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c09",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=14",
+      "labels": [
+        "§4.2，PDF 第14–16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c10",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=16",
+      "labels": [
+        "§4.3.1 与表3，PDF 第16–17页",
+        "后训练比较表3"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c11",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=18",
+      "labels": [
+        "§5.1.1–5.1.2，PDF 第18–19页",
+        "使用方法图5"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c12",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=19",
+      "labels": [
+        "§5.1.3，PDF 第19页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c13",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=20",
+      "labels": [
+        "§5.2.1，PDF 第19–20页",
+        "§5.2.2，PDF 第20页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c14",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=21",
+      "labels": [
+        "§5.3.1，PDF 第20–21页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c15",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=26",
+      "labels": [
+        "§5.3.2–5.3.3、§7 Agentic AI，PDF 第21–22、26页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c16",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=23",
+      "labels": [
+        "§6.1–6.2，PDF 第23–24页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c17",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=24",
+      "labels": [
+        "§6.2–6.3 与图6，PDF 第24–25页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c18",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=22",
+      "labels": [
+        "§5.4，PDF 第22–23页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "transformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "gpt3",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "chain-of-thought",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "rag",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "toolformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "reflexion",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "Formal journal version §§1–2: overview, architecture, training paradigm, scale and representative abilities",
+      "§§3.1–3.2 and 3.4; §3.3 for training-system role, not all optimizer/communication details",
+      "§4: SFT, rewards, policy optimization and method comparison",
+      "§§5.1–5.3; §5.4 for deployment cost and method roles",
+      "§§6–7: evaluation dimensions, protocols, contamination and open issues"
+    ],
+    "figuresViewed": [
+      "Figure 2: overall framework, formal PDF p3",
+      "Figure 3: data preparation, formal PDF p4",
+      "Figure 4: post-training, formal PDF p12",
+      "Figure 5: utilization, formal PDF p18",
+      "Figure 6: historical benchmark trends, formal PDF p24 (not transcribed as verified scores)",
+      "Table 1: network configurations, formal PDF p7",
+      "Table 3: post-training method comparison, formal PDF p16"
+    ],
+    "limitations": [
+      "依据正式40页期刊版本讲解研究主线，不是144页 arXiv v19 的完整解读。",
+      "不逐一推导所有架构、优化、分布式训练和部署算法，也未审计全部引用论文。",
+      "没有复现实验或将历史趋势图转换成当前排行榜；没有验证所有来源的评测数字。",
+      "通用语言建模公式、教学流程图与比较表为本页重新组织的解释；图示不复制原论文图片。",
+      "跨论文阅读顺序为编辑建议，不代表作者结论或读者已经阅读、掌握。"
+    ],
+    "reviewBasis": "Read the formal 40-page Springer PDF and publication record; inspected the listed figures/tables as locally rendered PDF pixels. Verified the 23-author formal identity, section/page locators, data/optimization distinctions and coverage boundaries. The arXiv v19 record was checked only to distinguish versions; no full comparison or independent reproduction. Authoring review; integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "LLM 综述：从语言模型走向 Agent",
+    "topics": [
+      {
+        "id": "large-language-models",
+        "label": "大语言模型",
+        "aliases": [
+          "LLM",
+          "large language models",
+          "语言模型基础"
+        ]
+      },
+      {
+        "id": "pretraining-posttraining",
+        "label": "预训练与后训练",
+        "aliases": [
+          "pre-training",
+          "post-training",
+          "SFT",
+          "RLHF"
+        ]
+      },
+      {
+        "id": "model-utilization-evaluation",
+        "label": "模型使用与评测",
+        "aliases": [
+          "上下文学习",
+          "ICL",
+          "模型评测",
+          "推理方法"
+        ]
+      }
+    ],
+    "summary": "沿预训练、后训练、模型使用和评测四条主线，解释数据与规模、指令与反馈、ICL与CoT、检索与工具怎样共同构成大语言模型及Agent的能力条件。",
+    "value": "把常见技术放回它们真正修改的对象，分清参数更新、上下文变化和环境交互，为继续阅读基础模型与Agent方法论文建立依赖地图。",
+    "prerequisites": [
+      "知道神经网络可从数据中调整参数即可；正文解释词元、条件概率和语言建模损失。",
+      "无需先读完所有经典论文；可按当前理解缺口转向Transformer、GPT-3或其他具体方法。"
+    ],
+    "boundaries": [
+      "以2026年正式40页期刊版本为阅读依据，作者与页码不混用早期arXiv长版本。",
+      "覆盖四条研究主线及通往Agent的必要机制，不代表全部架构、应用和引用文献均已核验。",
+      "评测条件、代价与局限和能力解释并列；没有实验复现或个人进度推断。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Wayne Xin Zhao",
+        "Kun Zhou",
+        "Junyi Li",
+        "Tianyi Tang",
+        "Zican Dong",
+        "Yupeng Hou",
+        "Beichen Zhang",
+        "Yingqian Min",
+        "Junjie Zhang",
+        "Peiyu Liu",
+        "Xiaolei Wang",
+        "Yifan Du",
+        "Chen Yang",
+        "Yushuo Chen",
+        "Zhipeng Chen",
+        "Jinhao Jiang",
+        "Ruiyang Ren",
+        "Yifan Li",
+        "Xinyu Tang",
+        "Zikang Liu",
+        "Yiwen Hu",
+        "Jian-Yun Nie",
+        "Ji-Rong Wen"
+      ],
+      "year": 2026,
+      "venue": "Frontiers of Computer Science 20 · Article 2012627",
+      "publicationKind": "journal",
+      "url": "https://link.springer.com/article/10.1007/s11704-026-60308-3",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "理解自回归目标、注意力结构和语言流畅与事实正确之间的区别。",
+        "concepts": [
+          "自回归",
+          "Transformer",
+          "条件概率",
+          "语言建模",
+          "注意力"
+        ],
+        "limit": "解释必要依赖，不推导所有注意力或位置编码变体。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "把数据配比、规模规律和中训练理解为能力形成的条件。",
+        "concepts": [
+          "预训练",
+          "中训练",
+          "数据质量",
+          "规模规律",
+          "scaling laws"
+        ],
+        "limit": "经验规律不是任意任务的可靠性保证，也不提供训练配置承诺。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "比较示范、偏好与可验证反馈怎样进入后训练。",
+        "concepts": [
+          "SFT",
+          "RLHF",
+          "DPO",
+          "PPO",
+          "GRPO",
+          "偏好优化"
+        ],
+        "limit": "保留信号来源与代理目标边界，不完整推导各优化算法。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "区分上下文学习、参数更新与推理时增加计算。",
+        "concepts": [
+          "ICL",
+          "CoT",
+          "上下文学习",
+          "思维链",
+          "推理预算"
+        ],
+        "limit": "可读的中间步骤不等于正确证明，多次采样不等于单次生成。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "检查外部知识、工具调用和生成模型各自承担的工作。",
+        "concepts": [
+          "RAG",
+          "检索增强",
+          "工具使用",
+          "证据",
+          "tool use"
+        ],
+        "limit": "通用流程不替代具体论文的训练和概率模型，也不保证引用支持结论。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "将模型能力连接到记忆、规划、执行和环境反馈。",
+        "concepts": [
+          "Agent",
+          "记忆",
+          "规划",
+          "执行",
+          "反馈闭环"
+        ],
+        "limit": "系统分类与编辑学习建议不能证明某个研究方案有效或新颖。"
+      },
+      {
+        "unitId": "u08",
+        "purpose": "把评测结果与提示、预算、数据和裁判条件一起解读。",
+        "concepts": [
+          "评测",
+          "基准",
+          "数据污染",
+          "模型裁判",
+          "效率"
+        ],
+        "limit": "不复制当前排行榜，没有运行复现或部署性能测试。"
+      }
+    ]
+  }
+}

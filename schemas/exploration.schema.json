@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaperDesk editorial exploration v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "kind": {
+      "const": "editorial-starting-points"
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "orientation": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "evidenceBoundary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "lenses": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "whyNow": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1500
+          },
+          "orientation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "guideRefs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "properties": {
+                "guideId": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "unitId": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+                },
+                "purpose": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "guideId",
+                "revision",
+                "unitId",
+                "purpose"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1500
+          },
+          "selfCheck": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1500
+          },
+          "nextAction": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "read-guide"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1500
+              },
+              "target": {
+                "type": "object",
+                "properties": {
+                  "guideId": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "unitId": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+                  },
+                  "purpose": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  }
+                },
+                "required": [
+                  "guideId",
+                  "revision",
+                  "unitId",
+                  "purpose"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "kind",
+              "description",
+              "target"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "rank",
+          "title",
+          "whyNow",
+          "orientation",
+          "guideRefs",
+          "prompt",
+          "selfCheck",
+          "nextAction"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "revision",
+    "kind",
+    "language",
+    "title",
+    "orientation",
+    "evidenceBoundary",
+    "lenses"
+  ],
+  "additionalProperties": false
+}

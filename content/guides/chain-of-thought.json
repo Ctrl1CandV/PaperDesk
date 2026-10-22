@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 2,
+  "id": "chain-of-thought",
+  "paperId": "arxiv:2201.11903",
+  "revision": 1,
+  "title": "Chain-of-Thought：中间步骤怎样改变语言模型的解题方式",
+  "paperTitle": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "理解带中间步骤的少样本提示如何改变生成过程，并通过规模、任务与消融判断推理收益的条件。",
+  "source": {
+    "id": "arxiv:2201.11903",
+    "version": "NeurIPS 2022 camera-ready",
+    "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf"
+  },
+  "bodyFile": "chain-of-thought.md",
+  "bodySha256": "b12f784aab2864e44cbda7b2e276cfc263190e041e20e2121900197d90772917",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从示范答案，转向示范解题过程"
+    },
+    {
+      "id": "u02",
+      "heading": "中间文本为什么能够影响后面的答案"
+    },
+    {
+      "id": "u03",
+      "heading": "如何读懂规模与任务共同决定的实验结果"
+    },
+    {
+      "id": "u04",
+      "heading": "消融告诉我们什么，又没有证明什么"
+    },
+    {
+      "id": "u05",
+      "heading": "从算术推广到常识与符号，仍需检查边界"
+    },
+    {
+      "id": "u06",
+      "heading": "它在 LLM 到 Agent 的路径上处于什么位置"
+    },
+    {
+      "id": "u07",
+      "heading": "回到原文与继续阅读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-26f38496cd",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf",
+      "labels": [
+        "主文 §1–2，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-dbc9e36b57",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf#page=3",
+      "labels": [
+        "主文 §2–3.1，PDF 第2–4页",
+        "方法入口，PDF 第3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-922930cab7",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf#page=6",
+      "labels": [
+        "主文 §2、§3.3，PDF 第3、5–6页",
+        "主文 §3.4、图6，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-1ae96492c4",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf#page=4",
+      "labels": [
+        "主文 §3.1，PDF 第3–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-d6af499df0",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Supplemental-Conference.pdf#page=7",
+      "labels": [
+        "补充表2–3，补充 PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-7e2ba63341",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Supplemental-Conference.pdf#page=2",
+      "labels": [
+        "补充 §A.1，补充 PDF 第2–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-4eaa300d33",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf#page=5",
+      "labels": [
+        "主文 §3.3、图5，PDF 第5–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-224eb5a986",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf#page=7",
+      "labels": [
+        "主文 §4–5，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-184dfe37b9",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf#page=8",
+      "labels": [
+        "主文 §5、图8，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    },
+    {
+      "id": "c-d46d98c5e4",
+      "url": "https://proceedings.neurips.cc/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf#page=9",
+      "labels": [
+        "主文 §3.2、§6，PDF 第5、9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2022 camera-ready"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "gpt3",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "Main paper sections 1–6 and 8",
+      "Official supplement section A.1 and Tables 2–3"
+    ],
+    "figuresViewed": [
+      "Main Figure 1 (PDF p1)",
+      "Main Figure 4 (PDF p5)",
+      "Main Figures 5–6 (PDF p6)",
+      "Supplement Tables 2–3 (supplement PDF p7, printed p21)"
+    ],
+    "limitations": [
+      "解释原论文少样本 CoT 提示主线，不覆盖后续推理模型训练或全部提示变体。",
+      "没有复现历史模型实验；结果受模型、示例、解码与任务设置约束。",
+      "没有逐个核验全部附录提示、生成案例和引用论文。",
+      "教学示意图与概率链式分解为原创解释，不是论文原图或新训练目标。"
+    ],
+    "reviewBasis": "Read the official conference main paper and selected independent supplement sections; locally rendered and visually inspected the listed figures/tables. Checked exact PaLM result cells, demonstration counts, greedy decoding, ablations and stated limitations. No experimental reproduction."
+  },
+  "orientation": {
+    "shortTitle": "Chain-of-Thought：先生成步骤，再形成答案",
+    "topics": [
+      {
+        "id": "chain-of-thought",
+        "label": "思维链提示",
+        "aliases": [
+          "Chain of Thought",
+          "CoT",
+          "链式思维",
+          "推理提示"
+        ]
+      },
+      {
+        "id": "few-shot-reasoning",
+        "label": "少样本推理",
+        "aliases": [
+          "few-shot reasoning",
+          "多步推理"
+        ]
+      },
+      {
+        "id": "in-context-learning",
+        "label": "上下文学习",
+        "aliases": [
+          "in-context learning",
+          "ICL"
+        ]
+      }
+    ],
+    "summary": "在少样本示范中加入中间推理步骤，让固定参数的模型先写出过程再生成答案，并通过算术、常识与符号任务检验效果。",
+    "value": "理解生成过程如何成为可利用的中间工作区，同时学会区分最终答案、步骤正确性、模型内部解释和实际环境交互。",
+    "prerequisites": [
+      "了解语言模型根据上下文逐词元生成，以及提示与微调的区别。",
+      "正文解释需要的概率分解；不要求预先学习强化学习或复杂数学证明。"
+    ],
+    "boundaries": [
+      "依据 NeurIPS 2022 正式版及所列补充材料，重点是带示例的 CoT 提示。",
+      "规模和任务会改变收益；书写流畅步骤不能保证路径正确或解释忠实。",
+      "不覆盖当代全部推理模型训练、自一致性等扩展，也没有复现实验。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Jason Wei",
+        "Xuezhi Wang",
+        "Dale Schuurmans",
+        "Maarten Bosma",
+        "Brian Ichter",
+        "Fei Xia",
+        "Ed H. Chi",
+        "Quoc V. Le",
+        "Denny Zhou"
+      ],
+      "year": 2022,
+      "venue": "NeurIPS 2022 · Advances in Neural Information Processing Systems 35",
+      "publicationKind": "conference",
+      "url": "https://proceedings.neurips.cc/paper/2022/hash/9d5609613524ecf4f15af0f7b31abca4-Abstract-Conference.html",
+      "preprintYear": 2022
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "理解先生成中间步骤为什么能改变后续答案的条件。",
+        "concepts": [
+          "思维链",
+          "CoT",
+          "中间步骤",
+          "自回归",
+          "上下文学习"
+        ],
+        "limit": "解释生成顺序和条件关系，不证明模型内部计算过程与文字逐步对应。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "结合示例数量、模型规模和任务类型理解结果。",
+        "concepts": [
+          "少样本",
+          "规模",
+          "解码",
+          "GSM8K",
+          "推理评测"
+        ],
+        "limit": "历史模型与特定提示下的结果，不能直接推断当前模型的统一规模阈值。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "用消融区分过程内容、输出长度与事后解释。",
+        "concepts": [
+          "消融",
+          "推理忠实性",
+          "实验条件",
+          "提示敏感性"
+        ],
+        "limit": "所测替代提示只能支持有限因果解释，不排除其他计算或推理方法。"
+      }
+    ]
+  }
+}

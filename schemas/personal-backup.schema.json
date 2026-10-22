@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaperDesk personal backup v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "schemaVersion", "exportedAt", "resume", "guideStates", "originalStates", "notes", "explorations", "preferences"],
+  "properties": {
+    "format": { "const": "paperdesk-personal-backup" },
+    "schemaVersion": { "const": 1 },
+    "exportedAt": { "$ref": "#/$defs/time" },
+    "resume": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/$defs/resume" } },
+    "guideStates": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/$defs/guideState" } },
+    "originalStates": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/$defs/originalState" } },
+    "notes": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/note" } },
+    "explorations": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/exploration" } },
+    "preferences": { "$ref": "#/$defs/preferences" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,79}$" },
+    "version": { "type": "integer", "minimum": 1, "maximum": 9007199254740990 },
+    "time": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$", "maxLength": 24 },
+    "text": { "type": "string", "maxLength": 20000 },
+    "nonempty": { "type": "string", "minLength": 1, "maxLength": 20000 },
+    "fingerprint": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "sourceVersion": { "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 100 }, { "type": "null" }] },
+    "status": { "enum": ["unread", "reading", "read", "deferred"] },
+    "target": {
+      "type": "object", "additionalProperties": false, "required": ["guideId", "revision", "unitId"],
+      "properties": { "guideId": { "$ref": "#/$defs/slug" }, "revision": { "$ref": "#/$defs/version" }, "unitId": { "$ref": "#/$defs/slug" } }
+    },
+    "resume": {
+      "type": "object", "additionalProperties": false, "required": ["guideId", "revision", "unitId", "offset", "updatedAt"],
+      "properties": { "guideId": { "$ref": "#/$defs/slug" }, "revision": { "$ref": "#/$defs/version" }, "unitId": { "$ref": "#/$defs/slug" }, "offset": { "type": "number", "minimum": 0, "maximum": 1 }, "updatedAt": { "$ref": "#/$defs/time" }, "blockFingerprint": { "$ref": "#/$defs/fingerprint" } }
+    },
+    "guideState": {
+      "type": "object", "additionalProperties": false, "required": ["guideId", "revision", "status", "updatedAt"],
+      "properties": { "guideId": { "$ref": "#/$defs/slug" }, "revision": { "$ref": "#/$defs/version" }, "status": { "$ref": "#/$defs/status" }, "updatedAt": { "$ref": "#/$defs/time" } }
+    },
+    "originalState": {
+      "type": "object", "additionalProperties": false, "required": ["sourceId", "sourceVersion", "status", "updatedAt"],
+      "properties": { "sourceId": { "type": "string", "minLength": 1, "maxLength": 4096 }, "sourceVersion": { "$ref": "#/$defs/sourceVersion" }, "status": { "$ref": "#/$defs/status" }, "updatedAt": { "$ref": "#/$defs/time" } }
+    },
+    "note": {
+      "type": "object", "additionalProperties": false, "required": ["id", "guideId", "revision", "unitId", "text", "status", "recordRevision", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "guideId": { "$ref": "#/$defs/slug" }, "revision": { "$ref": "#/$defs/version" }, "unitId": { "$ref": "#/$defs/slug" }, "text": { "$ref": "#/$defs/nonempty" }, "quote": { "$ref": "#/$defs/text" }, "blockFingerprint": { "$ref": "#/$defs/fingerprint" }, "status": { "enum": ["open", "resolved"] }, "recordRevision": { "$ref": "#/$defs/version" }, "createdAt": { "$ref": "#/$defs/time" }, "updatedAt": { "$ref": "#/$defs/time" }
+      }
+    },
+    "sourceSnapshot": {
+      "type": "object", "additionalProperties": false, "required": ["url", "label", "version"],
+      "properties": { "url": { "type": "string", "pattern": "^https?://", "maxLength": 4096 }, "label": { "type": "string", "minLength": 1, "maxLength": 600 }, "version": { "$ref": "#/$defs/sourceVersion" } }
+    },
+    "guideEvidence": {
+      "type": "object", "additionalProperties": false, "required": ["id", "provenance", "text", "target", "sources"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "provenance": { "const": "guide-excerpt" }, "text": { "$ref": "#/$defs/nonempty" }, "target": { "$ref": "#/$defs/target" }, "sources": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/sourceSnapshot" } }, "comment": { "$ref": "#/$defs/text" }, "relatedNoteId": { "$ref": "#/$defs/id" }, "blockFingerprint": { "$ref": "#/$defs/fingerprint" } }
+    },
+    "originalEvidence": {
+      "type": "object", "additionalProperties": false, "required": ["id", "provenance", "text", "source"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "provenance": { "const": "original-excerpt" }, "text": { "$ref": "#/$defs/nonempty" }, "target": { "$ref": "#/$defs/target" }, "source": { "type": "object", "additionalProperties": false, "required": ["identity", "locator", "version"], "properties": { "identity": { "type": "string", "minLength": 1, "maxLength": 4096 }, "locator": { "type": "string", "minLength": 1, "maxLength": 600 }, "version": { "$ref": "#/$defs/sourceVersion" } } }, "comment": { "$ref": "#/$defs/text" }, "relatedNoteId": { "$ref": "#/$defs/id" }, "blockFingerprint": { "$ref": "#/$defs/fingerprint" } }
+    },
+    "observation": {
+      "type": "object", "additionalProperties": false, "required": ["id", "provenance", "text"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "provenance": { "const": "reader-observation" }, "text": { "$ref": "#/$defs/nonempty" }, "target": { "$ref": "#/$defs/target" }, "comment": { "$ref": "#/$defs/text" }, "relatedNoteId": { "$ref": "#/$defs/id" }, "blockFingerprint": { "$ref": "#/$defs/fingerprint" } }
+    },
+    "nextAction": {
+      "anyOf": [{ "type": "null" }, {
+        "type": "object", "additionalProperties": false, "required": ["kind", "description"],
+        "properties": { "kind": { "enum": ["read-guide", "check-concept", "compare-evidence", "search-literature"] }, "description": { "type": "string", "minLength": 1, "maxLength": 2000 }, "target": { "$ref": "#/$defs/target" } }
+      }]
+    },
+    "exploration": {
+      "type": "object", "additionalProperties": false, "required": ["id", "title", "question", "origin", "status", "interpretation", "unknowns", "nextAction", "evidence", "recordRevision", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "title": { "type": "string", "minLength": 1, "maxLength": 300 }, "question": { "$ref": "#/$defs/nonempty" }, "origin": { "enum": ["reader", "adapted-editorial"] },
+        "seedRef": { "type": "object", "additionalProperties": false, "required": ["revision", "lensId"], "properties": { "revision": { "$ref": "#/$defs/version" }, "lensId": { "$ref": "#/$defs/slug" } } },
+        "status": { "enum": ["inbox", "exploring", "deferred", "archived"] }, "interpretation": { "$ref": "#/$defs/text" }, "unknowns": { "$ref": "#/$defs/text" }, "nextAction": { "$ref": "#/$defs/nextAction" }, "evidence": { "type": "array", "maxItems": 100, "items": { "anyOf": [{ "$ref": "#/$defs/guideEvidence" }, { "$ref": "#/$defs/originalEvidence" }, { "$ref": "#/$defs/observation" }] } }, "recordRevision": { "$ref": "#/$defs/version" }, "createdAt": { "$ref": "#/$defs/time" }, "updatedAt": { "$ref": "#/$defs/time" }
+      }
+    },
+    "preferences": { "type": "object", "additionalProperties": false, "properties": { "fontSize": { "type": "integer", "minimum": 16, "maximum": 22 }, "theme": { "enum": ["light", "dark", "system"] } } }
+  }
+}

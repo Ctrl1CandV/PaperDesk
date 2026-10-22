@@ -1,0 +1,86 @@
+{
+  "format": "paperdesk-content-additions-integrity",
+  "preserved": [
+    {
+      "path": "content/exploration.json",
+      "sha256": "a6d526168a66a183a1fac473d0e95e3d8fc64c1979af967788767c1d5487a5d5",
+      "unchanged": true
+    },
+    {
+      "path": "content/guides/agent-survey.json",
+      "sha256": "1239e65334c2d48e1fa4b6ebae355cd491e425ff9f06cd57c746c7b6c20c6930",
+      "unchanged": true
+    },
+    {
+      "path": "content/guides/agent-survey.md",
+      "sha256": "af7ea05e86bb35880a6d3c5a4f5ab1725140b904551f450eba1cda11499585c8",
+      "unchanged": true
+    },
+    {
+      "path": "content/guides/helm.json",
+      "sha256": "f7739439d444ef03e85f491fdd50e7efb2691f1a9bf2956abc5ac3a7555789fd",
+      "unchanged": true
+    },
+    {
+      "path": "content/guides/helm.md",
+      "sha256": "a612be64f646f9236282aaa59666bd5d7878e340b8d365efd133de97ec712d5c",
+      "unchanged": true
+    },
+    {
+      "path": "content/guides/instructgpt.json",
+      "sha256": "a5f33285536ddab6b6b5131689f76fbd5e6e750657b5edf102b7a79a90b932a7",
+      "unchanged": true
+    },
+    {
+      "path": "content/guides/instructgpt.md",
+      "sha256": "bc9d7a42cbc55a290f5cc6086b5edd25d07a05f4cd49229100a72b863f01a38a",
+      "unchanged": true
+    },
+    {
+      "path": "schemas/catalog.schema.json",
+      "sha256": "899a4c201cf19e67f2fcf93f71deaedc180778ad785517bd9c0106269c2a8e9b",
+      "unchanged": true
+    },
+    {
+      "path": "schemas/exploration.schema.json",
+      "sha256": "81f1bdf94f0813b36d2bbbf0be55a3329e17ac1f4eb9504224d121fd89d337d5",
+      "unchanged": true
+    },
+    {
+      "path": "schemas/guide.schema.json",
+      "sha256": "e61000b7b9c73a9a45cadd01c74d378e21fcc3d07d803d8f38fd22029ab7a275",
+      "unchanged": true
+    }
+  ],
+  "newFiles": [
+    {
+      "path": "content/guides/react.md",
+      "sha256": "740349ec9116e7e8ba256a90c4eaab6ecf0f4b12b7989fc47b8392928076f36b"
+    },
+    {
+      "path": "content/guides/react.json",
+      "sha256": "7fecc20d1d7831c121e20071018e8bc77599490ba710f2caee73312f19c8039a"
+    },
+    {
+      "path": "content/guides/toolformer.md",
+      "sha256": "b2fbdbd38238869fa32ee955cc50bcdbfc993d8cf647d968b7cff9557b34dc54"
+    },
+    {
+      "path": "content/guides/toolformer.json",
+      "sha256": "2935b0d748845c1a18d64ece8a059e21f04ac11c8d60f6d96e70623785655e25"
+    },
+    {
+      "path": "content/guides/reflexion.md",
+      "sha256": "7e410bb50aaedb979922ecc253294a9058763c61e3fe301c26f8ab676d88ae18"
+    },
+    {
+      "path": "content/guides/reflexion.json",
+      "sha256": "bc2d5adc2f76759eb696dd2698daa081fd24d2b0da4277d7cc3695158cdcd71f"
+    }
+  ],
+  "catalog": {
+    "path": "content/catalog.json",
+    "sha256": "1e5cdf6ba4b2b80e2e46ca8b8a6b14db7910a46f9dfa845d07e2aeef14665485",
+    "change": "Adds three current revision-1 guides; retains all six previous guide revisions and exploration revision 1."
+  }
+}

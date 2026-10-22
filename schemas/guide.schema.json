@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaperDesk guide metadata v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+    },
+    "paperId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "paperTitle": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "type": {
+      "enum": [
+        "survey",
+        "method",
+        "evaluation",
+        "system",
+        "theory",
+        "other"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "quick",
+        "standard",
+        "deep"
+      ]
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https?://",
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "url"
+      ]
+    },
+    "bodyFile": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:)[A-Za-z0-9_./-]+$",
+      "maxLength": 200
+    },
+    "bodySha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+          },
+          "heading": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 400
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "heading"
+        ]
+      },
+      "maxItems": 256,
+      "minItems": 1
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https?://",
+            "maxLength": 4096
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "maxItems": 256,
+            "minItems": 1
+          },
+          "role": {
+            "enum": [
+              "primary",
+              "background"
+            ]
+          },
+          "sourceVersion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "labels",
+          "role",
+          "sourceVersion"
+        ]
+      },
+      "maxItems": 256
+    },
+    "related": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "guideId": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+          },
+          "relation": {
+            "enum": [
+              "editorial-reading-order"
+            ]
+          }
+        },
+        "required": [
+          "guideId",
+          "relation"
+        ]
+      },
+      "maxItems": 256
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:)[A-Za-z0-9_./-]+$",
+            "maxLength": 200
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "mime": {
+            "enum": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ]
+          },
+          "alt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "origin": {
+            "type": "string",
+            "pattern": "^https?://",
+            "maxLength": 4096
+          },
+          "rights": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "mime",
+          "alt",
+          "origin",
+          "rights"
+        ]
+      },
+      "maxItems": 64
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "enum": [
+            "abstract",
+            "selected",
+            "mainline",
+            "full-survey"
+          ]
+        },
+        "basis": {
+          "enum": [
+            "abstract",
+            "sections",
+            "fulltext"
+          ]
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "maxItems": 256
+        },
+        "figuresViewed": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "maxItems": 256
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "maxItems": 256
+        },
+        "reviewBasis": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "scope",
+        "basis",
+        "sections",
+        "figuresViewed",
+        "limitations",
+        "reviewBasis"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "paperId",
+    "revision",
+    "title",
+    "paperTitle",
+    "language",
+    "type",
+    "mode",
+    "purpose",
+    "source",
+    "bodyFile",
+    "bodySha256",
+    "units",
+    "citations",
+    "related",
+    "assets",
+    "coverage"
+  ]
+}

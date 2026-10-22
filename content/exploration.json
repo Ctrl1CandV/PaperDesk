@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "kind": "editorial-starting-points",
+  "language": "zh-Hans",
+  "title": "从阅读走向可以继续追问的问题",
+  "orientation": "先用综述建立对象与组成之间的关系，再通过具体论文理解方法和证据。下面是三个可选的阅读观察角度；可以按建议顺序进入，也可以从当前遇到的问题出发。只有你主动保存后，它才成为个人探索记录。",
+  "evidenceBoundary": "这些是依据现有导读安排的编辑建议，不是完整领域分类、最新研究综述或已经验证的研究空白。所列文章提供背景，不证明任何个人构想有效。",
+  "lenses": [
+    {
+      "id": "application-construction",
+      "rank": 1,
+      "title": "从任务理解 Agent 应用怎样构成",
+      "whyNow": "先认识系统与环境怎样相互作用，之后才能判断一篇论文改变了哪个环节。",
+      "orientation": "把任务目标、可见信息、行动和反馈放在一起观察。综述帮助理解组成关系，具体方法论文则展示目标怎样变成可训练、可检查的过程；两者提供的证据层次并不相同。",
+      "guideRefs": [
+        {
+          "guideId": "agent-survey",
+          "revision": 1,
+          "unitId": "u01",
+          "purpose": "先建立主体、环境与行动的关系。"
+        },
+        {
+          "guideId": "agent-survey",
+          "revision": 1,
+          "unitId": "u02",
+          "purpose": "理解角色、记忆、规划、行动各自回应什么需要。"
+        },
+        {
+          "guideId": "instructgpt",
+          "revision": 1,
+          "unitId": "u03",
+          "purpose": "观察一个具体研究怎样把行为目标转为方法步骤；它不是 Agent 应用效果的证据。"
+        }
+      ],
+      "prompt": "阅读一个具体应用时，我能否说清任务需要什么、各环节承担什么，以及哪个环节还有疑问？",
+      "selfCheck": "能用自己的话连接任务、信息、行动和反馈，并指出至少一个还需要原文或新文献补充的地方；不要求先选择研究题目。",
+      "nextAction": {
+        "kind": "read-guide",
+        "description": "回到综述的组成讲解，选择一处仍不清楚的关系，保存为可继续查证的问题。",
+        "target": {
+          "guideId": "agent-survey",
+          "revision": 1,
+          "unitId": "u02",
+          "purpose": "结合组成关系形成一个具体阅读疑问。"
+        }
+      }
+    },
+    {
+      "id": "evaluation-and-failures",
+      "rank": 2,
+      "title": "理解表现、评价与失败之间的关系",
+      "whyNow": "理解基本方法后，再看一项结果是在什么设置下成立，避免把一个分数当成所有能力。",
+      "orientation": "评价需要说明测试对象、场景、适配方式和指标。先读懂一种评价为什么这样设计，再考虑把类似观察方法用于其他应用。HELM 提供语言模型评价的基础视角，不直接证明 Agent 系统在环境中的成功率。",
+      "guideRefs": [
+        {
+          "guideId": "helm",
+          "revision": 1,
+          "unitId": "u01",
+          "purpose": "理解已有评价难以直接比较的背景。"
+        },
+        {
+          "guideId": "helm",
+          "revision": 1,
+          "unitId": "u03",
+          "purpose": "区分不同指标分别表达什么要求。"
+        },
+        {
+          "guideId": "instructgpt",
+          "revision": 1,
+          "unitId": "u04",
+          "purpose": "把具体实验结果与其条件和未改善的方面放在一起看。"
+        }
+      ],
+      "prompt": "当一篇文章报告提升时，我还需要哪些设置与失败信息，才能解释这项提升的适用范围？",
+      "selfCheck": "能把作者报告的结果、测试条件和自己的解释分开；知道哪些判断仍缺证据。",
+      "nextAction": {
+        "kind": "read-guide",
+        "description": "读 HELM 的指标部分，再与一项具体实验结果对照；只记录实际能找到的依据。",
+        "target": {
+          "guideId": "helm",
+          "revision": 1,
+          "unitId": "u03",
+          "purpose": "明确每类指标能说明和不能说明的内容。"
+        }
+      }
+    },
+    {
+      "id": "collaboration",
+      "rank": 3,
+      "title": "按需要探索协作问题",
+      "whyNow": "这是可选延伸。先理解单个系统的任务与评价，遇到实际分工问题时再进入。",
+      "orientation": "协作可以作为观察 Agent 应用的一个角度，但参与者增多本身不是贡献或性能改进的证明。现有导读只用于建立应用与评价背景；进一步判断协作机制需要另外核查相关论文。",
+      "guideRefs": [
+        {
+          "guideId": "agent-survey",
+          "revision": 1,
+          "unitId": "u04",
+          "purpose": "先明确不同应用中的目标与成功条件。"
+        },
+        {
+          "guideId": "agent-survey",
+          "revision": 1,
+          "unitId": "u05",
+          "purpose": "理解开放问题与系统组成之间的联系。"
+        },
+        {
+          "guideId": "helm",
+          "revision": 1,
+          "unitId": "u06",
+          "purpose": "保留评价条件与结论边界的意识；这不是协作实验的直接依据。"
+        }
+      ],
+      "prompt": "如果一个任务需要多个参与者，我还缺少哪些材料，才能判断分工和沟通是否有帮助？",
+      "selfCheck": "能区分一个协作构想与证明它有用所需的证据；允许结论暂时是材料不足。",
+      "nextAction": {
+        "kind": "read-guide",
+        "description": "先读综述的应用部分，写下待补的文献问题；当前不自动给出未经核查的专题书目。",
+        "target": {
+          "guideId": "agent-survey",
+          "revision": 1,
+          "unitId": "u04",
+          "purpose": "从应用目标开始记录待查问题。"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 2,
+  "id": "transformer",
+  "paperId": "arxiv:1706.03762",
+  "revision": 1,
+  "title": "Transformer：注意力怎样把序列变成可计算的上下文",
+  "paperTitle": "Attention Is All You Need",
+  "language": "zh-CN",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "理解自注意力、因果遮罩、位置编码与训练/生成关系，为阅读自回归语言模型和后续 Agent 系统提供可核对的架构基础。",
+  "source": {
+    "id": "arxiv:1706.03762",
+    "version": "NIPS 2017 conference paper",
+    "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf"
+  },
+  "bodyFile": "transformer.md",
+  "bodySha256": "2b9e65adf1b269baefcad8f15b1c2c641bf006c3d8267814b9b0b84b34146b2b",
+  "units": [
+    {
+      "id": "intro",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从翻译任务理解预测对象"
+    },
+    {
+      "id": "u02",
+      "heading": "注意力计算：查询怎样从上下文取信息"
+    },
+    {
+      "id": "u03",
+      "heading": "多头、前馈层和残差共同组成一个模块"
+    },
+    {
+      "id": "u04",
+      "heading": "三种注意力通路与位置编码"
+    },
+    {
+      "id": "u05",
+      "heading": "并行性的收益，需要连同计算条件一起读"
+    },
+    {
+      "id": "u06",
+      "heading": "翻译结果与消融分别支持什么"
+    },
+    {
+      "id": "u07",
+      "heading": "从架构基础走向语言模型与 Agent"
+    },
+    {
+      "id": "u08",
+      "heading": "回到原文时，优先检查哪些地方"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf",
+      "labels": [
+        "原论文 §1–3，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c02",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=2",
+      "labels": [
+        "§3，PDF 第2–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c03",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=4",
+      "labels": [
+        "§3.2.1、图2与式1，PDF 第4页",
+        "图2与 §3.2.2，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c04",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=5",
+      "labels": [
+        "§3.2.2–3.2.3，PDF 第4–5页",
+        "§3.1、§3.2.3，PDF 第3、5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c05",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3",
+      "labels": [
+        "§3.1、§3.3，图1，PDF 第3–5页",
+        "图1与 §3.2.3，PDF 第3–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c06",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=6",
+      "labels": [
+        "§3.5，PDF 第6页",
+        "§4、表1，PDF 第6–7页",
+        "表1与 §4–6，PDF 第6–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c07",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=7",
+      "labels": [
+        "§5，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c08",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=8",
+      "labels": [
+        "§6.1、表2–3，PDF 第8–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c09",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=9",
+      "labels": [
+        "§6.2、表3，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "gpt3",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1–2: motivation and encoder–decoder context",
+      "§3.1–3.5: architecture, attention, feed-forward layers and positions",
+      "§4–5: complexity and training conditions",
+      "§6–7: translation results, selected ablations and conclusion"
+    ],
+    "figuresViewed": [
+      "Figure 1 — main PDF p3",
+      "Figure 2 — main PDF p4",
+      "Table 1 — main PDF p6",
+      "Table 2 — main PDF p8",
+      "Table 3 — main PDF p9"
+    ],
+    "limitations": [
+      "覆盖方法主线、主要翻译结果及少量消融，不逐项讲解全部超参数或引用工作。",
+      "会议摘要网页的旧数值与正式 PDF 不同；本文统一以固定会议 PDF 为证据。",
+      "理论复杂度、实测训练条件与生成速度分开解释；没有复现实验，也不声称完整 Agent 能力。"
+    ],
+    "reviewBasis": "Read the official NIPS 2017 PDF main text and verified architecture, formulas, training and evaluation conditions. Opened locally rendered pixels of Figures 1–2 and Tables 1–3. Bibliography was checked against the proceedings page; numerical claims follow the fixed PDF, not the differing web abstract. Authoring review; integration review is separate."
+  },
+  "orientation": {
+    "shortTitle": "Transformer：理解注意力与序列建模",
+    "topics": [
+      {
+        "id": "self-attention",
+        "label": "自注意力",
+        "aliases": [
+          "self-attention",
+          "attention",
+          "注意力机制",
+          "多头注意力"
+        ]
+      },
+      {
+        "id": "transformer-architecture",
+        "label": "Transformer 架构",
+        "aliases": [
+          "Transformer",
+          "编码器解码器",
+          "因果遮罩",
+          "位置编码"
+        ]
+      },
+      {
+        "id": "sequence-transduction",
+        "label": "序列建模",
+        "aliases": [
+          "sequence transduction",
+          "机器翻译",
+          "自回归生成"
+        ]
+      }
+    ],
+    "summary": "从翻译任务出发，解释查询、键和值如何交换信息，多头、前馈层、因果遮罩与位置编码如何组成 Transformer，并核对训练和翻译实验的条件。",
+    "value": "把后续论文中常见的上下文与注意力还原为信息通路，分清训练并行、逐步生成、组件作用及实验结论的适用范围。",
+    "prerequisites": [
+      "知道向量、矩阵乘法和条件概率的基本含义即可；正文解释 softmax 加权、词元和自回归所需概念。",
+      "不要求已读过循环网络或掌握完整模型实现；可跟随编码器—解码器任务逐步建立理解。"
+    ],
+    "boundaries": [
+      "固定 NIPS 2017 会议 PDF，主要研究机器翻译的序列转换架构，不是完整对话助手或 Agent。",
+      "讲解 Q/K/V、多头、前馈层、残差、遮罩、位置与训练，并选读主要结果及消融。",
+      "不覆盖后续 Transformer 变体、现代长上下文方案或全部实现细节；没有实验复现。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Ashish Vaswani",
+        "Noam Shazeer",
+        "Niki Parmar",
+        "Jakob Uszkoreit",
+        "Llion Jones",
+        "Aidan N. Gomez",
+        "Łukasz Kaiser",
+        "Illia Polosukhin"
+      ],
+      "year": 2017,
+      "venue": "NIPS 2017 · Advances in Neural Information Processing Systems 30",
+      "publicationKind": "conference",
+      "url": "https://papers.nips.cc/paper_files/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html",
+      "preprintYear": 2017
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "区分训练时真实前缀与推理时生成前缀，理解并行与自回归并不冲突。",
+        "concepts": [
+          "自回归",
+          "teacher forcing",
+          "训练并行",
+          "右移输入"
+        ],
+        "limit": "以原始编码器—解码器翻译模型解释，不假定所有后续语言模型架构相同。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "理解查询、键、值、缩放与 softmax 如何形成上下文加权。",
+        "concepts": [
+          "自注意力",
+          "QKV",
+          "缩放点积",
+          "softmax",
+          "attention"
+        ],
+        "limit": "注意力连接与权重不等于理解、因果解释或事实来源。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "沿信息来源分清自注意力、交叉注意力、因果遮罩和位置编码。",
+        "concepts": [
+          "因果遮罩",
+          "位置编码",
+          "交叉注意力",
+          "信息流"
+        ],
+        "limit": "正弦位置设计不保证任意长度泛化。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "核对主要翻译结果和组件消融的不同评测条件。",
+        "concepts": [
+          "BLEU",
+          "机器翻译",
+          "消融",
+          "测试集",
+          "开发集"
+        ],
+        "limit": "历史 WMT 结果，不代表当前排名、所有语言任务或 Agent 能力。"
+      }
+    ]
+  }
+}
