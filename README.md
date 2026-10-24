@@ -23,7 +23,7 @@ Open [PaperDesk](http://127.0.0.1:4173/library). For development use `npm run de
 - **Research exploration:** explicit questions, attributed evidence, interpretations, unknowns and next reading actions.
 - **Local accumulation:** notes, genuine resume positions, independent explanation/original reading marks, conflict handling, backup/restore and opt-in context packets. Opening an article never marks it read.
 
-The library contains **11 current readings: 2 surveys and 9 papers**, with 14 retained guide revisions. Topics connect Transformer architecture, pretraining and in-context learning, instruction learning, chain-of-thought prompting, retrieval, tools, Agent action/reflection and evaluation. Start with the LLM survey's optional dependency-based path.
+The library contains **14 current readings: 4 surveys and 10 papers**, with 18 retained guide revisions. Topics connect Transformer architecture, pretraining and in-context learning, instruction learning, chain-of-thought prompting, retrieval, tools, Agent action/reflection, memory, streaming context and concept drift. Start with the LLM survey's optional path or the [memory and dynamic-decision reading route](docs/LEARNING-ROUTE.md).
 
 Search matches titles and reviewed primary topics. The unselected library is a centered single-column list; selecting opens adjacent orientation. Narrow screens use list → orientation → reader. Further papers can be researched and added through deliberate assistant-assisted authoring; the website has no background model or online search integration.
 
@@ -50,5 +50,7 @@ Browser installation, synthetic end-to-end checks, content import/recovery and b
 See the [documentation index](docs/README.md), [project state](PROJECT-STATE.md), [continuation guide](START-HERE.md), [Git policy](docs/GIT-POLICY.md) and [changelog](CHANGELOG.md).
 
 Dependencies, builds, caches, incoming packages and recovery receipts are ignored. Private notes, backups and credentials are not repository content. Only the generic audience description in [Privacy](docs/PRIVACY.md) is used. Academic attribution remains in each guide; downloaded full-paper PDFs and review tooling are not bundled. No project license grant has been added.
+
+`git clone` provides the maintainable source project, so `tests/`, `scripts/`, schemas and the lockfile are intentional repository files. The tests protect content updates, reading records and backup recovery; they are not sample clutter. After install/build, `node_modules/`, `dist/` and `.cache/` appear locally but remain untracked. The production website is built into `dist/`; test sources and maintenance documents are not part of that web bundle. See [Git policy](docs/GIT-POLICY.md) before cleanup, especially the recovery records that must be retained.
 
 This version runs locally. Deployment, accounts, synchronization and cloud/model services are outside its implemented scope. Physical devices, other browser engines, screen readers and exhaustive paper/experiment verification remain outside the recorded checks; see [project state](PROJECT-STATE.md).

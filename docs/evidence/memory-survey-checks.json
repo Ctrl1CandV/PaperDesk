@@ -1,0 +1,24 @@
+{
+  "guideId": "agent-memory-survey",
+  "revision": 1,
+  "retainedContentFilesUnchanged": 26,
+  "renderedSegments": 56,
+  "units": 9,
+  "viewports": [
+    "1280x900",
+    "390x844 simulated"
+  ],
+  "citationDialogAndFocusReturn": true,
+  "narrowTableKeyboardScroll": true,
+  "pageErrors": [],
+  "unsolicitedExternalRequests": [],
+  "screenshots": [
+    "docs/evidence/memory-survey-orientation-desktop.png",
+    "docs/evidence/memory-survey-reader-desktop.png",
+    "docs/evidence/memory-survey-classification-desktop.png",
+    "docs/evidence/memory-survey-reader-narrow.png",
+    "docs/evidence/memory-survey-classification-narrow.png",
+    "docs/evidence/memory-survey-classification-narrow-end.png"
+  ],
+  "visualInspection": "All six listed screenshots inspected: desktop orientation/body/classification and narrow body/classification/scroll-end. Readable text, no page overflow; table right column reachable. Simulated viewports only; isolated synthetic browser context, no real records."
+}

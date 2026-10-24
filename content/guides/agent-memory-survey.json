@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 2,
+  "id": "agent-memory-survey",
+  "paperId": "arxiv:2404.13501",
+  "revision": 1,
+  "title": "Agent 记忆综述：过去的信息怎样参与下一次判断",
+  "paperTitle": "A Survey on the Memory Mechanism of Large Language Model based Agents",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "建立 Agent 记忆的概念地图，区分信息来源、存储形式和记忆操作，理解记忆如何支持后续行为，以及保存、检索、使用和任务表现的评价边界。",
+  "source": {
+    "id": "arxiv:2404.13501",
+    "version": "v1",
+    "url": "https://arxiv.org/html/2404.13501v1"
+  },
+  "bodyFile": "agent-memory-survey.md",
+  "bodySha256": "fdc1911b391525e05c53f205b9dbd8c4e9c241ab53207609ccfbfa82e92fff15",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "先界定记忆跨越了什么边界"
+    },
+    {
+      "id": "u02",
+      "heading": "为什么需要记忆：从保存经历到利用经历"
+    },
+    {
+      "id": "u03",
+      "heading": "来源、形式和操作是三个交叉的维度"
+    },
+    {
+      "id": "u04",
+      "heading": "文本记忆与参数记忆把成本放在不同地方"
+    },
+    {
+      "id": "u05",
+      "heading": "写入、管理和读取共同决定记忆是否有用"
+    },
+    {
+      "id": "u06",
+      "heading": "评价要区分记住事实、找到依据和完成任务"
+    },
+    {
+      "id": "u07",
+      "heading": "应用改变了“好记忆”的含义"
+    },
+    {
+      "id": "u08",
+      "heading": "原文阅读入口与覆盖说明"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-memory-1",
+      "url": "https://arxiv.org/html/2404.13501v1",
+      "labels": [
+        "论文 v1，§1、§3–6",
+        "论文 v1，§3.1–3.3；手动定位这些小节",
+        "论文 v1，§4.1–4.3",
+        "论文 v1，§5、§5.1–5.3",
+        "论文 v1，§5.2.1",
+        "论文 v1，§5.2.2–5.2.3",
+        "论文 v1，§3.4、§5.3.1–5.3.3",
+        "论文 v1，§6.1–6.3",
+        "论文 v1，§6.1.2",
+        "论文 v1，§7.1–7.7",
+        "论文 v1，§8.1–8.4",
+        "原文阅读入口：v1 §3、§5、§6"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-memory-2",
+      "url": "https://arxiv.org/pdf/2404.13501v1",
+      "labels": [
+        "固定 v1 PDF；图3–5手动定位"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "rag",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "reflexion",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "v1 §1 and §3.1–3.4: definitions and interaction framework",
+      "v1 §4.1–4.3: motivations and their interpretation limits",
+      "v1 §5.1–5.3: sources, forms and operations; Table 1–3 headings and selected entries",
+      "v1 §6.1–6.3: direct and indirect evaluation",
+      "v1 §7.1–7.7: selected application explanations",
+      "v1 §8.1–8.4: research directions"
+    ],
+    "figuresViewed": [],
+    "limitations": [
+      "固定依据 2024-04-21 arXiv v1，不覆盖后续版本或 2024 年之后的研究进展。",
+      "图3–5仅核对图注与PDF物理页码，未完成原图视觉审阅。",
+      "没有逐篇核验所引研究、逐项重审分类表或复现实验；应用分支为选择性解释。",
+      "认知类比、自我演化与参数记忆优势保持作者归因及适用边界，不构成通用能力保证。",
+      "不覆盖实时感知、信念修订、在线决策和计算分配的完整理论。"
+    ],
+    "reviewBasis": "实际阅读固定 v1 HTML 的定义、动机、来源、形式、操作和评价正文，选读应用与展望；PDF文字核对作者顺序、图注及物理页码。核查了试次边界、文本索引向量与参数记忆区别、知识编辑的保留目标与局限、答案正确性和参考准确性区别。未完成原图像素审阅；本字段为来源核查记录，不代替独立内容审阅。"
+  },
+  "orientation": {
+    "shortTitle": "Agent 记忆：来源、形式、操作与评价",
+    "topics": [
+      {
+        "id": "agent-memory",
+        "label": "Agent 记忆",
+        "aliases": [
+          "agent memory",
+          "智能体记忆",
+          "长期记忆"
+        ]
+      },
+      {
+        "id": "memory-operations",
+        "label": "记忆写入、管理与读取",
+        "aliases": [
+          "memory writing",
+          "memory management",
+          "memory reading",
+          "遗忘"
+        ]
+      },
+      {
+        "id": "memory-forms",
+        "label": "文本记忆与参数记忆",
+        "aliases": [
+          "textual memory",
+          "parametric memory",
+          "知识编辑"
+        ]
+      },
+      {
+        "id": "memory-evaluation",
+        "label": "记忆评价",
+        "aliases": [
+          "direct evaluation",
+          "indirect evaluation",
+          "参考准确性"
+        ]
+      }
+    ],
+    "summary": "以当前尝试、跨尝试和外部知识区分记忆来源，以文本和参数区分形式，再用写入、管理和读取解释它们怎样支持行为。评价部分分清答案、依据与完整任务表现。",
+    "value": "把 RAG、ReAct 和 Reflexion 中分散的历史利用机制放到可比较的概念地图上，识别记忆失败发生在哪个环节，并理解不同指标的证据边界。",
+    "prerequisites": [
+      "了解语言模型的上下文与参数是不同的信息承载方式；正文会解释试次、知识编辑及检索评价术语。",
+      "了解 Agent 可以通过行动获取环境反馈；可结合已有 RAG、ReAct、Reflexion 导读阅读。"
+    ],
+    "boundaries": [
+      "这是固定 arXiv v1 的 mainline 导读，不是全部记忆论文的全面复核或当前领域综述。",
+      "图3–5只核对图注和页码，未完成图像像素审阅；没有复现实验。",
+      "正文中的教学例子和证据风险分析属于导读解释，不冒充论文实验。",
+      "记忆是持续交互的一部分，本文不提供完整的实时决策或推理修订理论。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Zeyu Zhang",
+        "Xiaohe Bo",
+        "Chen Ma",
+        "Rui Li",
+        "Xu Chen",
+        "Quanyu Dai",
+        "Jieming Zhu",
+        "Zhenhua Dong",
+        "Ji-Rong Wen"
+      ],
+      "year": 2024,
+      "venue": "arXiv · 2404.13501v1",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2404.13501v1",
+      "preprintYear": 2024
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "分清任务、一次尝试和单步交互，理解狭义与广义记忆的来源范围。",
+        "concepts": [
+          "task",
+          "trial",
+          "step",
+          "狭义记忆",
+          "广义记忆"
+        ],
+        "limit": "试次是任务划分，不直接等同于现实时间长短或模型参数是否更新。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "用来源、形式、操作三个维度比较记忆方法，避免把分类当作互斥组件。",
+        "concepts": [
+          "当前尝试",
+          "跨尝试经验",
+          "外部知识",
+          "记忆来源"
+        ],
+        "limit": "代表工作用作概念衔接，没有逐篇重新审查其全部实验。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "解释文本与参数记忆的成本分布，以及向量索引为什么不等于参数记忆。",
+        "concepts": [
+          "文本记忆",
+          "参数记忆",
+          "检索",
+          "微调",
+          "知识编辑"
+        ],
+        "limit": "定性权衡不保证任意实现的速度、容量和知识保留效果。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "沿写入、管理和读取定位遗漏、压缩、检索与利用失败。",
+        "concepts": [
+          "写入",
+          "合并",
+          "反思",
+          "遗忘",
+          "读取"
+        ],
+        "limit": "证据风险示例是教学分析，不是本文额外实验或最优遗忘规则。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "区分最终答案、参考记忆和任务表现，并理解成本评价需要覆盖各操作。",
+        "concepts": [
+          "直接评价",
+          "间接评价",
+          "Precision",
+          "Recall",
+          "F1",
+          "答案正确性"
+        ],
+        "limit": "记忆参考匹配不等于生成解释忠实，端到端分数不能单独证明因果贡献。"
+      }
+    ]
+  }
+}

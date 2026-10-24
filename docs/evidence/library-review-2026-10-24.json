@@ -1,0 +1,245 @@
+{
+  "date": "2026-10-24",
+  "scope": "Current mainline library and source repository; no original experiment reproduction",
+  "currentGuides": 14,
+  "surveys": 4,
+  "papers": 10,
+  "retainedGuideRevisions": 18,
+  "retainedUnits": 153,
+  "citationUrls": 133,
+  "retainedPriorNonCatalogFilesUnchanged": 28,
+  "catalogSha256": "f3487030ec8ae6a90a36da95594128b9433de989dc1fcbc3abd6b12f906de528",
+  "currentRevisions": {
+    "agent-survey": 2,
+    "instructgpt": 2,
+    "helm": 2,
+    "react": 1,
+    "toolformer": 1,
+    "reflexion": 1,
+    "llm-survey": 1,
+    "transformer": 1,
+    "gpt3": 1,
+    "chain-of-thought": 1,
+    "rag": 1,
+    "agent-memory-survey": 1,
+    "streamingllm": 1,
+    "concept-drift-survey": 2
+  },
+  "unitTests": {
+    "passed": 90,
+    "skipped": 4,
+    "failed": 0,
+    "skipReason": "Synthetic Windows symlink creation unavailable (EPERM)"
+  },
+  "browserTests": {
+    "initial": {
+      "passed": 71,
+      "failed": 2
+    },
+    "final": {
+      "passed": 73,
+      "failed": 0
+    },
+    "resolved": [
+      "Selected citation version and exact URL checked",
+      "Concept-drift metadata r2 narrows 学习 to 在线适应; tool-learning assertion retained"
+    ]
+  },
+  "build": "Validation, typecheck and production build passed; existing >500 kB chunk warning remains",
+  "productionSmoke": "passed",
+  "contentUpdateProbe": {
+    "checkpoints": 6,
+    "mainContentFilesUnchanged": 34,
+    "syntheticRecordsUnchanged": true
+  },
+  "knownVulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "productionOutput": {
+    "files": 158,
+    "sourceTestOrDocDirectories": 0,
+    "developmentFixturePresent": false
+  },
+  "targetedCandidateScan": {
+    "forbiddenPaths": [],
+    "unexpectedMachinePathOrCredentialPatternFiles": [],
+    "reviewedFalsePositives": [
+      "Existing synthetic absolute-path rejection literals in content-validation.test.mjs and content-import.test.mjs"
+    ],
+    "limitation": "Targeted check, not comprehensive security certification"
+  },
+  "runtime": {
+    "node": "22.23.3",
+    "npm": "10.9.9",
+    "chromium": "156.0.8078.4"
+  },
+  "readerEndChecks": [
+    {
+      "id": "agent-survey",
+      "revision": 2,
+      "bodyEnd": 505.84375,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "instructgpt",
+      "revision": 2,
+      "bodyEnd": 505.8125,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "helm",
+      "revision": 2,
+      "bodyEnd": 505.453125,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "react",
+      "revision": 1,
+      "bodyEnd": 505.328125,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "toolformer",
+      "revision": 1,
+      "bodyEnd": 505.703125,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "reflexion",
+      "revision": 1,
+      "bodyEnd": 505.96875,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "llm-survey",
+      "revision": 1,
+      "bodyEnd": 505.890625,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "transformer",
+      "revision": 1,
+      "bodyEnd": 506.21875,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "gpt3",
+      "revision": 1,
+      "bodyEnd": 506.140625,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "chain-of-thought",
+      "revision": 1,
+      "bodyEnd": 506.078125,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "rag",
+      "revision": 1,
+      "bodyEnd": 506.140625,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "agent-memory-survey",
+      "revision": 1,
+      "bodyEnd": 505.359375,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "streamingllm",
+      "revision": 1,
+      "bodyEnd": 505.515625,
+      "toolbarTop": 748,
+      "overflow": false
+    },
+    {
+      "id": "concept-drift-survey",
+      "revision": 2,
+      "bodyEnd": 506.1875,
+      "toolbarTop": 748,
+      "overflow": false
+    }
+  ],
+  "screenshotsActuallyInspected": [
+    "docs/evidence/additions-agent-survey-reader-desktop.png",
+    "docs/evidence/additions-agent-survey-reader-narrow.png",
+    "docs/evidence/additions-instructgpt-reader-desktop.png",
+    "docs/evidence/additions-instructgpt-reader-narrow.png",
+    "docs/evidence/additions-helm-reader-desktop.png",
+    "docs/evidence/additions-helm-reader-narrow.png",
+    "docs/evidence/additions-react-reader-desktop.png",
+    "docs/evidence/additions-react-reader-narrow.png",
+    "docs/evidence/additions-toolformer-reader-desktop.png",
+    "docs/evidence/additions-toolformer-reader-narrow.png",
+    "docs/evidence/additions-reflexion-reader-desktop.png",
+    "docs/evidence/additions-reflexion-reader-narrow.png",
+    "docs/evidence/additions-llm-survey-reader-desktop.png",
+    "docs/evidence/additions-llm-survey-reader-narrow.png",
+    "docs/evidence/additions-transformer-reader-desktop.png",
+    "docs/evidence/additions-transformer-reader-narrow.png",
+    "docs/evidence/additions-gpt3-reader-desktop.png",
+    "docs/evidence/additions-gpt3-reader-narrow.png",
+    "docs/evidence/additions-chain-of-thought-reader-desktop.png",
+    "docs/evidence/additions-chain-of-thought-reader-narrow.png",
+    "docs/evidence/additions-rag-reader-desktop.png",
+    "docs/evidence/additions-rag-reader-narrow.png",
+    "docs/evidence/additions-agent-memory-survey-reader-desktop.png",
+    "docs/evidence/additions-agent-memory-survey-reader-narrow.png",
+    "docs/evidence/additions-transformer-media-2-narrow.png",
+    "docs/evidence/additions-transformer-media-2-end-narrow.png",
+    "docs/evidence/additions-toolformer-media-2-narrow.png",
+    "docs/evidence/additions-toolformer-media-2-end-narrow.png",
+    "docs/evidence/additions-agent-survey-media-1-narrow.png",
+    "docs/evidence/additions-agent-survey-media-1-end-narrow.png",
+    "docs/evidence/additions-agent-memory-survey-media-1-narrow.png",
+    "docs/evidence/additions-agent-memory-survey-media-1-end-narrow.png",
+    "docs/evidence/additions-streamingllm-orientation-desktop.png",
+    "docs/evidence/additions-streamingllm-reader-desktop.png",
+    "docs/evidence/additions-streamingllm-media-1-narrow.png",
+    "docs/evidence/additions-streamingllm-reader-narrow.png",
+    "docs/evidence/additions-concept-drift-survey-orientation-desktop.png",
+    "docs/evidence/additions-concept-drift-survey-reader-desktop.png",
+    "docs/evidence/additions-concept-drift-survey-detail-desktop.png",
+    "docs/evidence/additions-concept-drift-survey-reader-narrow.png",
+    "docs/evidence/library-dual-browse-desktop.png",
+    "docs/evidence/library-dual-narrow-list.png",
+    "docs/evidence/review-streamingllm-end-narrow.png",
+    "docs/evidence/review-concept-drift-survey-end-narrow.png",
+    "docs/evidence/library-dual-orientation-desktop.png"
+  ],
+  "visualScope": "45 current screenshots, visible regions only; simulated desktop/narrow viewports, not physical devices",
+  "limitations": [
+    "No exhaustive original-paper appendix/reference audit or experiment reproduction",
+    "No physical-device, screen-reader, live external PDF-anchor or power-loss durability certification"
+  ],
+  "independentSourceExport": {
+    "source": "Reviewed Git index exported into an isolated project-local directory",
+    "install": "npm ci --no-audit --cache ../../npm; 258 locked packages installed",
+    "build": "npm run build -- --logLevel warn passed validation, typecheck and production build",
+    "contentFilesMatchingWorktreeIndexAndExport": 34,
+    "initialAttempt": "Offline npm ci failed because a package tarball was absent from local cache; Windows cleanup also reported EPERM. Retried successfully with registry access inside the isolated copy.",
+    "limitation": "Build retains the existing >500 kB chunk warning. No source/dependency modifications were made to fix the install."
+  },
+  "curatedImagesRefreshed": [
+    "docs/images/library.png",
+    "docs/images/orientation.png"
+  ]
+}

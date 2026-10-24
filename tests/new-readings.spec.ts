@@ -35,7 +35,8 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: `docs/evidence/additions-${name}.png`, animations: 'disabled' });
 }
 
-for (const id of ['react', 'toolformer', 'reflexion', 'llm-survey', 'transformer', 'gpt3', 'chain-of-thought', 'rag'].filter(id => id in catalog.currentRevisions)) {
+// Every current guide participates, including future reviewed catalog additions.
+for (const id of Object.keys(catalog.currentRevisions)) {
   test(`${id}: full reviewed prose, two-level reading, media and keyboard source return`, async ({ page, context }) => {
     const revision = (catalog.currentRevisions as Record<string, number>)[id];
     const entry = catalog.entries.find(item => item.guideId === id && item.revision === revision)!;
@@ -95,7 +96,9 @@ for (const id of ['react', 'toolformer', 'reflexion', 'llm-survey', 'transformer
     await expect(page.locator('.prose table')).toHaveCount(tables);
     await shot(page, `${id}-reader-desktop`);
     const firstMedia = page.locator('.prose .teaching-diagram, .prose .formula-block, .prose .table-wrap').first();
-    await firstMedia.scrollIntoViewIfNeeded();
+    // A valid prose-led guide need not contain a diagram, display formula or table.
+    if (await firstMedia.count()) await firstMedia.scrollIntoViewIfNeeded();
+    else await page.locator('.prose section').nth(Math.min(3, metadata.units.length - 1)).scrollIntoViewIfNeeded();
     await shot(page, `${id}-detail-desktop`);
 
     const secondUnit = metadata.units[1];
@@ -106,11 +109,13 @@ for (const id of ['react', 'toolformer', 'reflexion', 'llm-survey', 'transformer
     await citation.scrollIntoViewIfNeeded(); await citation.focus();
     const scroll = await page.evaluate(() => scrollY);
     const label = (await citation.innerText()).replace(/↗$/, '');
+    const citedSource = metadata.citations.find((item: { labels: string[] }) => item.labels.includes(label));
+    expect(citedSource).toBeDefined();
     await page.keyboard.press('Enter');
     const dialog = page.getByRole('dialog', { name: '来源详情' });
     await expect(dialog).toContainText(label);
-    await expect(dialog).toContainText(metadata.source.version);
-    await expect(dialog.getByRole('link', { name: '打开原文（新标签页）' })).toHaveAttribute('href', /^https:\/\//);
+    await expect(dialog).toContainText(citedSource.sourceVersion ?? '未指定固定版本');
+    await expect(dialog.getByRole('link', { name: '打开原文（新标签页）' })).toHaveAttribute('href', citedSource.url);
     await expect(dialog.getByRole('link', { name: '打开原文（新标签页）' })).toHaveAttribute('rel', 'noopener noreferrer');
     await page.keyboard.press('Escape');
     await expect(citation).toBeFocused();

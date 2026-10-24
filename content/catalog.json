@@ -11,7 +11,10 @@
     "transformer": 1,
     "gpt3": 1,
     "chain-of-thought": 1,
-    "rag": 1
+    "rag": 1,
+    "agent-memory-survey": 1,
+    "streamingllm": 1,
+    "concept-drift-survey": 2
   },
   "entries": [
     {
@@ -152,6 +155,46 @@
         "rank": 11,
         "relation": "editorial-reading-order",
         "reason": "区分参数记忆和外部检索，理解知识接入、概率组合与可更新性的边界。"
+      }
+    },
+    {
+      "guideId": "agent-memory-survey",
+      "revision": 1,
+      "metadataFile": "guides/agent-memory-survey.json",
+      "recommendation": {
+        "rank": 12,
+        "relation": "editorial-reading-order",
+        "reason": "承接 RAG、ReAct 与 Reflexion，用综述建立记忆来源、形式、操作及评价的概念地图，再进入动态决策与持续推理。"
+      }
+    },
+    {
+      "guideId": "streamingllm",
+      "revision": 1,
+      "metadataFile": "guides/streamingllm.json",
+      "recommendation": {
+        "rank": 13,
+        "relation": "editorial-reading-order",
+        "reason": "接续 Transformer 与记忆综述，区分有限 KV 缓存下的持续语言建模与长期历史记忆。"
+      }
+    },
+    {
+      "guideId": "concept-drift-survey",
+      "revision": 1,
+      "metadataFile": "guides/concept-drift-survey.json",
+      "recommendation": {
+        "rank": 14,
+        "relation": "editorial-reading-order",
+        "reason": "理解环境中的数据规律变化、检测与适应，以及不使用未来信息的在线评价。"
+      }
+    },
+    {
+      "guideId": "concept-drift-survey",
+      "revision": 2,
+      "metadataFile": "guides/concept-drift-survey.r2.json",
+      "recommendation": {
+        "rank": 14,
+        "relation": "editorial-reading-order",
+        "reason": "理解环境中的数据规律变化、检测与适应，以及不使用未来信息的在线评价。"
       }
     }
   ],

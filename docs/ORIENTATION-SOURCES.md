@@ -1,6 +1,6 @@
 # Article orientation metadata and source review
 
-The three current articles now select guide revision 2 with metadata schema version 2. Their accepted Markdown bodies, original revision-1 metadata, citation inventories, source versions, section identities and coverage declarations are unchanged. Revision 2 adds article orientation; it does not claim a new full-text or figure audit.
+This record covers the original three articles' 2026-10-22 update to guide revision 2 with metadata schema version 2. Their accepted Markdown bodies, original revision-1 metadata, citation inventories, source versions, section identities and coverage declarations are unchanged. Revision 2 adds article orientation; it does not claim a new full-text or figure audit. Later library additions have separate records in `research/`.
 
 ## Bibliographic verification
 

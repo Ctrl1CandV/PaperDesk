@@ -8,7 +8,7 @@ The first integrated version (0.1.0, product specification 1.1) has completed re
 
 Run `npm ci`, `npm run build`, then one `npm run preview`. Open `http://127.0.0.1:4173/library`. Keep the origin fixed for browser records; stop project servers before reinstalling on Windows.
 
-The library has eleven current articles (two surveys, nine papers) and fourteen retained guide revisions. Approved bodies, attribution, locators, conditions, coverage gaps and original-reading advice remain intact. Add reviewed immutable revisions rather than editing a published body. See [content updates](docs/CONTENT-UPDATES.md), [source-review records](docs/research/) and integrity reports in `docs/evidence/`.
+The library has fourteen current articles (four surveys, ten papers) and eighteen retained guide revisions. Approved bodies, attribution, locators, conditions, coverage gaps and original-reading advice remain intact. Add reviewed immutable revisions rather than editing a published body. See [content updates](docs/CONTENT-UPDATES.md), [source-review records](docs/research/) and integrity reports in `docs/evidence/`.
 
 The original handoff and byte manifest are archived under `docs/history/preparation/`. Their paths and status describe the preparation snapshot, not the current checkout. Superseded screenshots are reproducible local artifacts; curated accepted library images are in `docs/images/`.
 

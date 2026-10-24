@@ -1,6 +1,6 @@
 {
   "format": "paperdesk-synthetic-content-browser-check",
-  "directory": ".cache/test-workspaces/content-browser-SeG980",
+  "directory": ".cache/test-workspaces/content-browser-wxcFQC",
   "port": 4175,
   "node": "v22.23.3",
   "guideId": "agent-survey",
@@ -13,7 +13,7 @@
       "name": "initial-current-with-synthetic-records",
       "current": 2,
       "seedRevision": 1,
-      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "personalSha256": "99b50fd22be14cb1a8546cb75481f0227266e22292002e53237b074758f29129",
       "completePersonalRecordsUnchanged": true,
       "retainedGuideRevision": 2,
       "retainedSeedRevision": 1
@@ -22,7 +22,7 @@
       "name": "applied-next-guide-and-seed",
       "current": 3,
       "seedRevision": 2,
-      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "personalSha256": "99b50fd22be14cb1a8546cb75481f0227266e22292002e53237b074758f29129",
       "completePersonalRecordsUnchanged": true,
       "retainedGuideRevision": 2,
       "retainedSeedRevision": 1
@@ -31,7 +31,7 @@
       "name": "selection-rollback-retains-new-and-old-revisions",
       "current": 2,
       "seedRevision": 1,
-      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "personalSha256": "99b50fd22be14cb1a8546cb75481f0227266e22292002e53237b074758f29129",
       "completePersonalRecordsUnchanged": true,
       "retainedGuideRevision": 2,
       "retainedSeedRevision": 1
@@ -40,7 +40,7 @@
       "name": "reselected-next-revision-after-rollback",
       "current": 3,
       "seedRevision": 2,
-      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "personalSha256": "99b50fd22be14cb1a8546cb75481f0227266e22292002e53237b074758f29129",
       "completePersonalRecordsUnchanged": true,
       "retainedGuideRevision": 2,
       "retainedSeedRevision": 1
@@ -49,7 +49,7 @@
       "name": "rejected-same-key-orientation-change",
       "current": 3,
       "seedRevision": 2,
-      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "personalSha256": "99b50fd22be14cb1a8546cb75481f0227266e22292002e53237b074758f29129",
       "completePersonalRecordsUnchanged": true,
       "retainedGuideRevision": 2,
       "retainedSeedRevision": 1
@@ -58,7 +58,7 @@
       "name": "interrupted-before-switch-and-recovered",
       "current": 3,
       "seedRevision": 2,
-      "personalSha256": "a9be87cbd0ccfcaedff7725869fde6ce97c3c9f7cececa1678b3fdff80c4e113",
+      "personalSha256": "99b50fd22be14cb1a8546cb75481f0227266e22292002e53237b074758f29129",
       "completePersonalRecordsUnchanged": true,
       "retainedGuideRevision": 2,
       "retainedSeedRevision": 1
@@ -78,7 +78,7 @@
     "Every complete personal backup is identical across update, rollback, rejection and recovery."
   ],
   "result": "pass",
-  "mainContentFilesUnchanged": 27,
+  "mainContentFilesUnchanged": 34,
   "acceptedBodySha256": "af7ea05e86bb35880a6d3c5a4f5ab1725140b904551f450eba1cda11499585c8",
   "unsolicitedExternalRequests": 0,
   "pageErrors": 0
