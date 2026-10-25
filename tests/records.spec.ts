@@ -220,7 +220,7 @@ test('backup page previews exact data, cancels without changes, exports only del
   expect(dataOnly(await readBackup(page))).toEqual(dataOnly(initial));
   await page.getByLabel('选择个人记录备份').setInputFiles(file);
   await page.getByRole('button', { name: '确认按以上选择导入' }).click();
-  await expect(page.getByRole('status')).toContainText('导入并回读确认完成');
+  await expect(page.getByRole('status')).toContainText('已导入');
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: '导出完整备份', exact: true }).click();
   const download = await downloadPromise;

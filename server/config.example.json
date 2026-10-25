@@ -1,0 +1,12 @@
+{
+  "baseURL": "https://api.openai.com/v1",
+  "apiKey": "",
+  "modelId": "",
+  "chatgptModelId": "",
+  "chatgptReasoningEffort": "",
+  "chatgptFallbackToApi": true,
+  "toolsEnabled": true,
+  "maxOutputTokens": 3000,
+  "timeoutMs": 120000,
+  "search": { "apiKey": "" }
+}

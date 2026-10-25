@@ -10,7 +10,9 @@
 .secondary-action:hover { background:var(--surface-muted); text-decoration:none; }
 .text-action { min-height:44px; display:inline-flex; align-items:center; font-size:13px; color:var(--accent); padding:8px 0; }
 .danger-action { background:var(--danger); color:var(--surface); min-height:44px; padding:10px 18px; border-radius:7px; }
+.danger-action:hover:not(:disabled) { background:var(--danger-hover); color:var(--surface); }
 .danger-text { color:var(--danger); }
+.danger-text:hover { color:var(--danger-hover); }
 .quiet-copy { color:var(--muted); font-size:13px; line-height:1.9; }
 .status-error,.status-warning,.status-message { padding:12px 16px; border-left:3px solid var(--warning); background:var(--warning-bg); color:var(--warning); font-size:13px; line-height:1.8; overflow-wrap:anywhere; }
 .status-message { border-color:var(--success); background:var(--success-bg); color:var(--success); }
@@ -18,7 +20,7 @@
 .status-error button { margin-left:10px; text-decoration:underline; }
 .field-label { display:flex; flex-direction:column; gap:9px; font-size:13px; color:var(--ink); margin:20px 0; line-height:1.7; }
 input,textarea,select { font:inherit; color:inherit; max-width:100%; }
-.field-label input,.field-label textarea,.field-label select,.library-search { border:1px solid var(--line); background:var(--surface); border-radius:7px; padding:11px 13px; min-height:44px; font-size:15px; line-height:1.8; width:100%; }
+.field-label input,.field-label textarea,.field-label select,.library-search { border:1px solid var(--control-border); background:var(--surface); border-radius:7px; padding:11px 13px; min-height:44px; font-size:15px; line-height:1.8; width:100%; }
 textarea { resize:vertical; }
 input:focus-visible,textarea:focus-visible,select:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
 .search-label { display:block; margin-top:30px; margin-bottom:10px; font-size:13px; color:var(--muted); }

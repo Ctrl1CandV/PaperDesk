@@ -19,6 +19,7 @@ test('current reading tools and next-reading panels remain readable at desktop a
   await page.getByLabel('我的笔记或问题', { exact: true }).fill('合成视觉检查：理解模型、行动与环境之间的关系。');
   await shot('note-desktop');
   await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => scrollTo(0, 0));
   await shot('reader-narrow');

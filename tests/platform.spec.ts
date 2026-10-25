@@ -74,7 +74,7 @@ test('actual scrolling resumes after reload while guide and original marks remai
   await expect(dialog.getByLabel('导读阅读状态', { exact: true })).toHaveValue('');
   await expect(dialog.getByLabel('原论文阅读状态', { exact: true })).toHaveValue('');
   await dialog.getByLabel('导读阅读状态', { exact: true }).selectOption('read');
-  await expect(dialog.getByRole('status')).toContainText('已保存这项明确标记');
+  await expect(dialog.getByRole('status')).toContainText('已保存');
   await dialog.getByLabel('原论文阅读状态', { exact: true }).selectOption('deferred');
   await expect.poll(async () => (await backup(page)).originalStates[0]?.status).toBe('deferred');
   await dialog.getByRole('button', { name: '关闭', exact: true }).click();

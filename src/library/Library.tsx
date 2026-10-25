@@ -39,27 +39,24 @@ function Orientation({ guide, resumes, returnToList }: { guide: Guide; resumes: 
   return <section className="article-orientation" aria-labelledby="orientation-title">
     <button className="orientation-back text-action" onClick={returnToList}>← 返回筛选结果</button>
     <header className="orientation-masthead">
-      <div className="orientation-top"><span className="orientation-label"><DocumentIcon survey={metadata.type === 'survey'} />文章导学</span><button className="orientation-close" aria-label="关闭导学" onClick={returnToList}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 12" /></svg></button></div>
-      <p className="article-kind">{typeLabel(metadata.type)}<span>{bibliography?.year ?? '年份待核实'}</span></p>
+      <div className="orientation-top"><p className="article-kind">{typeLabel(metadata.type)}<span>{bibliography?.year ?? '年份待核实'}</span></p><button className="orientation-close" aria-label="关闭导学" onClick={returnToList}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 12" /></svg></button></div>
       <h2 id="orientation-title" tabIndex={-1} className={title.subtitle ? 'has-subtitle' : ''}><span className="article-name">{title.name}</span>{title.subtitle && <><span className="visually-hidden">：</span><span className="article-subtitle">{title.subtitle}</span></>}</h2>
-      <p className="paper-original-title" lang="en">{metadata.paperTitle}</p>
-      <p className="orientation-authors">{bibliography?.authors.length ? <>{bibliography.authors.slice(0, 3).join(', ')}{bibliography.authors.length > 3 && <span> 等 {bibliography.authors.length} 位作者</span>}</> : '作者信息尚未补充'}</p>
-      <dl className="bibliography-facts"><div><dt>{bibliography?.publicationKind === 'preprint' ? '预印本' : '发表于'}</dt><dd>{bibliography?.venue ? <a href={bibliography.url} target="_blank" rel="noopener noreferrer">{bibliography.venue} · {bibliography.year ?? '年份待核实'} <span aria-hidden="true">↗</span></a> : '发表信息尚未核实'}</dd></div></dl>
-      {orientation && <div className="topic-tags" aria-label="主要主题">{orientation.topics.map(topic => <span key={topic.id}>{topic.label}</span>)}</div>}
+      <div className="orientation-subject"><p>{orientation?.summary ?? metadata.purpose}</p></div>
       <div className="orientation-actions"><AppLink id={`start-${metadata.id}`} className="primary-action" to={`/read/${metadata.id}/${metadata.revision}`}>进入深入阅读 <span aria-hidden="true">→</span></AppLink><a className="text-action" href={metadata.source.url} target="_blank" rel="noopener noreferrer">打开原论文 <span aria-hidden="true">↗</span></a></div>
-      {resumeAvailable && <p className="orientation-resume"><AppLink to={`/read/${resume.guideId}/${resume.revision}`}>继续上次停留的位置 →</AppLink><span>讲解修订 {resume.revision}；位置不代表已读。</span></p>}
+      {resumeAvailable && <p className="orientation-resume"><AppLink to={`/read/${resume.guideId}/${resume.revision}`}>继续上次停留的位置 →</AppLink>{resume.revision !== metadata.revision && <span>讲解修订 {resume.revision}</span>}</p>}
     </header>
     <div className="orientation-body">
-      <div className="orientation-section orientation-subject"><h3>这篇文章研究什么</h3><p>{orientation?.summary ?? metadata.purpose}</p></div>
-      <div className="orientation-section reading-value"><h3>为什么值得读</h3><p>{orientation?.value ?? metadata.purpose}</p></div>
-      <details className="orientation-preparation"><summary><span>阅读准备与覆盖范围</span><span className="disclosure-arrow" aria-hidden="true">⌄</span></summary><div className="orientation-support">
+      <section className="orientation-section reading-value"><h3>阅读重点</h3><p>{orientation?.value ?? metadata.purpose}</p></section>
+      <details className="orientation-preparation"><summary><span>阅读准备与覆盖范围</span><span className="coverage-summary">{coverageLabel(metadata.coverage.scope)}</span><span className="disclosure-arrow" aria-hidden="true">⌄</span></summary><div className="orientation-support">
         {orientation && <div className="orientation-section orientation-prerequisites"><h3>带着哪些基础开始</h3><ul>{orientation.prerequisites.map(item => <li key={item}>{item}</li>)}</ul></div>}
         <div className="orientation-section orientation-coverage"><h3>本次阅读的范围</h3><p className="coverage-caption">{coverageLabel(metadata.coverage.scope)} · {guide.units.length - 1} 个章节</p><ul>{(orientation?.boundaries ?? metadata.coverage.limitations).map(item => <li key={item}>{item}</li>)}</ul></div>
       </div></details>
-      <details className="orientation-source"><summary><span>来源与版本</span><span className="source-version">{metadata.paperId} · {metadata.source.version ?? '版本未指定'}</span><span className="disclosure-arrow" aria-hidden="true">⌄</span></summary><dl>
+      <details className="orientation-source"><summary><span>来源与版本</span><span className="source-version">{metadata.source.version ?? '版本未指定'}</span><span className="disclosure-arrow" aria-hidden="true">⌄</span></summary><p className="paper-original-title" lang="en">{metadata.paperTitle}</p><dl>
         <div><dt>完整作者</dt><dd>{bibliography?.authors.length ? bibliography.authors.join(', ') : '作者信息尚未补充'}</dd></div>
+        <div><dt>{bibliography?.publicationKind === 'preprint' ? '预印本' : '发表于'}</dt><dd>{bibliography?.venue ? <a href={bibliography.url} target="_blank" rel="noopener noreferrer">{bibliography.venue} · {bibliography.year ?? '年份待核实'} ↗</a> : '发表信息尚未核实'}</dd></div>
         <div><dt>阅读依据</dt><dd><a href={metadata.source.url} target="_blank" rel="noopener noreferrer">{metadata.paperId} · {metadata.source.version ?? '版本未指定'} ↗</a>{bibliography?.preprintYear ? <span className="preprint-year">首次预印本 {bibliography.preprintYear} 年</span> : null}</dd></div>
-        <div><dt>本地讲解</dt><dd>修订 {metadata.revision} · 保留图表、引用与原文定位</dd></div>
+        {orientation && <div><dt>主要主题</dt><dd>{orientation.topics.map(topic => topic.label).join(' · ')}</dd></div>}
+        <div><dt>本地讲解</dt><dd>修订 {metadata.revision}</dd></div>
       </dl></details>
       <details className="orientation-outline"><summary><span>查看阅读章节</span><span className="outline-count">{guide.units.filter(unit => unit.heading).length} 节</span><span className="disclosure-arrow" aria-hidden="true">⌄</span></summary><ol>{guide.units.filter(unit => unit.heading).map(unit => <li key={unit.id}><AppLink to={`/read/${metadata.id}/${metadata.revision}#${unit.id}`}>{unit.heading}</AppLink></li>)}</ol></details>
     </div>
@@ -139,13 +136,13 @@ export function Library({ home = false }: { home?: boolean }) {
   const latest = [...resumes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
   const resumeGuide = latest && contentRepository.get(latest.guideId, latest.revision);
   return <main id="main-content" className={`library-page library-workspace${detailOpen ? ' has-selection' : ''}`}>
-    <header className="library-heading"><div><h1>阅读书架</h1><p>从一篇文章，走向下一个问题。</p></div><AppLink className="text-action library-explore-link" to="/explore">带着问题去探索 <span aria-hidden="true">↗</span></AppLink></header>
+    <header className="library-heading"><h1>阅读书架</h1><AppLink className="text-action library-explore-link" to="/explore">研究探索 <span aria-hidden="true">↗</span></AppLink></header>
     {home && latest && <div className="home-resume"><div><span className="eyebrow">上次停留</span><p>{resumeGuide?.metadata.orientation?.shortTitle ?? resumeGuide?.metadata.title ?? '原阅读版本暂不可用'}</p></div><AppLink className="secondary-action" to={`/read/${latest.guideId}/${latest.revision}`}>继续阅读 →</AppLink></div>}
     {storageError && <p className="status-error" role="status">本地位置暂时无法读取，仍可浏览和阅读。</p>}
     <div ref={layoutRef} className="library-layout"><section className="library-shelf" aria-label="选择文章">
       <label className="visually-hidden" htmlFor="library-search">查找文章</label><div className="library-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input ref={searchRef} id="library-search" type="search" className="library-search" value={query} onChange={event => change({ q: event.target.value || null, article: null }, true)} placeholder="搜索标题或主要主题" />{query && <button aria-label="清除搜索" onClick={() => { change({ q: null, article: null }, true); searchRef.current?.focus(); }}>×</button>}</div>
       <div className="library-categories" role="group" aria-label="文章类型">{categories.map(([value, label]) => <button id={`library-type-${value}`} key={value} aria-pressed={category === value} onClick={() => change({ type: value === 'all' ? null : value, article: null })}>{label}<span>{entries.filter(({ guide }) => value === 'all' || (value === 'survey' ? guide.metadata.type === 'survey' : guide.metadata.type !== 'survey')).length}</span></button>)}</div>
-      <p className="library-result-count" role="status">{query ? `“${query}” · ` : ''}{filtered.length} 篇文章<span>{query ? '搜索结果' : '选择文章，查看导学'}</span></p>
+      <p className="library-result-count" role="status">{query ? `“${query}” · ` : ''}{filtered.length} 篇文章</p>
       <div className="guide-list">{filtered.map(({ guide, recommendation }) => {
         const { metadata } = guide, orientation = metadata.orientation;
         const title = titleParts(orientation?.shortTitle ?? metadata.title);
@@ -157,8 +154,6 @@ export function Library({ home = false }: { home?: boolean }) {
         </button>;
       })}</div>
       {!filtered.length && <div className="empty-state"><h2>没有匹配的文章</h2><p>当前只匹配标题和主要主题。可以换一个主题，或查看全部文章。</p><button className="secondary-action" onClick={() => change({ q: null, type: null, article: null })}>查看全部文章</button></div>}
-      {!!filtered.length && <p className="library-shelf-note">先看导学，再进入完整讲解。<br />选中文章不会更改阅读记录。</p>}
     </section><aside id="article-preview" className="library-preview" hidden={!selected} aria-label="文章导学" onKeyDown={event => { if (event.key === 'Escape' && !event.defaultPrevented) { event.preventDefault(); event.stopPropagation(); returnToList(); } }}>{selected && <Orientation key={`${selected.guide.metadata.id}/${selected.guide.metadata.revision}`} guide={selected.guide} resumes={resumes} returnToList={returnToList} />}</aside></div>
-    <footer className="library-footnote"><p>综述建立框架，论文深入方法与证据。</p><AppLink to="/explore">进入研究探索 →</AppLink></footer>
   </main>;
 }

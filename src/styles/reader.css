@@ -52,7 +52,8 @@ a:hover {
   text-underline-offset:4px
 }
 ::selection {
-  background:var(--surface-muted)
+  background:var(--selection);
+  color:var(--ink)
 }
 .site-header {
   height:68px;
@@ -175,12 +176,12 @@ nav li a {
 }
 nav li a:hover {
   text-decoration:none;
-  background:var(--surface-muted)
+  background:var(--surface-hover)
 }
 nav li a[aria-current] {
   color:var(--accent);
   border-left-color:var(--accent);
-  background:var(--surface-muted)
+  background:var(--surface-selected)
 }
 .toc-number {
   font-size:10px;
@@ -260,7 +261,7 @@ nav li a[aria-current] {
   letter-spacing:-.7px;
   line-height:1.5;
   font-weight:650;
-  color:var(--ink);
+  color:var(--heading);
   margin:0 0 26px;
   text-wrap:pretty
 }
@@ -268,7 +269,7 @@ nav li a[aria-current] {
   font-size:25px;
   line-height:1.6;
   font-weight:650;
-  color:var(--ink);
+  color:var(--heading);
   margin:0 0 22px;
   letter-spacing:-.3px
 }
@@ -276,7 +277,7 @@ nav li a[aria-current] {
   font-size:20px;
   line-height:1.7;
   font-weight:650;
-  color:var(--ink);
+  color:var(--heading);
   margin:30px 0 14px
 }
 .prose p {

@@ -13,7 +13,7 @@ import { isSafeExternalUrl } from '../../scripts/content-policy.mjs';
 function textOf(children: ReactNode): string {
   return Children.toArray(children).map(child => typeof child === 'string' || typeof child === 'number' ? String(child) : isValidElement<{ children?: ReactNode }>(child) ? textOf(child.props.children) : '').join('');
 }
-function Formula({ source, display }: { source: string; display: boolean }) {
+export function Formula({ source, display }: { source: string; display: boolean }) {
   try {
     const html = katex.renderToString(source, { displayMode: display, trust: false, strict: 'error', throwOnError: true, maxExpand: 200, maxSize: 20, macros: {} });
     if (!display) return <span className="inline-formula" dangerouslySetInnerHTML={{ __html: html }} />;

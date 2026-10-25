@@ -11,7 +11,8 @@
 .exploration-section-heading h2 { margin: 0; }
 .exploration-section-heading > span { color: var(--muted); font-size: 12px; }
 .exploration-lens-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
-.exploration-lens-card { padding: 24px 23px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.exploration-lens-card { display: flex; flex-direction: column; align-items: flex-start; padding: 24px 23px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.exploration-lens-card > .exploration-text-link { margin-top: auto; }
 .exploration-lens-rank { color: var(--muted); font-size: 12px; letter-spacing: .6px; }
 .exploration-lens-card h3 { margin: 19px 0 15px; }
 .exploration-lens-card h3 a { color: var(--ink); }
@@ -32,7 +33,7 @@
 .exploration-record-row p { margin: 0; font-size: 14px; color: var(--muted); }
 .exploration-record-row > span { color: var(--accent); }
 .exploration-status { display: inline-block; font-size: 12px; line-height: 1.7; padding: 3px 10px; border-radius: 7px; background: var(--surface-muted); color: var(--muted); white-space: nowrap; }
-.status-exploring { background: var(--surface-muted); color: var(--accent); }
+.status-exploring { background: var(--surface-selected); color: var(--accent); }
 .status-deferred, .status-archived { background: var(--surface-muted); color: var(--muted); }
 .exploration-back { display: block; width: fit-content; min-height: 44px; margin-bottom: 24px; color: var(--muted); font-size: 13px; }
 .exploration-lens-page, .exploration-detail { max-width: 860px; }
@@ -84,7 +85,7 @@
 .exploration-form { display: grid; gap: 18px; line-height: 1.8; }
 .exploration-form > .exploration-form-body { display: grid; gap: 18px; border: 0; padding: 0; margin: 0; min-width: 0; }
 .exploration-form label, .exploration-destination { display: grid; gap: 8px; font-size: 14px; color: var(--ink); }
-.exploration-form input, .exploration-form select, .exploration-form textarea, .exploration-destination select, .exploration-save-error textarea { width: 100%; max-width: 100%; font: inherit; font-size: 15px; line-height: 1.8; padding: 11px 13px; border: 1px solid var(--line-strong); border-radius: 7px; color: var(--ink); background: var(--surface); min-width: 0; }
+.exploration-form input, .exploration-form select, .exploration-form textarea, .exploration-destination select, .exploration-save-error textarea { width: 100%; max-width: 100%; font: inherit; font-size: 15px; line-height: 1.8; padding: 11px 13px; border: 1px solid var(--control-border); border-radius: 7px; color: var(--ink); background: var(--surface); min-width: 0; }
 .exploration-form input:focus-visible, .exploration-form select:focus-visible, .exploration-form textarea:focus-visible, .exploration-destination select:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .exploration-form textarea { resize: vertical; }
 .exploration-form fieldset { border: 1px solid var(--line); margin: 0; padding: 15px 20px 20px; border-radius: 7px; display: grid; gap: 16px; min-width: 0; }
@@ -102,6 +103,7 @@
 .exploration-editor-evidence > div + div { margin-top: 26px; }
 .exploration-editor-evidence label { margin-top: 12px; }
 .exploration-remove { min-height: 44px; color: var(--danger); font-size: 13px; padding: 8px 0; }
+.exploration-remove:hover { color: var(--danger-hover); }
 .exploration-attachment-context { padding: 16px 20px; border-radius: 7px; background: var(--surface-muted); }
 .exploration-attachment-context h3 { font-size: 17px; margin: 0 0 10px; }
 .exploration-attachment-context p { font-size: 14px; margin: 0 0 8px; }

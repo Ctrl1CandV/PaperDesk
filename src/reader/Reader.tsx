@@ -11,6 +11,7 @@ import { Dialog } from '../ui/Dialog';
 import { Markdown } from './Markdown';
 import { SourceDialog, type SourceSelection } from './SourceDialog';
 import { sectionContext } from './readingContext';
+import { ReaderAssistant } from './ReaderAssistant';
 
 function Contents({ guide, active, onChoose }: { guide: Guide; active: string; onChoose?: () => void }) {
   return <nav aria-label="章节目录"><ol>{guide.units.map((unit, index) => <li key={unit.id}>
@@ -40,6 +41,14 @@ export function Reader({ guide }: { guide: Guide }) {
   const [storageError, setStorageError] = useState('');
   const [stateMessage, setStateMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const [assistantWide, setAssistantWide] = useState(() => window.matchMedia('(min-width:1100px)').matches);
+  const [assistantOpen, setAssistantOpen] = useState(() => window.matchMedia('(min-width:1100px)').matches);
+  useEffect(() => {
+    const media = window.matchMedia('(min-width:1100px)');
+    const update = () => setAssistantWide(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
   const ready = useRef(false);
   const openCitation = useCallback((citation: Citation, label: string, trigger: HTMLButtonElement) => setSource({ citation, label, trigger }), []);
   useEffect(() => { readingEditors.set(bufferKey, { selection, noteContext, evidence }); }, [bufferKey, selection, noteContext, evidence]);
@@ -106,25 +115,26 @@ export function Reader({ guide }: { guide: Guide }) {
       const updatedAt = new Date().toISOString();
       if (kind === 'guide') { const record = { guideId: guide.metadata.id, revision: guide.metadata.revision, status, updatedAt }; await personalStore.setGuideState(record); setGuideState(record); }
       else { const record = { sourceId: guide.metadata.source.id, sourceVersion: guide.metadata.source.version, status, updatedAt }; await personalStore.setOriginalState(record); setOriginalState(record); }
-      setStateMessage('已保存这项明确标记。');
-    } catch { setStateMessage('标记保存失败，未显示为已保存。请重试或检查本地存储。'); } finally { setSaving(false); }
+      setStateMessage('已保存。');
+    } catch { setStateMessage('保存失败，请重试或检查本地存储。'); } finally { setSaving(false); }
   }
   const controls = <div className="font-controls" role="group" aria-label="正文字号"><span>字号</span><button aria-label="减小字号" disabled={fontSize <= 16} onClick={() => adjustFont(-1)}>A−</button><button aria-label="增大字号" disabled={fontSize >= 22} onClick={() => adjustFont(1)}>A+</button></div>;
   return <>
-    <div className="mobile-tools"><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
-    <div className="reader-layout"><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>CONTENTS</span></div><Contents guide={guide} active={active} /><div className="sidebar-footer"><span>来源与正文相连</span><p>点击文中引用，随时对照原文。</p><AppLink to="/explore">从阅读走向探索 →</AppLink></div></aside>
+    <div className={`mobile-tools${assistantOpen ? ' assistant-mobile-tools' : ''}`}><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
+    <div className={`reader-layout${assistantOpen && assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录</div><Contents guide={guide} active={active} /><div className="sidebar-footer"><AppLink to="/explore">研究探索 →</AppLink></div></aside>
       <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述 · 深入阅读' : '论文 · 深入阅读'}</span><span>{coverageLabel(guide.metadata.coverage.scope)}</span><span>{guide.metadata.source.version ?? '来源版本未指定'}</span></div><div className="desktop-font">{controls}</div></div>
-        <div className="reading-identity"><span className="reading-stage">研究主线解读</span><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)}><strong>阅读记录</strong><span>本篇解读 · {statusLabel(guideState?.status)}</span><span>原论文 · {statusLabel(originalState?.status)}</span><span aria-hidden="true">⌄</span></button></div>
+        <div className="reading-identity"><span className="reading-stage">研究主线解读</span><div className="reader-heading-actions"><button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)}><strong>阅读记录</strong><span>本篇解读 · {statusLabel(guideState?.status)}</span><span>原论文 · {statusLabel(originalState?.status)}</span><span aria-hidden="true">⌄</span></button></div></div>
         {storageError && <p className="status-warning" role="status">{storageError}</p>}
         <article className="prose" style={{ '--reading-size': `${fontSize}px` } as React.CSSProperties}>{guide.units.map(unit => <section id={unit.id} tabIndex={-1} key={unit.id} data-unit={unit.id}><Markdown guide={guide} markdown={unit.markdown} unitId={unit.id} onCitation={openCitation} /></section>)}</article>
-        <footer className="reading-footer"><span>本篇正文到此</span><AppLink to="#orientation">回到阅读起点 ↑</AppLink><p>导读提供理解与查证的入口。是否读过原文，仍由你的实际阅读决定。</p><AppLink to="/explore">带着问题进入探索 →</AppLink></footer>
+        <footer className="reading-footer"><AppLink to="#orientation">回到阅读起点 ↑</AppLink><AppLink to="/explore">研究探索 →</AppLink></footer>
       </main>
+      {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={selection?.text} wide={assistantWide} onClose={() => setAssistantOpen(false)} />}
     </div>
     <div className="reader-action-bar reading-tools" role="group" aria-label="阅读积累"><div className="reading-tool-context"><span>{selection ? '选中文本' : '当前章节'}</span><strong title={contextHeading}>{contextHeading}</strong></div>{selection && <button className="text-action clear-selection" onClick={() => { setSelection(undefined); window.getSelection()?.removeAllRanges(); }}>清除选择</button>}<button id="reader-note-action" className="tool-primary" aria-haspopup="dialog" onClick={() => setNoteContext(context())}>记笔记</button><button id="reader-explore-action" className="tool-primary" aria-haspopup="dialog" onClick={() => { const selected = context(); setEvidence({ id: crypto.randomUUID(), provenance: 'guide-excerpt', text: selected.text, target: { guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: selected.unitId }, sources: selected.sources }); }}>加入探索</button><button id="reader-packet-action" className="tool-secondary" aria-haspopup="dialog" onClick={() => setPacket(context())}>复制上下文</button></div>
     {source && <SourceDialog selection={source} guide={guide} onClose={() => setSource(null)} />}
     {noteContext && <NoteEditor target={{ guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: noteContext.unitId }} quote={noteContext.text} onClose={() => setNoteContext(undefined)} />}
     {evidence && <AddEvidenceDialog evidence={evidence} onClose={() => setEvidence(undefined)} />}
     {packet && <PacketDialog reading={packet} onClose={() => setPacket(undefined)} />}
-    {stateOpen && <Dialog title="阅读记录" className="reading-state-dialog" busy={saving} onClose={() => setStateOpen(false)}><p className="quiet-copy">本篇解读与原论文分别记录。打开页面或滚动只保存位置，不代表已读。选择状态后立即保存；关闭只收起面板。</p><label className="field-label">本篇解读（导读修订 {guide.metadata.revision}）<select aria-label="导读阅读状态" value={guideState?.status ?? ''} disabled={saving} onChange={event => mark('guide', event.target.value as ReadingStatus)}><option value="" disabled>未记录</option>{statuses.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><label className="field-label">原论文（{guide.metadata.source.version ?? '版本未指定'}）<select aria-label="原论文阅读状态" value={originalState?.status ?? ''} disabled={saving} onChange={event => mark('original', event.target.value as ReadingStatus)}><option value="" disabled>未记录</option>{statuses.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>{stateMessage && <p role="status">{stateMessage}</p>}<AppLink to="/backup">备份与恢复个人积累 →</AppLink></Dialog>}
+    {stateOpen && <Dialog title="阅读记录" className="reading-state-dialog" busy={saving} onClose={() => setStateOpen(false)}><p className="quiet-copy">选择后立即保存。</p><label className="field-label">本篇解读（导读修订 {guide.metadata.revision}）<select aria-label="导读阅读状态" value={guideState?.status ?? ''} disabled={saving} onChange={event => mark('guide', event.target.value as ReadingStatus)}><option value="" disabled>未记录</option>{statuses.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><label className="field-label">原论文（{guide.metadata.source.version ?? '版本未指定'}）<select aria-label="原论文阅读状态" value={originalState?.status ?? ''} disabled={saving} onChange={event => mark('original', event.target.value as ReadingStatus)}><option value="" disabled>未记录</option>{statuses.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>{stateMessage && <p role="status">{stateMessage}</p>}<AppLink to="/backup">备份与恢复个人积累 →</AppLink></Dialog>}
   </>;
 }

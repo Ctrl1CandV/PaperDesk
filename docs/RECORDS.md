@@ -1,5 +1,7 @@
 # Personal records and backups
 
+This document governs browser records. AI conversations are a separate backend SQLite store with a separate backup format and controls; see [AI reading](AI-READING.md). Browser export and clearing operations do not include those conversations.
+
 PaperDesk stores intentional personal records in IndexedDB database `paperdesk-personal-v1`, database version 1. Notes, explorations, resume positions, guide marks, original-paper marks and preferences are separate stores. Reviewed articles and editorial exploration seeds are read-only and never imported from personal backup files.
 
 ## Normal use

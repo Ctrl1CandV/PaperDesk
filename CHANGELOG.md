@@ -1,5 +1,13 @@
 # Changelog
 
+## AI reading and interface — 2026-10-25
+
+- Added a reader-triggered AI panel, bounded guide/library tools, optional web search, source snapshots, local conversations and separate AI backups.
+- Added official ChatGPT authorization, OpenAI-compatible API settings, capability-based Thinking and explicit quota-only API fallback. Credentials remain backend-only.
+- Repaired connection recovery, catalog loading/caching and streamed/final answer reconciliation while retaining recoverable partial answers.
+- Refined article orientation, AI settings/composer, palette contrast and reading controls; preserved approved academic content and existing personal-record behavior.
+- Unified local startup with `npm start`, updated operating contracts, archived stage reports and refreshed curated interface images.
+
 ## Streaming foundations and library review — 2026-10-24
 
 - Added mainline guides for *Efficient Streaming Language Models with Attention Sinks* and *A Survey on Concept Drift Adaptation*, with fixed source versions, mechanisms, evidence conditions and original-reading locators.

@@ -1,0 +1,62 @@
+export class PublicError extends Error {
+  constructor(message, status = 400) { super(message); this.status = status; }
+}
+export const reject = (message, status) => { throw new PublicError(message, status); };
+export const isUuid = value => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+export const isId = value => typeof value === 'string' && /^[a-z0-9][a-z0-9-]{0,99}$/.test(value);
+export const isHash = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+export const isRevision = value => Number.isSafeInteger(value) && value > 0;
+export const isTime = value => typeof value === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value;
+export const isText = (value, max, min = 0) => typeof value === 'string' && value.length >= min && value.length <= max;
+export function object(value, required, optional = []) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)
+    || required.some(key => !Object.hasOwn(value, key))
+    || Object.keys(value).some(key => !required.includes(key) && !optional.includes(key))) reject('数据字段不符合 AI 记录格式。');
+}
+export function safeWebUrl(value) {
+  try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password && value.length < 4096; } catch { return false; }
+}
+export function validateAsk(value) {
+  object(value, ['requestId', 'guideId', 'revision', 'bodySha256', 'unitId', 'question', 'webSearch'], ['conversationId', 'selection']);
+  if (!isUuid(value.requestId) || value.conversationId !== undefined && !isUuid(value.conversationId)
+    || !isId(value.guideId) || !isRevision(value.revision) || !isHash(value.bodySha256) || !isId(value.unitId)
+    || !isText(value.question, 6000, 1) || !value.question.trim() || typeof value.webSearch !== 'boolean'
+    || value.selection !== undefined && !isText(value.selection, 12000)) reject('问题或文章定位无效。问题最多 6000 字，选文最多 12000 字。');
+  return value;
+}
+export function validateSource(source) {
+  object(source, ['id', 'kind', 'title', 'text'], ['url', 'guideId', 'revision', 'unitId', 'version']);
+  if (!/^[LW][1-9]\d{0,3}$/.test(source.id) || !['guide', 'web'].includes(source.kind)
+    || !isText(source.title, 1000, 1) || !isText(source.text, 100000)
+    || source.version !== undefined && source.version !== null && !isText(source.version, 100)) reject('来源快照无效。');
+  if (source.kind === 'guide') {
+    if (!source.id.startsWith('L') || !isId(source.guideId) || !isRevision(source.revision) || !isId(source.unitId)
+      || source.url !== `/read/${source.guideId}/${source.revision}#${source.unitId}`) reject('导读来源定位无效。');
+  } else if (!source.id.startsWith('W') || !safeWebUrl(source.url) || source.guideId !== undefined || source.revision !== undefined || source.unitId !== undefined) reject('网页来源定位无效。');
+}
+// A snapshot is deliberately data-only. Metadata is preserved as a bounded JSON string,
+// so future content fields survive export without becoming executable configuration.
+export function validateContext(context) {
+  object(context, ['guideId', 'revision', 'bodySha256', 'unitId', 'selection', 'scope', 'metadataJson', 'historyTurnIds', 'webSearch', 'model', 'toolEvents'], ['provider', 'fallback']);
+  if (!isId(context.guideId) || !isRevision(context.revision) || !isHash(context.bodySha256) || !isId(context.unitId)
+    || !isText(context.selection, 12000) || !['full-guide', 'section'].includes(context.scope)
+    || !isText(context.metadataJson, 100000) || !isText(context.model, 200, 1) || typeof context.webSearch !== 'boolean'
+    || !Array.isArray(context.historyTurnIds) || context.historyTurnIds.length > 6 || !context.historyTurnIds.every(isUuid)
+    || !Array.isArray(context.toolEvents) || context.toolEvents.length > 8) reject('问答上下文快照无效。');
+  if (context.provider !== undefined && !['api', 'chatgpt'].includes(context.provider)) reject('回答服务来源无效。');
+  if (context.fallback !== undefined) {
+    const fallback = context.fallback;
+    object(fallback, ['reason', 'stage', 'fromModel', 'previousAnswer', 'previousToolCount']);
+    if (context.provider !== 'api' || fallback.reason !== 'subscription_quota' || !['catalog', 'answer'].includes(fallback.stage)
+      || fallback.fromModel !== null && !isText(fallback.fromModel, 200, 1) || !isText(fallback.previousAnswer, 40000)
+      || !Number.isSafeInteger(fallback.previousToolCount) || fallback.previousToolCount < 0 || fallback.previousToolCount > context.toolEvents.length
+      || fallback.stage === 'catalog' && (fallback.previousAnswer || fallback.previousToolCount)
+      || fallback.stage === 'answer' && fallback.fromModel === null) reject('备用 API 切换记录无效。');
+  }
+  try { const parsed = JSON.parse(context.metadataJson); if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw Error(); } catch { reject('文章元数据快照无效。'); }
+  for (const event of context.toolEvents) {
+    object(event, ['name', 'argumentsJson', 'resultJson']);
+    if (!['search_library', 'read_section', 'web_search'].includes(event.name) || !isText(event.argumentsJson, 2000) || !isText(event.resultJson, 40000)) reject('工具快照无效。');
+    try { JSON.parse(event.argumentsJson); JSON.parse(event.resultJson); } catch { reject('工具快照不是有效 JSON。'); }
+  }
+}

@@ -22,7 +22,7 @@ test('title/topic search excludes incidental mentions and filtering clears the p
   expect(matches).not.toContain('choose-instructgpt');
   await expect(page.locator('#orientation-title')).toHaveCount(0);
   await page.locator('#choose-agent-survey').click();
-  await expect(page.locator('#article-preview')).toContainText('文章导学');
+  await expect(page.locator('#article-preview')).toHaveAttribute('aria-label', '文章导学');
   const snapshot = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.exportBackup());
   expect(snapshot.resume).toEqual([]); expect(snapshot.guideStates).toEqual([]); expect(snapshot.originalStates).toEqual([]);
   await search.fill('合成测试不存在的主题');
@@ -32,11 +32,11 @@ test('title/topic search excludes incidental mentions and filtering clears the p
   await page.getByRole('group', { name: '文章类型' }).getByRole('button', { name: /^论文/ }).click();
   await expect(page.locator('.guide-entry')).toHaveCount(paperCount);
   await expect(page.locator('#orientation-title')).toHaveCount(0);
-  await page.locator('#choose-instructgpt').focus(); await page.keyboard.press('Enter');
+  await page.locator('#choose-instructgpt').press('Enter');
   await expect(page.locator('#orientation-title')).toContainText('InstructGPT');
   await expect(page.locator('.paper-original-title')).toContainText('Training language models');
-  await expect(page.locator('.bibliography-facts')).toContainText('2022');
-  await expect(page.locator('.article-orientation')).toContainText('为什么值得读');
+  await expect(page.locator('.article-kind')).toContainText('2022');
+  await expect(page.locator('.article-orientation')).toContainText('阅读重点');
   const selectedURL = page.url();
   await page.getByRole('link', { name: '进入深入阅读' }).click();
   await expect(page).toHaveURL(new RegExp(`/read/instructgpt/${revision.instructgpt}$`));
@@ -49,7 +49,7 @@ test('title/topic search excludes incidental mentions and filtering clears the p
   await enter.scrollIntoViewIfNeeded(); await enter.focus();
   const before = await page.evaluate(() => scrollY);
   await enter.press('Enter');
-  await page.locator('.back-link').click();
+  await page.locator('.back-link:visible, .reader-mobile-back:visible').click();
   await expect(page).toHaveURL(selectedURL);
   await expect(page.locator('#start-instructgpt')).toBeFocused();
   await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - before)).toBeLessThan(5);
@@ -116,7 +116,7 @@ test('a late article keeps its adjacent preview and reading return position thro
   expect(before).toBeGreaterThan(300);
   await enter.press('Enter');
   await expect(page).toHaveURL(`/read/${lastGuide.guideId}/${lastGuide.revision}`);
-  await page.locator('.back-link').click();
+  await page.locator('.back-link:visible, .reader-mobile-back:visible').click();
   await expect(page).toHaveURL(selectedURL);
   await expect(page.locator(`#start-${lastGuide.guideId}`)).toBeFocused();
   await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - before)).toBeLessThan(5);

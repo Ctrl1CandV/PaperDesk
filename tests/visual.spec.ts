@@ -71,6 +71,7 @@ for (const id of ['agent-survey', 'instructgpt', 'helm']) {
     await expect(dialog.getByRole('link', { name: '打开原文（新标签页）' })).toHaveAttribute('href', /^https:\/\//);
     await shot(page, `v1-${id}-source`); await page.keyboard.press('Escape');
     await expect(citation).toBeFocused(); expect(Math.abs(await page.evaluate(() => scrollY) - before)).toBeLessThan(5);
+    await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
     await page.setViewportSize({ width: 390, height: 844 }); await page.evaluate(() => scrollTo(0, 0));
     await expect(page.locator('#orientation p').first()).toBeInViewport();
     await bounded(page); await shot(page, `v1-${id}-narrow`);

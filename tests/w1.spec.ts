@@ -141,6 +141,8 @@ test('internal related-guide navigation restores guide, version, position and fo
   await expect(page).toHaveURL(/\/read\/agent-survey\/1/);
   await expect(related).toBeFocused();
   await expect.poll(async () => Math.abs((await page.evaluate(() => scrollY)) - priorScroll)).toBeLessThan(5);
+  // This route-return check continues through the full-width chapter sidebar.
+  await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
   await page.getByRole('link', { name: '应用不同，“做好了”的含义也不同', exact: true }).click();
   await expect(page).toHaveURL(/#u04$/);
   await expect(page.locator('#u04')).toBeFocused();

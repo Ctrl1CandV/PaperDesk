@@ -1,5 +1,7 @@
 # Local-first architecture
 
+The accepted static-reader architecture below is extended by the optional [AI reading service](AI-READING.md). `src/assistant/` owns the panel and API client; `server/` owns model configuration, validated content retrieval, tool orchestration and SQLite conversations. `ai-runtime.mjs` routes the chosen API or official ChatGPT adapter and permits a configured API fallback only on an exact subscription usage-limit error. `http.mjs` owns the per-question configuration snapshot, fallback checkpoint and stream reset; provider/model provenance stays with the turn. `chatgpt-auth.mjs` and `chatgpt-storage.mjs` own private provider authorization. The unified launcher supervises website and backend as one local session. Browser records retain their existing IndexedDB contract. Neither backend configuration, credentials nor AI records are frontend assets.
+
 ## Decisions
 
 Use React, TypeScript and Vite for a local static web application for survey guidance, paper assistance and research exploration. Interactive source panels, section navigation, selection context and local-record editing justify reusable components; there is no need for SSR, a service database or a framework migration from an older site.

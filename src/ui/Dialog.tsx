@@ -24,7 +24,10 @@ export function Dialog({ title, children, onClose, className = '', busy = false 
     };
   }, []);
   return <dialog ref={ref} className={`workspace-dialog ${className}`} aria-labelledby={titleId} aria-busy={busy || undefined}
-    onCancel={event => { event.preventDefault(); dismiss(); }}
+    onCancel={event => {
+      if (event.target !== event.currentTarget) return;
+      event.preventDefault(); dismiss();
+    }}
     onPointerDown={event => { outsidePointer.current = event.target === event.currentTarget && outside(event.clientX, event.clientY) ? event.pointerId : null; }}
     onPointerUp={event => {
       const startedOutside = outsidePointer.current === event.pointerId;
@@ -34,6 +37,7 @@ export function Dialog({ title, children, onClose, className = '', busy = false 
     onPointerCancel={() => { outsidePointer.current = null; }}
     onKeyDown={event => {
       if (event.key !== 'Tab') return;
+      if (event.target instanceof Element && event.target.closest('dialog') !== event.currentTarget) return;
       const focusable = [...ref.current!.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')].filter(element => element.getClientRects().length && !element.matches(':disabled'));
       const first = focusable[0], last = focusable.at(-1);
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }

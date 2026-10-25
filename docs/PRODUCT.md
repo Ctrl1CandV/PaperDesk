@@ -36,6 +36,12 @@ Three articles are the initial inventory, not an architectural limit. A represen
 
 ## Boundaries
 
+### Subsequent AI reading extension
+
+The accepted baseline is extended with an optional AI panel in deep reading. It answers explicit reader questions using the reviewed guide, its original-source attribution and coverage limits, with bounded read-only library tools and separately enabled web search. It is not a full-paper reader unless that text is actually supplied. Model interpretations remain visibly distinct from approved content and do not change notes or reading marks. Credentials persist only in the local backend. The reader can explicitly connect an eligible ChatGPT plan through official authorization, choose a currently available model, or enter an OpenAI-compatible API's Base URL, Model ID and Key in AI settings. Saved keys are never returned to the page. The default-enabled quota fallback can switch a question once to the configured API only after an explicit subscription/application usage-limit error; it is separately switchable and labels the actual provider/model. Other subscription failures do not cause fallback. Conversation storage and backups are separate from browser records. See [AI reading](AI-READING.md) for architecture, research and operation.
+
+The following exclusions describe the original v1 delivery; the AI extension above is the explicit exception for online model calls.
+
 No automatic AI discovery/generation, online model keys, topic scoring, novelty assessment, experiment execution, paper-writing engine, citation graph or vector database in v1. No preloaded personal records, profile inference or migration of an old project. Server deployment, authentication, synchronization, PWA installation and offline downloads remain future options after the local reading/exploration loop is accepted.
 
 The representative reading page receives feedback at W1 before implementation spreads. After W6 the entire survey–paper–exploration loop still needs reader acceptance. A reading platform can support learning; it cannot certify learning or publication prospects.

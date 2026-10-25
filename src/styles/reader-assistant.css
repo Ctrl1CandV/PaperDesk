@@ -1,0 +1,13 @@
+.reader-ai-trigger{min-height:40px;color:var(--accent);border:1px solid var(--line);white-space:nowrap;border-radius:7px;align-items:center;gap:8px;padding:6px 12px;font-size:13px;display:inline-flex}
+.reader-ai-trigger:hover,.reader-ai-trigger[aria-expanded=true]{background:var(--surface-muted)}
+.reader-heading-actions{flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:10px;display:flex}
+.reader-assistant-slot{align-self:start;min-width:0}
+.reader-assistant-dialog{border:1px solid var(--line);background:var(--surface);width:min(620px,100% - 24px);max-width:none;height:min(850px,100dvh - 24px);max-height:calc(100dvh - 24px);color:var(--ink);border-radius:12px;padding:0;overflow:hidden}
+.reader-assistant-dialog::backdrop{background:var(--backdrop)}
+.reader-assistant-dialog>.ai-panel{border-radius:inherit;border:0}
+.reader-assistant-dialog.is-docked{border-radius:10px;width:100%;height:calc(100dvh - 130px);min-height:360px;max-height:900px;margin:0;position:static}
+@media (width>=1100px){.reader-layout.with-assistant{grid-template-columns:180px minmax(0,720px) 360px;justify-content:center;gap:32px;max-width:1440px}.with-assistant .reader-assistant-slot{position:sticky;top:24px}}
+@media (height<=600px){.reader-assistant-dialog.is-docked{min-height:0}.reader-assistant-dialog>.ai-panel{overflow-y:auto}.reader-assistant-dialog .ai-messages{flex:none;min-height:160px;overflow:visible}}
+@media (width>=1100px) and (width<=1439px){.reader-layout.with-assistant{grid-template-columns:minmax(0,720px) 350px;gap:32px;max-width:1160px}.with-assistant .reading-sidebar{display:none}.assistant-mobile-tools{border-bottom:1px solid var(--line);justify-content:space-between;align-items:flex-start;gap:20px;max-width:1112px;margin:auto;padding:0 24px;display:flex}.assistant-mobile-tools .mobile-contents{flex:1}.assistant-mobile-tools summary{cursor:pointer;min-height:44px;color:var(--accent);align-content:center;font-size:13px}.assistant-mobile-tools .font-controls{display:none}.with-assistant .reader-mobile-back{display:inline-flex}}
+@media (width<=1099px){.reader-assistant-slot{display:contents}}
+@media (width<=600px){.reader-assistant-dialog{border:0;border-radius:0;width:100%;height:100dvh;max-height:100dvh}.reading-identity{flex-wrap:wrap}.reader-heading-actions{gap:6px}.reader-ai-trigger{min-height:44px}}

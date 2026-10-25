@@ -102,7 +102,16 @@ for (const id of Object.keys(catalog.currentRevisions)) {
     await shot(page, `${id}-detail-desktop`);
 
     const secondUnit = metadata.units[1];
-    const contentsLink = page.locator(`.reading-sidebar a[href="#${secondUnit.id}"]`);
+    // The AI pane moves contents into the header at intermediate desktop widths.
+    // Exercise the visible navigation instead of focusing its hidden sidebar copy.
+    const sidebarLink = page.locator(`.reading-sidebar a[href="#${secondUnit.id}"]`);
+    const sidebarVisible = await sidebarLink.isVisible();
+    if (!sidebarVisible) {
+      await page.locator('.mobile-contents summary').focus();
+      await page.keyboard.press('Enter');
+    }
+    const contentsLink = sidebarVisible ? sidebarLink : page.locator(`.mobile-contents a[href="#${secondUnit.id}"]`);
+    await expect(contentsLink).toBeVisible();
     await contentsLink.focus(); await page.keyboard.press('Enter');
     await expect(page.locator(`#${secondUnit.id}`)).toBeFocused();
     const citation = page.locator('.citation-button').first();
@@ -121,6 +130,9 @@ for (const id of Object.keys(catalog.currentRevisions)) {
     await expect(citation).toBeFocused();
     expect(Math.abs(await page.evaluate(() => scrollY) - scroll)).toBeLessThan(5);
 
+    // Close the docked assistant deliberately before inspecting the article on a
+    // narrow viewport; an open answer otherwise stays mounted in its modal.
+    await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.evaluate(() => scrollTo(0, 0));
     await shot(page, `${id}-reader-narrow`);

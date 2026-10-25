@@ -30,7 +30,7 @@ const centeredBrowse = async (page: Page) => {
   const layout = (await page.locator('.library-layout').boundingBox())!;
   expect(Math.abs(layout.x + layout.width / 2 - viewportWidth / 2)).toBeLessThan(2);
   expect(layout.width).toBeLessThanOrEqual(900);
-  for (const selector of ['.library-heading', '.library-shelf', '.library-search-box', '.library-footnote']) {
+  for (const selector of ['.library-heading', '.library-shelf', '.library-search-box']) {
     const bounds = (await page.locator(selector).boundingBox())!;
     expect(Math.abs(bounds.x - layout.x)).toBeLessThan(2);
     expect(Math.abs(bounds.width - layout.width)).toBeLessThan(2);
@@ -157,7 +157,7 @@ test('selected identity, source disclosures and chapters remain keyboard accessi
   await expect(source).toHaveAttribute('open', '');
   await expect(source).toContainText('完整作者');
   await expect(source).toContainText('首次预印本 2022 年');
-  await expect(source.getByRole('link')).toHaveAttribute('rel', 'noopener noreferrer');
+  for (const link of await source.getByRole('link').all()) await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   await noNestedVerticalScroll(page);
   await page.locator('.orientation-outline summary').focus(); await page.keyboard.press('Enter');
   const chapter = page.locator('.orientation-outline a').first();

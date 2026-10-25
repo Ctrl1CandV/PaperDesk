@@ -172,6 +172,7 @@ test('article-level status is separate from passage tools and survives closing a
   await page.mouse.click(4, 4);
   await expect(page.locator('.reading-state-trigger')).toContainText('本篇解读 · 阅读中');
   await expect(page.locator('.reading-state-trigger')).toContainText('原论文 · 未记录');
+  await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole('button', { name: '记笔记', exact: true })).toBeInViewport();
   await expect(page.getByRole('button', { name: '复制上下文', exact: true })).toBeInViewport();

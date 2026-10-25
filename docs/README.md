@@ -8,6 +8,7 @@ The integrated first version is accepted. [Project state](../PROJECT-STATE.md) r
 | Product and design | [Product](PRODUCT.md), [Implementation](IMPLEMENTATION.md), [UX](UX.md) |
 | Content and exploration | [Content](CONTENT.md), [Exploration](EXPLORATION.md), [Assisted discovery](ASSISTED-DISCOVERY.md), [Memory and dynamic-decision reading route](LEARNING-ROUTE.md) |
 | Engineering | [Architecture](ARCHITECTURE.md), [Records](RECORDS.md), [Content updates](CONTENT-UPDATES.md), [Maintenance](MAINTENANCE.md) |
+| AI reading extension | [Research, architecture and configuration](AI-READING.md) |
 | Boundaries | [Privacy](PRIVACY.md), [Acceptance criteria](ACCEPTANCE.md), [Future hosting](FUTURE-HOSTING.md) |
 | Attribution | [References](REFERENCES.md), [Orientation sources](ORIENTATION-SOURCES.md), [Research reviews](research/) |
 | Evidence and history | [Historical reports](history/README.md), [Compact evidence](evidence/README.md), [Curated images](images/) |

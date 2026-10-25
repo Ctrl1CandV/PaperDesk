@@ -62,7 +62,7 @@ export function BackupPage() {
     try {
       const result = await personalStore.importBackup(preview, choices);
       setSnapshot(await personalStore.exportBackup()); setPreview(undefined); source.current = '';
-      setNotice(`导入并回读确认完成：写入 ${result.imported} 条，其中保留副本 ${result.copied} 条，跳过 ${result.skipped} 条。`);
+      setNotice(`已导入 ${result.imported} 条，其中保留副本 ${result.copied} 条，跳过 ${result.skipped} 条。`);
     } catch (reason) { setError(message(reason)); }
     finally { setBusy(false); }
   }
@@ -72,20 +72,21 @@ export function BackupPage() {
     try {
       await personalStore.clearAll(); setSnapshot(await personalStore.exportBackup());
       setPreview(undefined); source.current = ''; setRemoveOpen(false); setConfirmRemoval(false);
-      setNotice('当前浏览器来源中的个人记录与阅读设置已清除，并已回读确认。');
+      setNotice('已清除当前浏览器的个人记录和阅读设置。');
     } catch (reason) { setError(message(reason)); }
     finally { setBusy(false); }
   }
   return <main id="main-content" className="records-page">
-    <p className="eyebrow">LOCAL RECORDS</p><h1>备份与本地记录</h1>
-    <p className="records-intro">笔记、探索、阅读位置和主动标记保存在当前浏览器。备份文件可能包含私人文字，请自行妥善保管；导出和导入都由你主动操作。</p>
-    <p className="records-muted">浏览器清理或存储回收可能删除记录。更换浏览器、协议、主机或端口后，需要用备份迁移。当前版本没有同步服务，也不保证离线可用。</p>
+    <h1>备份与本地记录</h1>
+    <p className="records-intro">备份当前浏览器的笔记、探索、阅读位置、主动标记和阅读设置。文件可能包含私人文字，请妥善保管。</p>
+    <p className="records-muted">浏览器清理或回收存储可能删除记录；更换浏览器或访问地址时，请用备份迁移。目前没有同步服务，也不保证离线可用。</p>
+    <p className="records-muted">AI 对话需在阅读页的 AI 解读中单独备份、恢复或删除，不受本页操作影响。连接同一本机服务的浏览器共享 AI 对话。</p>
     {error && <p role="alert" className="records-error">{error}</p>}
     <p role="status" className="records-status">{notice}</p>
     <section className="records-section" aria-labelledby="current-records-title">
       <h2 id="current-records-title">当前记录</h2>
       {snapshot ? <dl className="records-counts">{names.map(name => <div key={name}><dt>{labels[name]}</dt><dd>{snapshot[name].length}</dd></div>)}</dl> : <p>正在读取本地记录…</p>}
-      <div className="form-actions"><button disabled={busy} onClick={() => void exportFile()}>导出完整备份</button><button className="secondary-action" disabled={busy} onClick={() => fileInput.current?.click()}>选择备份并预览</button></div>
+      <div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void exportFile()}>导出完整备份</button><button className="secondary-action" disabled={busy} onClick={() => fileInput.current?.click()}>选择备份并预览</button></div>
       <input className="records-file-input" ref={fileInput} type="file" accept=".json,application/json" aria-label="选择个人记录备份" onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = ''; }} />
       <p className="records-muted">接受 PaperDesk 个人备份 v1，最大 5 MiB。仅选择文件不会修改记录。</p>
     </section>
@@ -104,8 +105,8 @@ export function BackupPage() {
         <div className="records-comparison"><details><summary>查看本地完整记录</summary><pre>{JSON.stringify(conflict.local, null, 2)}</pre></details><details><summary>查看导入完整记录</summary><pre>{JSON.stringify(conflict.incoming, null, 2)}</pre></details></div>
       </fieldset>)}
       <details className="records-exact-preview"><summary>查看将导入文件的完整内容</summary><textarea aria-label="导入文件完整内容" readOnly value={JSON.stringify(preview.backup, null, 2)} /></details>
-      <p className="records-muted">笔记和探索的冲突默认保留两份。阅读位置、阅读标记和设置默认保留本地。新旧修订号不会代替你的选择。</p>
-      <div className="form-actions"><button disabled={busy} onClick={() => void applyImport()}>确认按以上选择导入</button><button className="secondary-action" disabled={busy} onClick={() => { setPreview(undefined); source.current = ''; setChoices({}); setError(''); setNotice('已取消，本地记录未因预览改变。'); }}>取消导入</button><button className="secondary-action" disabled={busy} onClick={() => void makePreview(source.current)}>重新预览</button></div>
+      <p className="records-muted">笔记和探索的冲突默认保留两份；阅读位置、阅读标记和设置默认保留本地。</p>
+      <div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void applyImport()}>确认按以上选择导入</button><button className="secondary-action" disabled={busy} onClick={() => { setPreview(undefined); source.current = ''; setChoices({}); setError(''); setNotice('已取消，本地记录未改变。'); }}>取消导入</button><button className="secondary-action" disabled={busy} onClick={() => void makePreview(source.current)}>重新预览</button></div>
     </section>}
     <section className="records-section" aria-labelledby="remove-records-title"><h2 id="remove-records-title">清除本地记录</h2><p>清除当前来源的笔记、探索、位置、主动标记和阅读设置。导读正文不受影响。</p><button className="records-danger secondary-action" disabled={busy} onClick={() => { setRemoveOpen(true); setConfirmRemoval(false); }}>清除前确认</button></section>
     {removeOpen && <Dialog title="确认清除本地记录" onClose={() => { if (!busy) setRemoveOpen(false); }}>
@@ -113,7 +114,7 @@ export function BackupPage() {
       <button className="secondary-action" disabled={busy} onClick={() => void exportFile()}>先导出完整备份</button>
       {error && <p role="alert" className="records-error">{error}</p>}{notice && <p role="status">{notice}</p>}
       <label className="records-confirm"><input type="checkbox" checked={confirmRemoval} onChange={event => setConfirmRemoval(event.target.checked)} />我确认清除全部个人记录和阅读设置</label>
-      <div className="form-actions"><button className="records-danger" disabled={busy || !confirmRemoval} onClick={() => void removeAll()}>确认清除全部记录</button><button className="secondary-action" disabled={busy} onClick={() => setRemoveOpen(false)}>取消</button></div>
+      <div className="form-actions"><button className="records-danger secondary-action" disabled={busy || !confirmRemoval} onClick={() => void removeAll()}>确认清除全部记录</button><button className="secondary-action" disabled={busy} onClick={() => setRemoveOpen(false)}>取消</button></div>
     </Dialog>}
   </main>;
 }

@@ -24,6 +24,8 @@ Run appropriate checks per package and the full agreed suite/content validation/
 
 ## Change control
 
+The subsequent AI reading extension has its own implementation contract in AI-READING.md. Its source changes do not imply that the new feature has inherited the accepted baseline's visual or reader acceptance. Existing content and personal-record formats remain unchanged; the new backend database has a separate versioned schema.
+
 Preserve accepted guide prose until a factual correction is separately reviewed. New content/revisions need explicit coverage and sources, not just component compatibility. Keep deferred features out of the current loop; no cloud or AI integration is necessary for direction exploration.
 
 No Git history is supplied. Repository initialization, identity selection, commits, pushes and deployment need separate authorization. Do not copy global identity or invent it. This preparation does not publish anything.

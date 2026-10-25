@@ -143,7 +143,8 @@ test('v2 metadata can upgrade a v1 catalog while preserving each approved body a
   const before = await validateContent({ rootDir: f.rootDir });
   assert.equal(before.summary.guides, Object.keys(retainedCatalog.currentRevisions).length);
   const plan = await importContent(f);
-  assert.deepEqual(plan.addedGuides, ['agent-survey/2', 'instructgpt/2', 'helm/2']);
+  // The fixture removes every later catalog revision, including guides added after the original metadata upgrade.
+  assert.deepEqual(plan.addedGuides, retainedCatalog.entries.filter(entry => entry.revision > 1).map(entry => `${entry.guideId}/${entry.revision}`));
   assert.equal(plan.applied, false);
   assert.equal(plan.newFiles, 3);
   await importContent({ ...f, apply: true });

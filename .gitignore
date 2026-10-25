@@ -13,6 +13,8 @@
 .env.*
 !.env.example
 /private/
+/server/config.local.json
+paperdesk-ai-backup-*.json
 /personal-data/
 /backups/
 paperdesk-backup-*.json
