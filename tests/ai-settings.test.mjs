@@ -80,6 +80,35 @@ test('synthetic settings view never returns API/search credentials', async t => 
   assert.deepEqual(Object.keys(initial.api).sort(), ['apiKeyConfigured', 'baseURL', 'modelId']);
 });
 
+test('synthetic search credential save is explicit, protected and absent from HTTP responses', async t => {
+  const f = await httpFixture(t), before = (await f.call('/settings', undefined, f.token)).json;
+  const input = { revision: before.revision, apiKey: 'SYNTHETIC_REPLACEMENT_SECRET' };
+  assert.equal((await f.call('/settings/search', input)).status, 403);
+  assert.equal((await f.call('/settings/search', { ...input, endpoint: 'https://example.invalid' }, f.token)).status, 400);
+  const result = await f.call('/settings/search', input, f.token);
+  assert.equal(result.status, 200); noSecrets(result.json);
+  assert.equal(result.json.settings.search.apiKeyConfigured, true);
+  assert.equal(result.json.status.provider, 'api');
+  const saved = await f.disk();
+  assert.equal(saved.search.apiKey, 'SYNTHETIC_REPLACEMENT_SECRET');
+  assert.equal(saved.apiKey, 'SYNTHETIC_API_SECRET');
+  assert.equal(saved.toolsEnabled, false);
+  assert.equal(f.calls.length, 0); // Saving alone must not issue inference or search.
+  noSecrets((await f.call('/settings', undefined, f.token)).json);
+});
+
+test('synthetic search save preserves newer configuration and rejects malformed secrets', async t => {
+  const f = await fileFixture(t), before = await readFile(f.file, 'utf8');
+  for (const apiKey of ['', '   ', 'synthetic\ninvalid', 's'.repeat(4097), null]) {
+    await assert.rejects(f.settings.update({ revision: f.initial.revision, apiKey }, 'search'), error => error.status === 400);
+    assert.equal(await readFile(f.file, 'utf8'), before);
+  }
+  const changed = await f.settings.update(apiInput(f.initial), 'api');
+  await assert.rejects(f.settings.update({ revision: f.initial.revision, apiKey: 'SYNTHETIC_REPLACEMENT_SECRET' }, 'search'), error => error.status === 409);
+  assert.equal((await f.disk()).modelId, changed.api.modelId);
+  assert.equal((await f.disk()).search.apiKey, 'SYNTHETIC_SEARCH_SECRET');
+});
+
 test('synthetic omitted or blank API key preserves existing credential and unrelated options', async t => {
   const f = await fileFixture(t); let view = f.initial;
   for (const extra of [{}, { apiKey: '' }, { apiKey: '   ', baseURL: 'https://synthetic.example/v1/' }]) {

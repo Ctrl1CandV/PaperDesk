@@ -47,7 +47,16 @@ export function navigate(to: string, options: { replace?: boolean; preservePosit
 window.addEventListener('popstate', () => {
   initialNavigation = false;
   historyNavigation = true;
-  remember(); activeKey = String(history.state?.paperdeskKey ?? 'initial'); returning = true;
+  remember();
+  const nextKey = String(history.state?.paperdeskKey ?? 'initial');
+  // Native fragment navigation copies the current entry's state. Give it its
+  // own identity so the new anchor wins, while Back still restores the old view.
+  if (!history.state?.paperdeskKey || nextKey === activeKey) {
+    activeKey = crypto.randomUUID();
+    history.replaceState({ ...history.state, paperdeskKey: activeKey }, '');
+    returning = false;
+    historyNavigation = false;
+  } else { activeKey = nextKey; returning = true; }
   rememberLibrary();
   window.dispatchEvent(new Event('paperdesk:navigate'));
 });
@@ -67,7 +76,12 @@ export function useLocation() {
     returning = false;
     const started = performance.now();
     let frame: number;
+    let interrupted = false;
+    // A later keyboard/pointer action takes precedence over a queued restore.
+    // In particular, filtering must not steal focus back while the reader opens a row.
+    const interrupt = () => { interrupted = true; cancelAnimationFrame(frame); };
     const restore = () => {
+      if (interrupted) return;
       if (requestedTarget) {
         const focus = requestedTarget.focusId ? document.getElementById(requestedTarget.focusId) : undefined;
         const scroll = requestedTarget.scrollToId ? document.getElementById(requestedTarget.scrollToId) : undefined;
@@ -96,8 +110,14 @@ export function useLocation() {
         } else window.scrollTo(0, 0);
       }
     };
+    window.addEventListener('keydown', interrupt, { once: true });
+    window.addEventListener('pointerdown', interrupt, { once: true });
     frame = requestAnimationFrame(restore);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('keydown', interrupt);
+      window.removeEventListener('pointerdown', interrupt);
+    };
   }, [location]);
   return location;
 }

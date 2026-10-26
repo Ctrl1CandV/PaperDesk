@@ -8,22 +8,42 @@ export function ReaderAssistant({ guide, unitId, selection, wide, onClose }: {
   guide: Guide; unitId: string; selection?: string; wide: boolean; onClose: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const readingOverflow = useRef(document.body.style.overflow);
   const opener = useRef(document.activeElement as HTMLElement | null);
   const dismiss = useRef(onClose); dismiss.current = onClose;
   useEffect(() => {
     const dialog = dialogRef.current!;
+    const focus = document.activeElement as HTMLElement | null;
+    const left = window.scrollX, top = window.scrollY;
+    const nested = [...dialog.querySelectorAll<HTMLDialogElement>('dialog[open]')]
+      .map(element => ({ element, modal: element.matches(':modal'), scrollTop: element.scrollTop }));
     dialog.close();
-    const overflow = document.body.style.overflow;
-    if (wide) {
-      const focus = document.activeElement as HTMLElement | null;
-      dialog.show(); focus?.focus({ preventScroll: true });
+    if (wide) dialog.show();
+    else dialog.showModal();
+    // Resizing must keep an already-open settings/material dialog above its parent.
+    // Re-enter the top layer without remounting the React dialog or its form draft.
+    for (const { element, modal, scrollTop } of nested) {
+      if (!modal) continue;
+      element.close(); element.showModal(); element.scrollTop = scrollTop;
     }
-    else { dialog.showModal(); document.body.style.overflow = 'hidden'; }
-    return () => { dialog.close(); if (!wide) document.body.style.overflow = overflow; };
+    if (focus && focus !== document.body && focus !== document.documentElement) focus.focus({ preventScroll: true });
+    else if (wide && document.activeElement instanceof HTMLElement && dialog.contains(document.activeElement)) document.activeElement.blur();
+    if (window.scrollX !== left || window.scrollY !== top) window.scrollTo(left, top);
+    const syncOverflow = () => { document.body.style.overflow = document.querySelector('dialog:modal') ? 'hidden' : readingOverflow.current; };
+    syncOverflow();
+    const observer = new MutationObserver(syncOverflow);
+    observer.observe(dialog, { subtree: true, attributes: true, attributeFilter: ['open'] });
+    return () => {
+      observer.disconnect(); dialog.close();
+      if (!document.querySelector('dialog:modal')) document.body.style.overflow = readingOverflow.current;
+    };
   }, [wide]);
   useEffect(() => () => {
     const trigger = opener.current;
-    requestAnimationFrame(() => (trigger?.isConnected ? trigger : document.getElementById('reader-ai-action'))?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => {
+      if (!document.querySelector('dialog:modal')) document.body.style.overflow = readingOverflow.current;
+      (trigger?.isConnected ? trigger : document.getElementById('reader-ai-action'))?.focus({ preventScroll: true });
+    });
   }, []);
   return <aside className="reader-assistant-slot">
     <dialog ref={dialogRef} id="reader-assistant" className={`reader-assistant-dialog${wide ? ' is-docked' : ''}`}

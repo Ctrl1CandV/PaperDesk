@@ -1,20 +1,20 @@
-/* Dark reading ink, forest-green actions and warm paper surfaces. */
+/* A continuous white reading surface, slate tools and restrained indigo actions. */
 :root {
-  --ink: #2d3832;
-  --heading: #193f32;
-  --muted: #5e6c62;
-  --accent: #28684f;
-  --accent-hover: #1b503b;
+  --ink: #273244;
+  --heading: #172237;
+  --muted: #627086;
+  --accent: #344e9d;
+  --accent-hover: #233b80;
   --surface: #fff;
-  --surface-muted: #eff4e9;
-  --surface-soft: #f8faf6;
-  --surface-hover: #f2f6ee;
-  --surface-selected: #e3efe4;
-  --selection: #cce4d1;
-  --line: #dbe3d8;
-  --line-strong: #9aaf9e;
-  --control-border: #809482;
-  --focus: #28684f;
+  --surface-muted: #eef1f6;
+  --surface-soft: #f5f6f8;
+  --surface-hover: #f0f3fa;
+  --surface-selected: #e9eefb;
+  --selection: #d6e1fb;
+  --line: #dde2eb;
+  --line-strong: #a4afc2;
+  --control-border: #8a98ae;
+  --focus: #4966b8;
   --danger: #9b463d;
   --danger-hover: #7c342d;
   --danger-bg: #fff1ef;
@@ -22,10 +22,13 @@
   --warning-bg: #fff6e7;
   --success: #28684f;
   --success-bg: #edf6f0;
-  --shadow-color: #24453b12;
-  --modal-shadow: #24453b2b;
-  --backdrop: #1d302b52;
+  --shadow-color: #1722370a;
+  --modal-shadow: #17223726;
+  --backdrop: #17223765;
   --font-display: var(--font-body);
   --font-body: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
   --font-data: Consolas, 'SFMono-Regular', monospace;
+  /* Give wider windows more outer breathing room without squeezing laptop columns. */
+  --workspace-gutter: clamp(24px, calc(12.5vw - 120px), 180px);
 }
+.visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }

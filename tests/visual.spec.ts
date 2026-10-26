@@ -64,7 +64,7 @@ for (const id of ['agent-survey', 'instructgpt', 'helm']) {
     const citation = page.locator('.citation-button').first();
     await citation.scrollIntoViewIfNeeded(); await citation.focus();
     const before = await page.evaluate(() => scrollY);
-    const locator = (await citation.innerText()).replace(/↗$/, ''); await citation.press('Enter');
+    const locator = (await citation.getAttribute('aria-label')) ?? ''; expect(locator).toBeTruthy(); await citation.press('Enter');
     const dialog = page.getByRole('dialog', { name: '来源详情' });
     await expect(dialog).toContainText(locator); await expect(dialog).toContainText('手动查找');
     await expect(dialog.locator('.source-facts')).not.toContainText('未指定固定版本');

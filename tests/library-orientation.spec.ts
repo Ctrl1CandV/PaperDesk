@@ -45,7 +45,7 @@ test('title/topic search excludes incidental mentions and filtering clears the p
   await expect(page.getByRole('button', { name: /^论文/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#choose-instructgpt')).toHaveAttribute('aria-pressed', 'true');
   await page.reload(); await expect(page.locator('#orientation-title')).toContainText('InstructGPT');
-  const enter = page.getByRole('link', { name: '进入深入阅读' });
+  const enter = page.getByRole('link', { name: '继续上次阅读' });
   await enter.scrollIntoViewIfNeeded(); await enter.focus();
   const before = await page.evaluate(() => scrollY);
   await enter.press('Enter');

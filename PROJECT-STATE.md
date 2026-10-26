@@ -10,23 +10,23 @@
 - Real resume positions, separate explicit explanation/original states, notes, questions/evidence/next actions, conflict handling, strict backups and opt-in context packets. Opening an article never marks it read.
 - Reviewed immutable content updates, atomic catalog switching, recovery and selection rollback. Further discovery can be a deliberate reader–assistant workflow without background model services.
 
-## AI reading and interface — accepted 2026-10-25
+## Frontend and reading workflow — 2026-10-26
+
+The library, reader, AI discussion, notes, exploration and backup share white/slate surfaces, ink headings and restrained indigo actions. White article rows separate from the library background. The reading brief directly displays overview, value, prerequisites, coverage and chapter entry points; complete bibliography opens separately. At desktop widths of at least 1200px, the library uses 85% of the previously balanced workspace: 1428px at a 1920px viewport, capped at 1632px. Smaller windows keep the available width. The reader retains its separate three-column layout: 1680px at 1920px, a 1920px maximum workspace and an independent 832px prose limit. Closing AI preserves article width and position.
+
+Original-paper versions, guide revisions and explicit reading marks remain distinct. Reader actions flow beneath the contents; compact citations retain complete accessible labels and source return. AI drafts pin their materials, historical turns expose saved context, and long-answer completion retains transcript position. Notes support temporary filters and pinned-source return; explorations prioritize the saved question and next action. Reviewed content bytes and personal-record formats are unchanged.
+
+Connection, model and search controls are grouped in AI settings. The revision-protected Tavily configuration endpoint keeps credentials in backend storage; saving a key does not enable search or send a request. Restart an already-running local service once to load the endpoint, and rebuild after frontend changes.
+
+Final checks: `npm run build -- --logLevel warn` passed content validation, TypeScript and production bundling; `node --test --test-reporter=dot tests/*.test.mjs` passed; `npx playwright test` passed all 125 checks. The existing bundle-size warning remains. Final 1920px library and 1920/1440px orientation screenshots were examined; reader and combined AI settings states were reviewed during the same iteration. AI checks use synthetic responses, and narrow views are browser simulations. The [initial refactor record](docs/history/FRONTEND-REFACTOR-2026-10-26.md) and [feedback decisions and checks](docs/history/FRONTEND-FEEDBACK-2026-10-26.md) retain the design rationale, evidence and limitations.
+
+## AI service baseline — accepted 2026-10-25
 
 The reader-triggered AI extension adds a local backend, official ChatGPT authorization or an OpenAI-compatible API, streamed answers with source snapshots, optional web search, model/Thinking selection and separately backed-up SQLite conversations. Notes, exploration, reading marks and browser backups retain their existing contracts. Only an explicit subscription/application usage-limit response permits the optional API fallback, with its own charges.
 
 Connection recovery, bounded catalog caching, capability-based Thinking and validated per-message final-text reconciliation are implemented. Provider credentials stay in ignored backend storage; no other application's account files are used. See [AI reading](docs/AI-READING.md) for configuration, request/data boundaries, recovery and compatibility limits.
 
-The accepted interface retains the horizontal navigation, adjacent article orientation, continuous reading and pale forest-green palette. Orientation prioritizes the approved summary, reading actions and reading value. AI uses a compact composer and one settings entry, with connection/model/Thinking and API forms grouped by task. Routine explanatory copy was removed; fees, coverage limits, transfer scope and recovery actions remain available. Approved academic bodies, attribution and source locators are unchanged.
-
-## Current checks
-
-- Final interface validation: `npm run build -- --logLevel warn` passed, including content validation and TypeScript; the existing >500 kB bundle warning remains.
-- `npx playwright test --config .cache/frontend-craft/preview-test.config.ts`: **103 passed**. All **34 approved content files** match the pre-edit SHA-256 snapshot; `content/` has no diff.
-- Desktop and simulated narrow views, expanded orientation details, article endings, reading-state dialogs, ChatGPT/API forms, the composer, context scope and error/recovery states were actually examined before acceptance. No horizontal overflow was found at reviewed widths 320, 390, 820, 1280 and 1920. Narrow views are simulations, not phone tests.
-- Fresh browser checks of `/library` and `/read/agent-survey/2` on 4173 loaded JS/CSS matching the final production build, without page errors or unexpected requests. AI/network checks used synthetic responses and blocked real requests.
-- Source-delivery verification: the exact staged tree was exported to an isolated local directory. `npm ci --offline --no-audit --cache ../../npm` installed all 260 locked packages; `node --test --test-reporter=spec tests/*.test.mjs` passed **338 tests, no skips**, and `npm run build -- --logLevel warn` passed content validation, TypeScript and bundling. All 34 content files match the export. Only the documentation of these results was subsequently updated.
-
-Detailed commands, intermediate failures, source references and earlier implementation checks are retained in [AI/interface history](docs/history/AI-READING-AND-INTERFACE.md). Earlier content acceptance and review records remain under [research](docs/research/) and [delivery history](docs/history/README.md).
+The previous interface and accepted source-delivery checks are preserved in [AI/interface history](docs/history/AI-READING-AND-INTERFACE.md). They describe that earlier snapshot, not the current visual design. Content acceptance and review records remain under [research](docs/research/) and [delivery history](docs/history/README.md).
 
 ## Repository and operation
 

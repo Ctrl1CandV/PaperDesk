@@ -76,12 +76,12 @@ export function createAiServer(dependencies) {
         }
         return;
       }
-      if (request.method === 'POST' && ['/api/ai/settings/api', '/api/ai/settings/chatgpt', '/api/ai/settings/fallback'].includes(url.pathname)) {
+      if (request.method === 'POST' && ['/api/ai/settings/api', '/api/ai/settings/chatgpt', '/api/ai/settings/fallback', '/api/ai/settings/search'].includes(url.pathname)) {
         const runtime = dependencies.runtime;
         if (!runtime) reject('请更新并重启本机 AI 服务后再配置。', 503);
         const input = await readJson(request, 8 * 1024);
-        const provider = url.pathname.endsWith('/api') ? 'api' : url.pathname.endsWith('/fallback') ? 'fallback' : 'chatgpt';
-        object(input, provider === 'api' ? ['revision', 'baseURL', 'modelId'] : provider === 'fallback' ? ['revision', 'enabled'] : ['revision', 'modelId'], provider === 'api' ? ['apiKey'] : provider === 'chatgpt' ? ['reasoningEffort'] : []);
+        const provider = url.pathname.endsWith('/api') ? 'api' : url.pathname.endsWith('/fallback') ? 'fallback' : url.pathname.endsWith('/search') ? 'search' : 'chatgpt';
+        object(input, provider === 'api' ? ['revision', 'baseURL', 'modelId'] : provider === 'fallback' ? ['revision', 'enabled'] : provider === 'search' ? ['revision', 'apiKey'] : ['revision', 'modelId'], provider === 'api' ? ['apiKey'] : provider === 'chatgpt' ? ['reasoningEffort'] : []);
         if (active.size || mutatingConnection) reject('请等待当前问题或连接操作结束，再保存模型配置。', 409);
         mutatingConnection = true;
         const controller = new AbortController();

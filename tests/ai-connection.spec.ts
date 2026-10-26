@@ -33,7 +33,7 @@ async function syntheticService(context: BrowserContext, options: {
     status: initialStatus(), statusRequests: 0, connectRequests: 0, cancelRequests: 0, modelRequests: 0,
     modelRefreshes: [] as boolean[], settingsRequests: 0, statusFailures: 0,
     disconnectRequests: 0, providers: [] as string[], unexpected: [] as string[], external: [] as string[],
-    apiSaves: [] as Record<string, unknown>[], modelSaves: [] as Record<string, unknown>[], fallbackSaves: [] as Record<string, unknown>[], askRequests: [] as Record<string, unknown>[], settingsConflict: options.settingsConflict ?? false,
+    apiSaves: [] as Record<string, unknown>[], searchSaves: [] as Record<string, unknown>[], modelSaves: [] as Record<string, unknown>[], fallbackSaves: [] as Record<string, unknown>[], askRequests: [] as Record<string, unknown>[], settingsConflict: options.settingsConflict ?? false,
   };
   state.status.apiConfigured = options.apiConfigured ?? true;
   state.status.chatgpt.fallbackToApi = options.fallbackToApi ?? true;
@@ -67,6 +67,13 @@ async function syntheticService(context: BrowserContext, options: {
       if (state.settingsConflict) { await json({ error: '合成测试：配置已变，请重新载入。' }, 409); return; }
       settings = { ...settings, revision: `synthetic-${++revision}`, api: { baseURL: input.baseURL, modelId: input.modelId, apiKeyConfigured: settings.api.apiKeyConfigured || Boolean(input.apiKey) } };
       state.status = { ...state.status, apiConfigured: true, ...(state.status.provider === 'api' ? { configured: true, model: input.modelId } : {}) };
+      await json({ settings, status: state.status }); return;
+    }
+    if (path === '/settings/search' && request.method() === 'POST') {
+      const input = request.postDataJSON(); state.searchSaves.push(input);
+      if (state.settingsConflict) { await json({ error: '合成测试：配置已变，请重新载入。' }, 409); return; }
+      settings = { ...settings, revision: `synthetic-${++revision}`, search: { apiKeyConfigured: true } };
+      state.status = { ...state.status, searchAvailable: true };
       await json({ settings, status: state.status }); return;
     }
     if (path === '/settings/chatgpt' && request.method() === 'POST') {
@@ -191,7 +198,7 @@ test('synthetic official login handles blocked popup, polls to connected and ren
   await mkdir('.cache/ai-settings-ui', { recursive: true });
   await page.screenshot({ path: '.cache/ai-settings-ui/desktop-connected.png', fullPage: false });
   await dialog.getByRole('button', { name: '关闭', exact: true }).click();
-  await expect(page.getByRole('button', { name: '模型连接：ChatGPT · 已连接', exact: true })).toBeFocused();
+  await expect(page.getByRole('button', { name: 'AI 设置：ChatGPT · 已连接，联网关闭', exact: true })).toBeFocused();
   service.assertIsolated();
 });
 
@@ -297,8 +304,8 @@ test('synthetic connected settings remain reachable in the narrow reader dialog'
   await expect(dialog.getByRole('button', { name: '断开连接…', exact: true })).toBeVisible();
   await expect(dialog.getByRole('combobox', { name: '模型', exact: true })).toBeVisible();
   await dialog.getByRole('combobox', { name: '模型', exact: true }).selectOption('synthetic-reasoning');
-  await dialog.getByRole('combobox', { name: '思考强度 Thinking', exact: true }).selectOption('low');
-  await dialog.getByRole('combobox', { name: '思考强度 Thinking', exact: true }).scrollIntoViewIfNeeded();
+  await dialog.getByRole('combobox', { name: '思考强度', exact: true }).selectOption('low');
+  await dialog.getByRole('combobox', { name: '思考强度', exact: true }).scrollIntoViewIfNeeded();
   await expect(dialog.getByLabel('Base URL', { exact: true })).toHaveCount(0);
   expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
   await mkdir('.cache/ai-settings-ui', { recursive: true });
@@ -352,6 +359,73 @@ test('API settings save without switching provider, clear the key and retain it 
   await reopened.getByRole('button', { name: 'API', exact: true }).click();
   await expect(reopened.getByLabel('Model ID', { exact: true })).toHaveValue('synthetic-next-model');
   await expect(reopened.getByLabel(/^API Key/)).toHaveValue('');
+  service.assertIsolated();
+});
+
+test('search configuration and permission stay in settings and keep secrets out of browser storage', async ({ page, context }) => {
+  const service = await syntheticService(context, { connected: true, replacementAnswer: true }); await openReader(page);
+  await expect(page.locator('.ai-composer input[type="checkbox"]')).toHaveCount(0);
+  const dialog = await openSettings(page);
+  await dialog.getByRole('button', { name: '联网查证', exact: true }).click();
+  const toggle = dialog.getByRole('switch', { name: /允许联网查证/ });
+  await expect(toggle).toBeDisabled();
+  await dialog.getByLabel('Tavily API Key', { exact: true }).fill('synthetic-search-draft');
+  service.state.settingsConflict = true;
+  await dialog.getByRole('button', { name: '保存检索配置', exact: true }).click();
+  await expect(dialog.getByRole('alert')).toContainText('配置已变');
+  await expect(dialog.getByLabel('Tavily API Key', { exact: true })).toHaveValue('synthetic-search-draft');
+  service.state.settingsConflict = false;
+  await dialog.getByRole('button', { name: '重新载入配置', exact: true }).click();
+  await dialog.getByRole('button', { name: '保存检索配置', exact: true }).click();
+  await expect(dialog.getByLabel('Tavily API Key', { exact: true })).toHaveValue('');
+  await expect(toggle).toBeEnabled(); await expect(toggle).not.toBeChecked();
+  await toggle.check();
+  await expect(dialog.getByText('开启后，AI 可将包含提问内容的检索词发给 Tavily；取得的网页摘录会送给模型。')).toBeVisible();
+  await dialog.getByRole('button', { name: 'API', exact: true }).click();
+  await dialog.getByRole('button', { name: '联网查证', exact: true }).click();
+  await expect(toggle).toBeChecked();
+  await mkdir('.cache/feedback-round/after', { recursive: true });
+  await page.screenshot({ path: '.cache/feedback-round/after/ai-settings-search.png' });
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.ai-provider-trigger')).toContainText('联网');
+  expect(service.state.askRequests).toEqual([]);
+  expect(service.state.providers).toEqual([]);
+  expect(await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage } }))).not.toContain('synthetic-search-draft');
+  await page.getByRole('textbox', { name: '向 AI 提问', exact: true }).fill('合成联网问题，仅验证明确请求参数。');
+  await page.locator('.ai-send').click();
+  await expect(page.locator('.ai-answer')).toContainText('合成校正结论');
+  expect(service.state.askRequests).toHaveLength(1);
+  expect(service.state.askRequests[0].webSearch).toBe(true);
+  service.assertIsolated();
+});
+
+test('settings actions have deliberate width and quota state stays in a coherent connection group', async ({ page, context }) => {
+  const service = await syntheticService(context, { connected: true });
+  service.state.status.chatgpt.availability = { state: 'quota_exhausted', checkedAt: '2026-01-01T00:00:00.000Z', model: 'synthetic-reading', checking: false, lastError: null };
+  await openReader(page);
+  await expect(page.locator('.ai-context details')).toHaveCount(0);
+  await page.getByRole('button', { name: '查看本次提问资料', exact: true }).click();
+  const material = page.getByRole('dialog', { name: '本次提问资料', exact: true });
+  await expect(material).toContainText('本篇完整导读');
+  await expect(material).toContainText('原论文全文');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: '查看本次提问资料', exact: true })).toBeFocused();
+  const dialog = await openSettings(page);
+  await expect(dialog.locator('.ai-availability')).toContainText('额度已达上限');
+  const ratio = await dialog.locator('.ai-model-settings .primary-action').evaluate(element => element.clientWidth / element.parentElement!.clientWidth);
+  expect(ratio).toBeGreaterThanOrEqual(.7); expect(ratio).toBeLessThanOrEqual(.85);
+  await mkdir('.cache/feedback-round/after', { recursive: true });
+  await page.screenshot({ path: '.cache/feedback-round/after/ai-settings-quota.png' });
+  await dialog.getByRole('button', { name: 'API', exact: true }).click();
+  await page.screenshot({ path: '.cache/feedback-round/after/ai-settings-api.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(dialog.getByRole('button', { name: '保存配置', exact: true })).toBeInViewport();
+  await expect.poll(() => dialog.evaluate(element => {
+    const box = element.getBoundingClientRect();
+    return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)?.closest('dialog') === element;
+  })).toBe(true);
+  expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+  await page.screenshot({ path: '.cache/feedback-round/after/ai-settings-api-narrow.png' });
   service.assertIsolated();
 });
 
@@ -473,7 +547,7 @@ test('model catalogue waits for settings and initial opening sends one request; 
 test('thinking choices follow model capabilities, persist and reset to default on model change', async ({ page, context }) => {
   const service = await syntheticService(context, { connected: true }); await openReader(page);
   const dialog = await openSettings(page), model = dialog.getByRole('combobox', { name: '模型', exact: true });
-  const thinking = dialog.getByRole('combobox', { name: '思考强度 Thinking', exact: true });
+  const thinking = dialog.getByRole('combobox', { name: '思考强度', exact: true });
   await expect(model).toBeEnabled();
   await expect(thinking).toBeDisabled();
   await expect(thinking.locator('option')).toHaveText(['模型默认']);
@@ -487,10 +561,10 @@ test('thinking choices follow model capabilities, persist and reset to default o
   expect(service.state.modelSaves).toEqual([{ revision: 'synthetic-1', modelId: 'synthetic-reasoning', reasoningEffort: 'high' }]);
   await dialog.getByRole('button', { name: '关闭', exact: true }).click();
   const reopened = await openSettings(page);
-  await expect(reopened.getByRole('combobox', { name: '思考强度 Thinking', exact: true })).toHaveValue('high');
+  await expect(reopened.getByRole('combobox', { name: '思考强度', exact: true })).toHaveValue('high');
   await reopened.getByRole('combobox', { name: '模型', exact: true }).selectOption('synthetic-reading');
-  await expect(reopened.getByRole('combobox', { name: '思考强度 Thinking', exact: true })).toHaveValue('');
-  await expect(reopened.getByRole('combobox', { name: '思考强度 Thinking', exact: true })).toBeDisabled();
+  await expect(reopened.getByRole('combobox', { name: '思考强度', exact: true })).toHaveValue('');
+  await expect(reopened.getByRole('combobox', { name: '思考强度', exact: true })).toBeDisabled();
   service.assertIsolated();
 });
 
@@ -501,13 +575,13 @@ test('thinking conflict preserves its draft and unrelated API edits until explic
   await dialog.getByLabel('Model ID', { exact: true }).fill('synthetic-api-draft');
   await dialog.getByRole('button', { name: 'ChatGPT 订阅', exact: true }).click();
   await dialog.getByRole('combobox', { name: '模型', exact: true }).selectOption('synthetic-reasoning');
-  await dialog.getByRole('combobox', { name: '思考强度 Thinking', exact: true }).selectOption('max');
+  await dialog.getByRole('combobox', { name: '思考强度', exact: true }).selectOption('max');
   await dialog.getByRole('button', { name: '保存模型', exact: true }).click();
   await expect(dialog.getByRole('button', { name: '重新载入配置', exact: true })).toBeVisible();
   service.state.settingsConflict = false;
   await dialog.getByRole('button', { name: '重新载入配置', exact: true }).click();
   await expect(dialog.getByRole('button', { name: '保存模型', exact: true })).toBeEnabled();
-  await expect(dialog.getByRole('combobox', { name: '思考强度 Thinking', exact: true })).toHaveValue('max');
+  await expect(dialog.getByRole('combobox', { name: '思考强度', exact: true })).toHaveValue('max');
   await dialog.getByRole('button', { name: '保存模型', exact: true }).click();
   await expect(dialog.getByRole('button', { name: '保存模型', exact: true })).toBeDisabled();
   await dialog.getByRole('button', { name: 'API', exact: true }).click();
@@ -530,13 +604,13 @@ test('unavailable model catalogue keeps saved choice and offers retry without in
 test('legacy fallback defaults on and can be disabled independently when the catalogue fails', async ({ page, context }) => {
   const service = await syntheticService(context, { connected: true, modelsError: true, legacyFallback: true }); await openReader(page);
   const disclosure = page.getByText('订阅或此应用额度用尽时，同一问题与资料会转交已配置的备用 API，可能产生 API 费用。', { exact: true });
-  await page.locator('.ai-context summary').click();
+  await page.getByRole('button', { name: '查看本次提问资料', exact: true }).click();
   await expect(disclosure).toBeVisible();
-  await page.locator('.ai-context summary').click();
+  await page.getByRole('dialog', { name: '本次提问资料', exact: true }).getByRole('button', { name: '关闭', exact: true }).click();
   const dialog = await openSettings(page), toggle = dialog.getByRole('checkbox', { name: '额度用尽时使用备用 API', exact: true });
   await expect(dialog.getByRole('alert')).toContainText('模型目录暂不可用');
   await expect(toggle).toBeChecked();
-  await expect(dialog.getByText('仅在订阅或此应用额度达到上限时，将本轮问题、近期对话、导读上下文与已取得的来源发送至备用 API，可能产生 API 费用。')).toBeVisible();
+  await expect(dialog.getByText('仅在订阅或此应用额度用尽时，将问题、近期对话、导读与来源转交备用 API，独立计费。')).toBeVisible();
   await expect(dialog.locator('.ai-fallback-target')).toContainText('synthetic-api-model');
   await expect(dialog.getByRole('button', { name: '保存备用设置', exact: true })).toHaveCount(0);
   const requestsBefore = service.state.modelRequests;

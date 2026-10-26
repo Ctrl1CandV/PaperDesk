@@ -2,27 +2,33 @@
 
 This is an implementation direction, not a claim of visual acceptance. It applies the content, layout, typography and rendered-review requirements below. There is no requirement to copy an earlier interface or install a particular skill bundle.
 
+## Current implementation — 2026-10-26
+
+The frontend redesign and subsequent feedback iteration implement wider workspaces, white reading surfaces with slate tools and ink/indigo hierarchy, stable desktop prose width across AI open/close, fixed per-question materials, and traceable notes/exploration. The library's essential reading brief is directly visible; only full bibliography needs a separate dialog. AI settings group connection, model and search decisions, with a compact composer status and wider primary actions. See the [initial refactor record](history/FRONTEND-REFACTOR-2026-10-26.md) and [feedback decisions and checks](history/FRONTEND-FEEDBACK-2026-10-26.md). Earlier W1 feedback and first-release scope below are historical; no new stage approval is implied.
+
 ## Home and library
 
-Use a compact header, then Continue reading when a real resume record exists. Otherwise show the first recommended guide with a concrete purpose. Under it show the three ordered guide entries: title, what it explains, source type and honest coverage. Keep visible navigation to Library, Explore and Notes, with local library search; no dashboard of invented counts or empty side panels. A short Explore preview explains the next step from reading to a question. Show public editorial suggestions separately from any real saved explorations; no inferred profile or immediate specialist assignment.
+Use a compact header, then Continue reading when a real resume record exists. Otherwise show the first recommended guide with a concrete purpose. Show the fourteen current readings as naturally sized white rows on a distinct grey workspace, with complete titles, research-question subtitles, source type and reviewed topics. Wide browsing also shows the reviewed reading value for comparison. The adjacent brief directly displays overview, reading value, prerequisites, coverage and chapter entry targets; complete bibliography opens separately and returns focus to its trigger. Keep visible navigation to Library, Explore and Notes, with local library search; no dashboard of invented counts or empty side panels. A short Explore preview explains the next step from reading to a question. Show public editorial suggestions separately from any real saved explorations; no inferred profile or immediate specialist assignment.
+
+At viewports of at least 1200px, the library heading, list and adjacent brief share a centered width of 85% of the balanced workspace, capped at 1632px. This gives a 1122px library at 1440px and 1428px at 1920px. The list/detail ratio stays unchanged; smaller windows keep the available width and the existing narrow-screen reflow. The reader uses its own dimensions rather than inheriting this final library-only reduction.
 
 ## Reading layout
 
 ```text
 Desktop
   compact navigation / article identity
-  section contents | title + orientation + continuous prose | source details when opened
-                   | examples / diagrams / tables          | (otherwise absent)
+  section contents | title + orientation + continuous prose | AI discussion and composer
+                   | examples / diagrams / tables          | saved question materials
 
 Narrow screen
   back / concise article identity
   collapsed section navigation
   title, orientation, first substantive paragraph
   continuous prose with local-width figures and tables
-  source or note dialog when deliberately opened
+  AI, source or note dialog when deliberately opened
 ```
 
-At desktop widths reserve roughly 190–230px for the contents, 640–760px for the article, and 280–340px for an optional source panel only when there is enough space. These are starting ranges, not rigid columns. At intermediate widths the source panel becomes a dialog; never shrink the article to preserve three columns. Below roughly 800px use a single reading column with 16–24px side padding. A 390px viewport must show title, orientation and actual prose rather than a wall of metadata.
+At desktop widths the contents, article and AI discussion form three columns with outer margins that grow on wider windows. The effective reader workspace spans 1320px at a 1440px viewport, 1680px at 1920px, and at most 1920px on larger screens. Prose has a separate 832px maximum measure. These are local layout choices, not a universal occupancy target. The AI column stays reserved when closed to preserve article wrapping and position. Accumulation actions flow beneath the contents rather than appearing as a floating card. Between 1100px and 1199px the contents become a compact control above the prose; below 1100px AI opens as a dialog. Below roughly 800px use a single reading column with 16–24px side padding. Source details use an explicit dialog with focus and position return. Compact citations retain their complete original label in accessible text and the source dialog. A 390px viewport must show title, orientation and actual prose rather than a wall of metadata.
 
 Initial style: near-white neutral background, dark ink, restrained blue/teal links and a few spacing levels. Body 17–18px desktop, 16–18px narrow, line-height about 1.8, left/start alignment. Use system CJK-capable fallbacks and verify actual glyphs; package a licensed font only if actual evidence justifies it. Headings need genuine weight support. English terminology, numbers, punctuation and long titles must wrap naturally. Keep controls legible and touch targets approximately 44px where practical. Reader font adjustment should preserve layout and local table scrolling.
 
@@ -39,7 +45,7 @@ Do not embed every PDF or track its scrolling. No original figures have been bun
 
 ## Exploration experience
 
-The Explore page starts with the three supplied editorial lenses and their order/rationale, reading targets and next actions; a distinct My explorations area shows only actual saved records. With none, offer a useful guide target or Create a question, not an empty dashboard. Allow direct custom questions.
+With saved records, My explorations comes first with question, evidence count and next action. The three supplied editorial lenses remain a separate area with their order/rationale and reading targets; with no records, the editorial area comes first. With none, offer a useful guide target or Create a question, not an empty dashboard. Allow direct custom questions.
 
 A lens explains its context before presenting its prompt. Its self-check is an optional understanding standard, not a gate or score. Adopting a prompt opens an editable preview and requires Save. A reading selection offers Add to exploration: choose an existing record or create one, inspect quotation/provenance/source locations, then save. Cancel preserves the current reading position and creates nothing.
 
@@ -55,7 +61,7 @@ The context action takes selected text or the current section plus a new questio
 
 An exploration packet follows EXPLORATION.md: question/evidence/interpretation/unknowns/next action are chosen explicitly, personal text is labeled and previewed, and unrelated notes are excluded.
 
-Copy only after a click and show success only after the clipboard call succeeds. If unsupported/denied, offer a selectable text area and manual copy. A return link uses a neutral relative route in the packet, never an absolute machine path or a local network address. Copying is not resolving the question. Online model calls remain outside the website.
+Copy only after a click and show success only after the clipboard call succeeds. If unsupported/denied, offer a selectable text area and manual copy. A return link uses a neutral relative route in the packet, never an absolute machine path or a local network address. Copying is not resolving the question. The optional reader-triggered AI extension has its own explicit outbound and storage boundaries in AI-READING.md.
 
 ## Required states
 
@@ -65,4 +71,4 @@ Empty library, no search match, missing article/revision, unavailable source, br
 
 W1 must inspect actual rendered pixels at 1280px and 390px, both first screen and lower content, plus at least one source-open state. W6 adds the longest content, exploration and notes/error states, 200% zoom and keyboard traversal. Record the actual fonts. Fix the largest three visual issues first and inspect again; no repeated screenshot loop once issues are resolved.
 
-Public explanatory articles such as Distill are optional layout-study inputs, not a mandated aesthetic. Their text was consulted during preparation, but browser capture timed out, so this handoff makes no visual benchmarking claim. The implementer must judge its own rendered pages, and the representative-page feedback gate remains mandatory.
+Public explanatory articles such as Distill are optional layout-study inputs, not a mandated aesthetic. Their text was consulted during preparation, but browser capture timed out, so this handoff makes no visual benchmarking claim. The implementer must judge its own rendered pages, and the original representative-page feedback gate was completed before this continuation.

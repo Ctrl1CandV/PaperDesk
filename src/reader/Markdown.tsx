@@ -13,6 +13,10 @@ import { isSafeExternalUrl } from '../../scripts/content-policy.mjs';
 function textOf(children: ReactNode): string {
   return Children.toArray(children).map(child => typeof child === 'string' || typeof child === 'number' ? String(child) : isValidElement<{ children?: ReactNode }>(child) ? textOf(child.props.children) : '').join('');
 }
+// Compact only display notation; original labels remain in the accessible name and source dialog.
+function citationDisplay(label: string) {
+  return label.replace(/PDF\s*第([^页]+)页/g, 'p.$1').replace(/(原文(?:论)?(?:文)?)\s*v\d+(?:[.\d]*)[，,、]?\s*/g, '$1 ');
+}
 export function Formula({ source, display }: { source: string; display: boolean }) {
   try {
     const html = katex.renderToString(source, { displayMode: display, trust: false, strict: 'error', throwOnError: true, maxExpand: 200, maxSize: 20, macros: {} });
@@ -36,7 +40,7 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
       a: ({ href, children }) => {
         if (!href) return <span>{children}</span>;
         const citation = guide.metadata.citations.find(item => item.url === href);
-        if (citation) return <button id={`${unitId}-citation-${citationIndex++}`} className="citation-button" onClick={event => onCitation(citation, textOf(children), event.currentTarget)}>{children}<span aria-hidden="true" className="citation-arrow">↗</span></button>;
+        if (citation) { const label = textOf(children); return <button id={`${unitId}-citation-${citationIndex++}`} className="citation-button" aria-label={label} title={label} onClick={event => onCitation(citation, label, event.currentTarget)}><span aria-hidden="true" className="citation-display">{citationDisplay(label)}<span className="citation-arrow">↗</span></span><span className="visually-hidden">{children}</span></button>; }
         const related = contentRepository.resolveRelated(guide, href);
         if (related) return <AppLink id={`${unitId}-related-${href.replace('.md', '')}`} to={related}>{children}<span aria-hidden="true"> →</span></AppLink>;
         return <span>{children}</span>;

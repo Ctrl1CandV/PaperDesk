@@ -115,6 +115,7 @@ export function aiClient(token: string) {
   return {
     settings: (signal?: AbortSignal) => request<AiSettings>('/settings', { signal }).then(settingsDefaults),
     saveApiSettings: (input: { revision: string; baseURL: string; modelId: string; apiKey?: string }) => request<AiSettingsResult>('/settings/api', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) }).then(settingsResultDefaults),
+    saveSearchSettings: (input: { revision: string; apiKey: string }) => request<AiSettingsResult>('/settings/search', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) }).then(settingsResultDefaults),
     saveChatGptSettings: (input: { revision: string; modelId: string; reasoningEffort?: string }) => request<AiSettingsResult>('/settings/chatgpt', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) }).then(settingsResultDefaults),
     saveFallbackSettings: (input: { revision: string; enabled: boolean }) => request<AiSettingsResult>('/settings/fallback', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) }).then(settingsResultDefaults),
     chatGptModels: (signal?: AbortSignal, refresh = false) => request<ChatGptModels>(`/chatgpt/models${refresh ? '?refresh=1' : ''}`, { signal }),

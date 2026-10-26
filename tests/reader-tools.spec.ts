@@ -1,5 +1,19 @@
 import { test, expect, type Page } from '@playwright/test';
 
+// No live backend or account state is needed for reading-tool checks.
+test.beforeEach(async ({ context, baseURL }) => {
+  await context.route('**/*', async route => {
+    const url = new URL(route.request().url());
+    if (url.origin !== new URL(baseURL!).origin) return route.abort();
+    if (!url.pathname.startsWith('/api/ai/')) return route.continue();
+    const data = url.pathname.endsWith('/status')
+      ? { configured: false, provider: 'api', model: null, searchAvailable: false, csrfToken: 'synthetic-tools', apiConfigured: false,
+          chatgpt: { connected: false, loginPending: false, needsLogin: false, fallbackToApi: false, availability: { state: 'unknown' } } }
+      : { conversations: [] };
+    return route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) });
+  });
+});
+
 // Every personal string, storage injection and clipboard below is synthetic.
 async function chooseText(page: Page, paragraph = 0) {
   const quote = await page.locator('#u01 p').nth(paragraph).evaluate(element => {
@@ -162,16 +176,14 @@ test('restored packet choices wait for delayed notes before question changes can
 
 test('article-level status is separate from passage tools and survives closing after an explicit change', async ({ page }) => {
   await page.goto('/read/agent-survey/1');
-  await expect(page.locator('.reading-state-trigger')).toContainText('本篇解读 · 未记录');
-  await expect(page.locator('.reading-state-trigger')).toContainText('原论文 · 未记录');
+  await expect(page.locator('.reading-state-trigger')).toHaveAttribute('title', '本篇解读 · 未记录；原论文 · 未记录');
   await expect(page.locator('.reading-tools').getByRole('button', { name: '阅读记录', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '阅读记录', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '阅读记录' });
   await dialog.getByLabel('导读阅读状态', { exact: true }).selectOption('reading');
   await expect(dialog.getByRole('status')).toContainText('已保存');
   await page.mouse.click(4, 4);
-  await expect(page.locator('.reading-state-trigger')).toContainText('本篇解读 · 阅读中');
-  await expect(page.locator('.reading-state-trigger')).toContainText('原论文 · 未记录');
+  await expect(page.locator('.reading-state-trigger')).toHaveAttribute('title', '本篇解读 · 阅读中；原论文 · 未记录');
   await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole('button', { name: '记笔记', exact: true })).toBeInViewport();

@@ -15,11 +15,24 @@ import { ReaderAssistant } from './ReaderAssistant';
 
 function Contents({ guide, active, onChoose }: { guide: Guide; active: string; onChoose?: () => void }) {
   return <nav aria-label="章节目录"><ol>{guide.units.map((unit, index) => <li key={unit.id}>
-    <a href={`#${unit.id}`} aria-current={active === unit.id ? 'location' : undefined} onClick={event => {
+    <a href={`#${unit.id}`} aria-label={unit.heading ?? '阅读起点'} title={unit.heading ?? '阅读起点'} aria-current={active === unit.id ? 'location' : undefined} onClick={event => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); onChoose?.(); navigate(`#${unit.id}`);
-    }}><span className="toc-number" aria-hidden="true">{String(index).padStart(2, '0')}</span><span>{unit.heading ?? '阅读起点'}</span></a>
+    }}><span className="toc-number" aria-hidden="true">{String(index).padStart(2, '0')}</span><span>{navigationLabels[unit.heading ?? ''] ?? unit.heading ?? '阅读起点'}</span></a>
   </li>)}</ol></nav>;
+}
+// Presentation-only aliases; approved headings, section IDs and accessible names stay intact.
+const navigationLabels: Record<string, string> = {
+  'Agent 的基本视角：主体、环境与行动': '主体、环境与行动',
+  '四个组成部分，分别回应持续任务中的不同需要': '系统的四个组成部分',
+  '把组成连接起来，仍要解释能力从哪里来': '组成联系与能力来源',
+  '应用不同，“做好了”的含义也不同': '应用与评价条件',
+  '开放问题来自这些组成之间尚未解决的矛盾': '组成之间的开放问题',
+  '这篇怎样成为以后阅读的起点': '后续阅读的起点',
+  '哪些原文值得亲自读': '值得亲读的原文',
+};
+function ReadingActionIcon({ kind }: { kind: 'note' | 'explore' | 'copy' }) {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind === 'note' ? <><path d="M14 4H5v16h14v-9M10 14l1-4 7-7 3 3-7 7-4 1Z" /></> : kind === 'explore' ? <><circle cx="6" cy="5" r="2" /><circle cx="18" cy="12" r="2" /><circle cx="6" cy="19" r="2" /><path d="M6 7v10M8 6c6 0 3 6 8 6" /></> : <><rect x="8" y="8" width="12" height="13" rx="2" /><path d="M16 8V3H3v13h5" /></>}</svg>;
 }
 const statuses: [ReadingStatus, string][] = [['unread', '未读'], ['reading', '阅读中'], ['read', '已读'], ['deferred', '暂缓']];
 // Navigation buffers only; a selected passage is never a saved personal record.
@@ -41,13 +54,15 @@ export function Reader({ guide }: { guide: Guide }) {
   const [storageError, setStorageError] = useState('');
   const [stateMessage, setStateMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const [sidebarTools, setSidebarTools] = useState(() => window.matchMedia('(min-width: 801px) and (max-width: 1099px), (min-width: 1200px)').matches);
   const [assistantWide, setAssistantWide] = useState(() => window.matchMedia('(min-width:1100px)').matches);
   const [assistantOpen, setAssistantOpen] = useState(() => window.matchMedia('(min-width:1100px)').matches);
   useEffect(() => {
     const media = window.matchMedia('(min-width:1100px)');
-    const update = () => setAssistantWide(media.matches);
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
+    const sidebarMedia = window.matchMedia('(min-width: 801px) and (max-width: 1099px), (min-width: 1200px)');
+    const update = () => { setAssistantWide(media.matches); setSidebarTools(sidebarMedia.matches); };
+    media.addEventListener('change', update); sidebarMedia.addEventListener('change', update);
+    return () => { media.removeEventListener('change', update); sidebarMedia.removeEventListener('change', update); };
   }, []);
   const ready = useRef(false);
   const openCitation = useCallback((citation: Citation, label: string, trigger: HTMLButtonElement) => setSource({ citation, label, trigger }), []);
@@ -119,18 +134,19 @@ export function Reader({ guide }: { guide: Guide }) {
     } catch { setStateMessage('保存失败，请重试或检查本地存储。'); } finally { setSaving(false); }
   }
   const controls = <div className="font-controls" role="group" aria-label="正文字号"><span>字号</span><button aria-label="减小字号" disabled={fontSize <= 16} onClick={() => adjustFont(-1)}>A−</button><button aria-label="增大字号" disabled={fontSize >= 22} onClick={() => adjustFont(1)}>A+</button></div>;
+  const readingTools = <div className="reader-action-bar reading-tools" role="group" aria-label="阅读积累"><div className="reading-tool-context"><span>{selection ? '选中文本' : '当前章节'}</span><strong title={contextHeading}>{contextHeading}</strong></div>{selection && <button className="text-action clear-selection" onClick={() => { setSelection(undefined); window.getSelection()?.removeAllRanges(); }}>清除选择</button>}<button id="reader-note-action" className="tool-primary" aria-haspopup="dialog" onClick={() => setNoteContext(context())}><ReadingActionIcon kind="note" /><span>记笔记</span></button><button id="reader-explore-action" className="tool-primary" aria-haspopup="dialog" onClick={() => { const selected = context(); setEvidence({ id: crypto.randomUUID(), provenance: 'guide-excerpt', text: selected.text, target: { guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: selected.unitId }, sources: selected.sources }); }}><ReadingActionIcon kind="explore" /><span>加入探索</span></button><button id="reader-packet-action" className="tool-secondary" aria-haspopup="dialog" onClick={() => setPacket(context())}><ReadingActionIcon kind="copy" /><span>复制上下文</span></button></div>;
   return <>
-    <div className={`mobile-tools${assistantOpen ? ' assistant-mobile-tools' : ''}`}><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
-    <div className={`reader-layout${assistantOpen && assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录</div><Contents guide={guide} active={active} /><div className="sidebar-footer"><AppLink to="/explore">研究探索 →</AppLink></div></aside>
-      <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述 · 深入阅读' : '论文 · 深入阅读'}</span><span>{coverageLabel(guide.metadata.coverage.scope)}</span><span>{guide.metadata.source.version ?? '来源版本未指定'}</span></div><div className="desktop-font">{controls}</div></div>
-        <div className="reading-identity"><span className="reading-stage">研究主线解读</span><div className="reader-heading-actions"><button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)}><strong>阅读记录</strong><span>本篇解读 · {statusLabel(guideState?.status)}</span><span>原论文 · {statusLabel(originalState?.status)}</span><span aria-hidden="true">⌄</span></button></div></div>
+    <div className={`mobile-tools${assistantWide ? ' assistant-mobile-tools' : ''}`}><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
+    <div className={`reader-layout${assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>{guide.units.length - 1} 节</span></div><Contents guide={guide} active={active} /><div className="sidebar-footer"><AppLink to="/explore">研究探索 →</AppLink></div>{sidebarTools && readingTools}</aside>
+      <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述解读' : '论文解读'}</span><span>导读修订 {guide.metadata.revision}</span><span>{coverageLabel(guide.metadata.coverage.scope)}</span></div></div>
+        <div className="reading-identity"><a className="reading-original" href={guide.metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 · {guide.metadata.source.version ?? '版本未指定'} ↗</a><div className="reader-heading-actions"><div className="desktop-font">{controls}</div><button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)} title={`本篇解读 · ${statusLabel(guideState?.status)}；原论文 · ${statusLabel(originalState?.status)}`}><strong>阅读记录</strong><span aria-hidden="true">⌄</span></button></div></div>
         {storageError && <p className="status-warning" role="status">{storageError}</p>}
         <article className="prose" style={{ '--reading-size': `${fontSize}px` } as React.CSSProperties}>{guide.units.map(unit => <section id={unit.id} tabIndex={-1} key={unit.id} data-unit={unit.id}><Markdown guide={guide} markdown={unit.markdown} unitId={unit.id} onCitation={openCitation} /></section>)}</article>
         <footer className="reading-footer"><AppLink to="#orientation">回到阅读起点 ↑</AppLink><AppLink to="/explore">研究探索 →</AppLink></footer>
       </main>
       {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={selection?.text} wide={assistantWide} onClose={() => setAssistantOpen(false)} />}
     </div>
-    <div className="reader-action-bar reading-tools" role="group" aria-label="阅读积累"><div className="reading-tool-context"><span>{selection ? '选中文本' : '当前章节'}</span><strong title={contextHeading}>{contextHeading}</strong></div>{selection && <button className="text-action clear-selection" onClick={() => { setSelection(undefined); window.getSelection()?.removeAllRanges(); }}>清除选择</button>}<button id="reader-note-action" className="tool-primary" aria-haspopup="dialog" onClick={() => setNoteContext(context())}>记笔记</button><button id="reader-explore-action" className="tool-primary" aria-haspopup="dialog" onClick={() => { const selected = context(); setEvidence({ id: crypto.randomUUID(), provenance: 'guide-excerpt', text: selected.text, target: { guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: selected.unitId }, sources: selected.sources }); }}>加入探索</button><button id="reader-packet-action" className="tool-secondary" aria-haspopup="dialog" onClick={() => setPacket(context())}>复制上下文</button></div>
+    {!sidebarTools && readingTools}
     {source && <SourceDialog selection={source} guide={guide} onClose={() => setSource(null)} />}
     {noteContext && <NoteEditor target={{ guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: noteContext.unitId }} quote={noteContext.text} onClose={() => setNoteContext(undefined)} />}
     {evidence && <AddEvidenceDialog evidence={evidence} onClose={() => setEvidence(undefined)} />}

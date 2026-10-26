@@ -52,9 +52,9 @@ export class BackendSettings {
   }
   update(input, provider) { return this.enqueue(() => this.save(input, provider)); }
   async save(input, provider) {
-    if (!['api', 'chatgpt', 'fallback'].includes(provider)) throw new PublicError('模型连接类型无效。');
-    object(input, provider === 'api' ? ['revision', 'baseURL', 'modelId'] : provider === 'fallback' ? ['revision', 'enabled'] : ['revision', 'modelId'], provider === 'api' ? ['apiKey'] : provider === 'chatgpt' ? ['reasoningEffort'] : []);
-    if (typeof input.revision !== 'string' || (provider === 'fallback' ? typeof input.enabled !== 'boolean' : typeof input.modelId !== 'string')
+    if (!['api', 'chatgpt', 'fallback', 'search'].includes(provider)) throw new PublicError('模型连接类型无效。');
+    object(input, provider === 'api' ? ['revision', 'baseURL', 'modelId'] : provider === 'fallback' ? ['revision', 'enabled'] : provider === 'search' ? ['revision', 'apiKey'] : ['revision', 'modelId'], provider === 'api' ? ['apiKey'] : provider === 'chatgpt' ? ['reasoningEffort'] : []);
+    if (typeof input.revision !== 'string' || (provider === 'fallback' ? typeof input.enabled !== 'boolean' : provider === 'search' ? typeof input.apiKey !== 'string' : typeof input.modelId !== 'string')
       || provider === 'api' && (typeof input.baseURL !== 'string' || input.apiKey !== undefined && typeof input.apiKey !== 'string'))
       throw new PublicError('请填写有效的模型配置。');
     await this.readCurrent();
@@ -63,6 +63,9 @@ export class BackendSettings {
     if (provider === 'api') {
       raw.baseURL = input.baseURL.trim(); raw.modelId = input.modelId.trim();
       if (input.apiKey?.trim()) raw.apiKey = input.apiKey.trim();
+    } else if (provider === 'search') {
+      if (!input.apiKey.trim()) throw new PublicError('请填写 Tavily API Key。');
+      raw.search = { ...raw.search, apiKey: input.apiKey.trim() };
     } else if (provider === 'fallback') raw.chatgptFallbackToApi = input.enabled;
     else {
       raw.chatgptModelId = input.modelId.trim();

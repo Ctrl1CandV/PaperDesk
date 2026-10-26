@@ -27,7 +27,7 @@ export function TargetSelect({ value, onChange, label = '关联阅读位置', re
     <option value="">{required ? '请选择具体章节' : '不关联导读'}</option>
     {retained && <option value={encoded}>{targetLabel(value) ?? '原先保存的阅读位置（当前不可用）'}</option>}
     {entries.map(item => <option key={encodeTarget(item.target)} value={encodeTarget(item.target)}>{item.label}</option>)}
-  </select></label>;
+  </select>{retained && <span className="exploration-target-summary">保留的阅读位置 · 导读修订 {value.revision}<br />{targetLabel(value) ?? '原先保存的位置当前不可用，原始标识仍保留。'}</span>}</label>;
 }
 
 export function ExplorationEditor({ initial, expectedRevision, draftKey, onSaved, onCancel, creating = false, onBusyChange, onDiscard }: {

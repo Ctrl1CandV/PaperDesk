@@ -10,6 +10,8 @@ Run `npm ci` on a fresh checkout, `npm run build`, then `npm start`. This starts
 
 For the optional reader AI panel, open **AI 设置** to connect through official ChatGPT login or enter an OpenAI-compatible API's Base URL, Model ID and Key. Settings are saved in the ignored backend file; saved keys are never returned to the page. No second terminal is needed. `npm run dev` and `npm run preview` also start both services, with `-- --open` for automatic browser opening. For frontend-only use or isolated browser tests, use `npm run dev:web` or `npm run preview:web`. See [AI reading](docs/AI-READING.md) for setup, data boundaries and separate conversation backups.
 
+The composer's combined connection/search control opens **AI 设置**. Under **联网查证**, save a Tavily API Key and explicitly enable **允许联网查证** when wanted. Saving the key alone never sends a search or enables search permission; credentials remain backend-only. The reader's **资料** button shows the exact guide/selection scope for the current question without adding another scrolling area above the conversation.
+
 To use the API as a quota fallback, save its configuration while keeping ChatGPT selected. **ChatGPT 订阅 → 额度用尽时使用备用 API** is enabled by default and can be disabled independently. Only an explicit subscription/application usage-limit error switches that question to the configured API; separate API charges may apply.
 
 Under **ChatGPT 订阅**, choose **思考强度（Thinking）** and **保存模型** for subsequent questions. Choices follow the model's advertised capabilities; **模型默认** works when no capability choices are supplied. **刷新模型** reloads the catalog immediately; ordinary questions reuse it for up to five minutes. After source updates, restart the combined local service to use the new backend.

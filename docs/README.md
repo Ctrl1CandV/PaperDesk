@@ -15,4 +15,6 @@ The integrated first version is accepted. [Project state](../PROJECT-STATE.md) r
 
 The [2026-10-24 library and repository review](research/library-review-2026-10-24.md) records the fourteen-article content assessment, resolved findings, actual checks and remaining limitations.
 
+The [2026-10-26 frontend refactor](history/FRONTEND-REFACTOR-2026-10-26.md) records the reading workflow and initial design decisions. The [subsequent interface feedback record](history/FRONTEND-FEEDBACK-2026-10-26.md) records the final library/reader proportions, information layout, AI settings, visual evidence and verification boundaries.
+
 Historical instructions and test counts describe their named milestone. Current commands and repository rules take precedence over superseded paths and feedback gates.

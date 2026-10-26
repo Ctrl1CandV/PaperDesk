@@ -23,6 +23,7 @@ export function BackupPage() {
   const source = useRef<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
+    document.title = '备份与本地记录 · PaperDesk';
     let alive = true;
     const refresh = () => { personalStore.exportBackup().then(value => { if (alive) setSnapshot(value); }).catch(reason => { if (alive) setError(message(reason)); }); };
     refresh(); const unsubscribe = personalStore.subscribe(refresh);
@@ -77,19 +78,19 @@ export function BackupPage() {
     finally { setBusy(false); }
   }
   return <main id="main-content" className="records-page">
-    <h1>备份与本地记录</h1>
+    <header className="records-heading"><span className="eyebrow">数据管理 · 此浏览器</span><h1>备份与本地记录</h1>
     <p className="records-intro">备份当前浏览器的笔记、探索、阅读位置、主动标记和阅读设置。文件可能包含私人文字，请妥善保管。</p>
-    <p className="records-muted">浏览器清理或回收存储可能删除记录；更换浏览器或访问地址时，请用备份迁移。目前没有同步服务，也不保证离线可用。</p>
-    <p className="records-muted">AI 对话需在阅读页的 AI 解读中单独备份、恢复或删除，不受本页操作影响。连接同一本机服务的浏览器共享 AI 对话。</p>
+    </header>
     {error && <p role="alert" className="records-error">{error}</p>}
     <p role="status" className="records-status">{notice}</p>
     <section className="records-section" aria-labelledby="current-records-title">
       <h2 id="current-records-title">当前记录</h2>
-      {snapshot ? <dl className="records-counts">{names.map(name => <div key={name}><dt>{labels[name]}</dt><dd>{snapshot[name].length}</dd></div>)}</dl> : <p>正在读取本地记录…</p>}
+      {snapshot ? <dl className="records-counts">{names.map(name => <div key={name}><dt>{labels[name]}</dt><dd>{snapshot[name].length}</dd></div>)}</dl> : <p role="status">正在读取本地记录…</p>}
       <div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void exportFile()}>导出完整备份</button><button className="secondary-action" disabled={busy} onClick={() => fileInput.current?.click()}>选择备份并预览</button></div>
       <input className="records-file-input" ref={fileInput} type="file" accept=".json,application/json" aria-label="选择个人记录备份" onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = ''; }} />
       <p className="records-muted">接受 PaperDesk 个人备份 v1，最大 5 MiB。仅选择文件不会修改记录。</p>
     </section>
+    <aside className="records-scope" aria-label="备份范围与迁移"><div><h2>保留一份可迁移的记录</h2><p className="records-muted">浏览器清理或回收存储可能删除记录；更换浏览器或访问地址时，请用备份迁移。目前没有同步服务，也不保证离线可用。</p></div><div><h2>AI 对话单独保存</h2><p className="records-muted">AI 对话需在阅读页的 AI 解读中单独备份、恢复或删除，不受本页操作影响。连接同一本机服务的浏览器共享 AI 对话。</p></div></aside>
     {preview && <section className="records-section records-preview" aria-labelledby="import-preview-title">
       <h2 id="import-preview-title">导入预览</h2>
       <p>导出时间：{preview.backup.exportedAt}。以下是文件内的准确数量；完全相同的记录会跳过。</p>
@@ -108,7 +109,7 @@ export function BackupPage() {
       <p className="records-muted">笔记和探索的冲突默认保留两份；阅读位置、阅读标记和设置默认保留本地。</p>
       <div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void applyImport()}>确认按以上选择导入</button><button className="secondary-action" disabled={busy} onClick={() => { setPreview(undefined); source.current = ''; setChoices({}); setError(''); setNotice('已取消，本地记录未改变。'); }}>取消导入</button><button className="secondary-action" disabled={busy} onClick={() => void makePreview(source.current)}>重新预览</button></div>
     </section>}
-    <section className="records-section" aria-labelledby="remove-records-title"><h2 id="remove-records-title">清除本地记录</h2><p>清除当前来源的笔记、探索、位置、主动标记和阅读设置。导读正文不受影响。</p><button className="records-danger secondary-action" disabled={busy} onClick={() => { setRemoveOpen(true); setConfirmRemoval(false); }}>清除前确认</button></section>
+    <section className="records-section records-removal" aria-labelledby="remove-records-title"><div><h2 id="remove-records-title">清除本地记录</h2><p>清除当前来源的笔记、探索、位置、主动标记和阅读设置。导读正文不受影响。</p></div><button className="records-danger secondary-action" disabled={busy} onClick={() => { setRemoveOpen(true); setConfirmRemoval(false); }}>清除前确认</button></section>
     {removeOpen && <Dialog title="确认清除本地记录" onClose={() => { if (!busy) setRemoveOpen(false); }}>
       <p>这会删除当前浏览器来源的全部个人记录。此操作无法撤销；已有备份可重新导入。</p>
       <button className="secondary-action" disabled={busy} onClick={() => void exportFile()}>先导出完整备份</button>

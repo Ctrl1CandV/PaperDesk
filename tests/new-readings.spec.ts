@@ -52,8 +52,9 @@ for (const id of Object.keys(catalog.currentRevisions)) {
     await page.goto(`/library?article=${id}`);
     await expect(page.locator('#orientation-title')).toContainText(metadata.orientation.shortTitle);
     await expect(page.locator('.paper-original-title')).toHaveText(metadata.paperTitle);
-    await expect(page.locator('.orientation-subject')).toContainText(metadata.orientation.summary);
-    await expect(page.locator('.reading-value')).toContainText(metadata.orientation.value);
+    await expect(page.locator('.orientation-subject')).toContainText(metadata.orientation.value);
+    await expect(page.locator('.orientation-abstract')).toContainText(metadata.orientation.summary);
+    for (const prerequisite of metadata.orientation.prerequisites) await expect(page.locator('.reading-value')).toContainText(prerequisite);
     for (const boundary of metadata.orientation.boundaries) await expect(page.locator('.orientation-coverage')).toContainText(boundary);
     const before = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.exportBackup());
     expect(before.resume).toEqual([]); expect(before.guideStates).toEqual([]); expect(before.originalStates).toEqual([]);
@@ -117,7 +118,8 @@ for (const id of Object.keys(catalog.currentRevisions)) {
     const citation = page.locator('.citation-button').first();
     await citation.scrollIntoViewIfNeeded(); await citation.focus();
     const scroll = await page.evaluate(() => scrollY);
-    const label = (await citation.innerText()).replace(/↗$/, '');
+    const label = (await citation.getAttribute('aria-label')) ?? '';
+    expect(label).toBeTruthy();
     const citedSource = metadata.citations.find((item: { labels: string[] }) => item.labels.includes(label));
     expect(citedSource).toBeDefined();
     await page.keyboard.press('Enter');

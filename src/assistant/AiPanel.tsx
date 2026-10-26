@@ -14,7 +14,8 @@ import { aiClient, getAiStatus, type AiConversation, type AiSource, type AiStatu
 import { ChatGptConnection, providerLabel } from './ChatGptConnection';
 import './ai.css';
 
-type SessionDraft = { question: string; conversationId?: string; webSearch: boolean };
+type QuestionMaterial = { unitId: string; selection?: string };
+type SessionDraft = { question: string; conversationId?: string; webSearch: boolean; material?: QuestionMaterial };
 const conversationSelections = new Map<string, string | undefined>();
 const errorText = (error: unknown) => error instanceof Error && error.message ? error.message : '操作未完成，请保留草稿并重试。';
 const suggestions = ['这一节的核心思路是什么？请结合文章解释。', '这里的结论依赖哪些条件，有什么局限？', '把文中的方法串起来，解释它们之间的关系。'];
@@ -96,6 +97,21 @@ function AnswerIdentity({ turn }: { turn: AiTurn }) {
   const label = provider ? `${provider} · ${model || '模型待确认'}` : model ? `模型：${model}` : turn.status === 'running' ? '正在确认模型' : '此记录未包含模型信息';
   return <p className="ai-answer-model" aria-label="本轮使用的模型">{label}</p>;
 }
+function TurnMaterial({ turn }: { turn: AiTurn }) {
+  const context = turn.context;
+  const guide = typeof context?.guideId === 'string' && typeof context.revision === 'number'
+    ? contentRepository.get(context.guideId, context.revision) : undefined;
+  const unit = guide?.units.find(item => item.id === context?.unitId);
+  const selected = typeof context?.selection === 'string' ? context.selection : '';
+  const target = guide && unit ? `/read/${guide.metadata.id}/${guide.metadata.revision}#${unit.id}` : undefined;
+  const historyCount = Array.isArray(context?.historyTurnIds) ? context.historyTurnIds.length : undefined;
+  return <details className="ai-turn-material"><summary>提问时的资料{unit && <span>{selected ? '选文' : '章节'} · {unit.heading ?? '阅读起点'}</span>}</summary>
+    {target ? <AppLink to={target}>返回提问位置 · 导读 r{guide!.metadata.revision}</AppLink> : <p>这条记录没有可定位的提问章节；可查看下方保留的来源。</p>}
+    {selected && <blockquote>{selected}</blockquote>}
+    {context?.scope === 'full-guide' ? <p>本篇完整导读，包含来源与覆盖说明；不含原论文全文。</p> : context?.scope === 'section' ? <p>导读开篇与提问章节，包含来源与覆盖说明；其余章节未随问题发送。</p> : null}
+    {(historyCount !== undefined || typeof context?.webSearch === 'boolean') && <p>{historyCount !== undefined ? `带入 ${historyCount} 轮已完成对话。` : ''}{typeof context?.webSearch === 'boolean' ? context.webSearch ? '本轮允许网页检索；实际取得的资料见回答依据。' : '本轮未开启网页检索。' : ''}</p>}
+  </details>;
+}
 function PreviousAnswer({ turn }: { turn: AiTurn }) {
   const fallback = turn.context?.fallback;
   if (fallback?.reason !== 'subscription_quota' || !fallback.previousAnswer) return null;
@@ -115,6 +131,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   const draftKey = `ai:${guideKey}`;
   const [cached] = useState(() => getDraft<SessionDraft>(draftKey));
   const [question, setQuestion] = useState(cached?.question ?? '');
+  const [material, setMaterial] = useState<QuestionMaterial | undefined>(cached?.material);
   const [webSearch, setWebSearch] = useState(cached?.webSearch ?? false);
   const [status, setStatus] = useState<AiStatus>();
   const [connecting, setConnecting] = useState(true);
@@ -129,6 +146,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   const [phase, setPhase] = useState('');
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [materialOpen, setMaterialOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
   const [importPreview, setImportPreview] = useState<{ data: unknown; text: string; bytes: number; conversationCount: number | null; turnCount: number | null }>();
@@ -141,8 +159,12 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   const pendingRequest = useRef<{ input: AskInput; accepted: boolean } | undefined>(undefined);
   const input = useRef<HTMLTextAreaElement>(null), messages = useRef<HTMLDivElement>(null);
   const nearBottom = useRef(true), fileInput = useRef<HTMLInputElement>(null);
-  const unit = guide.units.find(item => item.id === unitId) ?? guide.units[0];
-  const selectionTooLong = Boolean(selection && selection.length > 12000);
+  const currentUnit = guide.units.find(item => item.id === unitId) ?? guide.units[0];
+  const questionMaterial = material ?? { unitId: currentUnit.id, selection };
+  const unit = guide.units.find(item => item.id === questionMaterial.unitId) ?? currentUnit;
+  const questionSelection = questionMaterial.selection;
+  const materialChanged = unit.id !== currentUnit.id || questionSelection !== selection;
+  const selectionTooLong = Boolean(questionSelection && questionSelection.length > 12000);
   const fullGuide = guide.body.length <= 40000;
   const hasRunning = turns.some(turn => turn.status === 'running');
   const locked = busy || sending;
@@ -151,10 +173,10 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   useUnloadWarning(sending);
 
   useEffect(() => {
-    if (question) keepDraft(draftKey, { question, conversationId, webSearch } satisfies SessionDraft);
+    if (question) keepDraft(draftKey, { question, conversationId, webSearch, material } satisfies SessionDraft);
     else clearDraft(draftKey);
     conversationSelections.set(guideKey, conversationId);
-  }, [draftKey, guideKey, question, conversationId, webSearch]);
+  }, [draftKey, guideKey, question, conversationId, webSearch, material]);
   useEffect(() => {
     alive.current = true; void connect();
     return () => { alive.current = false; connectGeneration.current++; controller.current?.abort(); };
@@ -203,12 +225,13 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     if (!alive.current) return;
     statusVersion.current++; setStatus(next);
   }
-  async function loadConversation(id: string, currentStatus = status) {
+  async function loadConversation(id: string, currentStatus = status, preserveScroll = false) {
     if (!currentStatus) return;
     const value = await aiClient(currentStatus.csrfToken).conversation(id);
     if (!alive.current) return;
     if (value.conversation.guideId !== guide.metadata.id || value.conversation.revision !== guide.metadata.revision) throw new Error('该对话属于另一个导读修订，请从对应文章打开。');
-    connectedId.current = id; setConversationId(id); setTurns(value.turns); nearBottom.current = true;
+    connectedId.current = id; setConversationId(id); setTurns(value.turns);
+    if (!preserveScroll) nearBottom.current = true;
     return value;
   }
   async function connect() {
@@ -249,7 +272,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     if (!ready || !status || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000) return;
     const text = question.trim();
     const base = { conversationId, guideId: guide.metadata.id, revision: guide.metadata.revision,
-      bodySha256: guide.metadata.bodySha256, unitId: unit.id, ...(selection ? { selection } : {}), question: text,
+      bodySha256: guide.metadata.bodySha256, unitId: unit.id, ...(questionSelection ? { selection: questionSelection } : {}), question: text,
       webSearch: Boolean(webSearch && status.searchAvailable) };
     const previous = pendingRequest.current;
     const oldBase = previous ? (({ requestId: _id, ...rest }) => rest)(previous.input) : undefined;
@@ -257,7 +280,10 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     pendingRequest.current = { input: request, accepted: false };
     const abort = new AbortController(); controller.current = abort;
     let localId = `pending-${request.requestId}`, acceptedId: string | undefined, completed = false;
-    const optimistic: AiTurn = { id: localId, question: text, answer: '', status: 'running', sources: [], context: null, createdAt: new Date().toISOString() };
+    const optimistic: AiTurn = { id: localId, question: text, answer: '', status: 'running', sources: [], context: {
+      guideId: request.guideId, revision: request.revision, unitId: request.unitId, selection: request.selection ?? '',
+      scope: fullGuide ? 'full-guide' : 'section', webSearch: request.webSearch,
+    }, createdAt: new Date().toISOString() };
     setTurns(current => [...current.filter(turn => turn.id !== optimistic.id), optimistic]); setSending(true); setError(''); setNotice(''); setPhase('正在准备文章上下文'); nearBottom.current = true;
     const update = (change: (turn: AiTurn) => AiTurn) => {
       const targetId = localId;
@@ -284,7 +310,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
           setError(event.message);
         }
       });
-      if (completed && alive.current) { setQuestion(''); clearDraft(draftKey); pendingRequest.current = undefined; }
+
     } catch (reason) {
       if (alive.current) {
         update(turn => ({ ...turn, status: 'interrupted' }));
@@ -294,15 +320,23 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
       if (alive.current) {
         setPhase('正在确认对话已保存'); controller.current = undefined;
         // A reload also resolves ambiguous failures and preserves a partial response already saved by the service.
-        try { await loadList(status); if (acceptedId) await loadConversation(acceptedId); }
+        try { await loadList(status); if (acceptedId) await loadConversation(acceptedId, status, true); }
         catch { if (alive.current) setNotice('本页回答仍保留，尚未确认服务端状态。请刷新对话核对。'); }
         finally {
           // A provider may have reported an expired login or refreshed model choice.
           try { const next = await getAiStatus(); receiveStatus(next); } catch { /* Keep the answer and the last known status. */ }
-          if (alive.current) { setSending(false); setPhase(''); }
+          if (alive.current) {
+            if (completed) { setQuestion(''); setMaterial(undefined); clearDraft(draftKey); pendingRequest.current = undefined; }
+            setSending(false); setPhase('');
+          }
         }
       }
     }
+  }
+  function editQuestion(value: string) {
+    if (value && !material) setMaterial({ unitId: currentUnit.id, selection });
+    if (!value) setMaterial(undefined);
+    setQuestion(value);
   }
   async function copy(answer: string) {
     try {
@@ -362,20 +396,16 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
       <div className="ai-heading-actions"><button type="button" className="ai-icon-button" aria-label="开始新对话" title="新对话" disabled={locked || connecting} onClick={() => void chooseConversation('')}><PanelIcon kind="new" /></button><button type="button" className="ai-icon-button" aria-label="查看历史对话" title="历史对话" disabled={locked} onClick={() => { setHistoryOpen(true); setError(''); setNotice(''); }}><PanelIcon kind="history" /></button>{onClose && <button type="button" className="ai-icon-button" aria-label="收起 AI 解读" title="收起" onClick={onClose}>×</button>}</div>
     </header>
     <div className="ai-context">
-      <details><summary><span><span className="ai-context-label">本次使用的资料</span><span className="ai-context-current">{selection ? '已选片段' : '当前章节'} · {unit.heading ?? '阅读起点'}</span></span><span aria-hidden="true">⌄</span></summary>
-        <p className="ai-guide-title">{guide.metadata.title}<span>导读 r{guide.metadata.revision}</span></p>
-        {selection && <blockquote>{selection}</blockquote>}
-        <p>向所选模型发送问题、{fullGuide ? '本篇完整导读' : '导读开篇与当前章节（全文超出长度限制）'}、选中片段（如有）、来源与覆盖说明，以及近期对话（最多 6 轮）。</p>
-        {status?.provider === 'chatgpt' && status.apiConfigured && status.chatgpt.fallbackToApi && <p>订阅或此应用额度用尽时，同一问题与资料会转交已配置的备用 API，可能产生 API 费用。</p>}
-        <p>模型可检索本地书库与相关导读章节，不会自动读取笔记、探索记录或阅读历史。</p>
-        <p>资料为论文导读，不包含原文全文。</p>
-      </details>
+      <button type="button" className="ai-material-trigger" onClick={() => setMaterialOpen(true)} aria-label="查看本次提问资料">
+        <span><span className="ai-context-label">{sending ? '本次提问位置' : question ? '已固定提问位置' : '围绕这一节提问'}</span><span className="ai-context-current">{questionSelection ? '选文 · ' : ''}{unit.heading ?? '阅读起点'}</span></span><span className="ai-material-info">资料</span>
+      </button>
+      {materialChanged && !sending && <button type="button" className="ai-material-change" disabled={locked} onClick={() => setMaterial({ unitId: currentUnit.id, selection })}>{selection ? '改用当前选文' : '改用当前阅读章节'} <span aria-hidden="true">↗</span></button>}
     </div>
     <div className="ai-messages" ref={messages} role="region" aria-label="AI 解读对话" tabIndex={0} onScroll={event => { const node = event.currentTarget; nearBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }}>
       {connecting ? <p className="ai-service-state" role="status">正在连接…</p> : connectionError ? <div className="ai-service-state"><p>{connectionError}</p><button type="button" className="ai-inline-action" onClick={() => void connect()}>重试连接</button></div> : status && !status.configured ? <div className="ai-service-state"><p>{status.provider === 'chatgpt' ? '连接 ChatGPT 后即可提问。' : '连接 ChatGPT 订阅，或配置自己的 API。'}</p><button type="button" className="ai-inline-action" onClick={() => setSettingsOpen(true)}>打开 AI 设置</button></div> : null}
-      {!turns.length && <div className="ai-empty"><div className="ai-suggestions">{suggestions.map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => { setQuestion(value); input.current?.focus(); }}>{suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
+      {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">从这篇导读继续追问</p><div className="ai-suggestions">{suggestions.map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => { editQuestion(value); input.current?.focus(); }}>{suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
       {turns.map((turn, index) => <section className="ai-turn" key={turn.id} aria-label={`问题 ${index + 1}`}>
-        <div className="ai-question"><span className="ai-speaker">你的问题</span><p>{turn.question}</p></div>
+        <div className="ai-question"><span className="ai-speaker">你的问题</span><p>{turn.question}</p><TurnMaterial turn={turn} /></div>
         <div className="ai-response"><div className="ai-response-label"><span>AI 解读</span>{turn.status !== 'complete' && <span className="ai-turn-state">{turn.status === 'running' ? '生成中' : turn.status === 'interrupted' ? '未完成' : '出错'}</span>}</div>
           <AnswerIdentity turn={turn} />
           {turn.context?.fallback?.reason === 'subscription_quota' && <p className="ai-fallback-notice">订阅或应用额度已达上限 · 本轮由 API 回答</p>}
@@ -391,17 +421,23 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
       {error && <div className="ai-error" role="alert"><p>{error}</p>{conversationId && <button type="button" disabled={locked} onClick={() => void refresh()}>刷新对话</button>}<button type="button" disabled={locked} onClick={() => void connect()}>重试连接</button><button type="button" disabled={locked} onClick={() => setSettingsOpen(true)}>AI 设置</button></div>}
       {notice && <p className="ai-notice" role="status">{notice}</p>}
       {loginPending && <p className="ai-notice" role="status">正在等待 ChatGPT 授权。完成或取消这次登录后即可发送，问题草稿仍保留。</p>}
-      {selectionTooLong && <p className="ai-error" role="alert">选文超过 12,000 字符。请在阅读工具中清除选文，或选择较短片段后发送；没有自动截断。</p>}
-      <div className="ai-input-surface"><label className="ai-visually-hidden" htmlFor={questionId}>向 AI 提问</label><textarea id={questionId} ref={input} rows={3} value={question} maxLength={6000} disabled={sending} placeholder="关于这篇文章，你想进一步理解什么？" onChange={event => setQuestion(event.target.value)} onKeyDown={event => {
+      {selectionTooLong && <p className="ai-error" role="alert">选文超过 12,000 字符。请打开“资料”，选择“不附带选文”，或改用较短的当前选文；没有自动截断。</p>}
+      <div className="ai-input-surface"><label className="ai-visually-hidden" htmlFor={questionId}>向 AI 提问</label><textarea id={questionId} ref={input} rows={3} value={question} maxLength={6000} disabled={sending} placeholder="关于这篇文章，你想进一步理解什么？" onChange={event => editQuestion(event.target.value)} onKeyDown={event => {
         if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) { event.preventDefault(); void send(); }
       }} />
-      <div className="ai-composer-actions"><button type="button" className="ai-provider-trigger" disabled={locked} aria-label={`模型连接：${providerLabel(status)}`} title={status?.model ? `${status.model} · AI 设置` : '打开 AI 设置'} onClick={() => setSettingsOpen(true)}><span className={ready ? 'is-connected' : ''} aria-hidden="true" /><span>{providerLabel(status)}</span><span className="ai-provider-chevron" aria-hidden="true">⌄</span></button><label className="ai-search-toggle" title={!status?.searchAvailable ? '尚未配置网页检索，请查看 AI 设置' : '允许把检索问题发送给 Tavily 搜索服务'}><input type="checkbox" checked={webSearch && Boolean(status?.searchAvailable)} disabled={locked || !status?.searchAvailable} aria-describedby={webSearch && status?.searchAvailable ? `${questionId}-search-hint` : undefined} onChange={event => setWebSearch(event.target.checked)} />联网查证{!status?.searchAvailable && <span>· 未配置</span>}</label>{sending ? <button type="button" className="ai-send" onClick={() => controller.current?.abort()}>停止</button> : <button className="ai-send" type="submit" disabled={!ready || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000}>发送 <span aria-hidden="true">↑</span></button>}</div></div>
-      {webSearch && status?.searchAvailable && <p id={`${questionId}-search-hint`} className="ai-search-notice">检索问题可能包含你的提问内容，将发送至 Tavily；网页摘录会送给模型。</p>}
+      <div className="ai-composer-actions"><button type="button" className="ai-provider-trigger" disabled={locked} aria-label={`AI 设置：${providerLabel(status)}，${webSearch && status?.searchAvailable ? '联网已开启' : '联网关闭'}`} title="设置模型连接与联网查证" onClick={() => setSettingsOpen(true)}><span className={ready ? 'is-connected' : ''} aria-hidden="true" /><span>{providerLabel(status)}<span className="ai-provider-search">{webSearch && status?.searchAvailable ? ' · 联网' : ' · 不联网'}</span></span><span className="ai-provider-chevron" aria-hidden="true">⌄</span></button>{sending ? <button type="button" className="ai-send" onClick={() => controller.current?.abort()}>停止</button> : <button className="ai-send" type="submit" disabled={!ready || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000}>发送 <span aria-hidden="true">↑</span></button>}</div></div>
       {(sending || question.length > 5000) && <p className="ai-composer-hint">{sending ? '关闭会停止回答' : `${question.length} / 6000`}</p>}
     </form>
     {deleteOpen && <Dialog title="删除这段 AI 对话" className="ai-small-dialog" busy={busy} onClose={() => setDeleteOpen(false)}><p>将删除整段对话与引用，无法撤销。笔记与阅读记录会保留。</p><p>可先在“AI 对话备份”中导出。</p>{error && <p role="alert" className="ai-error">{error}</p>}<div className="form-actions"><button className="secondary-action" disabled={busy} onClick={() => setDeleteOpen(false)}>保留对话</button><button className="danger-action" disabled={busy} onClick={() => void remove()}>确认删除这段对话</button></div></Dialog>}
     {copyText !== undefined && <Dialog title="手动复制回答" onClose={() => setCopyText(undefined)}><p>浏览器自动复制不可用。选中下方文字后使用 Ctrl+C 或系统复制。</p><textarea className="ai-copy-fallback" aria-label="回答完整内容" readOnly value={copyText} rows={12} onFocus={event => event.currentTarget.select()} /><button className="secondary-action" onClick={event => { const area = event.currentTarget.parentElement?.querySelector('textarea'); area?.focus(); area?.select(); }}>选中全部内容</button></Dialog>}
-    {settingsOpen && <Dialog title="AI 设置" onClose={() => setSettingsOpen(false)} className="ai-settings-dialog ai-small-dialog"><ChatGptConnection status={status} disabled={locked || hasRunning} onStatus={next => { receiveStatus(next); setConnectionError(''); }} /></Dialog>}
+    {materialOpen && <Dialog title="本次提问资料" className="ai-material-dialog ai-small-dialog" onClose={() => setMaterialOpen(false)}>
+      <p className="ai-guide-title">{guide.metadata.title}<span>导读 r{guide.metadata.revision} · {unit.heading ?? '阅读起点'}</span></p>
+      <dl className="ai-material-list"><div><dt>随问题发送</dt><dd>{fullGuide ? '本篇完整导读' : '导读开篇与提问章节（全文超出长度限制）'}、来源与覆盖说明，以及最多 6 轮近期对话。</dd></div><div><dt>不包含</dt><dd>原论文全文、个人笔记、探索记录和阅读历史。</dd></div></dl>
+      {questionSelection && <section className="ai-selected-material"><h3>附带选文</h3><blockquote>{questionSelection}</blockquote><button type="button" className="ai-inline-action" disabled={locked} onClick={() => setMaterial({ unitId: unit.id })}>不附带选文</button></section>}
+      <p className="ai-fine-print">AI 可以继续查找本地书库与相关导读章节。改变阅读位置不会替换正在编辑或已发出问题的资料。</p>
+      {status?.provider === 'chatgpt' && status.apiConfigured && status.chatgpt.fallbackToApi && <p className="ai-fine-print">订阅或此应用额度用尽时，同一问题与资料会转交已配置的备用 API，可能产生 API 费用。</p>}
+    </Dialog>}
+    {settingsOpen && <Dialog title="AI 设置" onClose={() => setSettingsOpen(false)} className="ai-settings-dialog ai-small-dialog"><ChatGptConnection status={status} disabled={locked || hasRunning} webSearch={webSearch} onWebSearch={setWebSearch} onStatus={next => { receiveStatus(next); setConnectionError(''); }} /></Dialog>}
     {historyOpen && <Dialog title="历史对话" className="ai-history-dialog ai-small-dialog" busy={busy} onClose={() => setHistoryOpen(false)}><p className="ai-dialog-intro">这篇导读的讨论 · r{guide.metadata.revision}</p>
       {error && <p className="ai-error" role="alert">{error}</p>}{notice && <p className="ai-notice" role="status">{notice}</p>}
       <div className="ai-history-list">{conversations.length ? conversations.map(item => <button key={item.id} type="button" aria-current={conversationId === item.id ? 'true' : undefined} disabled={locked || connecting || !status || Boolean(connectionError)} onClick={async () => { if (await chooseConversation(item.id)) setHistoryOpen(false); }}><span>{item.title}</span><time>{timeLabel(item.updatedAt)}</time></button>) : <p>还没有保存的对话。</p>}</div>

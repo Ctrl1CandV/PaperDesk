@@ -31,13 +31,14 @@ function checkedAtLabel(value?: string | null): string | undefined {
   return date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-export function ChatGptConnection({ status, disabled = false, onStatus }: {
-  status?: AiStatus; disabled?: boolean; onStatus: (status: AiStatus) => void;
+export function ChatGptConnection({ status, disabled = false, webSearch = false, onWebSearch, onStatus }: {
+  status?: AiStatus; disabled?: boolean; webSearch?: boolean; onWebSearch?: (enabled: boolean) => void; onStatus: (status: AiStatus) => void;
 }) {
   const formId = useId();
-  const [view, setView] = useState<AiProvider>(status?.provider ?? 'chatgpt');
+  const [view, setView] = useState<AiProvider | 'search'>(status?.provider ?? 'chatgpt');
   const [settings, setSettings] = useState<AiSettings>();
   const [baseURL, setBaseURL] = useState(''), [apiModel, setApiModel] = useState(''), [apiKey, setApiKey] = useState('');
+  const [searchKey, setSearchKey] = useState('');
   const [chatModel, setChatModel] = useState('');
   const [reasoningEffort, setReasoningEffort] = useState('');
   const [fallbackToApi, setFallbackToApi] = useState(status?.chatgpt?.fallbackToApi ?? true);
@@ -46,7 +47,7 @@ export function ChatGptConnection({ status, disabled = false, onStatus }: {
   const [modelReload, setModelReload] = useState(0);
   const refreshModels = useRef(false);
   const [conflict, setConflict] = useState(false);
-  const [busy, setBusy] = useState<'connect' | 'cancel' | 'disconnect' | 'provider' | 'save' | 'fallback' | null>(null);
+  const [busy, setBusy] = useState<'connect' | 'cancel' | 'disconnect' | 'provider' | 'save' | 'fallback' | 'search' | null>(null);
   const [refreshing, setRefreshing] = useState(true);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -85,7 +86,7 @@ export function ChatGptConnection({ status, disabled = false, onStatus }: {
     probeController.current = undefined; controller.abort();
     if (alive.current) setProbeRunning(false);
   }
-  function changeView(next: AiProvider) {
+  function changeView(next: AiProvider | 'search') {
     if (next !== view) cancelProbe();
     setView(next); setNotice('');
   }
@@ -296,6 +297,19 @@ export function ChatGptConnection({ status, disabled = false, onStatus }: {
       if (alive.current) { setError(reason instanceof Error ? reason.message : '保存失败，请重试。'); setConflict(reason instanceof AiApiError && reason.status === 409); }
     } finally { if (alive.current) setBusy(null); }
   }
+  async function saveSearch() {
+    if (locked || pending || !status || !settings || conflict || !searchKey.trim()) return;
+    setBusy('search'); setError(''); setNotice('');
+    try {
+      const result = await aiClient(status.csrfToken).saveSearchSettings({ revision: settings.revision, apiKey: searchKey.trim() });
+      receive(result.status, true);
+      if (!alive.current) return;
+      setSettings(result.settings); setSearchKey('');
+      setNotice('检索配置已保存。开启上方“允许联网查证”后，后续提问才可使用。');
+    } catch (reason) {
+      if (alive.current) { setError(reason instanceof Error ? reason.message : '保存失败，请重试。'); setConflict(reason instanceof AiApiError && reason.status === 409); }
+    } finally { if (alive.current) setBusy(null); }
+  }
   async function mutate(action: 'cancel' | 'disconnect' | 'provider', provider?: AiProvider) {
     if (locked || !status?.csrfToken) return;
     setBusy(action); setError(''); setNotice('');
@@ -326,6 +340,7 @@ export function ChatGptConnection({ status, disabled = false, onStatus }: {
     <div className="ai-provider-tabs" role="group" aria-label="编辑连接方式">
       <button type="button" aria-pressed={view === 'chatgpt'} disabled={Boolean(busy)} onClick={() => changeView('chatgpt')}>ChatGPT 订阅</button>
       <button type="button" aria-pressed={view === 'api'} disabled={Boolean(busy)} onClick={() => changeView('api')}>API</button>
+      <button type="button" aria-pressed={view === 'search'} disabled={Boolean(busy)} onClick={() => changeView('search')}>联网查证</button>
     </div>
     {error && <p className="ai-error" role="alert">{error}</p>}
     {!settings && !refreshing && <div className="ai-connection-actions">
@@ -340,9 +355,9 @@ export function ChatGptConnection({ status, disabled = false, onStatus }: {
     {notice && <p className="ai-notice" role="status">{notice}</p>}
     {!settings ? null : view === 'chatgpt' ? <div className="ai-provider-content">
       {connected && !pending && <section className="ai-availability" aria-labelledby={`${formId}-availability-title`}>
-        <div className="ai-availability-heading"><h3 id={`${formId}-availability-title`}><span className="ai-connected-dot" aria-hidden="true" />ChatGPT 已连接</h3><button type="button" className="ai-inline-action ai-disconnect" disabled={locked} onClick={() => { setDisconnectOpen(true); setError(''); }}>断开连接…</button></div>
-        <div className="ai-availability-action"><span role="status" className={availability?.state === 'quota_exhausted' ? 'is-unavailable' : availability?.state === 'available' && !probing ? 'is-available' : undefined}>{probing ? '正在尝试…' : availability?.state === 'available' ? '可用' : availability?.state === 'quota_exhausted' ? '额度已达上限' : '可用状态未确认'}</span><button type="button" className="ai-inline-action" disabled={locked || pending || !connected || !settings || chatDirty || conflict || modelsLoading} onClick={() => void checkAvailability()}>{probing ? '正在尝试…' : availability?.state === 'quota_exhausted' ? '重新尝试' : '尝试连接'}</button><a className="ai-usage-link" href="https://chatgpt.com/settings/usage" target="_blank" rel="noopener noreferrer">查看额度 ↗</a></div>
-        {(checkedAt || availability?.model) && <p className="ai-availability-result">最近确认{checkedAt ? `：${checkedAt}` : ''}{availability?.model ? ` · ${availability.model}` : ''}</p>}
+        <div className="ai-availability-heading"><h3 id={`${formId}-availability-title`}><span className="ai-connected-dot" aria-hidden="true" />ChatGPT 已连接</h3><span role="status" className={`ai-availability-badge ${availability?.state === 'quota_exhausted' ? 'is-unavailable' : availability?.state === 'available' && !probing ? 'is-available' : ''}`}>{probing ? '正在尝试…' : availability?.state === 'available' ? '可用' : availability?.state === 'quota_exhausted' ? '额度已达上限' : '可用状态未确认'}</span></div>
+        {checkedAt && <p className="ai-availability-result" title={availability?.model ?? undefined}>最近确认：{checkedAt}</p>}
+        <div className="ai-availability-action"><button type="button" className="ai-inline-action" disabled={locked || pending || !connected || !settings || chatDirty || conflict || modelsLoading} onClick={() => void checkAvailability()}>{probing ? '正在尝试…' : availability?.state === 'quota_exhausted' ? '重新尝试' : '尝试连接'}</button><a className="ai-usage-link" href="https://chatgpt.com/settings/usage" target="_blank" rel="noopener noreferrer">查看额度 ↗</a><button type="button" className="ai-inline-action ai-disconnect" disabled={locked} onClick={() => { setDisconnectOpen(true); setError(''); }}>断开连接…</button></div>
         {availabilityError && !probing && <p className={availability?.state === 'quota_exhausted' ? 'ai-warning' : 'ai-error'} role="alert">{availability?.state === 'quota_exhausted' ? '尚未确认额度恢复。' : '尚未确认当前可用状态。'}{availabilityError}</p>}
         {chatDirty && <p className="ai-availability-hint">请先保存模型，再尝试连接。</p>}
       </section>}
@@ -351,7 +366,7 @@ export function ChatGptConnection({ status, disabled = false, onStatus }: {
         {chatModel && !models?.some(model => model.id === chatModel) && <option value={chatModel} disabled>{chatModel}（暂不可用）</option>}
       </select>{modelsLoading && <p className="ai-field-hint" role="status">正在读取可用模型…</p>}
       {modelError && <p className="ai-error" role="alert">{modelError}</p>}{!modelsLoading && models?.length === 0 && <p className="ai-field-hint">暂无可用模型。请刷新模型，或在 ChatGPT 检查订阅权限。</p>}</div>
-      <div className="ai-field"><label htmlFor={`${formId}-reasoning`}>思考强度 <span>Thinking</span></label><select id={`${formId}-reasoning`} value={reasoningEffort} disabled={locked || !settings || modelsLoading || !models || (!reasoningEfforts.length && !reasoningEffort)} onChange={event => setReasoningEffort(event.target.value)} aria-describedby={`${formId}-reasoning-hint`}>
+      <div className="ai-field"><label htmlFor={`${formId}-reasoning`}>思考强度</label><select id={`${formId}-reasoning`} value={reasoningEffort} disabled={locked || !settings || modelsLoading || !models || (!reasoningEfforts.length && !reasoningEffort)} onChange={event => setReasoningEffort(event.target.value)} aria-describedby={`${formId}-reasoning-hint`}>
         <option value="">模型默认{defaultReasoning && reasoningLabels[defaultReasoning] ? `（${reasoningLabels[defaultReasoning]}）` : ''}</option>
         {reasoningEfforts.map(effort => <option key={effort} value={effort}>{reasoningLabels[effort]}</option>)}
         {!reasoningSupported && <option value={reasoningEffort} disabled>{reasoningLabels[reasoningEffort] || reasoningEffort}（暂不可用）</option>}
@@ -365,19 +380,25 @@ export function ChatGptConnection({ status, disabled = false, onStatus }: {
       </div>}
       <div className="ai-fallback-setting">
         <label className="ai-fallback-toggle" htmlFor={`${formId}-fallback`}><input id={`${formId}-fallback`} type="checkbox" checked={fallbackToApi} disabled={locked || pending || !settings} aria-describedby={`${formId}-fallback-hint`} onChange={event => setFallbackToApi(event.target.checked)} />额度用尽时使用备用 API</label>
-        <p id={`${formId}-fallback-hint`} className="ai-field-hint">仅在订阅或此应用额度达到上限时，将本轮问题、近期对话、导读上下文与已取得的来源发送至备用 API，可能产生 API 费用。</p>
+        <p id={`${formId}-fallback-hint`} className="ai-field-hint">仅在订阅或此应用额度用尽时，将问题、近期对话、导读与来源转交备用 API，独立计费。</p>
         {settings && <p className="ai-fallback-target">{apiConfigured ? <>备用模型：<span>{settings.api.modelId}</span></> : <>备用 API 尚未配置。<button type="button" className="ai-inline-action" disabled={locked} onClick={() => changeView('api')}>去 API 页配置</button></>}</p>}
         {(fallbackDirty || busy === 'fallback') && <button type="button" className="secondary-action" disabled={locked || pending || !settings || conflict || !fallbackDirty} onClick={() => void saveFallback()}>{busy === 'fallback' ? '正在保存…' : '保存备用设置'}</button>}
       </div>
-    </div> : <form className="ai-provider-content ai-api-form" onSubmit={event => { event.preventDefault(); void save(); }} autoComplete="off">
+    </div> : view === 'api' ? <form className="ai-provider-content ai-api-form" onSubmit={event => { event.preventDefault(); void save(); }} autoComplete="off">
       <div className="ai-api-heading"><h3>{apiConfigured ? 'API 已配置' : '配置 API'}</h3><span>兼容 OpenAI · 用量独立计费</span></div>
       <div className="ai-field"><label htmlFor={`${formId}-base-url`}>Base URL</label><input id={`${formId}-base-url`} type="url" inputMode="url" required value={baseURL} onChange={event => setBaseURL(event.target.value)} disabled={locked || !settings} placeholder="https://api.example.com/v1" spellCheck={false} maxLength={200} /></div>
       <div className="ai-field"><label htmlFor={`${formId}-api-model`}>Model ID</label><input id={`${formId}-api-model`} required value={apiModel} onChange={event => setApiModel(event.target.value)} disabled={locked || !settings} placeholder="服务提供的模型 ID" spellCheck={false} maxLength={200} /></div>
       <div className="ai-field"><label htmlFor={`${formId}-api-key`}>API Key <span>{settings?.api.apiKeyConfigured ? '已保存' : '未配置'}</span></label><input id={`${formId}-api-key`} type="password" autoComplete="new-password" value={apiKey} onChange={event => setApiKey(event.target.value)} disabled={locked || !settings} placeholder={needsNewKey ? '输入新服务的密钥' : settings?.api.apiKeyConfigured ? '留空保留现有密钥' : '输入 API Key'} required={needsNewKey} spellCheck={false} maxLength={4096} /><p className="ai-field-hint">{needsNewKey ? '更换地址需重新填写密钥。' : '仅保存在本机服务，保存后不回显。'}</p></div>
       {pending && <p className="ai-notice">请先完成或取消 ChatGPT 登录，再修改设置。</p>}
       <div className="ai-connection-actions"><button type="submit" className="primary-action" disabled={locked || pending || !settings || conflict || !apiDirty || !baseURL.trim() || !apiModel.trim()}>{busy === 'save' ? '正在保存…' : '保存配置'}</button>{activeProvider !== 'api' && <button type="button" className="secondary-action" disabled={locked || !apiConfigured || pending || apiDirty} onClick={() => void mutate('provider', 'api')}>使用此 API</button>}</div>
-    </form>}
-    {settings && (settings.search.apiKeyConfigured ? <details className="ai-settings-more"><summary>联网查证 · 已配置</summary><p>在提问时勾选“联网查证”即可使用。检索问题发送至 Tavily，网页摘录会送给模型。</p></details> : <p className="ai-search-status">联网查证 · 未配置</p>)}
+    </form> : <section className="ai-search-settings" aria-label="联网查证设置">
+      <div className="ai-search-permission"><label className="ai-search-switch" htmlFor={`${formId}-web-search`}><span><strong>允许联网查证</strong><span>用于这篇导读的后续提问</span></span><input id={`${formId}-web-search`} type="checkbox" role="switch" checked={webSearch && Boolean(status?.searchAvailable)} disabled={locked || !status?.searchAvailable} onChange={event => onWebSearch?.(event.target.checked)} aria-describedby={`${formId}-search-consequence`} /></label><p id={`${formId}-search-consequence`} className="ai-field-hint">开启后，AI 可将包含提问内容的检索词发给 Tavily；取得的网页摘录会送给模型。</p>{!status?.searchAvailable && <p className="ai-field-hint">{settings.search.apiKeyConfigured ? '请先连接模型，并确保模型工具已开启。' : '先保存下方检索密钥，再开启联网查证。'}</p>}</div>
+      <form className="ai-search-form" onSubmit={event => { event.preventDefault(); void saveSearch(); }} autoComplete="off">
+        <div className="ai-api-heading"><h3>Tavily 检索服务</h3><span>{settings.search.apiKeyConfigured ? '密钥已保存' : '尚未配置'}</span></div>
+        <div className="ai-field"><label htmlFor={`${formId}-search-key`}>Tavily API Key</label><input id={`${formId}-search-key`} type="password" autoComplete="new-password" value={searchKey} onChange={event => setSearchKey(event.target.value)} disabled={locked || pending} placeholder={settings.search.apiKeyConfigured ? '输入新密钥以替换' : '输入 Tavily API Key'} required spellCheck={false} maxLength={4096} /><p className="ai-field-hint">密钥仅保存在本机服务，保存后不回显。与模型 API 分别计费。</p></div>
+        <div className="ai-connection-actions"><button type="submit" className="primary-action" disabled={locked || pending || conflict || !searchKey.trim()}>{busy === 'search' ? '正在保存…' : '保存检索配置'}</button></div>
+      </form>
+    </section>}
     {disconnectOpen && <Dialog title="断开 ChatGPT 连接" className="ai-small-dialog" busy={Boolean(busy)} onClose={() => setDisconnectOpen(false)}><p>移除本机保存的 ChatGPT 授权，对话与笔记仍保留。下次使用需要重新连接。</p><p>断开后不会自动改用 API。</p>{error && <p className="ai-error" role="alert">{error}</p>}<div className="form-actions"><button type="button" className="secondary-action" disabled={Boolean(busy)} onClick={() => setDisconnectOpen(false)}>保留连接</button><button type="button" className="secondary-action ai-danger" disabled={Boolean(busy)} onClick={() => void mutate('disconnect')}>确认断开连接</button></div></Dialog>}
   </section>;
 }

@@ -29,13 +29,17 @@ const centeredBrowse = async (page: Page) => {
   const viewportWidth = await page.evaluate(() => document.documentElement.clientWidth);
   const layout = (await page.locator('.library-layout').boundingBox())!;
   expect(Math.abs(layout.x + layout.width / 2 - viewportWidth / 2)).toBeLessThan(2);
-  expect(layout.width).toBeLessThanOrEqual(900);
+  expect(layout.width).toBeLessThanOrEqual(1632);
+  if (viewportWidth >= 1024) {
+    // Balance useful space against outer margins; more width is not always better.
+    expect(layout.width / viewportWidth).toBeGreaterThan(viewportWidth >= 1200 ? .63 : .88);
+    expect(layout.width / viewportWidth).toBeLessThan(viewportWidth >= 1200 ? .82 : .96);
+  }
   for (const selector of ['.library-heading', '.library-shelf', '.library-search-box']) {
     const bounds = (await page.locator(selector).boundingBox())!;
     expect(Math.abs(bounds.x - layout.x)).toBeLessThan(2);
     expect(Math.abs(bounds.width - layout.width)).toBeLessThan(2);
   }
-  if (viewportWidth >= 1024) expect(layout.width).toBe(900);
 };
 const previewBesideSelected = async (page: Page, guideId: string) => {
   await expect.poll(async () => {
@@ -52,7 +56,7 @@ const previewBesideSelected = async (page: Page, guideId: string) => {
   const card = (await page.locator('.library-preview').boundingBox())!;
   expect(card.x - article.x - article.width).toBeGreaterThanOrEqual(12);
   expect(card.x - article.x - article.width).toBeLessThanOrEqual(36);
-  expect(card.width).toBeLessThan(article.width);
+  expect(card.width).toBeGreaterThan(article.width);
   expect(await page.locator('.library-preview').evaluate(element => getComputedStyle(element, '::before').content)).toMatch(/^(none|normal)$/);
   await noNestedVerticalScroll(page);
 };
@@ -90,7 +94,7 @@ test('keyboard browsing uses the page scroll and the last article opens a dismis
   await expect(page).not.toHaveURL(/article=/);
 });
 
-test('opening expands the centered workspace and the preview follows each article at a stable open-state row width', async ({ page }) => {
+test('wide browsing and the preview follow each article at a stable open-state row width', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await mkdir('docs/evidence', { recursive: true });
@@ -116,7 +120,9 @@ test('opening expands the centered workspace and the preview follows each articl
     } else expect(Math.abs(rowWidth - openWidth)).toBeLessThan(2);
     const before = await page.evaluate(() => scrollY);
     if (index > 0) expect(before).toBeGreaterThan(300);
-    await row.click();
+    // The card can be taller than the viewport; dispatch the already-selected action
+    // without Playwright first scrolling its row's center into view.
+    await row.dispatchEvent('click');
     await expect(page.locator('#orientation-title')).toBeFocused();
     await expect(page.getByRole('link', { name: '进入深入阅读' })).toBeInViewport();
     await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - before)).toBeLessThan(5);
@@ -133,7 +139,7 @@ test('opening expands the centered workspace and the preview follows each articl
   await expect(page.locator(`#choose-${lastGuide.guideId}`)).toBeFocused();
   await expect(page.locator(`#choose-${lastGuide.guideId}`)).toBeInViewport();
   await centeredBrowse(page);
-  expect(Math.abs((await page.locator('.guide-entry').first().boundingBox())!.width - originalWidth)).toBeLessThan(2);
+  expect((await page.locator('.guide-entry').first().boundingBox())!.width).toBeGreaterThan(originalWidth);
   expect(errors).toEqual([]);
 });
 
@@ -148,25 +154,27 @@ test('selected identity, source disclosures and chapters remain keyboard accessi
   await page.locator('#choose-instructgpt').click();
   await expect(page.locator('#orientation-title')).toBeFocused();
   const preparation = page.locator('.orientation-preparation');
-  await preparation.locator('summary').focus(); await page.keyboard.press('Enter');
-  await expect(preparation).toHaveAttribute('open', '');
-  await expect(preparation.getByRole('heading', { name: '带着哪些基础开始' })).toBeVisible();
+  await expect(page.locator('.article-orientation details')).toHaveCount(0);
+  await expect(page.locator('.orientation-abstract')).toBeVisible();
+  await expect(page.locator('.reading-value').getByRole('heading', { name: '带着哪些基础开始' })).toBeVisible();
   await expect(preparation.getByRole('heading', { name: '本次阅读的范围' })).toBeVisible();
-  const source = page.locator('.orientation-source');
-  await source.locator('summary').focus(); await page.keyboard.press('Enter');
-  await expect(source).toHaveAttribute('open', '');
+  await page.getByRole('button', { name: '完整来源与作者' }).focus(); await page.keyboard.press('Enter');
+  const source = page.getByRole('dialog', { name: '来源与版本' });
+  await expect(source).toBeVisible();
   await expect(source).toContainText('完整作者');
   await expect(source).toContainText('首次预印本 2022 年');
   for (const link of await source.getByRole('link').all()) await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   await noNestedVerticalScroll(page);
-  await page.locator('.orientation-outline summary').focus(); await page.keyboard.press('Enter');
+  await source.getByRole('button', { name: '关闭', exact: true }).click();
+  await expect(source).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '完整来源与作者' })).toBeFocused();
   const chapter = page.locator('.orientation-outline a').first();
   await expect(chapter).toHaveAttribute('href', new RegExp(`/read/instructgpt/${revisions.instructgpt}#`));
-  await chapter.focus(); await page.keyboard.press('Enter');
+  await chapter.press('Enter');
   await expect(page).toHaveURL(new RegExp(`/read/instructgpt/${revisions.instructgpt}#`));
 });
 
-test('expanding and collapsing card details preserves keyboard focus and recenters beside a late article', async ({ page }) => {
+test('full bibliographic details return focus and preserve the readable card geometry', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -175,19 +183,16 @@ test('expanding and collapsing card details preserves keyboard focus and recente
   await expect(page.locator('#orientation-title')).toBeFocused();
   await previewBesideSelected(page, lastGuide.guideId);
   const closedHeight = (await card.boundingBox())!.height;
-  const preparation = page.locator('.orientation-preparation');
-  const toggle = preparation.locator('summary');
+  const toggle = page.getByRole('button', { name: '完整来源与作者' });
   await toggle.focus();
+  const before = await page.evaluate(() => scrollY);
   await page.keyboard.press('Enter');
-  await expect(preparation).toHaveAttribute('open', '');
-  await expect(toggle).toBeFocused();
-  await expect.poll(async () => (await card.boundingBox())!.height).toBeGreaterThan(closedHeight + 40);
+  await expect(page.getByRole('dialog', { name: '来源与版本' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await previewBesideSelected(page, lastGuide.guideId);
   await expect(toggle).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(preparation).not.toHaveAttribute('open', '');
-  await previewBesideSelected(page, lastGuide.guideId);
-  await expect(toggle).toBeFocused();
+  await expect.poll(async () => Math.abs((await page.evaluate(() => scrollY)) - before)).toBeLessThan(3);
   expect(Math.abs((await card.boundingBox())!.height - closedHeight)).toBeLessThan(2);
   expect(errors).toEqual([]);
 });
@@ -216,13 +221,13 @@ test('centered browsing and wider two-column reading reflow across wide, narrow 
       const list = (await page.locator('.library-shelf').boundingBox())!;
       const card = (await page.locator('.library-preview').boundingBox())!;
       const layout = (await page.locator('.library-layout').boundingBox())!;
-      expect(card.x).toBeGreaterThan(width / 2);
-      expect(card.width).toBeLessThan(list.width);
+      expect(card.x).toBeGreaterThan(width * .4);
+      expect(card.width).toBeGreaterThan(list.width);
       expect(card.width).toBeGreaterThanOrEqual(340);
-      expect(card.width).toBeLessThanOrEqual(540);
-      if (width >= 1440) expect(card.width).toBe(540);
-      expect(layout.width).toBeLessThanOrEqual(1360);
-      expect(layout.width).toBeGreaterThan(fullListWidth);
+      if (width >= 1440) expect(card.width).toBeGreaterThan(580);
+      expect(layout.width / width).toBeGreaterThan(width >= 1200 ? .63 : .88);
+      expect(layout.width / width).toBeLessThan(width >= 1200 ? .82 : .96);
+      expect(Math.abs(layout.width - fullListWidth)).toBeLessThan(2);
       expect(Math.abs(card.x + card.width - layout.x - layout.width)).toBeLessThan(2);
       expect(list.x + list.width).toBeLessThanOrEqual(card.x);
       expect(fullListWidth - list.width).toBeGreaterThan(100);
