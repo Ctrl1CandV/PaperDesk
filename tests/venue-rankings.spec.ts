@@ -8,7 +8,7 @@ test('venue references prefer CCF A/B and use a dated CAS major category where a
     ['transformer', 'CCF-A', '2026目录'],
     ['react', 'CCF-A', '2026目录'],
     ['streamingllm', 'CCF-A', '2026目录'],
-    ['concept-drift-survey', '中科院 1区', '2025大类'],
+    ['concept-drift-survey', 'CAS-1', '2025大类'],
   ];
   for (const [id, label, edition] of cases) {
     await page.goto(`/library?article=${id}`);
@@ -22,7 +22,8 @@ test('venue references prefer CCF A/B and use a dated CAS major category where a
   }
   await page.setViewportSize({ width: 320, height: 844 });
   await page.goto('/library?article=concept-drift-survey');
-  await expect(page.locator('.orientation-ranking')).toContainText('中科院 1区');
+  await expect(page.locator('.orientation-ranking')).toContainText('CAS-1');
+  await expect(page.locator('.orientation-ranking a')).toHaveAttribute('aria-label', /中科院期刊分区 1 区/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 });
 

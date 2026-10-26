@@ -37,7 +37,7 @@ export function venueRanking(metadata: GuideMetadata): { label: string; edition:
     description: `发表渠道参考：中国计算机学会 ${venue.ccf.year} 年第七版推荐目录。点击查看目录出处。`,
   };
   if (venue?.kind === 'journal' && venue.cas && venue.cas.zone <= 2) return {
-    label: `中科院 ${venue.cas.zone}区`, edition: `${venue.cas.year}大类`, source: venue.cas.source,
-    description: `${venue.cas.year} 年升级版，${venue.cas.category}大类。年版据 SCI365 公开记录，分区与武汉大学图书馆记录交叉核对；非官方原表直查。`,
+    label: `CAS-${venue.cas.zone}`, edition: `${venue.cas.year}大类`, source: venue.cas.source,
+    description: `中科院期刊分区 ${venue.cas.zone} 区，${venue.cas.year} 年升级版，${venue.cas.category}大类。年版据 SCI365 公开记录，分区与武汉大学图书馆记录交叉核对；非官方原表直查。`,
   };
 }

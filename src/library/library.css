@@ -49,8 +49,8 @@
 .orientation-bibliography { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:6px 16px; font-size:13px; line-height:1.7; color:var(--muted); }
 .orientation-bibliography p { margin:0; flex:1 1 220px; }
 .orientation-bibliography .text-action { font-size:13px; white-space:nowrap; }
-.orientation-ranking { margin-top:10px; }
-.orientation-ranking a { display:inline-flex; align-items:baseline; flex-wrap:wrap; gap:8px; padding:3px 8px; border:1px solid #dce2ed; border-radius:4px; color:#52638e; font-size:12px; line-height:1.7; text-decoration:none; }
+.orientation-ranking { display:inline-block; margin-inline-start:12px; vertical-align:baseline; }
+.orientation-ranking a { display:inline-flex; align-items:baseline; gap:8px; padding:3px 8px; border:1px solid #dce2ed; border-radius:4px; color:#52638e; font-size:12px; line-height:1.7; white-space:nowrap; text-decoration:none; }
 .orientation-ranking a:hover { border-color:#a9b7d2; color:var(--accent); background:#f4f6fb; }
 .ranking-edition { color:var(--muted); font-size:11px; }
 .orientation-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px 18px; margin-top:20px; padding:18px 0; border-block:1px solid var(--line); }
