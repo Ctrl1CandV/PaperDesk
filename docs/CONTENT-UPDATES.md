@@ -2,6 +2,12 @@
 
 The importer changes reviewed public content only. It does not open IndexedDB or read, migrate, delete or export personal notes, states, quotations, exploration records or backups. Content validation is not scholarly review.
 
+## Library presentation briefs
+
+`content/library-briefs.json` holds the separately maintained library explanation, short chapter labels and verified source-version dates. It is keyed by guide ID plus revision and does not alter approved guide metadata or bodies. Editing this public editorial copy requires checking its claims against the named guide/source, running `npm run build`, and inspecting the rendered card. Build validation checks that each entry targets an existing revision and that its chapter labels cover exactly that revision's chapters.
+
+The importer still accepts only catalog-declared immutable content; it does not apply this application-owned presentation file from incoming packages. After importing a new revision, an absent matching brief uses that revision's own orientation metadata until an individually reviewed brief is added. Old brief entries are never applied to a new revision. Publication year, source-version date and guide revision remain separate; unknown source dates are omitted.
+
 ## Deliberate package format
 
 Place a reviewed release under a named project-relative directory, for example `incoming/release-one/`. It contains **catalog.json at its root**, plus the metadata, Markdown, image assets and exploration seed files declared by that catalog. Paths inside metadata/catalog remain normalized relative paths; they may not contain traversal, absolute paths, symlinks or unknown fields. The package root may contain spaces when quoted. Use forward slashes in the CLI argument. The importer does not discover other directories or download URLs.

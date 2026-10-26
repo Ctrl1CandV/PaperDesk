@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useState, type AnchorHTMLAttributes, type MouseEvent, type ReactNode } from 'react';
 
 type Position = { y: number; focus?: HTMLElement };
 const positions = new Map<string, Position>();
@@ -122,8 +122,10 @@ export function useLocation() {
   return location;
 }
 
-export function AppLink({ to, children, className, id, current }: { to: string; children: ReactNode; className?: string; id?: string; current?: boolean }) {
-  return <a href={to} id={id} className={className} aria-current={current ? 'page' : undefined} onClick={(event: MouseEvent) => {
+type AppLinkProps = { to: string; children: ReactNode; className?: string; id?: string; current?: boolean }
+  & Pick<AnchorHTMLAttributes<HTMLAnchorElement>, 'title' | 'aria-label' | 'aria-current'>;
+export function AppLink({ to, children, className, id, current, ...attributes }: AppLinkProps) {
+  return <a {...attributes} href={to} id={id} className={className} aria-current={current ? 'page' : attributes['aria-current']} onClick={(event: MouseEvent) => {
     if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
       event.preventDefault(); navigate(to);
     }

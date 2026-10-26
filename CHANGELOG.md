@@ -1,5 +1,12 @@
 # Changelog
 
+## Library briefs and venue references — 2026-10-26
+
+- Replaced fragmented reading briefs with complete paper-specific explanations for all fourteen current readings, a single reading-action group and directly available chapter navigation.
+- Kept publication identity, source edition and verified source-version dates visible; retained approved guide bodies and personal reading records.
+- Added sourced CCF A/B or CAS major-category 1/2 reference labels, with CCF precedence and explicit editions. Unknown venues remain blank.
+- Repaired delayed AI-panel focus return interfering with chapter entry; checked desktop/narrow rendering, old-revision resume, keyboard navigation and affected assistant states.
+
 ## AI reading and interface — 2026-10-25
 
 - Added a reader-triggered AI panel, bounded guide/library tools, optional web search, source snapshots, local conversations and separate AI backups.

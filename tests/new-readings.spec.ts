@@ -6,6 +6,7 @@ import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import catalog from '../content/catalog.json' with { type: 'json' };
+import briefs from '../content/library-briefs.json' with { type: 'json' };
 
 const compact = (value: string) => value.replace(/\s+/g, '');
 async function bounded(page: Page) {
@@ -42,6 +43,7 @@ for (const id of Object.keys(catalog.currentRevisions)) {
     const entry = catalog.entries.find(item => item.guideId === id && item.revision === revision)!;
     expect(entry).toBeDefined();
     const metadata = JSON.parse(await readFile(`content/${entry.metadataFile}`, 'utf8'));
+    const brief = briefs.entries.find(item => item.guideId === id && item.guideRevision === revision);
     const body = await readFile(posix.join('content', posix.dirname(entry.metadataFile), metadata.bodyFile), 'utf8');
     const errors: string[] = [], external: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -50,16 +52,30 @@ for (const id of Object.keys(catalog.currentRevisions)) {
     });
     await mkdir('docs/evidence', { recursive: true });
     await page.goto(`/library?article=${id}`);
-    await expect(page.locator('#orientation-title')).toContainText(metadata.orientation.shortTitle);
+    await expect(page.locator('#orientation-title')).toHaveText(metadata.orientation.shortTitle.split(/[：:]/, 1)[0]);
     await expect(page.locator('.paper-original-title')).toHaveText(metadata.paperTitle);
-    await expect(page.locator('.orientation-subject')).toContainText(metadata.orientation.value);
-    await expect(page.locator('.orientation-abstract')).toContainText(metadata.orientation.summary);
-    for (const prerequisite of metadata.orientation.prerequisites) await expect(page.locator('.reading-value')).toContainText(prerequisite);
-    for (const boundary of metadata.orientation.boundaries) await expect(page.locator('.orientation-coverage')).toContainText(boundary);
+    await expect(page.locator('.orientation-masthead')).toContainText(metadata.orientation.bibliography.authors[0]);
+    await expect(page.locator('.orientation-masthead')).toContainText(String(metadata.orientation.bibliography.year));
+    const source = page.locator('.article-orientation').getByRole('link', { name: /原论文/ });
+    await expect(source).toHaveAttribute('href', metadata.source.url);
+    await expect(source).toHaveAttribute('target', '_blank');
+    await expect(source).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(page.locator('.orientation-prose').getByRole('heading')).toHaveText([metadata.type === 'survey' ? '综述概述' : '论文概述', '为什么值得读', '阅读建议']);
+    await expect(page.locator('.orientation-prose p')).toHaveCount(3);
+    await expect(page.locator('.article-orientation details, .article-orientation [role="tab"]')).toHaveCount(0);
+    const chapters = metadata.units.filter((unit: { heading?: string }) => unit.heading);
+    await expect(page.locator('.orientation-outline a')).toHaveCount(chapters.length);
+    for (const unit of chapters) {
+      const link = page.locator(`.orientation-outline a[href="/read/${id}/${revision}#${unit.id}"]`);
+      await expect(link).toHaveAttribute('title', unit.heading);
+      await expect(link).toHaveAccessibleName((brief?.chapterLabels as Record<string, string> | undefined)?.[unit.id] ?? unit.heading);
+    }
+    await expect(page.locator('.orientation-outline small')).toHaveCount(0);
+    await expect(page.locator('.orientation-source')).toContainText(`导读修订 ${revision}`);
     const before = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.exportBackup());
     expect(before.resume).toEqual([]); expect(before.guideStates).toEqual([]); expect(before.originalStates).toEqual([]);
     await shot(page, `${id}-orientation-desktop`);
-    await page.getByRole('link', { name: '进入深入阅读' }).click();
+    await page.getByRole('link', { name: '开始导读' }).click();
     await expect(page).toHaveURL(new RegExp(`/read/${id}/${revision}$`));
     await expect(page.locator('.prose h1')).toHaveText(metadata.title);
     await expect(page.locator('.prose section')).toHaveCount(metadata.units.length);

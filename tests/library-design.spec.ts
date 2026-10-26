@@ -80,7 +80,7 @@ test('keyboard browsing uses the page scroll and the last article opens a dismis
   await page.keyboard.press('Enter');
   await expect(page.locator('#orientation-title')).toBeFocused();
   await expect(page.locator('#orientation-title')).toBeInViewport();
-  await expect(page.getByRole('link', { name: '进入深入阅读' })).toHaveAttribute('href', `/read/${lastGuide.guideId}/${lastGuide.revision}`);
+  await expect(page.getByRole('link', { name: '开始导读' })).toHaveAttribute('href', `/read/${lastGuide.guideId}/${lastGuide.revision}`);
   await previewBesideSelected(page, lastGuide.guideId);
   await noNestedVerticalScroll(page);
   await page.keyboard.press('Escape');
@@ -111,7 +111,7 @@ test('wide browsing and the preview follow each article at a stable open-state r
     await row.click();
     await expect(page.locator('#orientation-title')).toBeFocused();
     await expect(page.locator('#orientation-title')).toBeInViewport();
-    await expect(page.getByRole('link', { name: '进入深入阅读' })).toBeInViewport();
+    await expect(page.getByRole('link', { name: '开始导读' })).toBeInViewport();
     await previewBesideSelected(page, entry.guideId);
     const rowWidth = (await row.boundingBox())!.width;
     if (index === 0) {
@@ -124,7 +124,7 @@ test('wide browsing and the preview follow each article at a stable open-state r
     // without Playwright first scrolling its row's center into view.
     await row.dispatchEvent('click');
     await expect(page.locator('#orientation-title')).toBeFocused();
-    await expect(page.getByRole('link', { name: '进入深入阅读' })).toBeInViewport();
+    await expect(page.getByRole('link', { name: '开始导读' })).toBeInViewport();
     await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - before)).toBeLessThan(5);
     await previewBesideSelected(page, entry.guideId);
     await page.screenshot({ path: `docs/evidence/library-dual-anchored-${index === 0 ? 'first' : index === 1 ? 'middle' : 'last'}.png`, animations: 'disabled' });
@@ -143,7 +143,7 @@ test('wide browsing and the preview follow each article at a stable open-state r
   expect(errors).toEqual([]);
 });
 
-test('selected identity, source disclosures and chapters remain keyboard accessible', async ({ page }) => {
+test('selected identity, direct source and chapters remain keyboard accessible', async ({ page }) => {
   await page.goto('/library');
   await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '书架' })).toHaveAttribute('aria-current', 'page');
   await page.locator('#choose-instructgpt').focus();
@@ -153,28 +153,24 @@ test('selected identity, source disclosures and chapters remain keyboard accessi
   await expect(page.locator('#orientation-title')).toBeInViewport();
   await page.locator('#choose-instructgpt').click();
   await expect(page.locator('#orientation-title')).toBeFocused();
-  const preparation = page.locator('.orientation-preparation');
   await expect(page.locator('.article-orientation details')).toHaveCount(0);
-  await expect(page.locator('.orientation-abstract')).toBeVisible();
-  await expect(page.locator('.reading-value').getByRole('heading', { name: '带着哪些基础开始' })).toBeVisible();
-  await expect(preparation.getByRole('heading', { name: '本次阅读的范围' })).toBeVisible();
-  await page.getByRole('button', { name: '完整来源与作者' }).focus(); await page.keyboard.press('Enter');
-  const source = page.getByRole('dialog', { name: '来源与版本' });
-  await expect(source).toBeVisible();
-  await expect(source).toContainText('完整作者');
-  await expect(source).toContainText('首次预印本 2022 年');
-  for (const link of await source.getByRole('link').all()) await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  await expect(page.locator('.orientation-prose').getByRole('heading')).toHaveText(['论文概述', '为什么值得读', '阅读建议']);
+  const source = page.locator('.article-orientation').getByRole('link', { name: /原论文/ });
+  await expect(source).toHaveAttribute('href', 'https://arxiv.org/pdf/2203.02155v1');
+  await expect(source).toHaveAttribute('target', '_blank');
+  await expect(source).toHaveAttribute('rel', 'noopener noreferrer');
+  await source.focus();
+  await expect(source).toBeFocused();
+  await expect(page.locator('.orientation-masthead')).toContainText('Long Ouyang');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await noNestedVerticalScroll(page);
-  await source.getByRole('button', { name: '关闭', exact: true }).click();
-  await expect(source).toHaveCount(0);
-  await expect(page.getByRole('button', { name: '完整来源与作者' })).toBeFocused();
   const chapter = page.locator('.orientation-outline a').first();
   await expect(chapter).toHaveAttribute('href', new RegExp(`/read/instructgpt/${revisions.instructgpt}#`));
   await chapter.press('Enter');
   await expect(page).toHaveURL(new RegExp(`/read/instructgpt/${revisions.instructgpt}#`));
 });
 
-test('full bibliographic details return focus and preserve the readable card geometry', async ({ page }) => {
+test('source information stays directly readable and closing returns focus to the selected article', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -182,18 +178,18 @@ test('full bibliographic details return focus and preserve the readable card geo
   const card = page.locator('.library-preview');
   await expect(page.locator('#orientation-title')).toBeFocused();
   await previewBesideSelected(page, lastGuide.guideId);
-  const closedHeight = (await card.boundingBox())!.height;
-  const toggle = page.getByRole('button', { name: '完整来源与作者' });
-  await toggle.focus();
-  const before = await page.evaluate(() => scrollY);
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('dialog', { name: '来源与版本' })).toBeVisible();
-  await page.keyboard.press('Escape');
+  const source = page.locator('.orientation-source');
+  await source.scrollIntoViewIfNeeded();
+  await expect(source).toBeInViewport();
+  await expect(source).toContainText(`导读修订 ${lastGuide.revision}`);
+  await expect(source.getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await previewBesideSelected(page, lastGuide.guideId);
-  await expect(toggle).toBeFocused();
-  await expect.poll(async () => Math.abs((await page.evaluate(() => scrollY)) - before)).toBeLessThan(3);
-  expect(Math.abs((await card.boundingBox())!.height - closedHeight)).toBeLessThan(2);
+  expect((await card.boundingBox())!.height).toBeGreaterThan((await source.boundingBox())!.height);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#orientation-title')).toHaveCount(0);
+  await expect(page.locator(`#choose-${lastGuide.guideId}`)).toBeFocused();
+  await expect(page.locator(`#choose-${lastGuide.guideId}`)).toBeInViewport();
   expect(errors).toEqual([]);
 });
 

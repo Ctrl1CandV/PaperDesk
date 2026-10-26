@@ -18,3 +18,7 @@ The [2026-10-24 library and repository review](research/library-review-2026-10-2
 The [2026-10-26 frontend refactor](history/FRONTEND-REFACTOR-2026-10-26.md) records the reading workflow and initial design decisions. The [subsequent interface feedback record](history/FRONTEND-FEEDBACK-2026-10-26.md) records the final library/reader proportions, information layout, AI settings, visual evidence and verification boundaries.
 
 Historical instructions and test counts describe their named milestone. Current commands and repository rules take precedence over superseded paths and feedback gates.
+
+The [complete library brief follow-up](history/LIBRARY-BRIEF-2026-10-26.md) supersedes the earlier card's field-by-field introduction and separate bibliography dialog. It records the current paragraph structure, chapter navigation and source-version evidence.
+
+[Venue reference labels](research/venue-rankings-2026-10-26.md) records the CCF-first display policy, editions, source checks and unclassified entries.

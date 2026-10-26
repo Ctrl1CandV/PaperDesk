@@ -10,6 +10,7 @@ export function ReaderAssistant({ guide, unitId, selection, wide, onClose }: {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const readingOverflow = useRef(document.body.style.overflow);
   const opener = useRef(document.activeElement as HTMLElement | null);
+  const returnFocusFrame = useRef<number | undefined>(undefined);
   const dismiss = useRef(onClose); dismiss.current = onClose;
   useEffect(() => {
     const dialog = dialogRef.current!;
@@ -38,12 +39,20 @@ export function ReaderAssistant({ guide, unitId, selection, wide, onClose }: {
       if (!document.querySelector('dialog:modal')) document.body.style.overflow = readingOverflow.current;
     };
   }, [wide]);
-  useEffect(() => () => {
-    const trigger = opener.current;
-    requestAnimationFrame(() => {
-      if (!document.querySelector('dialog:modal')) document.body.style.overflow = readingOverflow.current;
-      (trigger?.isConnected ? trigger : document.getElementById('reader-ai-action'))?.focus({ preventScroll: true });
-    });
+  useEffect(() => {
+    // Effect replay is not a user closing the panel. Cancel its queued focus
+    // return so it cannot steal focus from a freshly navigated chapter.
+    if (returnFocusFrame.current !== undefined) cancelAnimationFrame(returnFocusFrame.current);
+    const fallback = document.getElementById('reader-ai-action');
+    return () => {
+      const trigger = opener.current;
+      returnFocusFrame.current = requestAnimationFrame(() => {
+        if (!document.querySelector('dialog:modal')) document.body.style.overflow = readingOverflow.current;
+        const active = document.activeElement;
+        if (active && active !== document.body && active !== document.documentElement) return;
+        (trigger?.isConnected ? trigger : fallback?.isConnected ? fallback : null)?.focus({ preventScroll: true });
+      });
+    };
   }, []);
   return <aside className="reader-assistant-slot">
     <dialog ref={dialogRef} id="reader-assistant" className={`reader-assistant-dialog${wide ? ' is-docked' : ''}`}

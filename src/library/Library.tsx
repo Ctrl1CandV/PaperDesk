@@ -1,11 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { contentRepository } from '../content/repository';
-import { coverageLabel } from '../content/labels';
 import type { Guide } from '../content/types';
 import { AppLink, navigate } from '../navigation';
 import { personalStore } from '../records/store';
 import type { ResumeRecord } from '../records/types';
-import { Dialog } from '../ui/Dialog';
+import { libraryBrief, publicationName, sourceVersionLabel } from './briefs';
+import { venueRanking } from './venueRankings';
 import './library.css';
 
 type Category = 'all' | 'survey' | 'paper';
@@ -32,41 +32,43 @@ export function matchesTitleOrTopic(guide: Guide, query: string) {
 }
 
 function Orientation({ guide, resumes, returnToList }: { guide: Guide; resumes: ResumeRecord[]; returnToList: () => void }) {
-  const [sourceOpen, setSourceOpen] = useState(false);
   const { metadata } = guide, orientation = metadata.orientation;
   const bibliography = orientation?.bibliography;
   const title = titleParts(orientation?.shortTitle ?? metadata.title);
+  const brief = libraryBrief(metadata);
+  const chapters = guide.units.filter(unit => unit.heading);
   const resume = resumes.filter(item => item.guideId === metadata.id).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
-  const resumeAvailable = resume && contentRepository.get(resume.guideId, resume.revision);
+  const resumeGuide = resume && contentRepository.get(resume.guideId, resume.revision);
+  const resumeUnit = resumeGuide?.units.find(unit => unit.id === resume?.unitId);
+  const canResume = Boolean(resumeUnit);
+  const currentResume = canResume && resume.revision === metadata.revision;
+  const resumeLabel = currentResume ? brief.chapterLabels[resume.unitId] ?? resumeUnit?.heading : resumeUnit?.heading;
+  const venue = publicationName(bibliography?.venue) || (bibliography?.publicationKind === 'preprint' ? '预印本' : '');
+  const ranking = venueRanking(metadata);
   return <section className="article-orientation" aria-labelledby="orientation-title">
     <button className="orientation-back text-action" onClick={returnToList}>← 返回筛选结果</button>
     <header className="orientation-masthead">
-      <div className="orientation-top"><p className="article-kind">{typeLabel(metadata.type)}<span>{bibliography?.year ?? '年份待核实'}</span></p><button className="orientation-close" aria-label="关闭导学" onClick={returnToList}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 12" /></svg></button></div>
-      <h2 id="orientation-title" tabIndex={-1} className={title.subtitle ? 'has-subtitle' : ''}><span className="article-name">{title.name}</span>{title.subtitle && <><span className="visually-hidden">：</span><span className="article-subtitle">{title.subtitle}</span></>}</h2>
+      <div className="orientation-title-row"><h2 id="orientation-title" tabIndex={-1}>{title.name}</h2><span className="orientation-kind">{typeLabel(metadata.type)}</span><button className="orientation-close" aria-label="关闭导学" onClick={returnToList}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 12" /></svg></button></div>
       <p className="paper-original-title" lang="en">{metadata.paperTitle}</p>
-      <div className="orientation-abstract"><p>{orientation?.summary ?? metadata.purpose}</p></div>
-      <div className="orientation-actions"><AppLink id={`start-${metadata.id}`} className="primary-action" to={resumeAvailable ? `/read/${resume.guideId}/${resume.revision}` : `/read/${metadata.id}/${metadata.revision}`}>{resumeAvailable ? '继续上次阅读' : '进入深入阅读'} <span aria-hidden="true">→</span></AppLink><a className="text-action" href={metadata.source.url} target="_blank" rel="noopener noreferrer">打开原论文 <span aria-hidden="true">↗</span></a></div>
-      {resumeAvailable && <p className="orientation-resume"><span>上次读到：{resumeAvailable.units.find(unit => unit.id === resume.unitId)?.heading ?? '阅读起点'} · 导读修订 {resume.revision}</span><AppLink to={`/read/${metadata.id}/${metadata.revision}#orientation`}>从头阅读 →</AppLink></p>}
+      <div className="orientation-bibliography"><p>{bibliography?.authors[0]}{bibliography && bibliography.authors.length > 1 ? ' 等' : ''}{venue && <span> · {venue}</span>}{bibliography?.year && <span> {bibliography.year}</span>}</p><a className="text-action" href={metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 <span aria-hidden="true">↗</span></a></div>
+      {ranking && <div className="orientation-ranking"><a href={ranking.source} target="_blank" rel="noopener noreferrer" title={ranking.description}><span>{ranking.label}</span><span className="ranking-edition">{ranking.edition}</span></a></div>}
+      <div className={`orientation-actions${canResume ? ' has-resume' : ''}`}>
+        {canResume && <p className="orientation-resume" title={resumeUnit?.heading ?? undefined}>上次读到：{resumeLabel ?? '阅读起点'}{!currentResume && <span> · 导读修订 {resume.revision}</span>}</p>}
+        <AppLink id={`start-${metadata.id}`} className="primary-action" to={canResume ? `/read/${resume.guideId}/${resume.revision}` : `/read/${metadata.id}/${metadata.revision}`}>{canResume ? '继续阅读' : '开始导读'} <span aria-hidden="true">→</span></AppLink>
+        {canResume && <AppLink className="text-action" to={`/read/${metadata.id}/${metadata.revision}#orientation`}>从头阅读</AppLink>}
+      </div>
     </header>
     <div className="orientation-body">
-      <section className="orientation-subject"><h3>阅读重点</h3><p>{orientation?.value ?? metadata.purpose}</p></section>
-      <div className="orientation-preparation">
-        {orientation && <section className="orientation-section reading-value"><h3>带着哪些基础开始</h3><ul>{orientation.prerequisites.map(item => <li key={item}>{item}</li>)}</ul></section>}
-        <section className="orientation-section orientation-coverage"><h3>本次阅读的范围</h3><p className="coverage-caption">{coverageLabel(metadata.coverage.scope)} · {guide.units.filter(unit => unit.heading).length} 个章节</p><ul>{(orientation?.boundaries ?? metadata.coverage.limitations).map(item => <li key={item}>{item}</li>)}</ul></section>
+      <div className="orientation-prose">
+        <section><h3>{metadata.type === 'survey' ? '综述概述' : '论文概述'}</h3><p>{brief.overview}</p></section>
+        {brief.value && <section><h3>为什么值得读</h3><p>{brief.value}</p></section>}
+        {brief.advice && <section><h3>阅读建议</h3><p>{brief.advice}</p></section>}
       </div>
-      <section className="orientation-outline"><div className="orientation-section-heading"><h3>阅读章节</h3><span>{guide.units.filter(unit => unit.heading).length} 节</span></div><ol>{guide.units.filter(unit => unit.heading).map((unit, index) => {
-        const target = orientation?.readingTargets.find(item => item.unitId === unit.id);
-        return <li key={unit.id}><AppLink to={`/read/${metadata.id}/${metadata.revision}#${unit.id}`}><span className="outline-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span><strong>{unit.heading}</strong>{target && <small>{target.purpose}</small>}</span><span className="outline-arrow" aria-hidden="true">↗</span></AppLink></li>;
-      })}</ol></section>
-      <footer className="orientation-source"><div><span>原论文 {metadata.source.version ?? '版本未指定'} · 导读修订 {metadata.revision}</span><p>{bibliography?.venue ?? (bibliography?.publicationKind === 'preprint' ? '预印本' : '发表信息待核实')}{bibliography?.year ? ` · ${bibliography.year}` : ''}</p></div><button className="text-action" onClick={() => setSourceOpen(true)}>完整来源与作者 <span aria-hidden="true">↗</span></button></footer>
+      <nav className="orientation-outline" aria-label="阅读章节"><div className="orientation-section-heading"><h3>阅读章节</h3><span>{chapters.length} 节</span></div><ol>{chapters.map((unit, index) =>
+        <li key={unit.id}><AppLink to={`/read/${metadata.id}/${metadata.revision}#${unit.id}`} title={unit.heading ?? undefined} aria-current={currentResume && resume.unitId === unit.id ? 'location' : undefined}><span className="outline-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span>{brief.chapterLabels[unit.id] ?? unit.heading}</span></AppLink></li>
+      )}</ol></nav>
+      <footer className="orientation-source"><span>{metadata.paperId} · 原文 {sourceVersionLabel(metadata.source.version)}</span>{brief.sourceUpdatedAt && <a href={brief.sourceRecordUrl ?? metadata.source.url} target="_blank" rel="noopener noreferrer">原文版本日期 <time dateTime={brief.sourceUpdatedAt}>{brief.sourceUpdatedAt}</time></a>}<span>导读修订 {metadata.revision}</span></footer>
     </div>
-    {sourceOpen && <Dialog title="来源与版本" onClose={() => setSourceOpen(false)} className="orientation-source-dialog"><p lang="en">{metadata.paperTitle}</p><dl>
-        <div><dt>完整作者</dt><dd>{bibliography?.authors.length ? bibliography.authors.join(', ') : '作者信息尚未补充'}</dd></div>
-        <div><dt>{bibliography?.publicationKind === 'preprint' ? '预印本' : '发表于'}</dt><dd>{bibliography?.venue ? <a href={bibliography.url} target="_blank" rel="noopener noreferrer">{bibliography.venue} · {bibliography.year ?? '年份待核实'} ↗</a> : '发表信息尚未核实'}</dd></div>
-        <div><dt>阅读依据</dt><dd><a href={metadata.source.url} target="_blank" rel="noopener noreferrer">{metadata.paperId} · {metadata.source.version ?? '版本未指定'} ↗</a>{bibliography?.preprintYear ? <span className="preprint-year">首次预印本 {bibliography.preprintYear} 年</span> : null}</dd></div>
-        {orientation && <div><dt>主要主题</dt><dd>{orientation.topics.map(topic => topic.label).join(' · ')}</dd></div>}
-        <div><dt>本地讲解</dt><dd>修订 {metadata.revision}</dd></div>
-      </dl></Dialog>}
   </section>;
 }
 
@@ -99,12 +101,6 @@ export function Library({ home = false }: { home?: boolean }) {
       const offset = rowBounds && !compactLibrary()
         ? Math.max(0, (rowBounds.top + rowBounds.height / 2 - bounds.top - cardHeight / 2) / scale) : 0;
       layout.style.setProperty('--preview-offset', `${offset}px`);
-      // Expanding details changes the card's center; keep its active control reachable.
-      const active = document.activeElement;
-      if (active instanceof HTMLElement && active.tagName === 'SUMMARY' && preview?.contains(active)) {
-        const control = active.getBoundingClientRect();
-        if (control.top < 16 || control.bottom > window.innerHeight - 16) active.scrollIntoView({ block: 'nearest' });
-      }
     };
     alignPreview();
     let frame = 0;

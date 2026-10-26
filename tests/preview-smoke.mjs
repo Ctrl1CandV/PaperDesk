@@ -30,7 +30,7 @@ try {
   for (const id of ['choose-agent-survey', 'choose-react', 'choose-reflexion']) assert.ok(agentMatches.includes(id));
   assert.equal(await page.locator('#choose-instructgpt').count(), 0);
   await page.locator('#choose-agent-survey').click();
-  await page.getByRole('link', { name: '进入深入阅读' }).click();
+  await page.getByRole('link', { name: '开始导读' }).click();
   await page.waitForURL(`**/read/agent-survey/${catalog.currentRevisions['agent-survey']}`);
   await page.locator('.reading-state-trigger').waitFor();
   await page.goto('http://127.0.0.1:4173/read/instructgpt/1');
@@ -45,7 +45,7 @@ try {
     const body = await readFile(resolve('content', entry.metadataFile, '..', metadata.bodyFile), 'utf8');
     await page.goto(`http://127.0.0.1:4173/library?article=${id}`);
     assert.ok((await page.locator('#orientation-title').textContent()).includes(metadata.orientation.shortTitle));
-    await page.getByRole('link', { name: '进入深入阅读' }).click();
+    await page.getByRole('link', { name: '开始导读' }).click();
     await page.waitForURL(`**/read/${id}/${revision}`);
     assert.equal(await page.locator('.prose section').count(), metadata.units.length);
     assert.equal(await page.locator('.prose h1').textContent(), metadata.title);
