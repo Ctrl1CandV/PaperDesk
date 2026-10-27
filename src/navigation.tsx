@@ -94,11 +94,12 @@ export function useLocation() {
         const waiting = document.querySelector('[data-navigation-pending="true"], [aria-busy="true"]')
           || (previous.focus?.id && !target)
           || document.documentElement.scrollHeight - window.innerHeight < previous.y - 1;
-        if (waiting && performance.now() - started < 3000) { frame = requestAnimationFrame(restore); return; }
+        if (waiting && performance.now() - started < 15000) { frame = requestAnimationFrame(restore); return; }
         window.scrollTo(0, previous.y);
         target?.focus({ preventScroll: true });
       } else if (window.location.hash) {
         const target = document.getElementById(window.location.hash.slice(1));
+        if (!target && document.querySelector('[data-navigation-pending="true"]') && performance.now() - started < 15000) { frame = requestAnimationFrame(restore); return; }
         target?.scrollIntoView(); target?.focus({ preventScroll: true });
       } else {
         const preview = document.getElementById('article-preview');

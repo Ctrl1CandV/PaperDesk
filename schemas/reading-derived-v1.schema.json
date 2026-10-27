@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaperDesk reading derived v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "parser",
+    "units",
+    "assets",
+    "gaps"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "parser": {
+      "type": "string",
+      "maxLength": 150
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sourceUnitId",
+          "type",
+          "headingPath",
+          "text",
+          "locator",
+          "range",
+          "verification"
+        ],
+        "properties": {
+          "sourceUnitId": {
+            "type": "string",
+            "maxLength": 100,
+            "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+          },
+          "type": {
+            "enum": [
+              "heading",
+              "paragraph",
+              "table",
+              "figure-caption",
+              "equation",
+              "page-text"
+            ]
+          },
+          "headingPath": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "maxItems": 6
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 12000
+          },
+          "locator": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "anchor",
+              "physicalPage",
+              "printedPageLabel"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "anchor": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 300
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "physicalPage": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "printedPageLabel": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "range": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "start",
+              "end",
+              "total"
+            ],
+            "properties": {
+              "start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "verification": {
+            "enum": [
+              "unreviewed",
+              "text-checked",
+              "visually-checked"
+            ]
+          }
+        }
+      },
+      "maxItems": 20000
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url",
+          "status",
+          "alt"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "status": {
+            "const": "not-acquired"
+          },
+          "alt": {
+            "type": "string",
+            "maxLength": 10000
+          }
+        }
+      },
+      "maxItems": 20000
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "maxItems": 20
+    }
+  }
+}

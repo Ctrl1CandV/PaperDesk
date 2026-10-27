@@ -40,7 +40,20 @@ export interface PersonalBackup {
 export type ImportChoice = 'keep-local' | 'use-imported' | 'keep-both';
 export interface ImportConflict { key: string; store: StoreName | 'preferences'; local: unknown; incoming: unknown; canKeepBoth: boolean }
 export interface ImportPreview {
-  backup: PersonalBackup; baseline: PersonalBackup;
+  backup: PersonalBackup; baselineRevision: number;
   counts: Record<StoreName, number>; duplicates: number; conflicts: ImportConflict[];
   unavailable: string[]; missingNotes: string[];
+}
+/** Storage layout, backup format and content revisions are independent versions. */
+export interface RecordStats {
+  bytes: number; counts: Record<StoreName, number>; revision: number;
+  limitBytes: number; migrationBackupAvailable: boolean;
+}
+export interface RecordPage<T> { records: T[]; nextCursor?: string }
+export interface RecordPageOptions { limit?: number; cursor?: string; guideId?: string; revision?: number }
+export interface ArchivePreview {
+  format: 'paperdesk-personal-archive'; schemaVersion: 2; jobId: string; exportedAt: string;
+  counts: Record<StoreName, number>; bytes: number; baselineRevision: number;
+  duplicates: number; conflictCount: number; conflicts: ImportConflict[];
+  unavailable: string[]; unavailableCount: number; missingNotes: string[]; missingNoteCount: number;
 }

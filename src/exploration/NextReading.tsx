@@ -29,6 +29,7 @@ export function NextReading({ record, onSaved }: { record: Exploration; onSaved:
   const guides = contentRepository.list().map(entry => entry.guide);
   const topics = [...new Map(guides.flatMap(guide => orientationFor(guide)?.topics ?? []).map(topic => [topic.id, topic])).values()];
   const candidates = draft.request ? findNextReadings(guides, draft.request) : [];
+  const candidateKey = candidates.map(item => `${item.target.guideId}/${item.target.revision}`).join('|');
   const state = useExplorationSave(value => {
     clearDraft(draftKey); setOpen(false); setDraft({ base: value, useQuestion: false, useUnknowns: false, goal: '', topicIds: [], brief: '', briefEdited: false });
     onSaved(value); requestAnimationFrame(() => trigger.current?.focus({ preventScroll: true }));
@@ -42,7 +43,7 @@ export function NextReading({ record, onSaved }: { record: Exploration; onSaved:
     let live = true;
     const refresh = async () => {
       try {
-        const items = await Promise.all(guides.map(async guide => {
+        const items = await Promise.all(candidates.map(async ({ guide }) => {
           const [guideState, original] = await Promise.all([
             personalStore.get('guideStates', guideKey(guide.metadata.id, guide.metadata.revision)),
             personalStore.get('originalStates', originalKey(guide.metadata.source.id, guide.metadata.source.version)),
@@ -52,10 +53,10 @@ export function NextReading({ record, onSaved }: { record: Exploration; onSaved:
         if (live) { setStates(Object.fromEntries(items)); setStateError(false); }
       } catch { if (live) setStateError(true); }
     };
-    void refresh(); const unsubscribe = personalStore.subscribe(() => { void refresh(); });
+    void refresh(); const unsubscribe = personalStore.subscribe(changed => { if (!changed || changed === 'guideStates' || changed === 'originalStates') void refresh(); });
     return () => { live = false; unsubscribe(); };
     // Catalog identity is immutable during this page session.
-  }, [open]);
+  }, [open, candidateKey]);
   function toggleTopic(id: string) { change({ topicIds: draft.topicIds.includes(id) ? draft.topicIds.filter(value => value !== id) : [...draft.topicIds, id] }); }
   function search() {
     const request = { text: [draft.goal, draft.useQuestion ? draft.base.question : '', draft.useUnknowns ? draft.base.unknowns : ''].filter(Boolean).join('\n\n').trim(), topicIds: [...draft.topicIds] };

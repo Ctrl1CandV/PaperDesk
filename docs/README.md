@@ -9,6 +9,7 @@ The integrated first version is accepted. [Project state](../PROJECT-STATE.md) r
 | Content and exploration | [Content](CONTENT.md), [Exploration](EXPLORATION.md), [Assisted discovery](ASSISTED-DISCOVERY.md), [Memory and dynamic-decision reading route](LEARNING-ROUTE.md) |
 | Engineering | [Architecture](ARCHITECTURE.md), [Records](RECORDS.md), [Content updates](CONTENT-UPDATES.md), [Maintenance](MAINTENANCE.md) |
 | AI reading extension | [Research, architecture and configuration](AI-READING.md) |
+| Reading/AI upgrade | [Entry](paperdesk-upgrade/00-START-HERE.md), [Content workflow](paperdesk-upgrade/01-CONTENT-WORKFLOW.md), [Sources and visuals](paperdesk-upgrade/02-SOURCES-AND-VISUALS.md), [Implementation](paperdesk-upgrade/04-CODEX-TASKS.md), [Current acceptance report](evidence/reading-ai-upgrade-report.md), [30-question evidence set](evidence/reading-ai-qa.json) |
 | Boundaries | [Privacy](PRIVACY.md), [Acceptance criteria](ACCEPTANCE.md), [Future hosting](FUTURE-HOSTING.md) |
 | Attribution | [References](REFERENCES.md), [Orientation sources](ORIENTATION-SOURCES.md), [Research reviews](research/) |
 | Evidence and history | [Historical reports](history/README.md), [Compact evidence](evidence/README.md), [Curated images](images/) |

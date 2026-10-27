@@ -6,11 +6,27 @@
 
 - Survey reading, substantive paper explanations and research exploration, with citations, source locators and reading return.
 - Two-level orientation → reading; title/primary-topic search; separate survey/paper filters.
-- Fourteen current readings (four surveys, ten papers), eighteen retained guide revisions, 153 retained units, 133 cited URLs, three editorial lenses and twelve pinned targets.
+- Fourteen current readings (four surveys, ten papers), twenty-one retained guide revisions, 180 retained units, 166 cited URLs, three editorial lenses and twelve pinned targets.
 - Real resume positions, separate explicit explanation/original states, notes, questions/evidence/next actions, conflict handling, strict backups and opt-in context packets. Opening an article never marks it read.
 - Reviewed immutable content updates, atomic catalog switching, recovery and selection rollback. Further discovery can be a deliberate reader–assistant workflow without background model services.
 
-## Frontend and reading workflow — 2026-10-26
+## Reading and AI data upgrade — 2026-10-27
+
+Current continuation standard is practical personal use across four needs: reliable storage/management, helpful AI answers, usable original-paper links and explanatory visuals, and readable guide extraction/presentation. Storage, source navigation and the reviewed guide/card workflow meet this baseline and need no further redesign. The stricter retrieval targets below remain diagnostic results, not blockers to ordinary reading or grounds for another architecture expansion. AI tools are usable; real-model answer quality remains an observation to make during deliberate use, not a claimed test pass.
+
+The usability follow-up centers display formulas while keeping long formulas scrollable, and gives teaching diagrams rounded pale-blue nodes, a clean white canvas and centered placement when they fit. The shared AI instructions now lead with the answer, expand explanations to match the question, and reserve full experiment plans for requests that need them. English keyword rewriting and one budget-permitting retry are explicit; this is prompt guidance, not a newly proven recall improvement. Reviewed prose and data formats are unchanged.
+
+Follow-up checks: `npm run build` passed content validation, types and production bundling (existing chunk-size warning); `node --test --test-reporter=spec tests/prompt-budget-upgrade.test.mjs tests/ai-runtime.test.mjs tests/ai-runtime-review.test.mjs tests/original-materials.test.mjs` passed 39/39; `npx playwright test tests/lazy-content-samples.spec.ts tests/w1.spec.ts` passed 7/7. Initially restricted loopback connections blocked runtime checks and browser readiness; the permitted local rerun passed. Examined the regenerated desktop RAG formula and StreamingLLM diagram screenshots plus the narrow StreamingLLM and synthetic long-formula screenshots. Browser checks used an isolated frontend with synthetic data, not a live model or a physical phone.
+
+The following records the earlier, stricter upgrade assessment; it does not add more mandatory work to the practical-use baseline above.
+
+Implemented incremental SQLite/IndexedDB storage, summary/cursor history reads, bounded block backups and migration recovery; asynchronous guide bodies with bounded caches; versioned HTML/text-layer PDF originals; persistent FTS5 retrieval with pinned generations; original-source tools and replay through both AI providers. Reviewed evidence maps remain authoritative files alongside originals, independent of index rebuilding. Existing private data was not inspected or used as a fixture.
+
+StreamingLLM, RAG and the agent-memory survey now recommend reviewed r2; all eighteen existing revision files retain their original bytes. The new source links, teaching diagram and formula explanation preserve the accepted prose/layout. The site does not mark original reading or mastery on generation/opening. Frontend-only production checks cover desktop and a simulated narrow viewport with the AI service unavailable.
+
+Acceptance is **partial**: engineering and three sample revisions have actual automated/visual evidence; real-model understanding, citation support, research advice and provider stability remain unverified. Thirty real-paper questions and evidence requirements are saved. Direct Chinese candidate recall is 33/46 (71.74%), below the proposed 90% goal; predeclared English keyword queries reach 44/46, which is not proof of model query rewriting. These are development-set results, not held-out validation. See the [current report](docs/evidence/reading-ai-upgrade-report.md), [independent review](docs/research/reading-upgrade-independent-review.md) and [sample review](docs/research/reading-upgrade-samples.md) for commands, scale results, failures and next steps. No live model calls, Git commit, push or deployment were performed in this upgrade.
+
+## Frontend and reading workflow — 2026-10-26 (historical milestone)
 
 The library, reader, AI discussion, notes, exploration and backup share white/slate surfaces, ink headings and restrained indigo actions. White article rows separate from the library background. The reading brief now uses complete overview, research-value and reading-advice paragraphs, with one reading-action group above and all chapter links below. Compact author/publication information, the original link, source edition and verified version dates remain directly visible; no card bibliography dialog or folding sections are required. At desktop widths of at least 1200px, the library uses 85% of the previously balanced workspace: 1428px at a 1920px viewport, capped at 1632px. Smaller windows keep the available width. The reader retains its separate three-column layout: 1680px at 1920px, a 1920px maximum workspace and an independent 832px prose limit. Closing AI preserves article width and position.
 

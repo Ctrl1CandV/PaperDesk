@@ -1,0 +1,91 @@
+{
+  "exampleOnly": true,
+  "templateVersion": 1,
+  "status": "seed-not-ready-for-execution",
+  "notice": "这不是完整30题集，也不是真实API验收结果。须固定本地原材料、解析修订、可用导读、来源单元与独立核验答案后，转换成实现采用的题集 schema。",
+  "cases": [
+    {
+      "caseId": "seed-streamingllm-table7-001",
+      "category": "fact",
+      "question": "StreamingLLM v4 附录 C 表 7 中，Llama-2-7B-32K-Instruct 在问题与答案相距 100 行、缓存配置为 4+4092 时的准确率是多少？请保留 token 距离和评价条件。",
+      "sources": [
+        {
+          "url": "https://arxiv.org/html/2309.17453v4",
+          "sourceVersion": "arXiv 2309.17453v4",
+          "locatorLabel": "Appendix C / Table 7；Line Distances=100；Cache Config=4+4092；同表表头和图注",
+          "verifiedHtmlAnchor": null,
+          "materialSha256": null,
+          "parserRevision": null,
+          "requiredSourceUnitIds": []
+        }
+      ],
+      "referenceAnswer": {
+        "accuracyPercent": 61.6,
+        "queryAnswerLineDistance": 100,
+        "queryAnswerTokenDistance": 2300,
+        "cacheConfig": "4+4092",
+        "model": "Llama-2-7B-32K-Instruct",
+        "task": "StreamEval",
+        "averaging": "100 samples，每个 sample 包含 100 queries",
+        "interpretationBoundary": "这是指定模型、任务与距离条件下的结果，不能推成所有长程记忆或通用问答的准确率。",
+        "reviewStatus": "本包已按固定原文HTML文字核对数值；尚未建立本地材料指纹、UI定位、独立验收金标准。"
+      },
+      "guideOnlyFixture": {
+        "repositoryCommit": "1668527a9e84cacac85019c569f44719bb90252d",
+        "guideId": "streamingllm",
+        "guideRevision": 1,
+        "guideBodySha256": null,
+        "allowedSources": "仅此修订正文，不读原文、不联网、不检索其他文章。",
+        "checkedGap": "此正文列出4+2044的85.80%与0，未给出本题4+4092的61.60%。",
+        "fixtureMustBeRecheckedBeforeRun": true
+      },
+      "expectedBehavior": {
+        "guideOnly": "说明该固定导读没有本题数值，不能把4+2044结果当作4+4092的答案；提出需读取原文表7。不能靠预训练记忆补出无证据数字。",
+        "originalAvailable": "读取固定版本表7及其表头/图注，回答61.60%，保留2300 token、模型、缓存与平均条件，并引用实际单元。",
+        "webEnabled": "只有实际读取并记录到固定版本的对应原文后才作数值断言；搜索摘要未包含该行时，说明证据不足。"
+      },
+      "gatesBeforeExecution": [
+        "导入固定原文并计算真实materialSha256。",
+        "固定parserRevision、来源单元ID和本轮索引代次。",
+        "固定guide-only材料的正文哈希，并再次核对缺口。",
+        "由独立审阅者核对金标准和可接受表达，再生成答案；金标准不进入被测模型上下文。"
+      ],
+      "execution": {
+        "status": "not-run",
+        "answer": null,
+        "citations": [],
+        "adjudication": null
+      }
+    },
+    {
+      "caseId": "seed-streaming-research-001",
+      "category": "research-exploration",
+      "question": "我想研究流式推理中的长期证据保留：能否将固定大小 KV 缓存和外部检索配合，在控制显存的同时改善较早信息的问答？请基于已读材料提出一个可证伪假设和最小对照实验，并说明哪些前提还需要查证。",
+      "fixedAnswer": null,
+      "sourcePolicy": "实施时固定实际使用的StreamingLLM、RAG及其他必要原文和修订；未读被引论文不能算已检索证据，联网状态单独记录。",
+      "requiredMaterialPins": [],
+      "rubric": [
+        "区分已有论文结论、基于材料的推断和待验证假设。",
+        "指出相关方案及比较条件；当前资料不足以判断新颖性时明确说明。",
+        "提出可观察、可反驳的假设，不只给一般性研究方向。",
+        "对照组至少能区分缓存策略的影响与额外检索信息的影响；控制模型、任务、数据、上下文及预算。",
+        "给出问答正确性/证据召回以及显存、延迟等合适指标，解释指标取舍。",
+        "检查近邻信息泄漏、检索失败和噪声证据等混杂，并给出会推翻建议的结果。",
+        "成本估计说明硬件、数据和模型假设；资料不足时给出查证步骤。",
+        "不保证创新性、成功或可发表，不自动改写个人笔记。"
+      ],
+      "expectedBehavior": {
+        "guideOnly": "基于导读给出有条件的实验草案，同时指出哪些机制、实现与近邻工作必须补查原文。",
+        "originalAvailable": "引用实际读取的材料，提供有根据的假设、对照与反证；本地库之外的新颖性保持未知。",
+        "webEnabled": "记录实际检索范围和日期；外部材料有支持才更新建议，不能把无命中写成无人研究。"
+      },
+      "execution": {
+        "status": "not-run",
+        "answer": null,
+        "citations": [],
+        "adjudication": null
+      }
+    }
+  ]
+}
+

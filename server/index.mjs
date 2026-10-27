@@ -32,7 +32,7 @@ try {
       dependencies.runtime = new AiRuntime({ config, fetchImpl: network.fetch, configFile: fileURLToPath(new URL('./config.local.json', import.meta.url)), directory: fileURLToPath(new URL('../private/ai/', import.meta.url)) });
       await dependencies.runtime.initialize();
       if (closing) { await closeProviders(); return; }
-      dependencies.store = new AiStore(fileURLToPath(new URL('../private/ai/paperdesk.sqlite', import.meta.url)));
+      dependencies.store = new AiStore(fileURLToPath(new URL('../private/ai/paperdesk.sqlite', import.meta.url)), { capacityBytes: config.storageCapacityMiB * 1024 * 1024, minimumFreeBytes: config.minimumFreeMiB * 1024 * 1024 });
       console.log(`PaperDesk AI: http://127.0.0.1:4176 · ${dependencies.runtime.status().configured ? '模型已配置' : '等待模型连接'}`);
     } catch {
       console.error('AI 后端启动失败，请检查数据库版本、模型连接记录与本地可写性。');
@@ -45,7 +45,7 @@ try {
     if (closing) return;
     closing = true; server.abortActive();
     void closeProviders().catch(() => {});
-    server.close(() => { dependencies.store?.close(); });
+    server.close(() => { dependencies.store?.close(); content.close(); });
   };
   process.once('SIGINT', close); process.once('SIGTERM', close);
 } catch {

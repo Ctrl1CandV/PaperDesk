@@ -29,6 +29,7 @@ export function PacketDialog({ reading, exploration, onClose }: { reading?: Read
   const [notes, setNotes] = useState<Note[]>([]);
   const [noteLoad, setNoteLoad] = useState<'loading' | 'ready' | 'error'>(reading ? 'loading' : 'ready');
   const [noteRetry, setNoteRetry] = useState(0);
+  const [noteCursor, setNoteCursor] = useState<string>();
   const [included, setIncluded] = useState(new Set<string>(cached?.included));
   const [question, setQuestion] = useState(cached?.question ?? '');
   const [preview, setPreview] = useState(() => cached?.preview ?? (reading ? readingPacket(reading, '', []) : exploration ? explorationPacket(exploration, new Set()) : ''));
@@ -47,10 +48,28 @@ export function PacketDialog({ reading, exploration, onClose }: { reading?: Read
     let live = true;
     if (reading) {
       setNoteLoad('loading');
-      personalStore.list('notes').then(items => { if (live) { setNotes(items.filter(note => note.guideId === reading.guide.metadata.id && note.revision === reading.guide.metadata.revision && note.unitId === reading.unitId)); setNoteLoad('ready'); } }).catch(() => { if (live) setNoteLoad('error'); });
+      Promise.all([
+        personalStore.listPage('notes', { guideId: reading.guide.metadata.id, revision: reading.guide.metadata.revision }),
+        Promise.all((cached?.included ?? []).map(id => personalStore.get('notes', id))),
+      ]).then(([page, retained]) => {
+        if (live) {
+          const items = [...page.records, ...retained.filter((item): item is Note => Boolean(item))];
+          setNotes([...new Map(items.filter(note => note.guideId === reading.guide.metadata.id && note.revision === reading.guide.metadata.revision && note.unitId === reading.unitId).map(note => [note.id, note])).values()]);
+          setNoteCursor(page.nextCursor); setNoteLoad('ready');
+        }
+      }).catch(() => { if (live) setNoteLoad('error'); });
     }
     return () => { live = false; };
   }, [reading, noteRetry]);
+  async function loadMoreNotes() {
+    if (!reading || !noteCursor) return;
+    setNoteLoad('loading');
+    try {
+      const page = await personalStore.listPage('notes', { guideId: reading.guide.metadata.id, revision: reading.guide.metadata.revision, cursor: noteCursor });
+      setNotes(previous => [...new Map([...previous, ...page.records.filter(note => note.unitId === reading.unitId)].map(note => [note.id, note])).values()]);
+      setNoteCursor(page.nextCursor); setNoteLoad('ready');
+    } catch { setNoteLoad('error'); }
+  }
   useEffect(() => {
     if (previousSelection.current === sourceSelection) return;
     previousSelection.current = sourceSelection;
@@ -72,6 +91,7 @@ export function PacketDialog({ reading, exploration, onClose }: { reading?: Read
     <p className="quiet-copy">预览就是将要复制的全部内容，可直接编辑。不会自动发送给模型或其他服务。</p>
     {noteLoad === 'loading' && <p className="draft-hint" role="status">正在读取本章可选笔记。已有预览保持不变，加载完成后可调整问题与选入项。</p>}
     {noteLoad === 'error' && <p className="draft-hint" role="alert">本章笔记暂时无法读取，当前预览未改动。<button className="text-action" disabled={copying} onClick={() => setNoteRetry(value => value + 1)}>重试读取笔记</button></p>}
+    {noteCursor && <button className="text-action" disabled={copying || noteLoad === 'loading'} onClick={() => void loadMoreNotes()}>继续查找本章较早笔记</button>}
     {unavailableNotes && <div className="preview-update"><p>此前选入的部分笔记当前无法读取。你仍可检查并复制已有预览；重建前请先移除不可用的选入项。</p><button className="text-action" disabled={copying} onClick={() => setIncluded(previous => new Set([...previous].filter(id => noteLoad === 'ready' && notes.some(note => note.id === id))))}>移除不可用的笔记选项</button></div>}
     {cached && <p className="draft-hint">已恢复本次会话中这份上下文的草稿，包括此前明确选入的内容。请检查完整预览。</p>}
     {reading && <><label className="field-label">这次想问什么？<textarea aria-label="这次想问什么？" disabled={copying || sourceBlocked} rows={2} value={question} maxLength={6000} onChange={event => setQuestion(event.target.value)} /></label>{notes.length > 0 && <fieldset disabled={copying || sourceBlocked}><legend>可选个人笔记（默认不包含）</legend>{notes.map(note => <label className="check-row" key={note.id}><input type="checkbox" checked={included.has(note.id)} onChange={() => toggle(note.id)} /><span>{note.text}</span></label>)}</fieldset>}</>}

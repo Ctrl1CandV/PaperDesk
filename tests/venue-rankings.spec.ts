@@ -36,7 +36,7 @@ test('unknown venues and preprints stay blank rather than inheriting a ranking f
   const unknown = await page.evaluate(async () => {
     const { venueRanking } = await import('/src/library/venueRankings.ts');
     const { contentRepository } = await import('/src/content/repository.ts');
-    const metadata = structuredClone(contentRepository.get('instructgpt', 2)!.metadata);
+    const metadata = structuredClone(contentRepository.getSummary('instructgpt', 2)!.metadata);
     const examples = ['Synthetic NeurIPS-related venue', 'NeurIPS Workshop on Synthetic Testing', 'ICLR Workshops'];
     const results = examples.map(venue => { metadata.orientation!.bibliography.venue = venue; return venueRanking(metadata); });
     metadata.orientation!.bibliography.venue = 'NeurIPS 2022 · Advances in Neural Information Processing Systems 35';

@@ -27,6 +27,15 @@ export interface Guide {
   metadata: GuideMetadata; body: string; bodyPath: string; packageDirectory: string;
   units: { id: string; heading: string | null; markdown: string }[];
 }
+/** Navigation and orientation data only; no body, citations, assets or review inventory. */
+export interface GuideSummary {
+  metadata: Pick<GuideMetadata, 'id' | 'paperId' | 'revision' | 'title' | 'paperTitle' | 'type' | 'purpose' | 'source' | 'orientation'> & {
+    coverage: Pick<GuideMetadata['coverage'], 'limitations'>;
+  };
+  units: GuideMetadata['units'];
+  bodyPath: string;
+  packageDirectory: string;
+}
 export interface EditorialTarget { guideId: string; revision: number; unitId: string; purpose: string }
 export interface EditorialLens {
   id: string; rank: number; title: string; whyNow: string; orientation: string;

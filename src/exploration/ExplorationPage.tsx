@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
 import { AppLink, navigate } from '../navigation';
-import { contentRepository } from '../content/repository';
+import { useExplorationSeed } from '../content/hooks';
 import { personalStore } from '../records/store';
 import type { Exploration } from '../records/types';
 import { getDraft } from '../ui/drafts';
 import { ManualEvidenceDialog } from './AddEvidenceDialog';
 import { EvidenceCard, ReadingTarget } from './EvidenceCard';
 import { ExplorationEditor, type CachedExplorationDraft } from './ExplorationEditor';
-import { actionLabels, statusLabels, useExplorations } from './model';
+import { actionLabels, statusLabels, useExploration } from './model';
 import { NextReading } from './NextReading';
 import './exploration.css';
 
 export function ExplorationPage({ explorationId, onHandoff }: { explorationId: string; onHandoff?: (record: Exploration) => void }) {
-  const { records, loading, error } = useExplorations();
-  const record = records.find(item => item.id === explorationId);
+  const { record, loading, error } = useExploration(explorationId);
   const draftKey = `exploration:edit:${explorationId}`;
   const [editing, setEditing] = useState(() => Boolean(getDraft<CachedExplorationDraft>(draftKey)));
   const [adding, setAdding] = useState(false);
@@ -21,17 +20,23 @@ export function ExplorationPage({ explorationId, onHandoff }: { explorationId: s
   const [noteIds, setNoteIds] = useState<Set<string>>();
   useEffect(() => { document.title = `${record?.title ?? '我的探索'} · PaperDesk`; }, [record?.title]);
   useEffect(() => {
-    let live = true;
-    const refresh = () => { void personalStore.list('notes').then(notes => { if (live) setNoteIds(new Set(notes.map(note => note.id))); }).catch(() => { if (live) setNoteIds(undefined); }); };
-    refresh(); const unsubscribe = personalStore.subscribe(refresh);
+    let live = true, generation = 0;
+    const ids = [...new Set(record?.evidence.flatMap(item => item.relatedNoteId ? [item.relatedNoteId] : []) ?? [])];
+    const refresh = () => {
+      const request = ++generation;
+      void Promise.all(ids.map(id => personalStore.get('notes', id))).then(notes => {
+        if (live && request === generation) setNoteIds(new Set(notes.flatMap(note => note ? [note.id] : [])));
+      }).catch(() => { if (live && request === generation) setNoteIds(undefined); });
+    };
+    refresh(); const unsubscribe = personalStore.subscribe(changed => { if (!changed || changed === 'notes') refresh(); });
     return () => { live = false; unsubscribe(); };
-  }, []);
+  }, [record]);
   function completed(value: Exploration) {
     setEditing(false); setSaved(true);
     if (value.id !== explorationId) navigate(`/explore/questions/${value.id}`);
   }
-  const seed = record?.seedRef ? contentRepository.getExplorationSeed(record.seedRef.revision) : undefined;
-  const lens = record?.seedRef ? contentRepository.getLens(record.seedRef.lensId, record.seedRef.revision) : undefined;
+  const { seed } = useExplorationSeed(record?.seedRef?.revision, Boolean(record?.seedRef));
+  const lens = record?.seedRef ? seed?.lenses.find(item => item.id === record.seedRef!.lensId) : undefined;
   return <main id="main-content" className="exploration-page exploration-detail" aria-busy={loading || undefined}>
     <AppLink className="exploration-back" to="/explore">← 返回研究探索</AppLink>
     {loading ? <p role="status">正在读取这条本地探索…</p> : error ? <><h1>暂时无法读取探索</h1><p role="alert">浏览器本地存储暂不可用。先前的草稿仍留在当前页面会话中，请稍后重试。</p></> : !record ? <>

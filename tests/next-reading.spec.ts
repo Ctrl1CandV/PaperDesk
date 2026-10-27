@@ -7,7 +7,7 @@ async function setup(page: Page, question = '合成测试：Agent 的规划怎�
   const initial = await page.evaluate(async questionText => {
     const { personalStore } = await import('/src/records/store.ts');
     const { contentRepository } = await import('/src/content/repository.ts');
-    const guide = contentRepository.get('agent-survey', contentRepository.currentRevision('agent-survey'))!;
+    const guide = contentRepository.getSummary('agent-survey', contentRepository.currentRevision('agent-survey'))!;
     const record = await personalStore.saveExploration({
       id: crypto.randomUUID(), title: '合成测试：选择下一步阅读', question: questionText,
       origin: 'reader', status: 'deferred', interpretation: '合成测试：既有解释必须保留。', unknowns: '合成测试：未选入的未知文本。',

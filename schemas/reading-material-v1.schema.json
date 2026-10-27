@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaperDesk reading material v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "paperId",
+    "sourceRevisionId",
+    "title",
+    "version",
+    "originalUrl",
+    "finalUrl",
+    "acquiredAt",
+    "materialSha256",
+    "materialFile",
+    "format",
+    "parserRevision",
+    "parser",
+    "configurationSha256",
+    "outputSha256",
+    "status",
+    "unitCount",
+    "assets",
+    "gaps"
+  ],
+  "properties": {
+    "referenceOnly": { "type": "boolean", "description": "Explicitly retained for visual review and backup; excluded from retrieval to avoid duplicate textual candidates." },
+    "schemaVersion": {
+      "const": 1
+    },
+    "paperId": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1
+    },
+    "sourceRevisionId": {
+      "type": "string",
+      "maxLength": 100,
+      "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 700,
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1
+    },
+    "originalUrl": {
+      "type": "string",
+      "maxLength": 4096
+    },
+    "finalUrl": {
+      "type": "string",
+      "maxLength": 4096
+    },
+    "acquiredAt": {
+      "type": "string",
+      "maxLength": 30
+    },
+    "materialSha256": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "materialFile": {
+      "type": "string",
+      "maxLength": 69,
+      "pattern": "^[a-f0-9]{64}\\.(html|pdf)$"
+    },
+    "format": {
+      "enum": [
+        "html",
+        "pdf"
+      ]
+    },
+    "parserRevision": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "parser": {
+      "type": "string",
+      "maxLength": 150
+    },
+    "configurationSha256": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "outputSha256": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "status": {
+      "enum": [
+        "partial",
+        "ready",
+        "failed"
+      ]
+    },
+    "unitCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20000
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url",
+          "status",
+          "alt"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "status": {
+            "const": "not-acquired"
+          },
+          "alt": {
+            "type": "string",
+            "maxLength": 10000
+          }
+        }
+      },
+      "maxItems": 20000
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "maxItems": 20
+    }
+  }
+}

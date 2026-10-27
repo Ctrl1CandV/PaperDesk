@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "rag-r2-fever-dev-checked",
+  "guideId": "rag",
+  "revision": 2,
+  "unitId": "u05",
+  "claim": "FEVER分类开发集的表6消融中，BM25检索优于Learned检索；作者提出实体词面重合作为可能解释，不能据此断言词面检索在所有任务更好。",
+  "conditions": "固定NeurIPS2020 §4.5/表6。FEVER-3标签准确率BM25 75.1%、Learned74.5%；FEVER-2分别91.6%、90.6%。这是dev消融而非表2 test结果，实体词面解释未被独立因果验证。",
+  "attribution": "paper",
+  "sourceRevisionId": "rag-neurips2020-pdf",
+  "parserRevision": "5f1e45d27167311f92e6bf83e9243420239e6d07bed06a9b7af09f535300a823",
+  "sourceUnitIds": [
+    "p7-s1",
+    "p8-s1"
+  ],
+  "review": {
+    "status": "visually-checked",
+    "reviewerType": "AI",
+    "note": "AI独立读第7页消融解释并查看第8页表6像素，核对列名dev、三分类/二分类及BM25/Learned行。第8页表4与第6页正文的11.7%/17%事实评价冲突仍不采用，本记录不裁定该争议，也不属于整篇实验复现。"
+  }
+}

@@ -241,7 +241,7 @@ test('backup page previews exact data, cancels without changes, exports only del
   expect(dataOnly(await readBackup(page))).toEqual(dataOnly(initial));
 });
 
-test('individually valid backups that exceed the merged size limit abort without changing existing records', async ({ page }) => {
+test('individually valid legacy backups can merge beyond 5 MiB and require the new complete archive', async ({ page }) => {
   const result = await page.evaluate(async () => {
     const { personalStore } = await import('/src/records/store.ts');
     const empty = await personalStore.exportBackup();
@@ -255,12 +255,12 @@ test('individually valid backups that exceed the merged size limit abort without
     const preview = await personalStore.previewImport(incoming);
     const before = await personalStore.exportBackup();
     let error = ''; try { await personalStore.importBackup(preview); } catch (failure) { error = failure.name + ': ' + failure.message; }
-    const after = await personalStore.exportBackup();
-    const { exportedAt: _beforeTime, ...beforeData } = before, { exportedAt: _afterTime, ...afterData } = after;
-    return { localBytes: new TextEncoder().encode(JSON.stringify(local)).length, incomingBytes: new TextEncoder().encode(JSON.stringify(incoming)).length, incomingCount: preview.counts.notes, unchanged: JSON.stringify(beforeData) === JSON.stringify(afterData), afterCount: after.notes.length, error };
+    const after = await personalStore.getStats();
+    const original = await personalStore.get('notes', before.notes[0].id);
+    return { localBytes: new TextEncoder().encode(JSON.stringify(local)).length, incomingBytes: new TextEncoder().encode(JSON.stringify(incoming)).length, incomingCount: preview.counts.notes, originalPreserved: JSON.stringify(before.notes[0]) === JSON.stringify(original), afterCount: after.counts.notes, error };
   });
   expect(result.localBytes).toBeLessThan(5 * 1024 * 1024); expect(result.incomingBytes).toBeLessThan(5 * 1024 * 1024);
   expect(result.localBytes + result.incomingBytes).toBeGreaterThan(5 * 1024 * 1024); expect(result.incomingCount).toBe(140);
-  expect(result.error).toContain('ValidationError'); expect(result.error).toContain('5 MiB');
-  expect(result.unchanged).toBe(true); expect(result.afterCount).toBe(140);
+  expect(result.error).toBe('');
+  expect(result.originalPreserved).toBe(true); expect(result.afterCount).toBe(280);
 });

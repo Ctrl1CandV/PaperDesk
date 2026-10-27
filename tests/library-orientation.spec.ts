@@ -41,6 +41,9 @@ test('title/topic search excludes incidental mentions and filtering clears the p
   await page.getByRole('link', { name: '开始导读' }).click();
   await expect(page).toHaveURL(new RegExp(`/read/instructgpt/${revision.instructgpt}$`));
   await expect(page.locator('.prose')).toContainText('三个阶段各自解决一个问题');
+  // Body rendering and the debounced resume write are separate asynchronous
+  // steps. Establish the saved-position prerequisite before expecting Continue.
+  await expect.poll(() => page.evaluate(async current => Boolean(await (await import('/src/records/store.ts')).personalStore.get('resume', `instructgpt/${current}`)), revision.instructgpt)).toBe(true);
   await page.goBack(); await expect(page).toHaveURL(selectedURL);
   await expect(page.getByRole('button', { name: /^论文/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#choose-instructgpt')).toHaveAttribute('aria-pressed', 'true');

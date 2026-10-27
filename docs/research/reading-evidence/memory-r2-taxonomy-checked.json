@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "memory-r2-taxonomy-checked",
+  "guideId": "agent-memory-survey",
+  "revision": 2,
+  "unitId": "u03",
+  "claim": "来源、形式和操作是三个分类视角：来源分同一trial、跨trial与外部知识，形式分文本与参数，操作分写入、管理、读取。不能把这些视角当互斥的单一算法类别。",
+  "conditions": "固定arXiv:2404.13501v1；§5及图4。仅核分类结构与正文定义，没有逐项核实图中所有代表工作的论文或实验。",
+  "attribution": "paper",
+  "sourceRevisionId": "agent-memory-survey-v1-html",
+  "parserRevision": "dc56683aa31b36c24c10f2ec5acbba624b34633d60e068c6ea670a88756e4ea8",
+  "sourceUnitIds": [
+    "u00077",
+    "u00079",
+    "u00094",
+    "u00125"
+  ],
+  "review": {
+    "status": "visually-checked",
+    "reviewerType": "AI",
+    "note": "AI独立核对HTML S5.F4及对应正文，并实际查看同版PDF物理第11页（印刷第11页）的图4像素。图中sources/forms/operations并列结构可辨认。本记录不将HTML图注解析提升为全文视觉审查，也不代表人工审核。"
+  }
+}

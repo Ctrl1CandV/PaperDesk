@@ -25,7 +25,7 @@ const venues: VenueRanking[] = [
   } },
 ];
 
-export function venueRanking(metadata: GuideMetadata): { label: string; edition: string; source: string; description: string } | undefined {
+export function venueRanking(metadata: Pick<GuideMetadata, 'orientation'>): { label: string; edition: string; source: string; description: string } | undefined {
   const bibliography = metadata.orientation?.bibliography;
   if (!bibliography?.venue) return;
   const name = bibliography.venue.toLowerCase();

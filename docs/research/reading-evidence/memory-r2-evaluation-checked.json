@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "memory-r2-evaluation-checked",
+  "guideId": "agent-memory-survey",
+  "revision": 2,
+  "unitId": "u06",
+  "claim": "记忆评价分为直接评估记忆模块与通过完整Agent任务作间接评估；图5中直接评价还分主观与客观。任务成功不能单独定位记忆写入、检索或利用哪个环节造成变化。",
+  "conditions": "固定arXiv:2404.13501v1 §6、图5；后一句是据评价层级提出的分析限制，不是论文报告的新实验结果。没有统一跨任务最优架构结论。",
+  "attribution": "editorial-explanation",
+  "sourceRevisionId": "agent-memory-survey-v1-html",
+  "parserRevision": "dc56683aa31b36c24c10f2ec5acbba624b34633d60e068c6ea670a88756e4ea8",
+  "sourceUnitIds": [
+    "u00140",
+    "u00141"
+  ],
+  "review": {
+    "status": "visually-checked",
+    "reviewerType": "AI",
+    "note": "AI独立阅读S6.p1.1/S6.F5并实际查看同版PDF物理第20页（印刷第20页）图5，核对直接主客观分支与间接任务分支及图中文字。没有逐项审计所有评价数据集、引用论文或实验。"
+  }
+}

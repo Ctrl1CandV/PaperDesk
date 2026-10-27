@@ -7,7 +7,8 @@ import { validateLibraryBriefs } from '../scripts/library-brief-validation.mjs';
 test('library editorial briefs cover current guides while retaining immutable revision targets', async () => {
   const { guides, catalog } = await validateContent();
   const data = JSON.parse(await readFile(new URL('../content/library-briefs.json', import.meta.url), 'utf8'));
-  assert.equal(validateLibraryBriefs(data, guides), Object.keys(catalog.currentRevisions).length);
+  assert.equal(validateLibraryBriefs(data, guides), data.entries.length);
+  assert.ok(data.entries.length >= Object.keys(catalog.currentRevisions).length, 'retained briefs remain bound to their old revisions');
   for (const [id, revision] of Object.entries(catalog.currentRevisions)) {
     assert.equal(data.entries.filter(entry => entry.guideId === id && entry.guideRevision === revision).length, 1);
   }

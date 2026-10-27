@@ -1,81 +1,80 @@
 # Local-first architecture
 
-The accepted static-reader architecture below is extended by the optional [AI reading service](AI-READING.md). `src/assistant/` owns the panel and API client; `server/` owns model configuration, validated content retrieval, tool orchestration and SQLite conversations. `ai-runtime.mjs` routes the chosen API or official ChatGPT adapter and permits a configured API fallback only on an exact subscription usage-limit error. `http.mjs` owns the per-question configuration snapshot, fallback checkpoint and stream reset; provider/model provenance stays with the turn. `chatgpt-auth.mjs` and `chatgpt-storage.mjs` own private provider authorization. The unified launcher supervises website and backend as one local session. Browser records retain their existing IndexedDB contract. Neither backend configuration, credentials nor AI records are frontend assets.
+PaperDesk is a React/TypeScript/Vite reader with an optional local Node AI service. The original static-reader decision remains valid for reading, notes and exploration; the subsequent AI extension adds SQLite conversations, provider adapters and explicit local original-paper ingestion. No hosted account system, synchronization, deployment or automatic content-production service is part of this architecture.
 
-## Decisions
+## Boundaries and files
 
-Use React, TypeScript and Vite for a local static web application for survey guidance, paper assistance and research exploration. Interactive source panels, section navigation, selection context and local-record editing justify reusable components; there is no need for SSR, a service database or a framework migration from an older site.
+```text
+content/                 reviewed immutable Markdown, metadata, assets and catalog
+schemas/                 strict content, record and original-material contracts
+src/content/             summary catalog, on-demand guide loading and bounded cache
+src/reader/              prose, tables, formulas, diagrams, locators and selection
+src/library/             overview and local title/topic filtering
+src/records/             IndexedDB records, editing, v1/v2 personal backups
+src/exploration/         editorial lenses and personal evidence/action loop
+src/handoff/             explicit context preview and clipboard fallback
+src/assistant/           AI panel, paginated history and API client
+server/                  providers, private configuration, AI storage and retrieval
+scripts/                 content validation/import and local materials CLI
+private/reading/         original bytes, manifests, derived units, evidence and index
+private/ai/              AI SQLite and separately protected provider credentials
+schemas/ tests/ docs/    contracts, verification and recorded evidence
+```
 
-At implementation time choose supported stable compatible releases, record the Node/runtime versions and commit a dependency lockfile only when committing is separately authorized. Do not guess future version numbers. Expected commands after W0: `npm run dev`, `npm run validate:content`, `npm test`, `npm run build`, `npm run preview`, and `npm run test:e2e`. These commands are a delivery contract, not currently present scripts.
+`private/` and backend configuration are never frontend assets. The unified launcher supervises the frontend and backend; port acquisition precedes opening private databases so a second backend cannot recover a live turn as interrupted.
 
 ```mermaid
 flowchart LR
-  A[Human-directed authoring] --> B[Reviewed Markdown and metadata]
-  B --> C[Local validator and build]
-  C --> D[Static reading application]
-  D --> E[Source links opened by reader]
-  D <--> F[Browser IndexedDB: personal records]
-  F <--> G[Explicit JSON backup and restore]
-  D --> H[Preview and copy selected context]
+  A[Explicit authoring and review] --> B[Versioned guides]
+  B --> C[Summary catalog and lazy reader]
+  C <--> D[Browser personal records]
+  D <--> E[Explicit personal backup]
+  C <--> F[Local AI service]
+  G[Explicit local original import] --> H[Raw materials and derived units]
+  H --> I[Rebuildable lexical index]
+  B --> I
+  I --> F
+  F <--> J[SQLite conversations and fixed evidence]
+  F -->|submitted question and bounded evidence| K[Selected model]
+  F -->|reader enables search| L[Web excerpts]
 ```
 
-## File ownership
+The application and CLI scripts now exist; the earlier W0 statement that these files/commands were only a delivery contract is historical. Use the current scripts in `package.json` and [operations](OPERATIONS.md), not archived preparation gates.
 
-```text
-content/                 reviewed source bodies, metadata and catalog
-schemas/                 package contract
-src/content/             catalog loader, validated types and link resolution
-src/reader/              prose, table, formula, diagram and source components
-src/library/             home/library and search
-src/records/             IndexedDB access, note editing, import/export
-src/exploration/         editorial paths, personal question/evidence/action loop
-src/handoff/             context preview and clipboard fallback
-src/styles/              tokens and responsive reading styles
-scripts/                 local content validation/import tooling
-tests/                   unit, integration, security and browser tests
-docs/                    specification and actual delivery evidence
-dist/                    generated assets, ignored
-```
+## Content identity and loading
 
-No files in src/ or scripts/ are supplied yet. Keep modules within this single application, not separate services. Two small boundaries suffice: `ContentRepository` loads read-only reviewed content; `PersonalRecordStore` owns local user records. Do not build a generic plugin framework for hypothetical future storage engines.
+Routes pin `/read/:guideId/:revision#unit`. Missing revisions never silently redirect to newer text. Metadata and body hashes identify an immutable revision; imports keep retained revisions and reject changed bytes under an existing identity. Content changes do not rewrite personal quotations, notes or reading status.
 
-## Routing and local origin
+`ContentRepository` initially exposes summaries and fetches the selected metadata/body on demand, checks hashes and bounds response sizes. URL-only imports keep article bodies separate from the initial JavaScript. A cache is bounded to eight guides/4 MiB, pending fetches support cancellation, and loading/error/retry states preserve the selected version. Library filtering and recommendations use summaries; opening a guide never means reading or mastering its original.
 
-Use routes `/`, `/library`, `/read/:guideId/:revision`, `/notes`, `/explore`, `/explore/lenses/:lensId` and `/explore/questions/:explorationId`; a fragment selects a stable unit. Keep the selected revision in the route so citations and notes have an exact context. A missing revision must show a meaningful choice to open the current revision, never silently redirect to different text.
+The backend keeps canonical guides and original manifests separate from the index. Imported HTML is parsed as data; raw active HTML does not run in the application origin. Original identity includes paper/source revision, material SHA-256, parser revision, source unit and locator. PDF physical pages are distinct from printed labels, which may be unknown. Parsed units remain `partial`/`unreviewed` unless a scoped evidence record says what was checked; figure captions are not image inspection.
 
-Use the same localhost origin and configured port for normal reading and preview, with strict-port failure rather than silently moving to another port. Ports used by isolated tests have separate storage. File URLs are not the supported launch mode. LAN testing is optional and must be explicitly enabled; bind to loopback by default.
+`ContentIndex` publishes immutable directory/index generations. A question fixes its generation; later import/reindex affects subsequent questions, not that question's tool reads. Evidence records bind guide revision/unit to original parser/unit and remain authoritative files independent of the index. Rebuilding the index must not erase original bytes, evidence reviews or saved conversation source snapshots.
 
-## Personal state
+Retrieval is SQLite FTS5 with lexical-v4 Chinese/English aliases and bounded candidates, not vector/semantic retrieval or exhaustive literature search. The current 30-question development set measured 33/46 required units for original Chinese queries and 44/46 for predeclared English queries; the former misses the proposed 90% goal. This is candidate retrieval, not real-model answer/citation validation. See [independent review](research/reading-upgrade-independent-review.md).
 
-Use IndexedDB with a versioned schema and transactions. No application server or account is required. The content package never includes these records:
+## Three storage domains
 
-- Resume: guideId, revision, unitId, optional block fingerprint, bounded intra-unit offset, updatedAt. Automatic position tracking is not a reading-status change.
-- Guide reading state: explicit unread/reading/read/deferred, timestamp and guide revision.
-- Original-paper reading state: separately explicit unread/reading/read/deferred, source version and timestamp. Default unknown/unread is not a claim of a person's actual history; distinguish no record from an explicit mark.
-- Notes/questions: UUID, guideId/revision/unitId, optional quoted passage and block fingerprint, user-authored text, status open/resolved only by user action, revision number and timestamps.
-- Explorations: records and embedded evidence/next actions exactly as defined in EXPLORATION.md. Store them separately from public editorial seeds; UUIDs are locally generated, not source identities.
-- Presentation preferences: font size/theme choices only; no inferred background or ability profile.
+**Browser records:** IndexedDB database name `paperdesk-personal-v1`, layout version 2. Separate intentional record stores, incremental byte/count metadata, cursor indexes, migration recovery and backup staging. The live-data cap is 512 MiB with independent record/field bounds. Hot saves validate only changed records and adjust counters transactionally; they do not rebuild a full backup. Notes/explorations use expected revisions and preserve conflicts/drafts. Reading positions are independent from explicit guide/original marks. See [records](RECORDS.md).
 
-No state is called mastery. Marking the guide read does not mark the original read; generating a guide, scrolling to the end or copying a question changes neither. If the original source version is unknown, store null rather than guessing.
+**AI conversations:** SQLite layout version 2 retains full turn/source snapshots plus byte/reservation counters and compact `summary_json`. Indexed cursor queries return conversation pages and at most 100 compact turn previews; a full turn is fetched deliberately. The latest six completed turns provide bounded conversation context. Checkpoints update the active row and counters rather than snapshotting history. One active request per conversation, two service-wide, with request idempotency, cancellations and recoverable terminal states. Default live-data capacity is 512 MiB and default low-disk reserve is 32 MiB; the old 16 MiB value limits legacy JSON transport only. These logical counters do not measure all SQLite/index/WAL/temp-file bytes.
 
-Note and exploration updates use an expected record revision in a read-modify-write transaction. Two tabs editing the same note or exploration must preserve both drafts and offer a conflict choice; do not use client timestamp as a winner. Resume position may use latest interaction, but it cannot replace note text. A failed save keeps the editor buffer visible and offers copy/export recovery; show Saved only after successful persistence/read-back.
+**Original materials:** `private/reading/{materials,manifests,derived,evidence}` holds authoritative public-source inputs and scoped review records. `jobs` records ingestion state; `index.sqlite` is rebuildable. CLI ingestion/reindex is explicit and uses already acquired local files, without model calls or an automated browsing pipeline. Materials have their own directory backup; AI and browser backups do not include them.
 
-Content updates never rewrite personal records. Keep the referenced old revision, or show the old quotation and an unresolved-anchor state. An exact unique text match can be offered for confirmation; no silent fuzzy relocation. Content rollback is independent of notes, explorations and guide/original reading marks. Removing a note or an unavailable content target must not cascade-delete an exploration or its saved quotation. Evidence shows unavailable linkage while keeping provenance and text.
+## Backups, migration and failure
 
-## Backup and import
+Personal v1 JSON remains bounded to 5 MiB; v2 NDJSON chunks support a larger collection with checksums, a snapshot revision, staging and atomic conflict-aware restore. IDB v1 migration retains original rows; downgrade uses an exported pre-upgrade v1 backup on a fresh origin, after separately preserving new records. The browser exporter uses bounded JSON strings and a full downloadable Blob, so browser Blob backing/quota and snapshot space still matter; this is not a guarantee of constant total memory.
 
-Personal backup JSON v1 has `format: paperdesk-personal-backup`, `schemaVersion: 1`, `exportedAt` in UTC and arrays named resume, guideStates, originalStates, notes and explorations, plus a preferences object. Exploration evidence and nextAction are embedded in each exploration, so they export atomically. The implementation must supply a strict backup schema and migration policy before persistence ships; unknown fields/unsupported versions fail rather than disappearing. Validate evidence by provenance: guide quotes require pinned guides, independent original excerpts require source identity/locator, and reader observations may legitimately have neither. Preserve these distinctions through export/import. It contains only intentional personal records and preferences, no browser identifiers or machine paths. Export is a download initiated by the user, not an upload. Explain that the file can contain private text.
+AI v3 NDJSON exports iterate a consistent temporary SQLite snapshot. A manifest, sequenced records and final SHA-256/counts close the stream. Imports stage in a separate SQLite database, validate all references and then commit once to live storage; duplicate conversation/turn/request IDs reject the entire import. v1/v2 legacy JSON remains importable within 16 MiB. A v1 layout migration creates an integrity-checked pre-v2 SQLite copy. Downgrade restores that copy separately; never edit `user_version` to bypass compatibility.
 
-Import validates size/schema/IDs before showing counts, duplicates, unavailable content revisions and conflicts. Use a transaction: identical id+revision+body is skipped; higher revision is not silently accepted over local changes; different content under the same ID preserves both versions until chosen. Cancel changes nothing; malformed or newer unsupported schema changes nothing. Preserve unmapped notes and exploration evidence with their old IDs and quotes. Check cross-record references without dropping missing-link snapshots; record conflicts include embedded evidence and next actions. Never merge imported content into the read-only article files. Provide explicit local-data removal with confirmation and a backup option.
+Materials backups verify raw/derived hashes and evidence references, copy allowed authoritative files to a new staging directory, then rename it to a new destination. Restore also requires a destination that does not exist; neither operation overwrites an existing collection. Indexes, job files, AI records and credentials are excluded. Normal AI/browser transfer cleanup does not guarantee cleanup after a process crash; materials staging directories also remain on cancellation/failure. See the exact cleanup and space limits in [operations](OPERATIONS.md).
 
-Browser storage can be evicted or cleared. Persistence requests may fail and are not backup. Changing host/protocol/port creates a different origin; migration requires export/import. V1 has no device synchronization and no offline availability promise.
+## Privacy, budgets and local origin
 
-## Content continuation
+Use the normal loopback origin `http://127.0.0.1:4173`; AI binds to 4176, isolated browser tests to 4174. Different schemes/hosts/ports have separate browser records. File URLs and implicit port changes are not supported. Internet hosting would require a different security model.
 
-ContentRepository owns the guide catalog and the public exploration seed. Both are read-only at runtime; local CLI updates use the validation/preview/apply contract in MAINTENANCE.md. A seed references exact guide revisions/units; resolve current editorial lens routes from the active seed, while saved seed origins refer to retained seed revisions. Adding another guide/lens must not require reader component edits. PROJECT-STATE.md and the operating guide keep development independent of conversation memory.
+Only reader-submitted questions, selected guide/original evidence and bounded history leave for the chosen provider; private browser notes do not automatically enter prompts. Optional Tavily search sends bounded queries/excerpts only when enabled for that question. Provider credentials stay in the backend. Fallback follows only the exact supported subscription usage-limit signal, with saved source identifiers and remaining tool budget preserved.
 
-## Dependencies and security
+Input preflight counts serialized UTF-8 bytes plus framing allowance and reserves configured output space. It is a conservative estimate for byte-level tokenizers, not exact token measurement or a guarantee for arbitrary compatible endpoints. API output uses `max_tokens`; the current ChatGPT adapter reserves output space locally but does not guarantee an exact upstream output-token cap. Evidence exceeding the local budget yields an explicit error rather than silent omission.
 
-Use react-markdown with raw HTML disabled and a product URL allowlist. KaTeX uses `trust: false`, bounded expansion/size and isolated macro state. Handle wide equations in their own region. Mermaid is lazy-loaded locally under the content rules; review generated SVG or use its sandbox mode if the chosen integration cannot safely enforce the stricter subset. No remote fonts, analytics, trackers, CDN scripts or model keys in the client.
-
-Validate imported strings before display, render user text as text, and test malicious URLs/HTML/diagram directives. Use `noopener noreferrer` for external windows; do not send the selected passage or private note in a URL query. A minimal CSP should allow only the local resources actually needed; it does not replace sanitization. Test that opening a source is the only intentional outbound reading request.
+Raw HTML stays disabled in guide Markdown; user text is rendered as text. KaTeX and Mermaid remain bounded/local, external links use the allowlist and safe opening behavior, and no remote fonts/analytics/model keys are shipped. Frontend/private-file denial and Host/Origin/token checks protect the local service; they are not internet authentication. Build/tests do not replace source-content, visual or real-model quality review.

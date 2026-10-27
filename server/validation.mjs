@@ -25,11 +25,33 @@ export function validateAsk(value) {
   return value;
 }
 export function validateSource(source) {
-  object(source, ['id', 'kind', 'title', 'text'], ['url', 'guideId', 'revision', 'unitId', 'version']);
-  if (!/^[LW][1-9]\d{0,3}$/.test(source.id) || !['guide', 'web'].includes(source.kind)
+  const originalFields = ['paperId', 'sourceRevisionId', 'materialSha256', 'parserRevision', 'sourceUnitId', 'locator', 'gaps', 'verification', 'readRanges'];
+  object(source, ['id', 'kind', 'title', 'text'], ['url', 'guideId', 'revision', 'unitId', 'version', ...originalFields]);
+  if (!/^[LWO][1-9]\d{0,3}$/.test(source.id) || !['guide', 'web', 'original'].includes(source.kind)
     || !isText(source.title, 1000, 1) || !isText(source.text, 100000)
     || source.version !== undefined && source.version !== null && !isText(source.version, 100)) reject('来源快照无效。');
-  if (source.kind === 'guide') {
+  if (source.kind !== 'original' && originalFields.some(key => Object.hasOwn(source, key))) reject('来源类型与原文字段不一致。');
+  if (source.kind === 'original') {
+    if (!source.id.startsWith('O') || !safeWebUrl(source.url) || !isText(source.paperId, 200, 1) || !isId(source.sourceRevisionId)
+      || !isHash(source.materialSha256) || !isHash(source.parserRevision) || !isId(source.sourceUnitId)
+      || source.guideId !== undefined || source.revision !== undefined || source.unitId !== undefined
+      || !Array.isArray(source.gaps) || source.gaps.length > 20 || !source.gaps.every(gap => isText(gap, 1000, 1))
+      || !['unreviewed', 'text-checked', 'visually-checked'].includes(source.verification)) reject('原文来源身份或核验状态无效。');
+    if (source.readRanges !== undefined) {
+      if (!Array.isArray(source.readRanges) || !source.readRanges.length || source.readRanges.length > 32) reject('原文读取范围无效。');
+      let previousEnd = -1, total;
+      for (const range of source.readRanges) {
+        object(range, ['start', 'end', 'total']);
+        if (![range.start, range.end, range.total].every(Number.isSafeInteger) || range.start < 0 || range.end <= range.start || range.end > range.total || range.total > 100000 || range.start <= previousEnd || total !== undefined && total !== range.total) reject('原文读取范围无效。');
+        previousEnd = range.end; total = range.total;
+      }
+    }
+    object(source.locator, ['label', 'physicalPage', 'printedPageLabel', 'anchor']);
+    const locator = source.locator;
+    if (!isText(locator.label, 1000, 1) || locator.physicalPage !== null && !isRevision(locator.physicalPage)
+      || locator.printedPageLabel !== null && !isText(locator.printedPageLabel, 100, 1)
+      || locator.anchor !== null && !isText(locator.anchor, 300, 1)) reject('原文来源定位无效。');
+  } else if (source.kind === 'guide') {
     if (!source.id.startsWith('L') || !isId(source.guideId) || !isRevision(source.revision) || !isId(source.unitId)
       || source.url !== `/read/${source.guideId}/${source.revision}#${source.unitId}`) reject('导读来源定位无效。');
   } else if (!source.id.startsWith('W') || !safeWebUrl(source.url) || source.guideId !== undefined || source.revision !== undefined || source.unitId !== undefined) reject('网页来源定位无效。');
@@ -37,13 +59,20 @@ export function validateSource(source) {
 // A snapshot is deliberately data-only. Metadata is preserved as a bounded JSON string,
 // so future content fields survive export without becoming executable configuration.
 export function validateContext(context) {
-  object(context, ['guideId', 'revision', 'bodySha256', 'unitId', 'selection', 'scope', 'metadataJson', 'historyTurnIds', 'webSearch', 'model', 'toolEvents'], ['provider', 'fallback']);
+  object(context, ['guideId', 'revision', 'bodySha256', 'unitId', 'selection', 'scope', 'metadataJson', 'historyTurnIds', 'webSearch', 'model', 'toolEvents'], ['provider', 'fallback', 'catalogDigest', 'indexGeneration', 'budget']);
   if (!isId(context.guideId) || !isRevision(context.revision) || !isHash(context.bodySha256) || !isId(context.unitId)
     || !isText(context.selection, 12000) || !['full-guide', 'section'].includes(context.scope)
     || !isText(context.metadataJson, 100000) || !isText(context.model, 200, 1) || typeof context.webSearch !== 'boolean'
     || !Array.isArray(context.historyTurnIds) || context.historyTurnIds.length > 6 || !context.historyTurnIds.every(isUuid)
     || !Array.isArray(context.toolEvents) || context.toolEvents.length > 8) reject('问答上下文快照无效。');
   if (context.provider !== undefined && !['api', 'chatgpt'].includes(context.provider)) reject('回答服务来源无效。');
+  for (const key of ['catalogDigest', 'indexGeneration']) if (context[key] !== undefined && !isHash(context[key])) reject('检索目录或索引代次无效。');
+  if (context.budget !== undefined) {
+    object(context.budget, ['method', 'inputTokens', 'outputTokens', 'limit']);
+    const budget = context.budget;
+    if (budget.method !== 'utf8-bytes-upper-bound' || !isRevision(budget.inputTokens) || !isRevision(budget.outputTokens) || !isRevision(budget.limit)
+      || budget.inputTokens + budget.outputTokens > budget.limit) reject('问答 token 预算无效。');
+  }
   if (context.fallback !== undefined) {
     const fallback = context.fallback;
     object(fallback, ['reason', 'stage', 'fromModel', 'previousAnswer', 'previousToolCount']);
@@ -55,8 +84,9 @@ export function validateContext(context) {
   }
   try { const parsed = JSON.parse(context.metadataJson); if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw Error(); } catch { reject('文章元数据快照无效。'); }
   for (const event of context.toolEvents) {
-    object(event, ['name', 'argumentsJson', 'resultJson']);
-    if (!['search_library', 'read_section', 'web_search'].includes(event.name) || !isText(event.argumentsJson, 2000) || !isText(event.resultJson, 40000)) reject('工具快照无效。');
+    object(event, ['name', 'argumentsJson', 'resultJson'], ['elapsedMs']);
+    if (!['search_library', 'read_section', 'web_search', 'search_sources', 'read_source_unit', 'resolve_source_locator'].includes(event.name) || !isText(event.argumentsJson, 2000) || !isText(event.resultJson, 40000)
+      || event.elapsedMs !== undefined && (typeof event.elapsedMs !== 'number' || !Number.isFinite(event.elapsedMs) || event.elapsedMs < 0)) reject('工具快照无效。');
     try { JSON.parse(event.argumentsJson); JSON.parse(event.resultJson); } catch { reject('工具快照不是有效 JSON。'); }
   }
 }

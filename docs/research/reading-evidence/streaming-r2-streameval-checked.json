@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "streaming-r2-streameval-checked",
+  "guideId": "streamingllm",
+  "revision": 2,
+  "unitId": "u06",
+  "claim": "表7中Llama-2-7B-32K-Instruct采用4+2044缓存时，20行（460词元）距离准确率85.80%，100行（2300词元）为0%；有限缓存的连续运行不等于任意远距离历史问答。",
+  "conditions": "固定v4附录C表7；每行23词元，100个样本、每样本100次查询，指标为准确率百分比。只比较所述模型/cache配置/查询距离，不外推所有长对话任务。",
+  "attribution": "paper",
+  "sourceRevisionId": "streamingllm-v4-html",
+  "parserRevision": "da2c25112a3238eff1f98a47ffe4099d2e3adca7196e8e0e0d19c7a49a91739a",
+  "sourceUnitIds": [
+    "u00165",
+    "u00166"
+  ],
+  "review": {
+    "status": "visually-checked",
+    "reviewerType": "AI",
+    "note": "AI独立核HTML A3.T7/A3.p1.1与同版PDF物理第16页（印刷16）表7像素，核行列、模型标题和样本表注；并查看相邻15/17页限制与LongBench上下文。没有复现原始StreamEval。"
+  }
+}

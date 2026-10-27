@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 2,
+  "id": "streamingllm",
+  "paperId": "arxiv:2309.17453",
+  "revision": 2,
+  "title": "StreamingLLM：有限缓存怎样支撑持续输入",
+  "paperTitle": "Efficient Streaming Language Models with Attention Sinks",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "deep",
+  "purpose": "理解 attention sinks 与滚动 KV 缓存怎样让已有模型持续处理输入，分清累计输入长度、有效上下文与长期记忆，并读懂稳定性和效率实验的证据边界。",
+  "source": {
+    "id": "arxiv:2309.17453",
+    "version": "v4",
+    "url": "https://arxiv.org/html/2309.17453v4"
+  },
+  "bodyFile": "streamingllm.r2.md",
+  "bodySha256": "469102522e3ed9c58d5dfdb182b48bbbbf0e7324a65c86bb7892605d03708237",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "先把持续运行、上下文窗口和记忆分开"
+    },
+    {
+      "id": "u02",
+      "heading": "为什么只留下最近一段文本还不够"
+    },
+    {
+      "id": "u03",
+      "heading": "Attention sink 是注意力分配现象，不是历史摘要"
+    },
+    {
+      "id": "u04",
+      "heading": "两段缓存还需要配套的位置处理"
+    },
+    {
+      "id": "u05",
+      "heading": "四百万 token 和速度收益各自在测什么"
+    },
+    {
+      "id": "u06",
+      "heading": "问答实验说明了有效近期上下文的边界"
+    },
+    {
+      "id": "u07",
+      "heading": "专门训练一个 sink token 是另一组实验"
+    },
+    {
+      "id": "u08",
+      "heading": "怎样把它接到持续理解这一学习方向"
+    },
+    {
+      "id": "u09",
+      "heading": "原文阅读入口与覆盖说明"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-a7e7cb7680",
+      "url": "https://arxiv.org/html/2309.17453v4#S1",
+      "labels": [
+        "论文 v4，§1–2、附录 A",
+        "论文 v4，§1–2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-e257183951",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/5e5fd18f863cbe6d8ae392a93fd271c9-Abstract-Conference.html",
+      "labels": [
+        "ICLR 2024 正式发表记录"
+      ],
+      "role": "background",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-8b2eb2e093",
+      "url": "https://arxiv.org/html/2309.17453v4#S3.F3",
+      "labels": [
+        "论文 v4，§3.1、图3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-88865ad716",
+      "url": "https://arxiv.org/html/2309.17453v4#S1.F1",
+      "labels": [
+        "论文 v4，§1、图1",
+        "论文 v4，图1、§4.5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-6c2bdd9d1b",
+      "url": "https://arxiv.org/html/2309.17453v4#S1.F2",
+      "labels": [
+        "论文 v4，§3.1、图2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-eff157d1c3",
+      "url": "https://arxiv.org/html/2309.17453v4#S3.E1",
+      "labels": [
+        "论文 v4，§3.1、公式1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-556bf63e79",
+      "url": "https://arxiv.org/html/2309.17453v4#S3.T1",
+      "labels": [
+        "论文 v4，表1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-661dd43cd6",
+      "url": "https://arxiv.org/html/2309.17453v4#S3.F4",
+      "labels": [
+        "论文 v4，§3.2、图4",
+        "缓存机制与原图4，固定 v4 HTML"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-1475aa419a",
+      "url": "https://arxiv.org/html/2309.17453v4#S3.SS2",
+      "labels": [
+        "论文 v4，§3.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-1bf1b64d34",
+      "url": "https://arxiv.org/html/2309.17453v4#S3.T2",
+      "labels": [
+        "论文 v4，§3.2、§4.4、表2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-bed101d302",
+      "url": "https://arxiv.org/html/2309.17453v4#S4.SS1",
+      "labels": [
+        "论文 v4，§4.1、图3、图5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-7673f9bc37",
+      "url": "https://arxiv.org/html/2309.17453v4#S4.F10",
+      "labels": [
+        "论文 v4，§4.5、图10"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-43be807ce5",
+      "url": "https://arxiv.org/html/2309.17453v4#S4.T5",
+      "labels": [
+        "论文 v4，§4.3、表5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-c8b352c214",
+      "url": "https://arxiv.org/html/2309.17453v4#S4.F8",
+      "labels": [
+        "论文 v4，§4.3、图8–9"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-e24d09b417",
+      "url": "https://arxiv.org/html/2309.17453v4#A3.T7",
+      "labels": [
+        "论文 v4，附录 C、表7"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-73f2d91801",
+      "url": "https://arxiv.org/html/2309.17453v4#S3.SS3",
+      "labels": [
+        "论文 v4，§3.3、公式2、表3",
+        "论文 v4，§3.3、§4.2、表3–4、图6–7"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-cb7fb3388a",
+      "url": "https://arxiv.org/html/2309.17453v4#A1",
+      "labels": [
+        "论文 v4，附录 A、C–D"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-7b4ac923d5",
+      "url": "https://arxiv.org/html/2309.17453v4#A4.T8",
+      "labels": [
+        "论文 v4，附录 D、表8"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-4f635faa0c",
+      "url": "https://arxiv.org/html/2309.17453v4#S3",
+      "labels": [
+        "原文阅读入口：v4 §3–4、附录 C"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-5eec37cd70",
+      "url": "https://arxiv.org/pdf/2309.17453v4",
+      "labels": [
+        "固定 v4 PDF；按上述物理页码手动定位"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    },
+    {
+      "id": "c-2d06aa08ea",
+      "url": "https://arxiv.org/html/2309.17453v4",
+      "labels": [
+        "固定 v4 HTML 完整版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v4"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-memory-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "rag",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "v4 §1–2: streaming, context extension and context utilization",
+      "v4 §3.1–3.3: attention sink evidence, rolling cache, positional treatment and pre-training; Equations 1–2, Tables 1–3",
+      "v4 §4.1–4.5: PG19, pre-training, ARC, StreamEval, ablations and efficiency; Tables 4–6",
+      "v4 Appendix A: applications and limitations",
+      "v4 Appendix C–D: query-answer distance and LongBench; Tables 7–8"
+    ],
+    "figuresViewed": [
+      "v4 Figure 1, PDF physical page 2",
+      "v4 Figure 2, PDF physical page 3",
+      "v4 Figure 3, PDF physical page 4",
+      "v4 Figure 4, PDF physical page 5",
+      "v4 Figures 5–7, PDF physical page 7",
+      "v4 Figures 8–9, PDF physical page 8",
+      "v4 Figure 10, PDF physical page 9"
+    ],
+    "limitations": [
+      "技术解释固定依据 2024-04-07 arXiv v4；ICLR 2024 页面仅核对作者、标题与发表信息。",
+      "mainline 范围覆盖主要机制和实验，并选读附录 A、C、D；不完整覆盖其他附录或所有相关工作。",
+      "未运行论文代码、复现实验或重新评价后续模型，历史实验不代表当前最优结果。",
+      "持续处理累计输入不等于无限历史记忆，也没有验证推理中的异步观察、打断或判断修订。",
+      "图表经 PDF 渲染像素查看；不打包原始论文图像，教学例子属于编辑解释。"
+    ],
+    "reviewBasis": "实际阅读固定 v4 HTML 的 §1–5 和附录 A、C、D，并用同版本 PDF 文字与物理页2–9、16–17的渲染图核对机制、图1–10、表1–8、公式与数值条件。核对表1换行符对照、表2不同模型的初始token数、图10中13B/4096的2355ms与106ms、表7距离越界结果。该记录为作者来源核查，不代替独立内容审阅。 修订2于2026-10-27重新核对固定HTML中的章节/表/公式锚点，并实际查看同版PDF物理第5页，核对图4的两段缓存、淘汰关系、连续位置说明及表1的模型、总缓存和数值。新增缓存图为教学示意，未扩大为全文核验。"
+  },
+  "orientation": {
+    "shortTitle": "StreamingLLM：attention sinks 与滚动缓存",
+    "topics": [
+      {
+        "id": "streaming-language-models",
+        "label": "流式语言模型",
+        "aliases": [
+          "StreamingLLM",
+          "持续输入",
+          "streaming LLM"
+        ]
+      },
+      {
+        "id": "attention-sinks",
+        "label": "注意力汇聚点",
+        "aliases": [
+          "attention sink",
+          "attention sinks",
+          "sink token"
+        ]
+      },
+      {
+        "id": "kv-cache",
+        "label": "KV 缓存与位置编码",
+        "aliases": [
+          "KV cache",
+          "RoPE",
+          "ALiBi",
+          "滑动窗口"
+        ]
+      },
+      {
+        "id": "context-boundaries",
+        "label": "上下文与记忆边界",
+        "aliases": [
+          "有限上下文",
+          "长期记忆",
+          "StreamEval"
+        ]
+      }
+    ],
+    "summary": "从普通滑窗的困惑度崩溃出发，解释最初 token 的注意力汇聚作用、两段 KV 缓存及连续位置处理，再分别审视语言建模、问答、预训练和速度实验。",
+    "value": "把持续输入问题拆成可比较的计算状态、近期证据和历史记忆问题，避免把处理四百万 token 误解成保存四百万上下文，也为后续记忆与在线决策阅读建立边界。",
+    "prerequisites": [
+      "知道自回归语言模型逐 token 预测；正文会解释 Query、Key、Value 缓存的用途。",
+      "能阅读简单求和与指数表达式；softmax 的必要性质在正文说明。"
+    ],
+    "boundaries": [
+      "这是固定 arXiv v4 的主线深入导读，不是当前流式 Agent 技术的综述。",
+      "论文主要解决既有语言模型在有界缓存下的持续运行，未解决无限历史记忆或推理时异步接收观察。",
+      "所有性能结论保留论文模型、任务、缓存和硬件条件，未复现或跨模型推广。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Guangxuan Xiao",
+        "Yuandong Tian",
+        "Beidi Chen",
+        "Song Han",
+        "Mike Lewis"
+      ],
+      "year": 2024,
+      "venue": "ICLR 2024",
+      "publicationKind": "conference",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/5e5fd18f863cbe6d8ae392a93fd271c9-Abstract-Conference.html",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "分清累计输入、一次可关注的上下文和可恢复的历史信息。",
+        "concepts": [
+          "自回归",
+          "KV cache",
+          "上下文窗口",
+          "长期记忆"
+        ],
+        "limit": "设备日志例子用于解释概念，不是论文实际工业实验。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "沿注意力分配、softmax 分母和换行符干预理解汇聚点证据。",
+        "concepts": [
+          "attention sink",
+          "softmax",
+          "归一化",
+          "语义与位置"
+        ],
+        "limit": "注意力强度不能直接解释成事实重要性，机制解释不是对所有模型的定理。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "推演两段缓存淘汰以及缓存内连续位置编号。",
+        "concepts": [
+          "固定初始 KV",
+          "rolling cache",
+          "RoPE",
+          "ALiBi"
+        ],
+        "limit": "四个初始 token 是被测模型中的经验配置，不能保证任务语义都被保留。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "区分长时间语言建模稳定性、累计计算量与具体实现速度。",
+        "concepts": [
+          "PG19",
+          "困惑度",
+          "重算窗口",
+          "per-token latency"
+        ],
+        "limit": "四百万 token 是连续语言建模证据，22.2倍是指定A6000与模型配置下相对重算的最高收益。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "用 StreamEval 的答案距离辨认有效近期上下文的边界。",
+        "concepts": [
+          "ARC",
+          "StreamEval",
+          "query-answer distance",
+          "cache capacity"
+        ],
+        "limit": "近期检索正确不等于任意历史可访问，缓存变大也不保证准确率单调提高。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "区分已有模型推理调整与需要从头训练的专用 sink token。",
+        "concepts": [
+          "learnable sink token",
+          "Zero Sink",
+          "160M预训练"
+        ],
+        "limit": "小规模预训练证据不构成任意大模型的收益保证。"
+      }
+    ]
+  }
+}

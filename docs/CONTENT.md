@@ -2,6 +2,10 @@
 
 ## Authoring workflow
 
+The durable detailed process is [Content workflow](paperdesk-upgrade/01-CONTENT-WORKFLOW.md); use [Sources and visuals](paperdesk-upgrade/02-SOURCES-AND-VISUALS.md) for fixed originals, physical PDF pages, visual checks, teaching diagrams and focused explanations. These documents refine the contract below without replacing immutable revisions, approved prose, attribution or personal-action boundaries. No plugin modification or integration is required.
+
+The [three r2 samples](research/reading-upgrade-samples.md) and [independent review](research/reading-upgrade-independent-review.md) record actual 2026-10-27 changes. Fixed materials use `reading-material-v1`, parsed units use `reading-derived-v1`, and claim/condition/guide-unit mappings use `reading-evidence-v1`. An AI visual check is labelled AI, never human; a checked claim does not change the entire parser output from `unreviewed` to reviewed. Evidence files survive index reconstruction and are pinned to the question's index generation. Missing images, PDF text order and incomplete coverage remain explicit. Operations documents import, backup and rebuild commands.
+
 Content is authored outside the website by a human-directed harness following the reading contract below. Existing authoring skills can be used in that separate workflow; no particular installed plugin or private record is an implementation dependency. The website consumes reviewed packages, not an assumed skill API.
 
 1. Select a paper for a concrete learning purpose and explain priority and alternatives. Broad context precedes narrower exploration when needed.

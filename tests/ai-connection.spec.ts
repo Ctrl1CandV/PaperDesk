@@ -406,8 +406,8 @@ test('settings actions have deliberate width and quota state stays in a coherent
   await expect(page.locator('.ai-context details')).toHaveCount(0);
   await page.getByRole('button', { name: '查看本次提问资料', exact: true }).click();
   const material = page.getByRole('dialog', { name: '本次提问资料', exact: true });
-  await expect(material).toContainText('本篇完整导读');
-  await expect(material).toContainText('原论文全文');
+  await expect(material).toContainText('按本轮预算可能仅发送开篇与提问章节');
+  await expect(material).toContainText('不会自动下载原论文');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: '查看本次提问资料', exact: true })).toBeFocused();
   const dialog = await openSettings(page);

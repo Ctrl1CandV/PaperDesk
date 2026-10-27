@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "streaming-r2-cache-diagram-checked",
+  "guideId": "streamingllm",
+  "revision": 2,
+  "unitId": "u04",
+  "claim": "教学图将缓存分为固定初始KV与滚动最近KV，当前输入参与注意力并更新滚动缓存；被淘汰中段不再参与。位置处理使用保留缓存内连续位置，不能由attention sink恢复已经丢弃的历史。",
+  "conditions": "固定arXiv:2309.17453v4 §3.2、图4；4个初始词元是常用实验配置而非所有模型定理。图省略多层、多头与并行实现，属于教学示意而非原图复制或实现伪代码。",
+  "attribution": "editorial-explanation",
+  "sourceRevisionId": "streamingllm-v4-html",
+  "parserRevision": "da2c25112a3238eff1f98a47ffe4099d2e3adca7196e8e0e0d19c7a49a91739a",
+  "sourceUnitIds": [
+    "u00043",
+    "u00044",
+    "u00045",
+    "u00046"
+  ],
+  "review": {
+    "status": "visually-checked",
+    "reviewerType": "AI",
+    "note": "AI独立核对S3.F4及§3.2段落，实际查看同版PDF物理第5页（印刷第5页）：原0/1/2/3保留、4/5淘汰、6/7/8近期与当前9、连续缓存位置。核对RoPE旋转前key缓存与ALiBi说明；未复现实验。"
+  }
+}

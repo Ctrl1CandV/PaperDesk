@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { contentRepository } from '../content/repository';
-import type { Guide } from '../content/types';
+import type { GuideSummary } from '../content/types';
 import { AppLink, navigate } from '../navigation';
-import { personalStore } from '../records/store';
+import { guideKey, personalStore } from '../records/store';
 import type { ResumeRecord } from '../records/types';
 import { libraryBrief, publicationName, sourceVersionLabel } from './briefs';
 import { venueRanking } from './venueRankings';
@@ -24,21 +24,21 @@ function DocumentIcon({ survey = false }: { survey?: boolean }) {
     {survey ? <><path d="M12 5c-3-2-7-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-2-1-6-1-9 1Z" /><path d="M12 5v15M6 8h3M6 11h3M15 8h3M15 11h3" /></> : <><path d="M14 3H5v18h14V8Z" /><path d="M14 3v5h5M8 12h8M8 16h6" /></>}
   </svg>;
 }
-export function matchesTitleOrTopic(guide: Guide, query: string) {
+export function matchesTitleOrTopic(guide: GuideSummary, query: string) {
   const terms = normalized(query).split(' ').filter(Boolean);
   const fields = [guide.metadata.title, guide.metadata.paperTitle, guide.metadata.orientation?.shortTitle ?? '',
     ...(guide.metadata.orientation?.topics.flatMap(topic => [topic.label, ...topic.aliases]) ?? [])].map(normalized);
   return terms.every(term => fields.some(field => /^[a-z0-9-]+$/i.test(term) ? field.split(/[^a-z0-9-]+/i).some(word => word === term) : field.includes(term)));
 }
 
-function Orientation({ guide, resumes, returnToList }: { guide: Guide; resumes: ResumeRecord[]; returnToList: () => void }) {
+function Orientation({ guide, resumes, returnToList }: { guide: GuideSummary; resumes: ResumeRecord[]; returnToList: () => void }) {
   const { metadata } = guide, orientation = metadata.orientation;
   const bibliography = orientation?.bibliography;
   const title = titleParts(orientation?.shortTitle ?? metadata.title);
   const brief = libraryBrief(metadata);
   const chapters = guide.units.filter(unit => unit.heading);
   const resume = resumes.filter(item => item.guideId === metadata.id).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
-  const resumeGuide = resume && contentRepository.get(resume.guideId, resume.revision);
+  const resumeGuide = resume && contentRepository.getSummary(resume.guideId, resume.revision);
   const resumeUnit = resumeGuide?.units.find(unit => unit.id === resume?.unitId);
   const canResume = Boolean(resumeUnit);
   const currentResume = canResume && resume.revision === metadata.revision;
@@ -116,9 +116,15 @@ export function Library({ home = false }: { home?: boolean }) {
   useEffect(() => {
     document.title = `${home ? '阅读与探索' : '阅读书架'} · PaperDesk`;
     let live = true;
-    personalStore.list('resume').then(records => { if (live) setResumes(records); }).catch(() => { if (live) setStorageError(true); }).finally(() => { if (live) setResumesLoading(false); });
+    setResumesLoading(true);
+    Promise.all([
+      personalStore.listPage('resume', { limit: 1 }),
+      Promise.all(selectedId ? contentRepository.revisions(selectedId).map(revision => personalStore.get('resume', guideKey(selectedId, revision))) : []),
+    ]).then(([latest, selectedResumes]) => {
+      if (live) { setResumes([...new Map([...latest.records, ...selectedResumes.filter((item): item is ResumeRecord => Boolean(item))].map(item => [guideKey(item.guideId, item.revision), item])).values()]); setStorageError(false); }
+    }).catch(() => { if (live) setStorageError(true); }).finally(() => { if (live) setResumesLoading(false); });
     return () => { live = false; };
-  }, [home]);
+  }, [home, selectedId]);
   function change(patch: Record<string, string | null>, replace = false, target?: { focusId: string; scrollToId?: string }) {
     const next = new URLSearchParams(window.location.search);
     for (const [key, value] of Object.entries(patch)) { if (value) next.set(key, value); else next.delete(key); }
@@ -139,7 +145,7 @@ export function Library({ home = false }: { home?: boolean }) {
     change({ article: null }, false, { focusId: `choose-${id}`, scrollToId: `choose-${id}` });
   }
   const latest = [...resumes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
-  const resumeGuide = latest && contentRepository.get(latest.guideId, latest.revision);
+  const resumeGuide = latest && contentRepository.getSummary(latest.guideId, latest.revision);
   return <main id="main-content" data-navigation-pending={resumesLoading} className={`library-page library-workspace${detailOpen ? ' has-selection' : ''}`}>
     <header className="library-heading"><h1>阅读书架</h1><AppLink className="text-action library-explore-link" to="/explore">研究探索 <span aria-hidden="true">↗</span></AppLink></header>
     {latest && <div className="home-resume"><div><span className="eyebrow">上次停留</span><p>{resumeGuide?.metadata.orientation?.shortTitle ?? resumeGuide?.metadata.title ?? '原阅读版本暂不可用'}</p></div><AppLink className="secondary-action" to={`/read/${latest.guideId}/${latest.revision}`}>继续阅读 →</AppLink></div>}

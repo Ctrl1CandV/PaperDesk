@@ -216,8 +216,8 @@ test('optional notes arriving asynchronously never overwrite an edited packet pr
   await selectParagraph(page); await seedNote(page);
   await page.evaluate(async () => {
     const { personalStore } = await import('/src/records/store.ts');
-    const original = personalStore.list.bind(personalStore);
-    personalStore.list = (name: string) => name === 'notes' ? new Promise(resolve => { (window as any).syntheticReleaseNotes = async () => resolve(await original('notes')); }) : original(name);
+    const original = personalStore.listPage.bind(personalStore);
+    personalStore.listPage = (name: string, options) => name === 'notes' ? new Promise(resolve => { (window as any).syntheticReleaseNotes = async () => resolve(await original('notes', options)); }) : original(name, options);
   });
   await page.getByRole('button', { name: '复制上下文', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '复制阅读上下文' }), preview = dialog.getByLabel('完整复制预览', { exact: true });

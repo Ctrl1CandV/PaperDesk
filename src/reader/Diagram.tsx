@@ -17,7 +17,7 @@ export function Diagram({ source }: { source: string }) {
       mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', htmlLabels: false, theme: 'base',
         fontFamily: 'Segoe UI, Microsoft YaHei, sans-serif',
         flowchart: { htmlLabels: false, useMaxWidth: false, padding: 18, nodeSpacing: 26, rankSpacing: 34 },
-        themeVariables: { primaryColor: color('--surface-muted'), primaryTextColor: color('--ink'), primaryBorderColor: color('--line-strong'), lineColor: color('--accent'), secondaryColor: color('--surface-soft'), tertiaryColor: color('--surface'), edgeLabelBackground: color('--surface'), fontSize: '16px' },
+        themeVariables: { primaryColor: color('--surface-selected'), primaryTextColor: color('--ink'), primaryBorderColor: color('--line-strong'), lineColor: color('--accent'), secondaryColor: color('--surface-soft'), tertiaryColor: color('--surface'), edgeLabelBackground: color('--surface'), fontSize: '16px', dropShadow: 'none' },
       });
       const result = await mermaid.render(id, source);
       const safe = DOMPurify.sanitize(result.svg, { USE_PROFILES: { svg: true, svgFilters: true }, FORBID_TAGS: ['foreignObject', 'a', 'image', 'script'], FORBID_ATTR: ['href', 'xlink:href'] });

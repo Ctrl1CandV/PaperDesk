@@ -1,4 +1,5 @@
 import { importContent, recoverContent, rollbackContent } from './content-import.mjs';
+import { ContentIndex } from '../server/content.mjs';
 
 const usage = 'Usage: npm run import:content -- --from incoming/package --dry-run|--apply; or --recover [--apply]; or --rollback [--apply]';
 try {
@@ -21,6 +22,12 @@ try {
     result = await importContent({ from, apply: flags.has('--apply') });
   }
   console.log(JSON.stringify(result, null, 2));
+  if (flags.has('--apply')) {
+    try { await import('./build-content-index.mjs'); }
+    catch { console.warn('Content selection is committed; browser navigation index generation failed. Run npm run validate:content and npm run build before opening the new selection.'); process.exitCode = 1; }
+    try { const index = await ContentIndex.load(); console.log(`Retrieval index refreshed: ${index.generation}`); index.close(); }
+    catch { console.warn('Content selection is committed; retrieval indexing is pending. Run npm run reading:materials -- reindex. The next AI question also reconciles the catalog digest.'); }
+  }
   console.log('Content only. Personal notes, states, evidence and backups are never read or changed by this command.');
 } catch (error) {
   // Node filesystem errors can contain machine paths. Only neutral code plus controlled validation messages are printed.

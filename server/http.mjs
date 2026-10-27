@@ -1,9 +1,11 @@
 import { createServer } from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { PublicError, reject, object, isId, isRevision, isUuid, validateAsk } from './validation.mjs';
+import { once } from 'node:events';
+import { PublicError, reject, object, isId, isHash, isRevision, isUuid, validateAsk } from './validation.mjs';
 import { LIMITS } from './content.mjs';
 import { answer } from './provider.mjs';
-import { requestHash } from './store.mjs';
+import { requestHash, validateBackup } from './store.mjs';
+import { exportBackupStream, importBackupStream } from './backup.mjs';
 
 const HOSTS = new Set(['127.0.0.1:4176', '127.0.0.1:4173', '127.0.0.1:4174']);
 const ORIGINS = new Set(['http://127.0.0.1:4173', 'http://127.0.0.1:4174']);
@@ -45,13 +47,13 @@ export function createAiServer(dependencies) {
   const { config, content, fetchImpl = fetch } = dependencies;
   const token = randomBytes(32).toString('hex'), active = new Map();
   const activeConversations = new Set();
-  let mutatingConnection = false, checkingController = null;
+  let mutatingConnection = false, checkingController = null, importing = false;
   const status = () => ({ ...(dependencies.runtime?.status() ?? {
     configured: config.configured, model: config.configured ? config.modelId : null,
     searchAvailable: config.searchAvailable, provider: 'api', apiConfigured: config.configured,
     chatgpt: { connected: false, loginPending: false, needsLogin: false,
       availability: { state: 'unknown', checkedAt: null, model: null, checking: false, lastError: null } },
-  }), csrfToken: token });
+  }), csrfToken: token, storage: dependencies.store?.usage() });
   const server = createServer(async (request, response) => {
     try {
       const store = dependencies.store;
@@ -62,6 +64,14 @@ export function createAiServer(dependencies) {
         json(response, 200, status()); return;
       }
       checkBrowserRequest(request, token);
+      const material = /^\/api\/ai\/materials\/([^/]+)\/([^/]+)\/([^/]+)$/.exec(url.pathname);
+      if (request.method === 'GET' && material) {
+        const [, sourceRevisionId, parserRevision, sourceUnitId] = material;
+        if (!isId(sourceRevisionId) || !isHash(parserRevision) || !isId(sourceUnitId)) reject('原文定位编号无效。');
+        const view = await content.reading?.view(sourceRevisionId, parserRevision, sourceUnitId);
+        if (!view) reject('此原文材料或解析修订不可用，已保存的来源快照仍可查看。', 404);
+        json(response, 200, view); return;
+      }
       if (request.method === 'GET' && ['/api/ai/settings', '/api/ai/chatgpt/models'].includes(url.pathname)) {
         const runtime = dependencies.runtime;
         if (!runtime) reject('请更新并重启本机 AI 服务后再配置。', 503);
@@ -134,7 +144,7 @@ export function createAiServer(dependencies) {
       if (request.method === 'GET' && url.pathname === '/api/ai/conversations') {
         const guideId = url.searchParams.get('guideId'), revision = Number(url.searchParams.get('revision'));
         if (!isId(guideId) || !isRevision(revision)) reject('请提供有效的文章与修订编号。');
-        json(response, 200, { conversations: store.list(guideId, revision) }); return;
+        json(response, 200, store.listPage(guideId, revision, { cursor: url.searchParams.get('cursor'), limit: Number(url.searchParams.get('limit') ?? 50) })); return;
       }
       const match = /^\/api\/ai\/conversations\/([^/]+)$/.exec(url.pathname);
       if (match && ['GET', 'DELETE'].includes(request.method)) {
@@ -142,18 +152,64 @@ export function createAiServer(dependencies) {
         if (!isUuid(id)) reject('会话编号无效。');
         const conversation = store.conversation(id);
         if (!conversation) reject('会话不存在。', 404);
-        if (request.method === 'DELETE') { store.delete(id); json(response, 200, { deleted: true }); }
-        else json(response, 200, { conversation, turns: store.turns(id) });
+        if (request.method === 'DELETE') { if (importing) reject('备份正在恢复，请稍后再删除。', 409); store.delete(id); json(response, 200, { deleted: true }); }
+        else json(response, 200, { conversation, ...(url.searchParams.get('summary') === '1' ? store.turnSummariesPage(id, { cursor: url.searchParams.get('cursor'), limit: Number(url.searchParams.get('limit') ?? 100) }) : store.turnsPage(id, { cursor: url.searchParams.get('cursor'), limit: Number(url.searchParams.get('limit') ?? 50) })) });
+        return;
+      }
+      const turnMatch = /^\/api\/ai\/turns\/([^/]+)$/.exec(url.pathname);
+      if (turnMatch && request.method === 'GET') {
+        if (!isUuid(turnMatch[1])) reject('问答编号无效。');
+        const turn = store.turn(turnMatch[1]); if (!turn) reject('问答不存在。', 404);
+        json(response, 200, { turn }); return;
+      }
+      if (request.method === 'GET' && url.pathname === '/api/ai/export/stream') {
+        const controller = new AbortController();
+        const close = () => { if (!response.writableEnded) controller.abort(); };
+        response.on('close', close);
+        try {
+          const records = exportBackupStream(store, controller.signal);
+          // Start the consistent snapshot before sending headers, so preparation failures remain structured errors.
+          const first = await records.next();
+          response.writeHead(200, { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff',
+            'content-disposition': 'attachment; filename="paperdesk-ai-backup-v3.ndjson"' });
+          try {
+            if (!first.done && !response.write(first.value)) await once(response, 'drain', { signal: controller.signal });
+            for await (const record of records) if (!response.write(record)) await once(response, 'drain', { signal: controller.signal });
+            response.end();
+          } finally { await records.return(); }
+        } catch (error) {
+          // An incomplete backup must fail the download stream, not look like a
+          // successful EOF and commit a partial native-save file.
+          if (response.headersSent) response.destroy();
+          throw error;
+        } finally { response.off('close', close); controller.abort(); }
+        return;
+      }
+      if (request.method === 'POST' && url.pathname === '/api/ai/import/stream') {
+        if (!/^application\/x-ndjson(?:\s*;|$)/i.test(request.headers['content-type'] ?? '') || request.headers['content-encoding'] && request.headers['content-encoding'] !== 'identity') reject('分块备份必须使用未压缩 NDJSON。', 415);
+        if (active.size || importing) reject('请等待当前问题或备份操作结束后再恢复。', 409);
+        importing = true;
+        const controller = new AbortController();
+        const close = () => { if (!response.writableEnded) controller.abort(); };
+        response.on('close', close);
+        try { json(response, 200, await importBackupStream(store, request, controller.signal, { preview: url.searchParams.get('preview') === '1' })); }
+        finally { importing = false; response.off('close', close); controller.abort(); }
         return;
       }
       if (request.method === 'GET' && url.pathname === '/api/ai/export') { json(response, 200, store.export()); return; }
       if (request.method === 'POST' && url.pathname === '/api/ai/import') {
         const backup = await readJson(request, 16 * 1024 * 1024);
         if (active.size) reject('请等待当前问题结束后再导入 AI 备份。', 409);
+        if (importing) reject('请等待备份操作结束后再导入 AI 备份。', 409);
+        if (url.searchParams.get('preview') === '1') {
+          validateBackup(backup);
+          json(response, 200, { counts: { conversations: backup.conversations.length, turns: backup.turns.length }, schemaVersion: backup.schemaVersion, exportedAt: backup.exportedAt }); return;
+        }
         const counts = store.import(backup);
         json(response, 200, { counts }); return;
       }
       if (request.method !== 'POST' || url.pathname !== '/api/ai/ask') reject('未找到该 AI 接口。', 404);
+      if (importing) reject('AI 备份正在恢复，请稍后再提问。', 409);
       const input = validateAsk(await readJson(request, 64 * 1024));
       // An already committed idempotency key can be replayed without paying for another model call.
       const existing = store.byRequest(input.requestId);
@@ -173,7 +229,7 @@ export function createAiServer(dependencies) {
       if (active.has(input.requestId)) reject('该问题仍在准备或回答中，请稍后加载会话。', 409);
       if (input.conversationId && activeConversations.has(input.conversationId)) reject('当前会话正在准备或回答，请等待或停止后再试。', 409);
       if (active.size >= 2) reject('已有两个问题在回答，请稍后再试。', 429);
-      const previous = input.conversationId ? store.turns(input.conversationId) : [];
+      const previous = input.conversationId ? store.recentTurns(input.conversationId) : [];
       // Validate guide identity before any model/catalog request. The actual
       // selected model replaces this placeholder before committing the turn.
       // Pin credentials, target and fallback preference for this entire request,
@@ -274,7 +330,7 @@ export function createAiServer(dependencies) {
       else if (!response.writableEnded) response.end();
     }
   });
-  server.requestTimeout = 15000;
+  server.requestTimeout = 120000;
   server.headersTimeout = 10000;
   server.keepAliveTimeout = 5000;
   server.on('clientError', (_error, socket) => { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); });

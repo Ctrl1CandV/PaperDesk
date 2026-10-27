@@ -21,7 +21,7 @@ export function Formula({ source, display }: { source: string; display: boolean 
   try {
     const html = katex.renderToString(source, { displayMode: display, trust: false, strict: 'error', throwOnError: true, maxExpand: 200, maxSize: 20, macros: {} });
     if (!display) return <span className="inline-formula" dangerouslySetInnerHTML={{ __html: html }} />;
-    return <span className="formula-block"><span className="overflow-hint">公式可横向滚动，键盘聚焦后用方向键查看。</span><span className="formula-scroll" role="region" tabIndex={0} aria-label="公式，可横向滚动" dangerouslySetInnerHTML={{ __html: html }} /></span>;
+    return <span className="formula-block"><span className="formula-scroll" role="region" tabIndex={0} aria-label="公式，可横向滚动" dangerouslySetInnerHTML={{ __html: html }} /><span className="overflow-hint">长公式可横向滚动，键盘聚焦后用方向键查看。</span></span>;
   } catch {
     return <span className="formula-error">公式未能显示：<code>{source}</code></span>;
   }

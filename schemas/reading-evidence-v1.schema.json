@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaperDesk reading evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "evidenceId",
+    "guideId",
+    "revision",
+    "unitId",
+    "claim",
+    "conditions",
+    "attribution",
+    "sourceRevisionId",
+    "parserRevision",
+    "sourceUnitIds",
+    "review"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "evidenceId": {
+      "type": "string",
+      "maxLength": 100,
+      "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+    },
+    "guideId": {
+      "type": "string",
+      "maxLength": 100,
+      "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "unitId": {
+      "type": "string",
+      "maxLength": 100,
+      "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+    },
+    "claim": {
+      "type": "string",
+      "maxLength": 5000,
+      "minLength": 1
+    },
+    "conditions": {
+      "type": "string",
+      "maxLength": 5000
+    },
+    "attribution": {
+      "enum": [
+        "paper",
+        "editorial-explanation",
+        "hypothesis"
+      ]
+    },
+    "sourceRevisionId": {
+      "type": "string",
+      "maxLength": 100,
+      "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+    },
+    "parserRevision": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sourceUnitIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 100,
+        "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+      },
+      "maxItems": 20
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewerType",
+        "note"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unreviewed",
+            "text-checked",
+            "visually-checked"
+          ]
+        },
+        "reviewerType": {
+          "enum": [
+            "AI",
+            "human"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 5000,
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

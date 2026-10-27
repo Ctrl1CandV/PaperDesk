@@ -1,0 +1,288 @@
+{
+  "schemaVersion": 2,
+  "id": "rag",
+  "paperId": "arxiv:2005.11401",
+  "revision": 2,
+  "title": "RAG：让生成模型通过检索使用外部知识",
+  "paperTitle": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "理解检索器、生成器与潜在文档边缘化如何共同利用外部知识，以及知识更新、检索失败和事实可靠性的边界。",
+  "source": {
+    "id": "arxiv:2005.11401",
+    "version": "NeurIPS 2020 camera-ready",
+    "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf"
+  },
+  "bodyFile": "rag.r2.md",
+  "bodySha256": "1fec1582c7131a68d88e4d846a4439608ba8ed96b870e140e0ec3301b494f359",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "参数中的知识与可替换的外部材料"
+    },
+    {
+      "id": "u02",
+      "heading": "检索和生成怎样接到同一个概率模型里"
+    },
+    {
+      "id": "u03",
+      "heading": "RAG-Sequence 与 RAG-Token 的区别在求和位置"
+    },
+    {
+      "id": "u04",
+      "heading": "训练信号来自答案，但检索器并非从零开始"
+    },
+    {
+      "id": "u05",
+      "heading": "结果需要连同指标与对照一起阅读"
+    },
+    {
+      "id": "u06",
+      "heading": "可更新知识，不等于自动获得可靠知识"
+    },
+    {
+      "id": "u07",
+      "heading": "从知识增强走向 Agent，以及原文阅读入口"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-06d872cc5c",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf",
+      "labels": [
+        "主文 §1–2，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c-8b59a814af",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=3",
+      "labels": [
+        "主文 §1、§2.2–2.3，PDF 第1–3页",
+        "主文 §2.2，PDF 第3页",
+        "主文 §2.1，PDF 第3页",
+        "两种边缘化公式及单词元分类条件，PDF 物理第3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c-d253866fea",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=4",
+      "labels": [
+        "主文 §3，PDF 第4页",
+        "主文 §2.4，PDF 第3–4页",
+        "主文 §2.5，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c-b1e76acec7",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=7",
+      "labels": [
+        "主文 §4.3、图2，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c-5b05b0fa20",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=5",
+      "labels": [
+        "主文 §2.2、§2.4、§4.1，PDF 第3–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c-5f481e3324",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=6",
+      "labels": [
+        "主文 §3.1、表1，PDF 第4、6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c-22e269b293",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=8",
+      "labels": [
+        "主文 §4.5、表6，PDF 第7–8页",
+        "主文 §4.5，PDF 第7–8页",
+        "主文 §4.5、图3，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c-76251b6ae8",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=2",
+      "labels": [
+        "方法与图1入口，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "transformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "toolformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "Main paper sections 1–4 and 6",
+      "Broader Impact discussion of knowledge-source accuracy and bias"
+    ],
+    "figuresViewed": [
+      "Main Figure 1 (PDF p2)",
+      "Main probability formulas (PDF p3)",
+      "Main Tables 1–2 (PDF p6)",
+      "Main Tables 4–6 and Figure 3 (PDF p8)"
+    ],
+    "limitations": [
+      "解释 2020 年 RAG 原始方法，不是当代所有检索增强技术的综述。",
+      "没有复现实验、审计全部语料或逐条核验生成案例及引用文献。",
+      "原文人工评价表4与正文一项数值不一致；本解释不采用争议单元。",
+      "流程图为原创教学示意；公式及所选结果按原文定位。"
+    ],
+    "reviewBasis": "Read official NeurIPS 2020 main method, task/results and limits; locally rendered and inspected the listed figures/tables/formulas. Checked sequence/token marginalization, frozen document encoder/index, question-answer supervision, exact-match cells, retrieval ablations and index-swap conditions. No experimental reproduction. Revision 2: AI visual inspection on 2026-10-27 of the same fixed PDF physical pages 2, 3, 6 and 8 (printed labels 2, 3, 6, 8), checking Figure 1 paths, sequence/token formulas, Table 1 column conditions and Table 6 development-set scope. The two-token expansion is a teaching derivation, not an empirical finding. Table 4 discrepancy remains excluded."
+  },
+  "orientation": {
+    "shortTitle": "RAG：从外部知识中检索并生成答案",
+    "topics": [
+      {
+        "id": "retrieval-augmented-generation",
+        "label": "检索增强生成",
+        "aliases": [
+          "RAG",
+          "retrieval augmented generation",
+          "知识增强"
+        ]
+      },
+      {
+        "id": "dense-retrieval",
+        "label": "稠密检索",
+        "aliases": [
+          "dense retrieval",
+          "DPR",
+          "向量检索"
+        ]
+      },
+      {
+        "id": "parametric-memory",
+        "label": "参数与外部记忆",
+        "aliases": [
+          "parametric memory",
+          "non-parametric memory",
+          "知识更新"
+        ]
+      }
+    ],
+    "summary": "把 DPR 检索器与 BART 生成器结合，对候选文档的生成概率进行边缘化，并在任务监督下微调，研究外部知识怎样参与语言生成。",
+    "value": "从概率结构理解检索与生成的分工，辨别原始 RAG、简单拼接提示和多轮 Agent 检索之间的差异，并学习按阶段检查错误。",
+    "prerequisites": [
+      "了解 Transformer 编码器与解码器的基本作用；正文会解释检索向量和条件生成。",
+      "能读简单求和与乘积即可；边缘化、联合训练及解码差异都在正文展开。"
+    ],
+    "boundaries": [
+      "依据 NeurIPS 2020 正式论文，重点是原始方法与主要问答、消融证据。",
+      "外部知识源为特定 Wikipedia 快照，不是实时互联网搜索；检索和引用都不自动保证答案可靠。",
+      "没有复现实验，也不覆盖所有现代 RAG 工程组件或逐句事实验证方法。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Patrick Lewis",
+        "Ethan Perez",
+        "Aleksandra Piktus",
+        "Fabio Petroni",
+        "Vladimir Karpukhin",
+        "Naman Goyal",
+        "Heinrich Küttler",
+        "Mike Lewis",
+        "Wen-tau Yih",
+        "Tim Rocktäschel",
+        "Sebastian Riedel",
+        "Douwe Kiela"
+      ],
+      "year": 2020,
+      "venue": "NeurIPS 2020 · Advances in Neural Information Processing Systems 33",
+      "publicationKind": "conference",
+      "url": "https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html",
+      "preprintYear": 2020
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "理解查询向量、文档向量、检索权重和条件生成的分工。",
+        "concepts": [
+          "RAG",
+          "稠密检索",
+          "DPR",
+          "知识增强",
+          "向量检索"
+        ],
+        "limit": "解释原始 DPR 与 BART 组合，不等同于所有使用检索提示的后续系统。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "用求和位置理解 Sequence 与 Token 两种边缘化形式。",
+        "concepts": [
+          "边缘化",
+          "潜变量",
+          "RAG-Sequence",
+          "RAG-Token",
+          "生成概率"
+        ],
+        "limit": "候选集合依据原问题检索，Token 形式不是每生成一个词就重新查询外部库。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "区分任务答案监督、检索器预训练与实际更新的参数。",
+        "concepts": [
+          "联合训练",
+          "DPR",
+          "检索监督",
+          "解码",
+          "参数冻结"
+        ],
+        "limit": "固定文档编码器和索引，不能把端到端理解为所有参数和离散搜索都可微更新。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "检查可替换外部记忆为何仍可能遗漏、过时或被错误利用。",
+        "concepts": [
+          "知识更新",
+          "检索噪声",
+          "事实可靠性",
+          "检索失败",
+          "证据"
+        ],
+        "limit": "索引替换实验不证明所有知识更新正确，也不构成逐句引用认证。"
+      }
+    ]
+  }
+}

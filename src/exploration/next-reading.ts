@@ -1,14 +1,14 @@
-import type { Guide, GuideOrientation } from '../content/types';
+import type { GuideSummary, GuideOrientation } from '../content/types';
 import type { GuideTarget } from '../records/types';
 
 /** This is explicit catalog matching, not semantic inference about a reader. */
 export type ReadingTopic = GuideOrientation['topics'][number];
 export interface ReadingRequest { text: string; topicIds: string[] }
 export interface ReadingCandidate {
-  guide: Guide; target: GuideTarget; heading: string; purpose: string; limit: string;
+  guide: GuideSummary; target: GuideTarget; heading: string; purpose: string; limit: string;
   matchedTopics: string[]; matchedConcepts: string[];
 }
-export function orientationFor(guide: Guide) { return guide.metadata.orientation; }
+export function orientationFor(guide: GuideSummary) { return guide.metadata.orientation; }
 
 const normalize = (value: string) => value.normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
 export function containsConcept(text: string, concept: string) {
@@ -20,7 +20,7 @@ export function containsConcept(text: string, concept: string) {
   return new RegExp(`${start}${escaped}${end}`, 'u').test(haystack);
 }
 
-export function findNextReadings(guides: Guide[], request: ReadingRequest): ReadingCandidate[] {
+export function findNextReadings(guides: GuideSummary[], request: ReadingRequest): ReadingCandidate[] {
   const candidates: { candidate: ReadingCandidate; rank: number; order: number }[] = [];
   guides.forEach((guide, order) => {
     const orientation = orientationFor(guide);

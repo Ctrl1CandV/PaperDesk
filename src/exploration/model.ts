@@ -3,6 +3,7 @@ import { personalStore } from '../records/store';
 import type { Exploration, ExplorationDraft, GuideTarget } from '../records/types';
 import type { EditorialLens } from '../content/types';
 import { contentRepository } from '../content/repository';
+import { useRecords } from '../records/hooks';
 
 export const statusLabels: Record<Exploration['status'], string> = {
   inbox: '待梳理', exploring: '探索中', deferred: '暂缓', archived: '已归档',
@@ -15,7 +16,7 @@ export function targetPath(target: GuideTarget) {
   return `/read/${target.guideId}/${target.revision}#${target.unitId}`;
 }
 export function targetLabel(target: GuideTarget) {
-  const guide = contentRepository.get(target.guideId, target.revision);
+  const guide = contentRepository.getSummary(target.guideId, target.revision);
   const unit = guide?.units.find(item => item.id === target.unitId);
   return unit ? `${guide!.metadata.title} · ${unit.heading ?? '阅读起点'}` : null;
 }
@@ -30,16 +31,23 @@ export function createExploration(lens?: EditorialLens, seedRevision?: number): 
   };
 }
 export function useExplorations() {
-  const [records, setRecords] = useState<Exploration[]>([]);
+  return useRecords('explorations');
+}
+export function useExploration(id: string) {
+  const [record, setRecord] = useState<Exploration>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   useEffect(() => {
-    let live = true;
-    const refresh = () => personalStore.list('explorations').then(items => {
-      if (live) { setRecords(items.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))); setLoading(false); setError(false); }
-    }).catch(() => { if (live) { setError(true); setLoading(false); } });
-    refresh(); const unsubscribe = personalStore.subscribe(refresh);
+    let live = true, generation = 0;
+    setRecord(undefined); setLoading(true); setError(false);
+    const refresh = () => {
+      const request = ++generation;
+      return personalStore.get('explorations', id).then(item => {
+        if (live && request === generation) { setRecord(item); setLoading(false); setError(false); }
+      }).catch(() => { if (live && request === generation) { setError(true); setLoading(false); } });
+    };
+    refresh(); const unsubscribe = personalStore.subscribe(changed => { if (!changed || changed === 'explorations') void refresh(); });
     return () => { live = false; unsubscribe(); };
-  }, []);
-  return { records, loading, error };
+  }, [id]);
+  return { record, loading, error };
 }

@@ -210,7 +210,7 @@ test('Responses uses supported stateless fields, instructions, namespaced tools 
   assert.match(request.body.input[0].content, /Synthetic coverage only/);
   assert.equal(request.body.tools[0].type, 'namespace');
   assert.equal(request.body.tools[0].name, 'paperdesk');
-  assert.deepEqual(request.body.tools[0].tools.map(item => item.name), ['search_library', 'read_section']);
+  assert.deepEqual(request.body.tools[0].tools.map(item => item.name), ['search_library', 'read_section', 'search_sources', 'read_source_unit', 'resolve_source_locator']);
   assert.ok(request.body.tools[0].tools.every(tool => tool.type === 'function' && tool.strict === true && !('function' in tool)));
   assert.equal(state.turn.answer, '合成回答 [L1]。');
   assert.equal(JSON.stringify(emitted).includes('Synthetic hidden'), false);
@@ -236,7 +236,7 @@ test('tool continuation retains opaque reasoning, assistant phase, calls and all
   assert.equal(thirdInput.at(-1).call_id, 'synthetic-call-two');
   assert.equal(localCalls.length, 2);
   assert.equal(state.turn.context.toolEvents.length, 2);
-  assert.equal(saved.length, 2);
+  assert.equal(saved.length, 5, 'three prompt budget checkpoints plus two retained tool results');
   assert.equal(emitted.filter(event => event.type === 'sources').length, 2);
   assert.equal(JSON.stringify(saved).includes('synthetic-opaque-ciphertext'), false);
   assert.equal(JSON.stringify(emitted).includes('synthetic-opaque-ciphertext'), false);

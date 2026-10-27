@@ -10,7 +10,7 @@ import { Dialog } from '../ui/Dialog';
 import { Formula } from '../reader/Markdown';
 import { clearDraft, getDraft, keepDraft, useUnloadWarning } from '../ui/drafts';
 import { isSafeExternalUrl } from '../../scripts/content-policy.mjs';
-import { aiClient, getAiStatus, type AiConversation, type AiSource, type AiStatus, type AiTurn, type AskInput } from './api';
+import { aiClient, AiApiError, getAiStatus, type AiConversation, type AiSource, type AiStatus, type AiTurn, type AskInput } from './api';
 import { ChatGptConnection, providerLabel } from './ChatGptConnection';
 import './ai.css';
 
@@ -26,9 +26,9 @@ function PanelIcon({ kind }: { kind: 'new' | 'history' }) {
 }
 
 function sourceTarget(source: AiSource): string | undefined {
-  if (source.kind === 'web') return source.url && isSafeExternalUrl(source.url) ? source.url : undefined;
+  if (source.kind === 'web' || source.kind === 'original') return source.url && isSafeExternalUrl(source.url) ? source.url : undefined;
   if (!source.guideId || !Number.isSafeInteger(source.revision) || !source.unitId) return;
-  const guide = contentRepository.get(source.guideId, source.revision!);
+  const guide = contentRepository.getSummary(source.guideId, source.revision!);
   return guide?.units.some(unit => unit.id === source.unitId)
     ? `/read/${source.guideId}/${source.revision}#${source.unitId}` : undefined;
 }
@@ -39,7 +39,7 @@ function citationPlugin(sources: AiSource[], turnId: string) {
       visit(tree, 'text', (node: any, index: number | undefined, parent: any) => {
         if (index === undefined || !parent || ['link', 'linkReference'].includes(parent.type)) return;
         const parts: any[] = []; let offset = 0;
-        for (const match of node.value.matchAll(/\[([LW][1-9]\d{0,3})\]/g)) {
+        for (const match of node.value.matchAll(/\[([LOW][1-9]\d{0,3})\]/g)) {
           if (!known.has(match[1])) continue;
           if (match.index > offset) parts.push({ type: 'text', value: node.value.slice(offset, match.index) });
           parts.push({ type: 'link', url: `#ai-source-${turnId}-${match[1]}`, children: [{ type: 'text', value: match[0] }] });
@@ -66,12 +66,39 @@ function Sources({ sources, turnId }: { sources: AiSource[]; turnId: string }) {
   return <details className="ai-sources"><summary>查看依据 · {sources.length}</summary>
     <ol>{sources.map((source, index) => {
       const target = sourceTarget(source);
-      return <li key={`${source.id}-${index}`} id={`ai-source-${turnId}-${source.id}`} tabIndex={-1}><div className="ai-source-heading"><span className="ai-source-id">[{source.id}]</span><span>{source.kind === 'guide' ? '导读章节' : '网页检索'}{source.version ? ` · ${source.version}` : ''}</span></div>
+      return <li key={`${source.id}-${index}`} id={`ai-source-${turnId}-${source.id}`} tabIndex={-1}><div className="ai-source-heading"><span className="ai-source-id">[{source.id}]</span><span>{source.kind === 'guide' ? '导读章节' : source.kind === 'original' ? '固定原文' : '网页摘录'}{source.version ? ` · ${source.version}` : ''}</span></div>
         {target ? source.kind === 'guide' ? <AppLink to={target}>{source.title}</AppLink> : <a href={target} target="_blank" rel="noopener noreferrer">{source.title} ↗</a> : <span>{source.title}（原位置暂不可用）</span>}
         <p>{source.text}</p>
+        {source.kind === 'original' && <OriginalSource source={source} />}
       </li>;
     })}</ol>
   </details>;
+}
+function OriginalSource({ source }: { source: AiSource }) {
+  const [open, setOpen] = useState(false), [text, setText] = useState(''), [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const controller = useRef<AbortController | null>(null);
+  useEffect(() => () => controller.current?.abort(), []);
+  async function show() {
+    setOpen(true); setError(''); setLoading(true);
+    const request = new AbortController(); controller.current?.abort(); controller.current = request;
+    try {
+      const status = await getAiStatus(request.signal);
+      const response = await fetch(`/api/ai/materials/${source.sourceRevisionId}/${source.parserRevision}/${source.sourceUnitId}`, { signal: request.signal, headers: { 'x-paperdesk-token': status.csrfToken }, cache: 'no-store' });
+      if (!response.ok) throw new Error('本地固定材料暂不可用。保留的回答来源仍可阅读，也可打开上方公共原文入口。');
+      const value = await response.json();
+      if (typeof value.text !== 'string' || value.text.length > 100000) throw new Error('本地材料响应无效。');
+      if (!request.signal.aborted) setText(value.text);
+    } catch (reason) { if (!request.signal.aborted) setError(errorText(reason)); }
+    finally { if (!request.signal.aborted) setLoading(false); }
+  }
+  return <><p className="ai-fine-print">{source.locator?.label} · {source.verification === 'visually-checked' ? '对应内容已核图' : source.verification === 'text-checked' ? '已核对文本' : '解析文本，尚未独立核验'}</p>
+    {source.gaps?.map(gap => <p className="ai-fine-print" key={gap}>{gap}</p>)}
+    <button type="button" className="secondary-action" onClick={() => void show()}>读取本地固定材料</button>
+    {open && <Dialog title={source.title} onClose={() => { controller.current?.abort(); setOpen(false); }} className="ai-material-dialog">
+      <p>{source.locator?.label}</p><p className="ai-fine-print">这是固定解析版本的文本；表格、公式与图像按上方缺口说明使用。原始 HTML 不在页面执行。</p>
+      {loading ? <p role="status">正在读取本地材料…</p> : error ? <p role="alert">{error}</p> : <p style={{ whiteSpace: 'pre-wrap' }}>{text}</p>}
+    </Dialog>}</>;
 }
 function Answer({ turn }: { turn: AiTurn }) {
   const permitted = new Set(turn.sources.map(sourceTarget).filter((value): value is string => Boolean(value)));
@@ -100,7 +127,7 @@ function AnswerIdentity({ turn }: { turn: AiTurn }) {
 function TurnMaterial({ turn }: { turn: AiTurn }) {
   const context = turn.context;
   const guide = typeof context?.guideId === 'string' && typeof context.revision === 'number'
-    ? contentRepository.get(context.guideId, context.revision) : undefined;
+    ? contentRepository.getSummary(context.guideId, context.revision) : undefined;
   const unit = guide?.units.find(item => item.id === context?.unitId);
   const selected = typeof context?.selection === 'string' ? context.selection : '';
   const target = guide && unit ? `/read/${guide.metadata.id}/${guide.metadata.revision}#${unit.id}` : undefined;
@@ -108,7 +135,7 @@ function TurnMaterial({ turn }: { turn: AiTurn }) {
   return <details className="ai-turn-material"><summary>提问时的资料{unit && <span>{selected ? '选文' : '章节'} · {unit.heading ?? '阅读起点'}</span>}</summary>
     {target ? <AppLink to={target}>返回提问位置 · 导读 r{guide!.metadata.revision}</AppLink> : <p>这条记录没有可定位的提问章节；可查看下方保留的来源。</p>}
     {selected && <blockquote>{selected}</blockquote>}
-    {context?.scope === 'full-guide' ? <p>本篇完整导读，包含来源与覆盖说明；不含原论文全文。</p> : context?.scope === 'section' ? <p>导读开篇与提问章节，包含来源与覆盖说明；其余章节未随问题发送。</p> : null}
+    {context?.scope === 'full-guide' ? <p>本篇完整导读，包含来源与覆盖说明；不含原论文全文。</p> : context?.scope === 'section' ? <p>导读开篇与提问章节的预算内材料，可能为节选；包含来源与覆盖说明，其余文本未随问题发送。</p> : null}
     {(historyCount !== undefined || typeof context?.webSearch === 'boolean') && <p>{historyCount !== undefined ? `带入 ${historyCount} 轮已完成对话。` : ''}{typeof context?.webSearch === 'boolean' ? context.webSearch ? '本轮允许网页检索；实际取得的资料见回答依据。' : '本轮未开启网页检索。' : ''}</p>}
   </details>;
 }
@@ -139,6 +166,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [conversations, setConversations] = useState<AiConversation[]>([]);
+  const [conversationCursor, setConversationCursor] = useState<string | null>(null), [turnCursor, setTurnCursor] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | undefined>(cached?.conversationId ?? conversationSelections.get(guideKey));
   const [turns, setTurns] = useState<AiTurn[]>([]);
   const [busy, setBusy] = useState(false);
@@ -149,7 +177,8 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   const [materialOpen, setMaterialOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
-  const [importPreview, setImportPreview] = useState<{ data: unknown; text: string; bytes: number; conversationCount: number | null; turnCount: number | null }>();
+  const [importPreview, setImportPreview] = useState<{ file: File; bytes: number; conversationCount: number; turnCount: number; schemaVersion: number }>();
+  const transfer = useRef<AbortController | undefined>(undefined);
   const [copyText, setCopyText] = useState<string>();
   const headingId = useId(), questionId = useId();
   const controller = useRef<AbortController | undefined>(undefined);
@@ -165,7 +194,6 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   const questionSelection = questionMaterial.selection;
   const materialChanged = unit.id !== currentUnit.id || questionSelection !== selection;
   const selectionTooLong = Boolean(questionSelection && questionSelection.length > 12000);
-  const fullGuide = guide.body.length <= 40000;
   const hasRunning = turns.some(turn => turn.status === 'running');
   const locked = busy || sending;
   const loginPending = Boolean(status?.chatgpt?.loginPending);
@@ -179,7 +207,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
   }, [draftKey, guideKey, question, conversationId, webSearch, material]);
   useEffect(() => {
     alive.current = true; void connect();
-    return () => { alive.current = false; connectGeneration.current++; controller.current?.abort(); };
+    return () => { alive.current = false; connectGeneration.current++; controller.current?.abort(); transfer.current?.abort(); };
   }, []);
   useEffect(() => {
     if (settingsOpen || locked || connecting) return;
@@ -218,21 +246,57 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
 
   async function loadList(currentStatus: AiStatus) {
     const result = await aiClient(currentStatus.csrfToken).conversations(guide.metadata.id, guide.metadata.revision);
-    if (alive.current) setConversations(result.conversations);
+    if (alive.current) { setConversations(result.conversations); setConversationCursor(result.nextCursor ?? null); }
     return result.conversations;
   }
   function receiveStatus(next: AiStatus) {
     if (!alive.current) return;
     statusVersion.current++; setStatus(next);
   }
-  async function loadConversation(id: string, currentStatus = status, preserveScroll = false) {
+  async function loadConversation(id: string, currentStatus = status, preserveScroll = false, reconcileTurnId?: string) {
     if (!currentStatus) return;
     const value = await aiClient(currentStatus.csrfToken).conversation(id);
+    if (reconcileTurnId && value.turns.some(turn => turn.id === reconcileTurnId && turn.summaryOnly)) {
+      const detail = await aiClient(currentStatus.csrfToken).turn(reconcileTurnId);
+      value.turns = value.turns.map(turn => turn.id === reconcileTurnId ? detail.turn : turn);
+    }
     if (!alive.current) return;
     if (value.conversation.guideId !== guide.metadata.id || value.conversation.revision !== guide.metadata.revision) throw new Error('该对话属于另一个导读修订，请从对应文章打开。');
-    connectedId.current = id; setConversationId(id); setTurns(value.turns);
+    connectedId.current = id; setConversationId(id);
+    setTurns(previous => {
+      if (!preserveScroll) return value.turns;
+      const incoming = new Map(value.turns.map(turn => [turn.id, turn]));
+      const merged = previous.map(turn => {
+        const next = incoming.get(turn.id); incoming.delete(turn.id);
+        return !next || next.summaryOnly && !turn.summaryOnly && next.status === turn.status ? turn : next;
+      });
+      return [...merged, ...incoming.values()];
+    });
+    if (!preserveScroll) setTurnCursor(value.nextCursor ?? null);
     if (!preserveScroll) nearBottom.current = true;
     return value;
+  }
+  async function loadMore(kind: 'conversations' | 'turns') {
+    if (!status || locked) return; setBusy(true); setError('');
+    try {
+      if (kind === 'conversations' && conversationCursor) {
+        const result = await aiClient(status.csrfToken).conversations(guide.metadata.id, guide.metadata.revision, undefined, conversationCursor);
+        setConversations(previous => [...previous, ...result.conversations.filter(item => !previous.some(old => old.id === item.id))]); setConversationCursor(result.nextCursor ?? null);
+      } else if (kind === 'turns' && conversationId && turnCursor) {
+        const id = conversationId, height = messages.current?.scrollHeight ?? 0, top = messages.current?.scrollTop ?? 0;
+        const result = await aiClient(status.csrfToken).conversation(id, undefined, turnCursor);
+        if (connectedId.current !== id) return;
+        nearBottom.current = false;
+        setTurns(previous => [...result.turns.filter(item => !previous.some(old => old.id === item.id)), ...previous]); setTurnCursor(result.nextCursor ?? null);
+        requestAnimationFrame(() => { if (messages.current) messages.current.scrollTop = top + messages.current.scrollHeight - height; });
+      }
+    } catch (reason) { setError(errorText(reason)); }
+    finally { if (alive.current) setBusy(false); }
+  }
+  async function readTurn(id: string) {
+    if (!status || locked) return; setBusy(true); setError(''); const owner = connectedId.current;
+    try { const result = await aiClient(status.csrfToken).turn(id); if (alive.current && connectedId.current === owner) setTurns(previous => previous.map(turn => turn.id === id ? result.turn : turn)); }
+    catch (reason) { setError(errorText(reason)); } finally { if (alive.current) setBusy(false); }
   }
   async function connect() {
     const generation = ++connectGeneration.current;
@@ -241,18 +305,20 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
       const next = await getAiStatus();
       if (!alive.current || generation !== connectGeneration.current) return;
       receiveStatus(next);
-      const list = await loadList(next);
+      await loadList(next);
       if (!alive.current || generation !== connectGeneration.current) return;
       const remembered = connectedId.current;
-      if (remembered && list.some(item => item.id === remembered)) await loadConversation(remembered, next);
-      else if (remembered) { connectedId.current = undefined; setConversationId(undefined); setTurns([]); }
+      if (remembered) {
+        try { await loadConversation(remembered, next); }
+        catch (reason) { if (!(reason instanceof AiApiError) || reason.status !== 404) throw reason; connectedId.current = undefined; setConversationId(undefined); setTurns([]); setTurnCursor(null); }
+      }
     } catch (reason) { if (alive.current && generation === connectGeneration.current) setConnectionError(errorText(reason)); }
     finally { if (alive.current && generation === connectGeneration.current) setConnecting(false); }
   }
   async function chooseConversation(id: string) {
     if (locked || connecting) return false;
     setError(''); setNotice('');
-    if (!id) { connectedId.current = undefined; setConversationId(undefined); setTurns([]); pendingRequest.current = undefined; return true; }
+    if (!id) { connectedId.current = undefined; setConversationId(undefined); setTurns([]); setTurnCursor(null); pendingRequest.current = undefined; return true; }
     setBusy(true);
     try { await loadConversation(id); pendingRequest.current = undefined; return true; }
     catch (reason) { setError(errorText(reason)); return false; }
@@ -282,7 +348,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     let localId = `pending-${request.requestId}`, acceptedId: string | undefined, completed = false;
     const optimistic: AiTurn = { id: localId, question: text, answer: '', status: 'running', sources: [], context: {
       guideId: request.guideId, revision: request.revision, unitId: request.unitId, selection: request.selection ?? '',
-      scope: fullGuide ? 'full-guide' : 'section', webSearch: request.webSearch,
+      scope: 'pending', webSearch: request.webSearch,
     }, createdAt: new Date().toISOString() };
     setTurns(current => [...current.filter(turn => turn.id !== optimistic.id), optimistic]); setSending(true); setError(''); setNotice(''); setPhase('正在准备文章上下文'); nearBottom.current = true;
     const update = (change: (turn: AiTurn) => AiTurn) => {
@@ -320,7 +386,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
       if (alive.current) {
         setPhase('正在确认对话已保存'); controller.current = undefined;
         // A reload also resolves ambiguous failures and preserves a partial response already saved by the service.
-        try { await loadList(status); if (acceptedId) await loadConversation(acceptedId, status, true); }
+        try { await loadList(status); if (acceptedId) await loadConversation(acceptedId, status, true, completed ? undefined : localId); }
         catch { if (alive.current) setNotice('本页回答仍保留，尚未确认服务端状态。请刷新对话核对。'); }
         finally {
           // A provider may have reported an expired login or refreshed model choice.
@@ -349,41 +415,39 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     setBusy(true); setError('');
     try {
       await aiClient(status.csrfToken).remove(conversationId);
-      connectedId.current = undefined; setConversationId(undefined); setTurns([]); setDeleteOpen(false);
+      connectedId.current = undefined; setConversationId(undefined); setTurns([]); setTurnCursor(null); setDeleteOpen(false);
       pendingRequest.current = undefined; await loadList(status); setNotice('这段对话已从本机服务删除。');
     } catch (reason) { setError(errorText(reason)); }
     finally { if (alive.current) setBusy(false); }
   }
   async function exportAll() {
     if (!status || locked) return;
-    setBusy(true); setError('');
+    setBusy(true); setError(''); const operation = new AbortController(); transfer.current = operation;
     try {
-      const backup = await aiClient(status.csrfToken).export();
-      const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: 'application/json' }));
-      const anchor = document.createElement('a'); anchor.href = url; anchor.download = `paperdesk-ai-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      anchor.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const backup = await aiClient(status.csrfToken).exportFile(operation.signal);
+      if (backup) {
+        const url = URL.createObjectURL(backup), anchor = document.createElement('a'); anchor.href = url; anchor.download = `paperdesk-ai-backup-${new Date().toISOString().slice(0, 10)}.ndjson`;
+        anchor.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
       setNotice('已生成全部 AI 对话的备份下载，请在浏览器下载列表确认文件。');
     } catch (reason) { setError(errorText(reason)); }
     finally { if (alive.current) setBusy(false); }
   }
   async function previewFile(file?: File) {
     setError(''); setImportPreview(undefined);
-    if (!file) return;
-    if (file.size > 16 * 1024 * 1024) { setError('AI 备份超过 16 MiB，未读取或发送。'); return; }
+    if (!file || !status) return;
+    const operation = new AbortController(); transfer.current?.abort(); transfer.current = operation; setBusy(true);
     try {
-      const text = await file.text(), data: unknown = JSON.parse(text);
-      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('请选择完整的 AI 备份 JSON 对象。');
-      const record = data as { conversations?: unknown; turns?: unknown };
-      setImportPreview({ data, text, bytes: file.size,
-        conversationCount: Array.isArray(record.conversations) ? record.conversations.length : null,
-        turnCount: Array.isArray(record.turns) ? record.turns.length : null });
-    } catch (reason) { setError(reason instanceof SyntaxError ? '文件不是有效 JSON，尚未导入。' : errorText(reason)); }
+      const result = await aiClient(status.csrfToken).previewBackupFile(file, operation.signal);
+      if (!operation.signal.aborted) setImportPreview({ file, bytes: file.size, schemaVersion: result.schemaVersion, conversationCount: result.counts.conversations, turnCount: result.counts.turns });
+    } catch (reason) { if (!operation.signal.aborted) setError(errorText(reason)); }
+    finally { if (alive.current) setBusy(false); }
   }
   async function importAll() {
     if (!status || !importPreview || locked) return;
-    setBusy(true); setError('');
+    setBusy(true); setError(''); const operation = new AbortController(); transfer.current = operation;
     try {
-      await aiClient(status.csrfToken).import(importPreview.data);
+      await aiClient(status.csrfToken).importFile(importPreview.file, operation.signal);
       await loadList(status);
       if (connectedId.current) await loadConversation(connectedId.current);
       setImportPreview(undefined); setNotice('AI 备份已导入，并已重新读取对话列表。');
@@ -404,14 +468,15 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     <div className="ai-messages" ref={messages} role="region" aria-label="AI 解读对话" tabIndex={0} onScroll={event => { const node = event.currentTarget; nearBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }}>
       {connecting ? <p className="ai-service-state" role="status">正在连接…</p> : connectionError ? <div className="ai-service-state"><p>{connectionError}</p><button type="button" className="ai-inline-action" onClick={() => void connect()}>重试连接</button></div> : status && !status.configured ? <div className="ai-service-state"><p>{status.provider === 'chatgpt' ? '连接 ChatGPT 后即可提问。' : '连接 ChatGPT 订阅，或配置自己的 API。'}</p><button type="button" className="ai-inline-action" onClick={() => setSettingsOpen(true)}>打开 AI 设置</button></div> : null}
       {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">从这篇导读继续追问</p><div className="ai-suggestions">{suggestions.map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => { editQuestion(value); input.current?.focus(); }}>{suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
+      {turnCursor && <button type="button" className="ai-inline-action" disabled={locked} onClick={() => void loadMore('turns')}>读取更早的问答</button>}
       {turns.map((turn, index) => <section className="ai-turn" key={turn.id} aria-label={`问题 ${index + 1}`}>
-        <div className="ai-question"><span className="ai-speaker">你的问题</span><p>{turn.question}</p><TurnMaterial turn={turn} /></div>
+        <div className="ai-question"><span className="ai-speaker">你的问题{turn.summaryOnly ? ' · 历史摘要' : ''}</span><p>{turn.question}</p>{!turn.summaryOnly && <TurnMaterial turn={turn} />}</div>
         <div className="ai-response"><div className="ai-response-label"><span>AI 解读</span>{turn.status !== 'complete' && <span className="ai-turn-state">{turn.status === 'running' ? '生成中' : turn.status === 'interrupted' ? '未完成' : '出错'}</span>}</div>
           <AnswerIdentity turn={turn} />
           {turn.context?.fallback?.reason === 'subscription_quota' && <p className="ai-fallback-notice">订阅或应用额度已达上限 · 本轮由 API 回答</p>}
           {turn.answer ? <Answer turn={turn} /> : <p className="ai-empty-answer">{turn.status === 'running' ? '正在阅读文章上下文…' : '这轮还没有可显示的回答。问题已保留。'}</p>}
-          <PreviousAnswer turn={turn} /><Sources sources={turn.sources} turnId={turn.id} />
-          {turn.answer && <button type="button" className="ai-inline-action ai-copy" onClick={() => void copy(turn.answer)}>复制{turn.status === 'complete' ? '回答' : '已有内容'}</button>}
+          {turn.summaryOnly ? <button type="button" className="ai-inline-action" disabled={locked} onClick={() => void readTurn(turn.id)}>读取完整问答与 {turn.sourceCount ?? 0} 条依据</button> : <><PreviousAnswer turn={turn} /><Sources sources={turn.sources} turnId={turn.id} /></>}
+          {turn.answer && !turn.summaryOnly && <button type="button" className="ai-inline-action ai-copy" onClick={() => void copy(turn.answer)}>复制{turn.status === 'complete' ? '回答' : '已有内容'}</button>}
         </div>
       </section>)}
       {sending && <p className="ai-progress" role="status"><span aria-hidden="true" />{phase || '正在生成'}</p>}
@@ -432,7 +497,7 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     {copyText !== undefined && <Dialog title="手动复制回答" onClose={() => setCopyText(undefined)}><p>浏览器自动复制不可用。选中下方文字后使用 Ctrl+C 或系统复制。</p><textarea className="ai-copy-fallback" aria-label="回答完整内容" readOnly value={copyText} rows={12} onFocus={event => event.currentTarget.select()} /><button className="secondary-action" onClick={event => { const area = event.currentTarget.parentElement?.querySelector('textarea'); area?.focus(); area?.select(); }}>选中全部内容</button></Dialog>}
     {materialOpen && <Dialog title="本次提问资料" className="ai-material-dialog ai-small-dialog" onClose={() => setMaterialOpen(false)}>
       <p className="ai-guide-title">{guide.metadata.title}<span>导读 r{guide.metadata.revision} · {unit.heading ?? '阅读起点'}</span></p>
-      <dl className="ai-material-list"><div><dt>随问题发送</dt><dd>{fullGuide ? '本篇完整导读' : '导读开篇与提问章节（全文超出长度限制）'}、来源与覆盖说明，以及最多 6 轮近期对话。</dd></div><div><dt>不包含</dt><dd>原论文全文、个人笔记、探索记录和阅读历史。</dd></div></dl>
+      <dl className="ai-material-list"><div><dt>随问题发送</dt><dd>本篇导读（按本轮预算可能仅发送开篇与提问章节，必要时为节选）、来源与覆盖说明，以及预算内最多 6 轮近期对话。精确范围保存在每轮「提问时的资料」中。</dd></div><div><dt>按需取证</dt><dd>提问后可检索已明确导入的固定原文文本，来源区分导读、原文与网页摘录；未取得或未核验的部分会保留缺口。</dd></div><div><dt>不包含</dt><dd>个人笔记、探索记录和阅读历史；不会自动下载原论文。</dd></div></dl>
       {questionSelection && <section className="ai-selected-material"><h3>附带选文</h3><blockquote>{questionSelection}</blockquote><button type="button" className="ai-inline-action" disabled={locked} onClick={() => setMaterial({ unitId: unit.id })}>不附带选文</button></section>}
       <p className="ai-fine-print">AI 可以继续查找本地书库与相关导读章节。改变阅读位置不会替换正在编辑或已发出问题的资料。</p>
       {status?.provider === 'chatgpt' && status.apiConfigured && status.chatgpt.fallbackToApi && <p className="ai-fine-print">订阅或此应用额度用尽时，同一问题与资料会转交已配置的备用 API，可能产生 API 费用。</p>}
@@ -441,14 +506,17 @@ function AiPanelContent({ guide, unitId, selection, onClose }: { guide: Guide; u
     {historyOpen && <Dialog title="历史对话" className="ai-history-dialog ai-small-dialog" busy={busy} onClose={() => setHistoryOpen(false)}><p className="ai-dialog-intro">这篇导读的讨论 · r{guide.metadata.revision}</p>
       {error && <p className="ai-error" role="alert">{error}</p>}{notice && <p className="ai-notice" role="status">{notice}</p>}
       <div className="ai-history-list">{conversations.length ? conversations.map(item => <button key={item.id} type="button" aria-current={conversationId === item.id ? 'true' : undefined} disabled={locked || connecting || !status || Boolean(connectionError)} onClick={async () => { if (await chooseConversation(item.id)) setHistoryOpen(false); }}><span>{item.title}</span><time>{timeLabel(item.updatedAt)}</time></button>) : <p>还没有保存的对话。</p>}</div>
+      {conversationCursor && <button type="button" className="ai-inline-action" disabled={locked} onClick={() => void loadMore('conversations')}>读取更多对话</button>}
       <div className="ai-history-actions"><button type="button" className="ai-inline-action" disabled={locked || !status} onClick={() => void refresh()}>刷新对话</button><button type="button" className="ai-inline-action ai-danger" disabled={locked || !conversationId || hasRunning} onClick={() => { setDeleteOpen(true); setError(''); }}>删除当前对话…</button><button type="button" className="ai-inline-action" disabled={locked} onClick={() => { setBackupOpen(true); setError(''); setNotice(''); }}>备份与恢复</button></div>
       <p className="ai-fine-print">对话保存在本机服务，与浏览器笔记分别保存。</p>
     </Dialog>}
     {backupOpen && <Dialog title="AI 对话备份" busy={busy} onClose={() => { setBackupOpen(false); setImportPreview(undefined); }} className="ai-backup-dialog ai-small-dialog"><p className="ai-dialog-intro">导出或恢复全部文章的 AI 对话。</p><p className="ai-fine-print">包含提问、回答与引用，可能有私人文字，请妥善保管。浏览器笔记与连接授权不在此备份中。</p>
       {error && <p className="ai-error" role="alert">{error}</p>}{notice && <p className="ai-notice" role="status">{notice}</p>}
-      <div className="ai-backup-actions"><button className="primary-action" disabled={busy || !status || Boolean(connectionError)} onClick={() => void exportAll()}>导出全部 AI 对话</button><button className="secondary-action" disabled={busy || !status || Boolean(connectionError)} onClick={() => fileInput.current?.click()}>选择备份文件…</button></div><p className="ai-fine-print">JSON 文件，最大 16 MiB。导入前可预览，不会重新请求模型。</p>
-      <input className="ai-visually-hidden" ref={fileInput} type="file" accept=".json,application/json" aria-label="选择 AI 对话备份" onChange={event => { void previewFile(event.target.files?.[0]); event.target.value = ''; }} />
-      {importPreview && <section className="ai-import-preview"><h3>导入前检查</h3><p>{importPreview.conversationCount ?? '无法识别'} 段对话，{importPreview.turnCount ?? '无法识别'} 轮问答 · {(importPreview.bytes / 1024).toFixed(1)} KiB</p><p>已有相同对话或问答时，整份文件不会导入。请保留备份并核对现有对话。</p><details><summary>查看完整导入内容</summary><textarea readOnly aria-label="AI 备份完整预览" rows={10} value={importPreview.text} /></details><div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void importAll()}>确认导入 AI 备份</button><button className="secondary-action" disabled={busy} onClick={() => setImportPreview(undefined)}>取消</button></div></section>}
+      <div className="ai-backup-actions"><button className="primary-action" disabled={busy || !status || Boolean(connectionError)} onClick={() => void exportAll()}>导出全部 AI 对话</button><button className="secondary-action" disabled={busy || !status || Boolean(connectionError)} onClick={() => fileInput.current?.click()}>选择备份文件…</button></div><p className="ai-fine-print">新版 NDJSON 分块校验备份；兼容旧 JSON（16 MiB 内）。大备份直接写入所选文件，导入前完整校验，不会请求模型。原文材料需另行备份。</p>
+      {status?.storage?.nearCapacity && <p className="ai-error">AI 记录接近运行容量，请先备份再整理旧对话。</p>}
+      {busy && <button type="button" onClick={() => { transfer.current?.abort(); setNotice('已请求取消；已提交的恢复以重新读取的记录为准。'); }}>取消文件操作</button>}
+      <input className="ai-visually-hidden" ref={fileInput} type="file" accept=".json,.ndjson,application/json,application/x-ndjson" aria-label="选择 AI 对话备份" onChange={event => { void previewFile(event.target.files?.[0]); event.target.value = ''; }} />
+      {importPreview && <section className="ai-import-preview"><h3>导入前检查</h3><p>{importPreview.conversationCount} 段对话，{importPreview.turnCount} 轮问答 · {(importPreview.bytes / 1024).toFixed(1)} KiB · 格式 v{importPreview.schemaVersion}</p><p>完整文件及引用已在本机服务校验。已有相同对话或问答时，整份文件不会导入。请保留备份并核对现有对话。</p><div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void importAll()}>确认导入 AI 备份</button><button className="secondary-action" disabled={busy} onClick={() => setImportPreview(undefined)}>取消</button></div></section>}
     </Dialog>}
   </aside>;
 }

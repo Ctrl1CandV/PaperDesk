@@ -11,7 +11,7 @@ import './exploration.css';
 export function AddEvidenceDialog({ evidence, onClose, onSaved }: {
   evidence: GuideEvidence; onClose: () => void; onSaved?: (record: Exploration) => void;
 }) {
-  const { records, loading, error } = useExplorations();
+  const { records, loading, error, hasMore, loadMore } = useExplorations();
   const draftKey = `exploration:from-reading:${evidence.target.guideId}/${evidence.target.revision}/${evidence.target.unitId}:${evidence.text}`;
   const attachmentKey = `${draftKey}:attachment`;
   const [selected, setSelected] = useState<Exploration | null>(() => getDraft<{selected: Exploration | null}>(attachmentKey)?.selected ?? null);
@@ -28,6 +28,7 @@ export function AddEvidenceDialog({ evidence, onClose, onSaved }: {
     <label className="exploration-destination">保存到<select aria-label="保存到哪个探索" value={selected?.id ?? ''} onChange={event => { const next = records.find(record => record.id === event.target.value) ?? null; setSelected(next); keepDraft(attachmentKey, { selected: next, comment }); state.clearError(); }} disabled={loading || busy}>
       <option value="">创建新探索</option>{records.map(record => <option key={record.id} value={record.id}>{record.title} · {statusLabels[record.status]}</option>)}
     </select></label>
+    {hasMore && <button className="text-action" disabled={loading || busy} onClick={() => void loadMore()}>载入更多可选探索</button>}
     {error && <p className="exploration-missing" role="alert">暂时不能读取已有探索。仍可写下问题；保存失败时会保留草稿。</p>}
     {selected ? <form className="exploration-form" onSubmit={event => { event.preventDefault(); void state.save({ ...selected, evidence: [...selected.evidence, { ...evidence, ...(comment ? { comment } : {}) }] }, selected.recordRevision); }}>
       <fieldset className="exploration-form-body" disabled={state.busy}>

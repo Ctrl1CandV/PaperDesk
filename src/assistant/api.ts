@@ -4,6 +4,7 @@ export interface ChatGptAvailability {
   checkedAt: string | null; model: string | null; checking: boolean; lastError: string | null;
 }
 export interface AiStatus {
+  storage?: { bytes: number; reservedBytes: number; capacityBytes: number; nearCapacity: boolean; conversations: number; turns: number };
   configured: boolean; model: string | null; searchAvailable: boolean; csrfToken: string;
   provider: AiProvider; apiConfigured: boolean;
   chatgpt: { connected: boolean; loginPending: boolean; needsLogin: boolean; fallbackToApi: boolean; availability: ChatGptAvailability; error?: string };
@@ -22,8 +23,12 @@ export interface ChatGptModels {
 }
 export interface AiConversation { id: string; title: string; guideId: string; revision: number; updatedAt: string }
 export interface AiSource {
-  id: string; kind: 'guide' | 'web'; title: string; url?: string;
+  id: string; kind: 'guide' | 'web' | 'original'; title: string; url?: string;
   guideId?: string; revision?: number; unitId?: string; text: string; version?: string | null;
+  paperId?: string; sourceRevisionId?: string; materialSha256?: string; parserRevision?: string; sourceUnitId?: string;
+  locator?: { label: string; physicalPage: number | null; printedPageLabel: string | null; anchor: string | null };
+  readRanges?: { start: number; end: number; total: number }[];
+  gaps?: string[]; verification?: 'unreviewed' | 'text-checked' | 'visually-checked';
 }
 export interface AiContext {
   provider?: AiProvider;
@@ -38,8 +43,11 @@ export interface AiTurn {
   id: string; question: string; answer: string;
   status: 'running' | 'complete' | 'interrupted' | 'error';
   sources: AiSource[]; context: AiContext | null; createdAt: string;
+  summaryOnly?: boolean; sourceCount?: number;
 }
-export interface AiConversationDetail { conversation: AiConversation; turns: AiTurn[] }
+export interface AiConversationDetail { conversation: AiConversation; turns: AiTurn[]; nextCursor?: string | null }
+export interface AiBackupPreview { counts: { conversations: number; turns: number }; schemaVersion: number; exportedAt: string }
+export interface AiMaterialView { text: string; title: string; locator: NonNullable<AiSource['locator']>; gaps: string[]; verification: NonNullable<AiSource['verification']> }
 export interface AskInput {
   requestId: string; conversationId?: string; guideId: string; revision: number;
   bodySha256: string; unitId: string; selection?: string; question: string; webSearch: boolean;
@@ -112,6 +120,18 @@ export function aiClient(token: string) {
     if (response.status === 204) return undefined as T;
     return response.json();
   }
+  async function transferFile(file: File, signal?: AbortSignal, preview = false): Promise<AiBackupPreview | { counts: AiBackupPreview['counts'] }> {
+    const prefix = await file.slice(0, 4096).text();
+    let manifest: { type?: string } | null = null;
+    try { manifest = JSON.parse(prefix.split('\n', 1)[0]); } catch { /* Legacy JSON is checked below. */ }
+    if (manifest?.type === 'manifest') {
+      return request(`/import/stream${preview ? '?preview=1' : ''}`, { method: 'POST', signal, headers: { 'content-type': 'application/x-ndjson' }, body: file });
+    }
+    if (file.size > 16 * 1024 * 1024) throw new AiApiError('旧 JSON 备份最多 16 MiB；大型记录库请使用新版 NDJSON 分块备份。');
+    let value: unknown;
+    try { value = JSON.parse(await file.text()); } catch { throw new AiApiError('备份不是有效的 JSON 或 NDJSON 文件。'); }
+    return request(`/import${preview ? '?preview=1' : ''}`, { method: 'POST', signal, headers: { 'content-type': 'application/json' }, body: JSON.stringify(value) });
+  }
   return {
     settings: (signal?: AbortSignal) => request<AiSettings>('/settings', { signal }).then(settingsDefaults),
     saveApiSettings: (input: { revision: string; baseURL: string; modelId: string; apiKey?: string }) => request<AiSettingsResult>('/settings/api', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) }).then(settingsResultDefaults),
@@ -124,10 +144,35 @@ export function aiClient(token: string) {
     cancelChatGpt: () => request<unknown>('/chatgpt/cancel', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }),
     disconnectChatGpt: () => request<AiStatus>('/chatgpt/disconnect', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then(statusDefaults),
     provider: (provider: AiProvider) => request<AiStatus>('/provider', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ provider }) }).then(statusDefaults),
-    conversations: (guideId: string, revision: number, signal?: AbortSignal) => request<{ conversations: AiConversation[] }>(`/conversations?${new URLSearchParams({ guideId, revision: String(revision) })}`, { signal }),
-    conversation: (id: string, signal?: AbortSignal) => request<AiConversationDetail>(`/conversations/${encodeURIComponent(id)}`, { signal }),
+    conversations: (guideId: string, revision: number, signal?: AbortSignal, cursor?: string) => request<{ conversations: AiConversation[]; nextCursor?: string | null }>(`/conversations?${new URLSearchParams({ guideId, revision: String(revision), ...(cursor ? { cursor } : {}) })}`, { signal }),
+    conversation: (id: string, signal?: AbortSignal, cursor?: string) => request<AiConversationDetail>(`/conversations/${encodeURIComponent(id)}?summary=1${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`, { signal }),
+    turn: (id: string, signal?: AbortSignal) => request<{ turn: AiTurn }>(`/turns/${encodeURIComponent(id)}`, { signal }),
+    material: (source: AiSource, signal?: AbortSignal) => request<AiMaterialView>(`/materials/${encodeURIComponent(source.sourceRevisionId ?? '')}/${encodeURIComponent(source.parserRevision ?? '')}/${encodeURIComponent(source.sourceUnitId ?? '')}`, { signal }),
     remove: (id: string) => request(`/conversations/${encodeURIComponent(id)}`, { method: 'DELETE' }),
     export: () => request<unknown>('/export'),
+    previewBackupFile: (file: File, signal?: AbortSignal) => transferFile(file, signal, true) as Promise<AiBackupPreview>,
+    importFile: (file: File, signal?: AbortSignal) => transferFile(file, signal),
+    async exportFile(signal?: AbortSignal): Promise<Blob | null> {
+      // A native save stream keeps a large backup out of JS memory. The bounded
+      // fallback is for browsers without the local File System Access API.
+      const picker = (window as unknown as { showSaveFilePicker?: (options: unknown) => Promise<{ createWritable(): Promise<WritableStream<Uint8Array>> }> }).showSaveFilePicker;
+      const handle = picker ? await picker.call(window, { suggestedName: 'paperdesk-ai-backup-v3.ndjson', types: [{ description: 'AI 对话分块备份', accept: { 'application/x-ndjson': ['.ndjson'] } }] }) : null;
+      const response = await fetch(`${ROOT}/export/stream`, { signal, cache: 'no-store', headers: { 'x-paperdesk-token': token } });
+      if (!response.ok) return responseError(response);
+      if (!response.body) throw new AiApiError('浏览器未提供备份数据流。');
+      if (handle) { await response.body.pipeTo(await handle.createWritable(), { signal }); return null; }
+      const reader = response.body.getReader(), chunks: Uint8Array<ArrayBuffer>[] = [];
+      let size = 0;
+      try {
+        while (true) {
+          const { value, done } = await reader.read(); if (done) break;
+          size += value.byteLength;
+          if (size > 32 * 1024 * 1024) throw new AiApiError('大型备份需要支持直接保存文件的浏览器，请在桌面 Chrome 或 Edge 中导出。');
+          chunks.push(new Uint8Array(value));
+        }
+      } finally { await reader.cancel(); reader.releaseLock(); }
+      return new Blob(chunks, { type: 'application/x-ndjson' });
+    },
     import: (backup: unknown) => request<{ counts?: unknown; imported?: number }>('/import', {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(backup),
     }),

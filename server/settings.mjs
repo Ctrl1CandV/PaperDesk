@@ -6,7 +6,7 @@ import { normalizeConfig } from './config.mjs';
 import { object, PublicError } from './validation.mjs';
 import { validReasoningEffort } from './reasoning.mjs';
 
-const keys = ['baseURL', 'apiKey', 'modelId', 'chatgptModelId', 'chatgptReasoningEffort', 'chatgptFallbackToApi', 'toolsEnabled', 'maxOutputTokens', 'timeoutMs', 'search'];
+const keys = ['baseURL', 'apiKey', 'modelId', 'chatgptModelId', 'chatgptReasoningEffort', 'chatgptFallbackToApi', 'toolsEnabled', 'maxOutputTokens', 'contextTokenLimit', 'storageCapacityMiB', 'minimumFreeMiB', 'timeoutMs', 'search'];
 const fingerprint = text => createHash('sha256').update(text).digest('hex');
 
 // The browser can replace a credential, but can never retrieve one. Only the

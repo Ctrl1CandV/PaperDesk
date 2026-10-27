@@ -3,6 +3,10 @@ import { isSafeExternalUrl } from '../../scripts/content-policy.mjs';
 import type { PersonalBackup, StoreName } from './types';
 
 export const MAX_BACKUP_BYTES = 5 * 1024 * 1024;
+export const MAX_PERSONAL_BYTES = 512 * 1024 * 1024;
+export const MAX_RECORD_BYTES = 8 * 1024 * 1024;
+export const MAX_PERSONAL_RECORDS = 250_000;
+export const byteLength = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).byteLength;
 type Rule = { $ref?: string; anyOf?: Rule[]; const?: unknown; enum?: unknown[]; type?: string; required?: string[]; properties?: Record<string, Rule>; additionalProperties?: boolean; items?: Rule; maxItems?: number; minLength?: number; maxLength?: number; pattern?: string; minimum?: number; maximum?: number };
 const definitions = schema.$defs as Record<string, Rule>;
 const ruleNames: Record<StoreName | 'preferences', string> = { notes: 'note', explorations: 'exploration', resume: 'resume', guideStates: 'guideState', originalStates: 'originalState', preferences: 'preferences' };
@@ -72,6 +76,7 @@ function semantic(value: unknown, path: string): void {
 
 export function validateRecord(store: StoreName | 'preferences', value: unknown): void {
   check(definitions[ruleNames[store]], value, store); semantic(value, store);
+  if (byteLength(value) > MAX_RECORD_BYTES) fail(store, '单条记录超过 8 MiB 限制');
 }
 export function guideKey(guideId: string, revision: number) { return `${guideId}/${revision}`; }
 export function originalKey(sourceId: string, version: string | null) { return JSON.stringify([sourceId, version]); }

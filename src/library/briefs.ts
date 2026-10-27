@@ -1,5 +1,5 @@
 import data from '../../content/library-briefs.json';
-import type { GuideMetadata } from '../content/types';
+import type { GuideSummary } from '../content/types';
 
 type LibraryBrief = {
   guideId: string;
@@ -16,7 +16,7 @@ const briefs: LibraryBrief[] = data.entries;
 
 // A brief describes one approved revision; a newly imported guide must never
 // inherit prose, chapter labels or dates from a different revision.
-export function libraryBrief(metadata: GuideMetadata): LibraryBrief {
+export function libraryBrief(metadata: GuideSummary['metadata']): LibraryBrief {
   return briefs.find(brief => brief.guideId === metadata.id && brief.guideRevision === metadata.revision) ?? {
     guideId: metadata.id,
     guideRevision: metadata.revision,

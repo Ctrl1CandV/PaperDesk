@@ -156,9 +156,9 @@ test('restored packet choices wait for delayed notes before question changes can
   await page.keyboard.press('Escape');
   await page.evaluate(async () => {
     const { personalStore } = await import('/src/records/store.ts');
-    const original = personalStore.list.bind(personalStore);
+    const original = personalStore.listPage.bind(personalStore);
     const releases: (() => Promise<void>)[] = [];
-    personalStore.list = (name: string) => name === 'notes' ? new Promise(resolve => { releases.push(async () => resolve(await original('notes'))); }) : original(name);
+    personalStore.listPage = (name: string, options: unknown) => name === 'notes' ? new Promise(resolve => { releases.push(async () => resolve(await original('notes', options))); }) : original(name, options);
     (window as any).syntheticReleasePacketNotes = () => Promise.all(releases.map(release => release()));
   });
   await page.getByRole('button', { name: '复制上下文', exact: true }).click();

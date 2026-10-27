@@ -3,13 +3,16 @@ import { object, PublicError } from './validation.mjs';
 import { validReasoningEffort } from './reasoning.mjs';
 
 export function normalizeConfig(input = {}) {
-  object(input, [], ['baseURL', 'apiKey', 'modelId', 'chatgptModelId', 'chatgptReasoningEffort', 'chatgptFallbackToApi', 'toolsEnabled', 'maxOutputTokens', 'timeoutMs', 'search']);
-  const config = { baseURL: '', apiKey: '', modelId: '', chatgptModelId: '', chatgptReasoningEffort: '', chatgptFallbackToApi: true, toolsEnabled: true, maxOutputTokens: 3000, timeoutMs: 120000, search: { apiKey: '' }, ...input };
+  object(input, [], ['baseURL', 'apiKey', 'modelId', 'chatgptModelId', 'chatgptReasoningEffort', 'chatgptFallbackToApi', 'toolsEnabled', 'maxOutputTokens', 'contextTokenLimit', 'storageCapacityMiB', 'minimumFreeMiB', 'timeoutMs', 'search']);
+  const config = { baseURL: '', apiKey: '', modelId: '', chatgptModelId: '', chatgptReasoningEffort: '', chatgptFallbackToApi: true, toolsEnabled: true, maxOutputTokens: 3000, contextTokenLimit: 32768, storageCapacityMiB: 512, minimumFreeMiB: 32, timeoutMs: 120000, search: { apiKey: '' }, ...input };
   object(config.search, [], ['apiKey']);
   config.search = { apiKey: '', ...config.search };
   for (const key of ['baseURL', 'apiKey', 'modelId', 'chatgptModelId']) if (typeof config[key] !== 'string' || config[key].length > (key === 'apiKey' ? 4096 : 200) || /[\r\n]/.test(config[key])) throw new PublicError('AI 后端配置格式无效。', 503);
   if (typeof config.search.apiKey !== 'string' || config.search.apiKey.length > 4096 || /[\r\n]/.test(config.search.apiKey)
     || !validReasoningEffort(config.chatgptReasoningEffort) || typeof config.toolsEnabled !== 'boolean' || typeof config.chatgptFallbackToApi !== 'boolean' || !Number.isInteger(config.maxOutputTokens) || config.maxOutputTokens < 128 || config.maxOutputTokens > 8192
+    || !Number.isSafeInteger(config.contextTokenLimit) || config.contextTokenLimit < 8192 || config.contextTokenLimit > 1048576
+    || !Number.isSafeInteger(config.storageCapacityMiB) || config.storageCapacityMiB < 256 || config.storageCapacityMiB > 16384
+    || !Number.isSafeInteger(config.minimumFreeMiB) || config.minimumFreeMiB < 32 || config.minimumFreeMiB > 16384
     || !Number.isInteger(config.timeoutMs) || config.timeoutMs < 1000 || config.timeoutMs > 180000) throw new PublicError('AI 后端配置格式无效。', 503);
   if (config.baseURL) {
     let url;

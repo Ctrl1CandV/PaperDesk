@@ -1,0 +1,77 @@
+{
+  "exampleOnly": true,
+  "templateVersion": 1,
+  "status": "illustrative-not-a-runtime-schema",
+  "notice": "本例所有论文、ID、页码、主张均为合成示意。不能导入生产库、作为真实证据或被记为核验通过。实现时先定义版本化伴随 schema。",
+  "evidenceId": "synthetic:evidence-001",
+  "guide": {
+    "guideId": "synthetic-guide",
+    "revision": 1,
+    "unitId": "synthetic-unit-01"
+  },
+  "source": {
+    "paperId": "synthetic:paper-001",
+    "sourceRevisionId": "synthetic:source-r1",
+    "materialSha256": null,
+    "originalUrl": null,
+    "acquiredAt": null
+  },
+  "parsing": {
+    "parserRevision": "synthetic:parse-r1",
+    "parserName": null,
+    "parserVersion": null,
+    "configurationSha256": null,
+    "outputSha256": null,
+    "sourceUnitIds": [
+      "synthetic:table-001"
+    ],
+    "status": "not-run"
+  },
+  "claim": {
+    "text": "示意条件下，方法 A 在指标 M 上高于基线 B。",
+    "attribution": "author-reported-result",
+    "conditions": [
+      "相同测试集与数据划分",
+      "相同指标定义、分母和预算"
+    ],
+    "limitations": [
+      "该示例不含任何真实实验结果"
+    ]
+  },
+  "locator": {
+    "type": "pdf",
+    "physicalPage": 4,
+    "printedPageLabel": "3",
+    "label": "示意表 1",
+    "boundingBox": null,
+    "verification": "not-reviewed",
+    "notice": "4 与 3 仅演示物理页和印刷页不同；正式记录必须由真实材料核定。"
+  },
+  "verification": {
+    "visual": {
+      "status": "not-reviewed",
+      "actorType": null,
+      "checkedAt": null,
+      "scope": null
+    },
+    "numeric": {
+      "status": "not-reviewed",
+      "actorType": null,
+      "checkedAt": null,
+      "scope": null
+    },
+    "support": {
+      "status": "unreviewed",
+      "actorType": null,
+      "checkedAt": null,
+      "scope": null
+    }
+  },
+  "provenance": {
+    "authoritativeRecordLocation": "private/reading/manifests/（实现建议，非本例的实际保存位置）",
+    "indexIsDerived": true,
+    "supersedesEvidenceId": null,
+    "manualCorrections": []
+  }
+}
+

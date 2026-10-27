@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "rag-r2-two-token-expansion-checked",
+  "guideId": "rag",
+  "revision": 2,
+  "unitId": "u03",
+  "claim": "固定两篇候选、同一两词元目标序列时，Sequence为w1*a1*b1+w2*a2*b2，Token为(w1*a1+w2*a2)*(w1*b1+w2*b2)；Token有跨文档贡献项。单词元必然结构等价，多词元特殊参数也可能相等。",
+  "conditions": "NeurIPS2020 camera-ready §2.1，PDF物理/印刷第3页。wj为固定检索权重；aj和bj为同一指定目标及其前缀条件下的生成概率。此展开是教学推导，不是新实验；不意味着每词重新检索或Token必然更好。",
+  "attribution": "editorial-explanation",
+  "sourceRevisionId": "rag-neurips2020-pdf",
+  "parserRevision": "5f1e45d27167311f92e6bf83e9243420239e6d07bed06a9b7af09f535300a823",
+  "sourceUnitIds": [
+    "p3-s1"
+  ],
+  "review": {
+    "status": "visually-checked",
+    "reviewerType": "AI",
+    "note": "AI独立查看第3页公式像素并对照解析文本，核求和/乘积次序及单词元分类说明。发现候选“只有一个位置才重合”的过强必要性表述后要求修正，并重新检查r2最终措辞。PDF解析本身仍partial/unreviewed，不以乱码公式作为唯一依据。"
+  }
+}
