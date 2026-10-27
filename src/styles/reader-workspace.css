@@ -1,0 +1,64 @@
+/* Reading workspace: use the window for tools while keeping prose at a readable measure. */
+html { scroll-padding-block:28px 140px; }
+.site-header { background:var(--surface); }
+.brand { font-weight:700; letter-spacing:-.5px; }
+.brand-mark { color:white; background:var(--heading); border-color:var(--heading); border-radius:8px; }
+.brand-mark span { color:#acbce9; }
+.reader-layout { max-width:2280px; grid-template-columns:240px minmax(0,1fr); gap:28px; padding:32px var(--workspace-gutter) 80px; }
+.reading-main { min-width:0; background:var(--surface); padding:28px clamp(28px,2.5vw,52px) 38px; border:1px solid var(--line); border-radius:6px; }
+.reading-main > .prose,.reading-main > .article-topline,.reading-main > .reading-identity,.reading-main > .reading-footer { max-width:52rem; margin-inline:auto; }
+.reading-sidebar { padding-right:0; top:24px; max-height:calc(100dvh - 48px); overflow:auto; }
+.back-link { margin-bottom:22px; color:var(--accent); }
+.toc-heading { padding:0 12px 14px; justify-content:space-between; color:var(--heading); font-size:15px; font-weight:700; }
+.toc-heading span { letter-spacing:0; font-size:12px; }
+.reading-sidebar nav li a { padding:11px 12px; gap:10px; font-size:14px; line-height:1.7; color:var(--muted); border-radius:0 5px 5px 0; }
+.reading-sidebar nav li a[aria-current] { color:var(--accent); font-weight:700; background:var(--surface-selected); }
+.toc-number { min-width:16px; font-family:var(--font-data); font-size:10px; font-weight:400; }
+.sidebar-footer { margin-top:18px; padding:14px 12px 0; }
+.article-topline { min-height:0; margin-bottom:10px; }
+.article-labels { flex-wrap:wrap; gap:8px; font-size:12px; line-height:1.7; letter-spacing:0; }
+.article-labels span+span:before { margin-right:8px; }
+.prose { line-height:1.9; line-break:strict; }
+.prose h1 { font-size:32px; line-height:1.48; letter-spacing:-.65px; font-weight:700; margin-bottom:28px; text-wrap:balance; }
+.prose h2 { font-size:25px; font-weight:700; line-height:1.55; margin-bottom:22px; }
+.prose h3 { font-size:20px; font-weight:700; }
+.prose p { margin-bottom:24px; }
+.prose section+section { margin-top:44px; padding-top:36px; }
+.prose section { scroll-margin-top:28px; }
+.prose strong { font-weight:700; }
+.citation-button { display:inline; font-size:12px; line-height:1.8; padding:2px 5px; margin-inline:2px; border:0; border-radius:4px; background:var(--surface-muted); color:var(--accent); box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+.citation-button:hover { background:var(--surface-selected); }
+.citation-arrow { font-size:10px; margin-left:3px; }
+.reading-footer { margin-top:48px; padding-top:22px; }
+@media(min-width:1200px) {
+  .reader-layout.with-assistant { grid-template-columns:minmax(200px,.82fr) minmax(0,2.45fr) minmax(350px,1.42fr); gap:clamp(22px,1.5vw,38px); }
+  .with-assistant .reader-assistant-slot { position:sticky; top:24px; }
+}
+@media(min-width:1200px) and (max-width:1350px) {
+  .reader-layout.with-assistant { grid-template-columns:190px minmax(0,1fr) 330px; gap:20px; padding-inline:24px; }
+  .reading-main { padding-inline:24px; }
+  .reading-sidebar nav li a { font-size:13px; padding-inline:8px; }
+}
+@media(min-width:1100px) and (max-width:1199px) {
+  .reader-layout.with-assistant { grid-template-columns:minmax(0,1fr) 370px; gap:24px; }
+  .with-assistant .reading-sidebar { display:none; }
+  .with-assistant .desktop-font { display:none; }
+  .assistant-mobile-tools { display:flex; margin:auto; padding:0 28px; }
+  .with-assistant .reader-mobile-back { display:inline-flex; }
+  .reading-main { padding-inline:26px; }
+}
+@media(min-width:801px) and (max-width:1099px) {
+  .reader-layout { grid-template-columns:210px minmax(0,1fr); gap:22px; padding-inline:22px; }
+  .reading-main { padding-inline:28px; }
+  .reading-sidebar nav li a { font-size:13px; padding-inline:8px; }
+}
+@media(max-width:800px) {
+  .reader-layout { display:block; margin:0; padding:0 0 145px; max-width:none; background:var(--surface); }
+  .reading-main { border:0; border-radius:0; padding:24px 22px; }
+  .prose { line-height:1.9; }
+  .prose h1 { font-size:27px; line-height:1.5; }
+  .prose h2 { font-size:23px; line-height:1.6; }
+  .prose h3 { font-size:20px; }
+  .prose section+section { margin-top:34px; padding-top:28px; }
+  .mobile-tools { background:var(--surface); padding-inline:22px; }
+}

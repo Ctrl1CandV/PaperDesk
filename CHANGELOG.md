@@ -1,5 +1,18 @@
 # Changelog
 
+## Project organization and learning entry — 2026-10-27
+
+- Grouped backend HTTP, AI, content and storage modules; separated reusable rules from command entry points and organized checks by type.
+- Kept the existing npm commands, reader routes, runtime data locations and reviewed content identities while splitting the AI presentation and reading styles by responsibility.
+- Added a Chinese source-learning route, separated current contracts and long-term content workflows from completed task materials, and concentrated generated outputs under `.cache/`.
+- Preserved original-material reviews, evidence JSON, prior content revisions, backups and content-recovery boundaries. Verification of this structural change is recorded by its finishing commit and current project state.
+
+## Reading and AI data upgrade — 2026-10-27
+
+- Added incremental storage accounting, paginated reads, compatible backups and on-demand guide bodies while preserving existing records and versions.
+- Added fixed original materials, source-unit retrieval and saved evidence through both AI provider paths; published reviewed r2 samples for StreamingLLM, RAG and the memory survey.
+- Centered display formulas, refined teaching-diagram styling, and matched AI response depth to the question. The completed functional baseline is `a8d97f9`; real-model answer quality remains an observation for deliberate use.
+
 ## Library briefs and venue references — 2026-10-26
 
 - Replaced fragmented reading briefs with complete paper-specific explanations for all fourteen current readings, a single reading-action group and directly available chapter navigation.

@@ -1,0 +1,193 @@
+@media(min-width:1450px) {
+  .reader-layout {
+    max-width:1180px;
+    gap:90px
+  }
+}
+@media(max-width:1050px) and (min-width:801px) {
+  .reader-layout {
+    grid-template-columns:190px minmax(0,1fr);
+    gap:35px;
+    padding-inline:24px
+  }
+  .prose h1 {
+    font-size:30px
+  }
+  nav li a {
+    font-size:12px
+  }
+}
+@media(max-width:800px) {
+  .site-header {
+    height:64px
+  }
+  .header-inner {
+    padding:0 20px
+  }
+  .brand {
+    font-size:18px;
+    gap:8px
+  }
+  .brand-mark {
+    font-size:27px;
+    width:31px;
+    height:33px;
+    line-height:31px
+  }
+  .header-right {
+    font-size:12px;
+    gap:0
+  }
+  .preview-label {
+    display:none
+  }
+  .reading-sidebar,.desktop-font {
+    display:none
+  }
+  .reader-layout {
+    display:block;
+    padding:18px 20px 46px;
+    max-width:720px;
+    margin:0 auto;
+    border:0;
+    border-radius:0
+  }
+  .mobile-tools {
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    align-items:flex-start;
+    border-bottom:1px solid var(--line);
+    padding:0 18px;
+    background:var(--surface-soft)
+  }
+  .mobile-contents {
+    flex:1;
+    min-width:0
+  }
+  .mobile-contents summary {
+    font-size:12px;
+    min-height:48px;
+    align-content:center;
+    color:var(--accent);
+    cursor:pointer
+  }
+  .mobile-contents[open] {
+    padding-bottom:12px
+  }
+  .mobile-contents nav li a {
+    font-size:13px
+  }
+  .mobile-tools .font-controls {
+    height:48px;
+    flex-shrink:0
+  }
+  .mobile-tools .font-controls>span {
+    display:none
+  }
+  .article-topline {
+    margin-bottom:10px;
+    min-height:25px
+  }
+  .article-labels {
+    font-size:10px;
+    gap:10px
+  }
+  .article-labels span+span:before {
+    margin-right:10px
+  }
+  .prose {
+    font-size:calc(var(--reading-size,18px) - 1px);
+    line-height:1.9
+  }
+  .prose h1 {
+    font-size:27px;
+    line-height:1.5;
+    letter-spacing:-.5px;
+    margin-bottom:20px
+  }
+  .prose h2 {
+    font-size:22px;
+    line-height:1.65;
+    margin-bottom:20px
+  }
+  .prose h3 {
+    font-size:19px
+  }
+  .prose p {
+    margin-bottom:22px
+  }
+  .prose section+section {
+    margin-top:32px;
+    padding-top:28px
+  }
+  .prose section {
+    scroll-margin-top:20px
+  }
+  .citation-button {
+    font-size:.81em
+  }
+  .teaching-diagram {
+    margin:25px 0
+  }
+  .teaching-diagram figcaption {
+    padding:12px;
+    gap:8px;
+    font-size:10px
+  }
+  .diagram-scroll {
+    padding-inline:12px
+  }
+  .source-dialog {
+    padding:19px 22px 22px
+  }
+  .source-dialog h2 {
+    font-size:23px;
+    margin:12px 0 20px
+  }
+  .source-locator {
+    font-size:20px
+  }
+  .library-page,.error-page {
+    padding:35px 20px
+  }
+  .library-page>h1 {
+    font-size:29px
+  }
+  .library-intro {
+    font-size:15px
+  }
+  .guide-entry {
+    gap:14px
+  }
+  .guide-entry h2 {
+    font-size:18px
+  }
+  .guide-number {
+    font-size:12px
+  }
+  .guide-entry>span:last-child {
+    display:none
+  }
+  .preview-note {
+    padding:20px
+  }
+  .fixture {
+    padding:20px
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  * {
+    scroll-behavior:auto!important;
+    transition:none!important
+  }
+}
+.prose h1 {
+  text-wrap:balance
+}
+.prose img {
+  display:block;
+  max-width:100%;
+  height:auto;
+  margin:24px auto
+}

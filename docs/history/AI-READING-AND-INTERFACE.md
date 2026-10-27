@@ -1,6 +1,6 @@
 # AI reading and interface implementation records
 
-These milestone records were archived from PROJECT-STATE.md after acceptance of the refined interface on 2026-10-25. Test counts, failures, cache paths and superseded layouts describe their individual stages. Use [current project state](../../PROJECT-STATE.md), [AI reading](../AI-READING.md) and [Operations](../OPERATIONS.md) for the current contract. Local generated evidence is not bundled with this archive.
+These milestone records were archived from PROJECT-STATE.md after acceptance of the refined interface on 2026-10-25. Test counts, failures, cache paths and superseded layouts describe their individual stages. Use [current project state](../development/PROJECT-STATE.md), [AI reading](../development/AI-READING.md) and [Operations](../development/OPERATIONS.md) for the current contract. Local generated evidence is not bundled with this archive.
 
 ## Focused orientation and AI refinement — 2026-10-25
 
@@ -63,7 +63,7 @@ No commit, push or deployment was performed. Live provider stability and real su
 
 ## ChatGPT streamed/final text reconciliation — 2026-10-25
 
-Replaced the subscription adapter's global delta concatenation and prefix-only final check with bounded per-message/per-content accumulation. The former check could reject valid completed responses after interleaved text or finalized wording corrections. Text/refusal/item done events now update their own snapshots, and validated final output controls the displayed answer. Final identities are matched independently of wire order; completed commentary may be omitted, while unfinished missing items, conflicting IDs and type changes remain errors. This implements the relevant behavior from the official Responses contract and openai-node, linked in [AI reading](docs/AI-READING.md#streaming-text-reconciliation).
+Replaced the subscription adapter's global delta concatenation and prefix-only final check with bounded per-message/per-content accumulation. The former check could reject valid completed responses after interleaved text or finalized wording corrections. Text/refusal/item done events now update their own snapshots, and validated final output controls the displayed answer. Final identities are matched independently of wire order; completed commentary may be omitted, while unfinished missing items, conflicting IDs and type changes remain errors. This implements the relevant behavior from the official Responses contract and openai-node, linked in [AI reading](../development/AI-READING.md#streaming-text-reconciliation).
 
 The HTTP layer saves corrected text before emitting `replace`, retains the provider's turn reference, and keeps earlier tool rounds and source snapshots. The page replaces only the answer text. This path makes no extra inference request and does not trigger API fallback; only the existing exact subscription-quota signal can do so. Failed/incomplete/empty responses, interrupted transport, failed checkpoints and budget violations preserve recoverable partial text. Existing interrupted records are not rewritten. A local finalization error cannot establish the amount of subscription usage consumed or imply that usage was refunded.
 
@@ -84,7 +84,7 @@ Implemented targeted repairs for catalog loading, availability checks and author
 
 Thinking uses the model's advertised supported effort subset and sends `reasoning.effort` on every tool round. The backend validates both saves and subsequent questions. Missing capability metadata offers only **模型默认**; older configuration defaults to no override. Credentials, fallback rules, approved content, browser records and conversation backup schemas are unchanged. The short availability check uses the lowest advertised effort, a 60-second total deadline, a 256 KiB transport bound and the existing 256-character visible-answer limit. It preserves specific sanitized failure messages. The stream decoder now accepts CR, LF and CRLF across transport/UTF-8 boundaries, and actual reasoning events produce only a generic progress label. Opaque reasoning remains in memory only.
 
-References and compatibility limits are recorded in [AI reading](docs/AI-READING.md#connection-reliability-and-thinking): official SIWC/Responses documentation, the SIWC DevKit, Codex model metadata and the official openai-node decoder. No third-party credentials or private inference endpoints were introduced.
+References and compatibility limits are recorded in [AI reading](../development/AI-READING.md#connection-reliability-and-thinking): official SIWC/Responses documentation, the SIWC DevKit, Codex model metadata and the official openai-node decoder. No third-party credentials or private inference endpoints were introduced.
 
 Actual checks:
 
@@ -111,7 +111,7 @@ Actual checks for this revision: `npm run build -- --logLevel warn` passed conte
 
 ## Earlier subscription usage entry and API limitation — 2026-10-24
 
-Added **订阅额度** to the connected ChatGPT settings page, with five-hour/weekly remaining labels and a deliberate link to `https://chatgpt.com/settings/usage`. Both values truthfully show **未提供**. The requested live remaining percentages are **not implemented**: the reviewed SIWC documentation and DevKit do not expose a supported numeric-usage source for the project's authorization. The official docs direct applications to Usage and state that the five-hour shared-app limit applies to Plus, not Pro. Codex's usage endpoint uses a separate authorization context; it is not evidence of SIWC compatibility. Sources and integration boundaries are in [AI reading](docs/AI-READING.md#viewing-subscription-usage).
+Added **订阅额度** to the connected ChatGPT settings page, with five-hour/weekly remaining labels and a deliberate link to `https://chatgpt.com/settings/usage`. Both values truthfully show **未提供**. The requested live remaining percentages are **not implemented**: the reviewed SIWC documentation and DevKit do not expose a supported numeric-usage source for the project's authorization. The official docs direct applications to Usage and state that the five-hour shared-app limit applies to Plus, not Pro. Codex's usage endpoint uses a separate authorization context; it is not evidence of SIWC compatibility. Sources and integration boundaries are in [AI reading](../development/AI-READING.md#viewing-subscription-usage).
 
 This change adds only a settings section and styles. It makes no quota requests, reads no account records, stores no usage data, and adds no dependency or provider changes. The link opens a new tab with opener/referrer isolation. `npm run build -- --logLevel warn` passed content validation, TypeScript and bundling with the existing >500 kB warning. Independent read-only source review found no misleading numeric values or added network effects. No tests were added or run, no live balance request was made, and the new section has not received browser or screenshot review; prior test/screenshot counts below are historical and do not verify it.
 
@@ -188,7 +188,7 @@ Actual checks:
 - Actually examined `.cache/ai-connection-ui/desktop-connected.png`, `narrow-connected.png` and `narrow-record-actions.png` at 1440×1000 and simulated 390×844. Connection controls and lower backup actions are accessible, without horizontal overflow or account identity. No physical-phone claim is made.
 - `git diff --check` passed; `git diff --name-only -- content` is empty. API settings were preserved. No commit, push or deployment was performed.
 
-Broader factual-answer quality, real subscription account compatibility, external search and full AI backup/cancellation acceptance remain separate checks. Setup, protocol sources and storage limits are in [AI reading](docs/AI-READING.md).
+Broader factual-answer quality, real subscription account compatibility, external search and full AI backup/cancellation acceptance remain separate checks. Setup, protocol sources and storage limits are in [AI reading](../development/AI-READING.md).
 
 ## Unified startup and live connection check — 2026-10-24
 
@@ -200,7 +200,7 @@ Content validation, TypeScript and production build passed after the launch chan
 
 ## Initial AI reading extension — 2026-10-24
 
-Implemented an optional AI companion in the deep reader, with a docked desktop column and a narrow-screen dialog. It includes question drafts, context disclosure, streamed answers, math rendering, cancellation, history, verified source-reference navigation and separate conversation backup/import/delete controls. BaseURL/API key/Model ID are configured only in ignored `server/config.local.json`; `server/config.example.json` is the portable template. The later unified launcher above replaces the initial two-terminal workflow. See [research, architecture and operation](docs/AI-READING.md).
+Implemented an optional AI companion in the deep reader, with a docked desktop column and a narrow-screen dialog. It includes question drafts, context disclosure, streamed answers, math rendering, cancellation, history, verified source-reference navigation and separate conversation backup/import/delete controls. BaseURL/API key/Model ID are configured only in ignored `server/config.local.json`; `server/config.example.json` is the portable template. The later unified launcher above replaces the initial two-terminal workflow. See [research, architecture and operation](../development/AI-READING.md).
 
 The local Node backend uses validated guide versions and hashes, bounded complete-guide context, library search/section tools and opt-in Tavily web search. New SQLite AI storage is separate from the unchanged IndexedDB v1 personal records. Source/context snapshots, idempotent requests, interrupted runs, capacity reservations and complete AI backups are implemented. The normal browser backup page explicitly excludes AI conversations. This is one local service shared by connected browsers, not per-account isolation or a hosted service.
 
@@ -214,7 +214,7 @@ All approved guide bodies, public attribution, locators, conditions, coverage ga
 
 ## Streaming foundations and complete library review — 2026-10-24
 
-Added StreamingLLM (fixed arXiv v4) and the concept-drift survey (44-page author accepted manuscript, separately verified 2014 publication). All fourteen current guides were reviewed within their declared mainline scope. Existing guide bodies remain unchanged; the new concept-drift metadata selects revision 2 to narrow an overly broad recommendation keyword while retaining revision 1. See [the complete review](docs/research/library-review-2026-10-24.md) for per-paper findings and source-review limits.
+Added StreamingLLM (fixed arXiv v4) and the concept-drift survey (44-page author accepted manuscript, separately verified 2014 publication). All fourteen current guides were reviewed within their declared mainline scope. Existing guide bodies remain unchanged; the new concept-drift metadata selects revision 2 to narrow an overly broad recommendation keyword while retaining revision 1. See [the complete review](../research/library-review-2026-10-24.md) for per-paper findings and source-review limits.
 
 Final checks: unit tests 90 passed / 4 Windows symlink skips / 0 failed; build and typecheck passed; browser tests 73/73 passed; production smoke and six isolated content-update/recovery checkpoints passed. The first browser run exposed a citation-version test assumption and the broad keyword; both were corrected before the final run. All 28 prior non-catalog content files remain byte-identical. The final recovery probe preserved all 34 main content files and complete synthetic records. Dependency audit reported zero known vulnerabilities; the existing >500 kB build warning remains.
 

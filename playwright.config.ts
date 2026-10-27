@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 process.env.PLAYWRIGHT_BROWSERS_PATH = resolve('.cache/playwright');
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e',
   testMatch: '**/*.spec.ts',
   timeout: 45_000,
   expect: { timeout: 10_000 },

@@ -1,5 +1,5 @@
 import schema from '../../schemas/personal-backup.schema.json';
-import { isSafeExternalUrl } from '../../scripts/content-policy.mjs';
+import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
 import type { PersonalBackup, StoreName } from './types';
 
 export const MAX_BACKUP_BYTES = 5 * 1024 * 1024;

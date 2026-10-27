@@ -3,7 +3,8 @@
 /dist/
 /.cache/
 
-# Generated browser evidence; curated images live in docs/images/
+# Legacy browser evidence path; new checks write .cache/screenshots/
+# Curated versioned images remain in docs/images/
 /docs/evidence/*.png
 
 # Local configuration and private records

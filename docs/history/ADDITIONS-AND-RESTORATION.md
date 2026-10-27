@@ -1,4 +1,4 @@
-> Archived milestone. Current instructions: [Operations](../OPERATIONS.md) and [project state](../../PROJECT-STATE.md). Screenshot paths and commands below describe the original run; generated PNGs are not bundled.
+> Archived milestone. Current instructions: [Operations](../development/OPERATIONS.md) and [project state](../development/PROJECT-STATE.md). Screenshot paths and commands below describe the original run; generated PNGs are not bundled.
 
 # Original style restored; three papers added
 
@@ -32,7 +32,7 @@ OpenReview presented a browser challenge; ReAct instead uses the authors' fixed 
 
 The complete package was staged in incoming/agent-foundations and imported with the existing content importer. An initial dry-run caught a missing exact main-PDF citation inventory entry; it was corrected and the package revalidated before applying. Final dry-run/apply added three revision-1 packages (six files) while retaining all six prior guide revisions and existing exploration inputs.
 
-The current library is **one survey plus five papers**, with nine retained guide revisions. The original ten non-catalog content/schema inputs match their previous hashes; the catalog intentionally selects the additions. [evidence/additions-content-integrity.json](../evidence/additions-content-integrity.json) records the comparison and new hashes. Previously approved bodies, citations, attribution, gaps and reading advice were not rewritten. Importing or previewing creates no read/mastered state.
+The current library is **one survey plus five papers**, with nine retained guide revisions. The original ten non-catalog content/schema inputs match their previous hashes; the catalog intentionally selects the additions. [evidence/additions-content-integrity.json](evidence/additions-content-integrity.json) records the comparison and new hashes. Previously approved bodies, citations, attribution, gaps and reading advice were not rewritten. Importing or previewing creates no read/mastered state.
 
 Search still uses titles and reviewed primary topics. Searching Agent returns the Agent survey, ReAct and Reflexion; it does not return InstructGPT merely because of a tangential mention. Local next-reading suggestions can use the added reviewed targets. No automated external discovery, online model or private-record access was added.
 

@@ -1,0 +1,80 @@
+// Production-only smoke check. Run after `npm run build` and `npm run preview`.
+import { resolve } from 'node:path';
+import { mkdir, readFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import catalog from '../../content/catalog.json' with { type: 'json' };
+
+process.env.PLAYWRIGHT_BROWSERS_PATH = resolve('.cache/playwright');
+const { chromium } = await import('playwright');
+const browser = await chromium.launch();
+try {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const errors = [];
+  const external = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('request', request => { if (/^https?:/.test(request.url()) && !request.url().startsWith('http://127.0.0.1:4173/')) external.push(request.url()); });
+  await page.goto('http://127.0.0.1:4173/read/agent-survey/1');
+  await page.locator('.teaching-diagram svg').waitFor();
+  assert.equal(await page.locator('.prose section').count(), 8);
+  assert.equal(await page.locator('h1').textContent(), 'Agent 综述：理解大模型怎样进入环境并持续行动');
+  assert.deepEqual(external, []);
+  assert.deepEqual(errors, []);
+  await mkdir('.cache/screenshots', { recursive: true });
+  await page.screenshot({ path: '.cache/screenshots/v1-production-first.png' });
+  await page.goto('http://127.0.0.1:4173/library');
+  assert.equal(await page.locator('.guide-entry').count(), Object.keys(catalog.currentRevisions).length);
+  assert.equal(await page.locator('#orientation-title').count(), 0);
+  await page.getByRole('searchbox', { name: '查找文章' }).fill('Agent');
+  const agentMatches = await page.locator('.guide-entry').evaluateAll(elements => elements.map(element => element.id));
+  for (const id of ['choose-agent-survey', 'choose-react', 'choose-reflexion']) assert.ok(agentMatches.includes(id));
+  assert.equal(await page.locator('#choose-instructgpt').count(), 0);
+  await page.locator('#choose-agent-survey').click();
+  await page.getByRole('link', { name: '开始导读' }).click();
+  await page.waitForURL(`**/read/agent-survey/${catalog.currentRevisions['agent-survey']}`);
+  await page.locator('.reading-state-trigger').waitFor();
+  await page.goto('http://127.0.0.1:4173/read/instructgpt/1');
+  await page.locator('.teaching-diagram svg').waitFor();
+  assert.equal(await page.locator('.prose section').count(), 7);
+  await page.goto('http://127.0.0.1:4173/read/helm/1');
+  await page.locator('.table-scroll').waitFor();
+  for (const id of Object.keys(catalog.currentRevisions)) {
+    const revision = catalog.currentRevisions[id];
+    const entry = catalog.entries.find(item => item.guideId === id && item.revision === revision);
+    const metadata = JSON.parse(await readFile(`content/${entry.metadataFile}`, 'utf8'));
+    const body = await readFile(resolve('content', entry.metadataFile, '..', metadata.bodyFile), 'utf8');
+    await page.goto(`http://127.0.0.1:4173/library?article=${id}`);
+    assert.ok((await page.locator('#orientation-title').textContent()).includes(metadata.orientation.shortTitle));
+    await page.getByRole('link', { name: '开始导读' }).click();
+    await page.waitForURL(`**/read/${id}/${revision}`);
+    assert.equal(await page.locator('.prose section').count(), metadata.units.length);
+    assert.equal(await page.locator('.prose h1').textContent(), metadata.title);
+    if (/^(?:```|~~~)mermaid/m.test(body)) await page.locator('.teaching-diagram svg').waitFor();
+    assert.equal(await page.locator('.formula-error').count(), 0);
+  }
+  await page.goto('http://127.0.0.1:4173/explore');
+  assert.equal(await page.locator('.exploration-lens-card').count(), 3);
+  await page.getByRole('button', { name: '创建自己的问题' }).click();
+  const create = page.getByRole('dialog');
+  await create.getByLabel('探索标题', { exact: true }).fill('合成生产检查：证据与条件');
+  await create.getByLabel('我想继续追问的问题', { exact: true }).fill('合成测试：保存后能否继续追问？');
+  await create.getByRole('button', { name: '保存探索', exact: true }).click();
+  await page.waitForURL(/\/explore\/questions\//);
+  await page.getByRole('button', { name: '准备探索上下文' }).click();
+  assert.ok(!(await page.getByLabel('完整复制预览', { exact: true }).inputValue()).includes('合成测试：保存后'));
+  await page.getByRole('checkbox', { name: '问题', exact: true }).check();
+  await page.waitForFunction(() => document.querySelector('.packet-preview')?.value.includes('合成测试：保存后'));
+  assert.ok((await page.getByLabel('完整复制预览', { exact: true }).inputValue()).includes('合成测试：保存后'));
+  await page.keyboard.press('Escape');
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '备份', exact: true }).click();
+  await page.locator('.records-counts').waitFor();
+  const explorationCount = page.locator('.records-counts > div').filter({ has: page.locator('dt', { hasText: /^探索$/ }) }).locator('dd');
+  assert.equal(await explorationCount.textContent(), '1');
+  await page.goto('http://127.0.0.1:4173/__fixtures/reader');
+  assert.equal(await page.locator('.fixture').count(), 0);
+  await page.close();
+  assert.deepEqual(external, []); assert.deepEqual(errors, []);
+  console.log(`Production preview PASS: ${Object.keys(catalog.currentRevisions).length} current guides and retained original readers, library, three lenses, explicit exploration save, opt-in packet and backup count; no page/console errors or outbound requests; development fixture absent. Synthetic isolated browser records only.`);
+} finally {
+  await browser.close();
+}

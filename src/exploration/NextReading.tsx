@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { contentRepository } from '../content/repository';
-import { AppLink } from '../navigation';
+import { AppLink } from '../app/navigation';
 import { guideKey, originalKey, personalStore } from '../records/store';
 import type { Exploration, GuideState, NextAction, OriginalState, ReadingStatus } from '../records/types';
 import { clearDraft, getDraft, keepDraft } from '../ui/drafts';

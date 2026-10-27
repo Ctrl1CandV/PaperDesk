@@ -6,9 +6,9 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import type { Citation, Guide } from '../content/types';
 import { contentRepository } from '../content/repository';
-import { AppLink } from '../navigation';
+import { AppLink } from '../app/navigation';
 import { Diagram } from './Diagram';
-import { isSafeExternalUrl } from '../../scripts/content-policy.mjs';
+import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
 
 function textOf(children: ReactNode): string {
   return Children.toArray(children).map(child => typeof child === 'string' || typeof child === 'number' ? String(child) : isValidElement<{ children?: ReactNode }>(child) ? textOf(child.props.children) : '').join('');

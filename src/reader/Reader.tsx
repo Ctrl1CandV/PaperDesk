@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Citation, Guide } from '../content/types';
 import { coverageLabel } from '../content/labels';
-import { AppLink, isHistoryNavigation, isReloadNavigation, libraryReturnPath, navigate } from '../navigation';
+import { AppLink, isHistoryNavigation, isReloadNavigation, libraryReturnPath, navigate } from '../app/navigation';
 import { personalStore, guideKey, originalKey } from '../records/store';
 import type { GuideEvidence, GuideState, OriginalState, ReadingStatus, ResumeRecord } from '../records/types';
 import { NoteEditor } from '../notes/Notes';

@@ -1,0 +1,133 @@
+.teaching-diagram {
+  margin:30px 0 26px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface);
+  overflow:hidden
+}
+.teaching-diagram figcaption {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:14px 18px;
+  border-bottom:1px solid var(--line);
+  font-size:12px;
+  color:var(--muted);
+  background:var(--surface-soft)
+}
+.figure-label {
+  color:var(--accent);
+  font-weight:600
+}
+.diagram-scroll {
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  min-height:195px;
+  padding:26px 20px 20px
+}
+.diagram-scroll>div {
+  width:max-content;
+  min-width:100%
+}
+.diagram-scroll svg {
+  display:block;
+  max-width:none;
+  height:auto;
+  margin-inline:auto
+}
+.diagram-scroll .node rect {
+  rx:8px;
+  ry:8px
+}
+.diagram-scroll .nodeLabel {
+  font-family:"Segoe UI","Microsoft YaHei",sans-serif
+}
+.diagram-loading {
+  font-size:14px;
+  color:var(--muted);
+  padding:30px
+}
+.overflow-hint {
+  font-size:12px!important;
+  line-height:1.6!important;
+  color:var(--muted);
+  margin:8px 16px 10px!important
+}
+.diagram-text {
+  font-size:12px;
+  color:var(--muted);
+  border-top:1px solid var(--line);
+  padding:0 16px
+}
+.diagram-text summary {
+  min-height:44px;
+  align-content:center;
+  cursor:pointer
+}
+.diagram-text pre {
+  white-space:pre-wrap;
+  font:12px/1.9 monospace;
+  overflow-wrap:anywhere;
+  margin:0 0 14px
+}
+.code-block {
+  max-width:100%
+}
+.code-block>code {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere
+}
+.table-wrap {
+  margin:28px 0
+}
+.table-scroll,.formula-scroll {
+  display:block;
+  max-width:100%;
+  overflow:auto;
+  overscroll-behavior-x:contain
+}
+.table-scroll table {
+  border-collapse:collapse;
+  min-width:600px;
+  font-size:.88em;
+  line-height:1.8
+}
+.table-scroll th,.table-scroll td {
+  border:1px solid var(--line);
+  text-align:left;
+  padding:12px 16px
+}
+.table-scroll th {
+  background:var(--surface-muted);
+  font-weight:600
+}
+.formula-scroll {
+  padding:20px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface-soft)
+}
+.formula-block {
+  display:block;
+  margin:24px 0
+}
+.formula-scroll .katex-display {
+  margin:0;
+  width:max-content;
+  min-width:100%;
+  text-align:center
+}
+.formula-scroll .katex-display>.katex {
+  text-align:center
+}
+.formula-error {
+  display:block;
+  border-left:3px solid var(--warning);
+  padding:12px;
+  font-size:14px;
+  background:var(--warning-bg)
+}
+.content-fallback {
+  font-size:.85em;
+  color:var(--muted)
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { contentRepository } from '../content/repository';
-import { AppLink } from '../navigation';
+import { AppLink } from '../app/navigation';
 import { personalStore, ConflictError } from '../records/store';
 import { useRecords } from '../records/hooks';
 import type { GuideTarget, Note, NoteDraft } from '../records/types';

@@ -1,4 +1,4 @@
-> Archived milestone. Current instructions: [Operations](../OPERATIONS.md) and [project state](../../PROJECT-STATE.md). Screenshot paths and commands below describe the original run; generated PNGs are not bundled.
+> Archived milestone. Current instructions: [Operations](../development/OPERATIONS.md) and [project state](../development/PROJECT-STATE.md). Screenshot paths and commands below describe the original run; generated PNGs are not bundled.
 
 # W0/W1 observed checks
 
@@ -36,16 +36,18 @@ Actual Chromium webpage screenshots were opened and inspected, not merely genera
 
 | View | Evidence | Observation |
 |---|---|---|
-| Desktop 1280×900 first screen | [Desktop first](../evidence/w1-desktop-first.png) | Balanced title, readable continuous prose, 220px contents and 720px article. Orientation and substantive text visible. |
-| Desktop diagram | [Desktop diagram](../evidence/w1-desktop-diagram.png) | Labels and directed connections visible; local horizontal scrolling preserves label size. |
-| Desktop lower prose | [Desktop lower](../evidence/w1-desktop-lower.png) | Original-reading recommendations and complete scope paragraph preserved; current contents marker verified. |
-| Desktop source open | [Desktop source](../evidence/w1-desktop-source.png) | Visible keyboard focus, locator, role, version, manual fallback and return/open controls. |
-| Narrow 390×844 first screen | [Narrow first](../evidence/w1-narrow-first.png) | Collapsed contents, title and complete first paragraph; 20px margins, no page overflow. |
-| Narrow diagram | [Narrow diagram](../evidence/w1-narrow-diagram.png) | Readable labels with local scrolling cue; only part of the wide diagram is visible at once. Text flow is separately available. |
-| Narrow lower prose | [Narrow lower](../evidence/w1-narrow-lower.png) | Prose, recommendations and coverage limitations remain continuous and available. |
-| Narrow source open | [Narrow source](../evidence/w1-narrow-source.png) | Dialog fits viewport and all actions remain reachable. |
-| Synthetic technical fixture | [Table](../evidence/w1-synthetic-overflow.png), [formula](../evidence/w1-synthetic-formula.png) | Explicit synthetic label, local keyboard scroll and readable invalid-formula fallback; no whole-page horizontal overflow. |
-| Production preview | [Production first](../evidence/w1-production-first.png) | Built application visually matches the reader and runs under production CSP. |
+| Desktop 1280×900 first screen | `w1-desktop-first.png` | Balanced title, readable continuous prose, 220px contents and 720px article. Orientation and substantive text visible. |
+| Desktop diagram | `w1-desktop-diagram.png` | Labels and directed connections visible; local horizontal scrolling preserves label size. |
+| Desktop lower prose | `w1-desktop-lower.png` | Original-reading recommendations and complete scope paragraph preserved; current contents marker verified. |
+| Desktop source open | `w1-desktop-source.png` | Visible keyboard focus, locator, role, version, manual fallback and return/open controls. |
+| Narrow 390×844 first screen | `w1-narrow-first.png` | Collapsed contents, title and complete first paragraph; 20px margins, no page overflow. |
+| Narrow diagram | `w1-narrow-diagram.png` | Readable labels with local scrolling cue; only part of the wide diagram is visible at once. Text flow is separately available. |
+| Narrow lower prose | `w1-narrow-lower.png` | Prose, recommendations and coverage limitations remain continuous and available. |
+| Narrow source open | `w1-narrow-source.png` | Dialog fits viewport and all actions remain reachable. |
+| Synthetic technical fixture | `w1-synthetic-overflow.png`, `w1-synthetic-formula.png` | Explicit synthetic label, local keyboard scroll and readable invalid-formula fallback; no whole-page horizontal overflow. |
+| Production preview | `w1-production-first.png` | Built application visually matches the reader and runs under production CSP. |
+
+The screenshot names above identify historical generated files. Generated PNGs are not repository assets; current runs write to `.cache/screenshots/`.
 
 ## Failures found and resolved
 

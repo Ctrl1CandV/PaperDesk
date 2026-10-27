@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { contentRepository } from '../content/repository';
 import type { GuideSummary } from '../content/types';
-import { AppLink, navigate } from '../navigation';
+import { AppLink, navigate } from '../app/navigation';
 import { guideKey, personalStore } from '../records/store';
 import type { ResumeRecord } from '../records/types';
 import { libraryBrief, publicationName, sourceVersionLabel } from './briefs';

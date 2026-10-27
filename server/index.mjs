@@ -1,10 +1,10 @@
 import { fileURLToPath } from 'node:url';
 import { loadConfig } from './config.mjs';
-import { ContentIndex } from './content.mjs';
-import { AiStore } from './store.mjs';
-import { createAiServer } from './http.mjs';
-import { AiRuntime } from './ai-runtime.mjs';
-import { createBackendNetwork } from './network.mjs';
+import { ContentIndex } from './content/index.mjs';
+import { AiStore } from './storage/ai-store.mjs';
+import { createAiServer } from './http/server.mjs';
+import { AiRuntime } from './ai/runtime.mjs';
+import { createBackendNetwork } from './http/network.mjs';
 
 let network;
 try {

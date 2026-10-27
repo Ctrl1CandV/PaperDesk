@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AppLink, navigate } from '../navigation';
+import { AppLink, navigate } from '../app/navigation';
 import { useExplorationSeed } from '../content/hooks';
 import { personalStore } from '../records/store';
 import type { Exploration } from '../records/types';

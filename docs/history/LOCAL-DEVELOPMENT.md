@@ -1,4 +1,4 @@
-> Archived milestone. Current instructions: [Operations](../OPERATIONS.md) and [project state](../../PROJECT-STATE.md). Screenshot paths and commands below describe the original run; generated PNGs are not bundled.
+> Archived milestone. Current instructions: [Operations](../development/OPERATIONS.md) and [project state](../development/PROJECT-STATE.md). Screenshot paths and commands below describe the original run; generated PNGs are not bundled.
 
 > Historical W1 record. For the current complete platform and commands, use OPERATIONS.md and DELIVERY.md. W1 was accepted before W2–W6 implementation.
 

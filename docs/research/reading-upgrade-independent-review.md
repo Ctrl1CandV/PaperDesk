@@ -14,7 +14,7 @@
 | `streamingllm.r2.md` | `469102522e3ed9c58d5dfdb182b48bbbbf0e7324a65c86bb7892605d03708237` |
 | `rag.r2.md` | `1fec1582c7131a68d88e4d846a4439608ba8ed96b870e140e0ec3301b494f359` |
 
-原文使用本轮已取得的固定公开材料；本审查者没有另行联网下载，也未访问私人会话库。读取范围是 `.cache/upgrade/originals/` 及 `private/reading/manifests/`、`derived/`。清单记录及每题均包含 sourceRevisionId、materialSha256、parserRevision、sourceUnitId 与准确 locator；完整值保存在 [reading-ai-qa.json](../evidence/reading-ai-qa.json)。
+原文使用本轮已取得的固定公开材料；本审查者没有另行联网下载，也未访问私人会话库。读取范围是 `.cache/upgrade/originals/` 及 `private/reading/manifests/`、`derived/`。清单记录及每题均包含 sourceRevisionId、materialSha256、parserRevision、sourceUnitId 与准确 locator；完整值保存在 [reading-ai-qa.json](qa/reading-ai-qa.json)。
 
 | 材料 | 固定版本与公开出处 | 解析单元 |
 |---|---|---:|

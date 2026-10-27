@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import DOMPurify from 'dompurify';
-import { isSafeDiagram } from '../../scripts/content-policy.mjs';
+import { isSafeDiagram } from '../../shared/content-policy.mjs';
 
 export function Diagram({ source }: { source: string }) {
   const id = `diagram-${useId().replace(/[^a-z0-9]/gi, '')}`;

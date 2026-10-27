@@ -1,12 +1,12 @@
 # PaperDesk
 
-A local platform for survey reading, substantive paper explanations and research exploration. **First version: 0.1.0; product specification: 1.1.** The integrated platform and final library layout have completed reader acceptance.
+本地论文阅读与研究积累平台，支持书架、导读卡、深入阅读、笔记、研究探索和可选 AI 问答。当前版本 **0.1.0**，产品规格 **1.1**；书架包含 **14 篇当前材料、21 个保留修订**。
 
-![PaperDesk library](docs/images/library.png)
+![PaperDesk 书架](docs/images/library.png)
 
-## Run locally
+## 运行
 
-Use Node.js 22.13+ within the supported 22.x line, or Node.js 24+. Verified with Node 22.23.3 and npm 10.9.9.
+使用 Node.js 22.13+（22.x），或 Node.js 24+。已验证的运行时为 Node 22.23.3、npm 10.9.9。
 
 ```text
 npm ci
@@ -14,45 +14,34 @@ npm run build
 npm start
 ```
 
-`npm start` starts the website and local AI service together and opens [PaperDesk](http://127.0.0.1:4173/library). Ctrl+C stops both. For development use `npm run dev`; `npm run preview` serves the build without automatically opening a browser. Keep this origin fixed: browser-owned records belong to the exact host and port. Stop project servers before reinstalling dependencies or starting another instance on Windows.
+`npm start` 同时启动网站和本地 AI 服务，打开 [PaperDesk](http://127.0.0.1:4173/library)；Ctrl+C 一起退出。开发使用 `npm run dev`。保持固定的访问地址，浏览器记录按来源保存；Windows 下重新安装依赖前先停止项目服务。
 
-## Read, explore and accumulate
+阅读、笔记和探索在本地积累。需要 AI 时，在 **AI 设置** 中使用官方 ChatGPT 授权或配置兼容 API；密钥只由后端保存。问答在主动提交后运行，联网查证单独开启。配置、三类备份与内容导入见[运行说明](docs/development/OPERATIONS.md)。
 
-- **Survey guidance:** coherent explanations, navigation, diagrams, citations, coverage gaps and original-reading advice.
-- **Paper reading:** bibliographic orientation before substantive mechanism/evidence explanations, with source locators and return navigation.
-- **Research exploration:** explicit questions, attributed evidence, interpretations, unknowns and next reading actions.
-- **Local accumulation:** notes, genuine resume positions, independent explanation/original reading marks, conflict handling, backup/restore and opt-in context packets. Opening an article never marks it read.
-- **AI reading:** ask questions about the current reviewed guide, inspect answer sources, and optionally search the web. Open **AI 设置** to connect through official ChatGPT login or configure an OpenAI-compatible API; credentials are stored by the local backend. See [AI setup](docs/AI-READING.md).
+## 学习与维护
 
-The library contains **14 current readings: 4 surveys and 10 papers**, with 18 retained guide revisions. Topics connect Transformer architecture, pretraining and in-context learning, instruction learning, chain-of-thought prompting, retrieval, tools, Agent action/reflection, memory, streaming context and concept drift. Start with the LLM survey's optional path or the [memory and dynamic-decision reading route](docs/LEARNING-ROUTE.md).
+从[中文项目导览](docs/learning/README.md)开始，沿着一次导读、一次 AI 问答和一次记录保存阅读代码。
 
-Search matches titles and reviewed primary topics. The unselected library is a centered single-column list; selecting opens adjacent orientation. Narrow screens use list → orientation → reader. Further papers can be researched and added through deliberate assistant-assisted authoring. AI answers and optional web searches run only after an explicit reader question; they do not change reviewed content.
+| 位置 | 职责 |
+|---|---|
+| `src/` | 前端页面、阅读交互和浏览器记录 |
+| `server/` | 本地接口、AI、材料检索和会话存储 |
+| `shared/` | 前后端与命令共用的纯规则 |
+| `content/`、`schemas/` | 已审核内容、全部修订和格式约束 |
+| `scripts/`、`tests/` | 启动、内容维护与合成检查 |
+| `docs/` | 学习入口、当前契约、内容规范、来源核验和历史 |
 
-## Check and maintain
+常用检查：
 
 ```text
 npm run validate:content
 npm test
-npm run typecheck
 npm run build
+npm run test:e2e
 ```
 
-Browser installation, synthetic end-to-end checks, content import/recovery and backups are in [Operations](docs/OPERATIONS.md). Reviewed content is immutable and validated by exact byte hashes; `.gitattributes` preserves those bytes across platforms.
+当前能力见[项目状态](docs/development/PROJECT-STATE.md)，继续开发看[开始说明](docs/development/START-HERE.md)和 [AGENTS](AGENTS.md)，其他材料从[文档索引](docs/README.md)查找。论文选择可参考[记忆与动态决策阅读路线](docs/content/LEARNING-ROUTE.md)，版本记录见 [CHANGELOG](CHANGELOG.md)。
 
-| Location | Purpose |
-|---|---|
-| `src/` | Reader, library, exploration and local record modules |
-| `server/` | Local AI API, optional ChatGPT authorization, retrieval and conversation storage |
-| `content/`, `schemas/` | Reviewed guides, catalog, seeds and validation contracts |
-| `scripts/`, `tests/` | Content maintenance and synthetic checks |
-| `docs/`, `docs/research/` | Operating/product contracts and public-source verification |
-| `docs/history/` | Archived handoff and implementation evidence |
-| `docs/images/`, `docs/evidence/` | Curated UI images and compact verification reports |
+审核内容按不可变修订维护；正文哈希、来源身份与旧引用受到保护。打开文章不会自动标记已读。个人记录、模型凭据、原文材料备份与回滚收据不能作为普通缓存清理，见[隐私](docs/development/PRIVACY.md)和 [Git 规则](docs/development/GIT-POLICY.md)。
 
-See the [documentation index](docs/README.md), [project state](PROJECT-STATE.md), [continuation guide](START-HERE.md), [Git policy](docs/GIT-POLICY.md) and [changelog](CHANGELOG.md).
-
-Dependencies, builds, caches, incoming packages and recovery receipts are ignored. Private notes, backups and credentials are not repository content. Only the generic audience description in [Privacy](docs/PRIVACY.md) is used. Academic attribution remains in each guide; downloaded full-paper PDFs and review tooling are not bundled. No project license grant has been added.
-
-`git clone` provides the maintainable source project, so `tests/`, `scripts/`, schemas and the lockfile are intentional repository files. The tests protect content updates, reading records and backup recovery; they are not sample clutter. After install/build, `node_modules/`, `dist/` and `.cache/` appear locally but remain untracked. The production website is built into `dist/`; test sources and maintenance documents are not part of that web bundle. See [Git policy](docs/GIT-POLICY.md) before cleanup, especially the recovery records that must be retained.
-
-This version runs locally. The AI extension adds deliberate external model requests and optional provider authorization; deployment, a hosted account system, synchronization and cloud provisioning remain outside scope. Physical devices, other browser engines, screen readers and exhaustive paper/experiment verification remain outside the recorded checks; see [project state](PROJECT-STATE.md).
+`node_modules/`、`dist/` 和 `.cache/` 是依赖、构建与开发产物，保持忽略；`private/` 和 `server/config.local.json` 是本地运行数据与配置。部署、同步和云服务仍在当前范围之外。学术归属保留在内容和来源记录中；本项目尚未添加许可证授权。

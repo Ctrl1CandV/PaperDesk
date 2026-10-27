@@ -1,6 +1,6 @@
-import { AppLink } from '../navigation';
+import { AppLink } from '../app/navigation';
 import type { Evidence, GuideTarget } from '../records/types';
-import { isSafeExternalUrl } from '../../scripts/content-policy.mjs';
+import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
 import { targetLabel, targetPath } from './model';
 
 export function ReadingTarget({ target, id }: { target: GuideTarget; id?: string }) {

@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
-import { object, PublicError } from './validation.mjs';
-import { validReasoningEffort } from './reasoning.mjs';
+import { object, PublicError } from './http/validation.mjs';
+import { validReasoningEffort } from './ai/reasoning.mjs';
 
 export function normalizeConfig(input = {}) {
   object(input, [], ['baseURL', 'apiKey', 'modelId', 'chatgptModelId', 'chatgptReasoningEffort', 'chatgptFallbackToApi', 'toolsEnabled', 'maxOutputTokens', 'contextTokenLimit', 'storageCapacityMiB', 'minimumFreeMiB', 'timeoutMs', 'search']);

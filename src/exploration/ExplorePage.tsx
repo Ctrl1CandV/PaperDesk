@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useExplorationSeed } from '../content/hooks';
-import { AppLink, navigate } from '../navigation';
+import { AppLink, navigate } from '../app/navigation';
 import { CreateExplorationDialog } from './ExplorationEditor';
 import { ReadingTarget } from './EvidenceCard';
 import { createExploration, statusLabels, useExplorations } from './model';

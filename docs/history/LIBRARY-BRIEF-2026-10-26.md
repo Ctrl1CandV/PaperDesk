@@ -27,7 +27,7 @@ Six version dates were checked against primary version records:
 
 The label is **原文版本日期**: a v1 submission is not described as a later update. For Toolformer, Reflexion, the LLM survey, Transformer, GPT-3, Chain-of-Thought, RAG and the concept-drift survey, the actual source is a conference PDF, formal journal PDF or author accepted manuscript. No exact update date for those files was established, so no date is invented or borrowed from a different arXiv revision. Existing publication and original-source links remain authoritative. HELM's scope was also checked against the [authors' project explanation](https://crfm.stanford.edu/2022/11/17/helm.html).
 
-The build validates revision targets, complete chapter mappings and matching fixed-version records. It does not certify scholarly accuracy. Editorial briefs are maintained with the application and are not silently imported by the immutable-content importer; see [content updates](../CONTENT-UPDATES.md).
+The build validates revision targets, complete chapter mappings and matching fixed-version records. It does not certify scholarly accuracy. Editorial briefs are maintained with the application and are not silently imported by the immutable-content importer; see [content updates](../content/CONTENT-UPDATES.md).
 
 ## Verification and repairs
 

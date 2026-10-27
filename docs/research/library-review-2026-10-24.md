@@ -2,7 +2,7 @@
 
 The fourteen current guides satisfy the project's stated **mainline** reading contract. No blocking factual or explanatory issue was found in the reviewed scope. This means coherent explanation with source conditions and explicit gaps; it does not mean exhaustive coverage of every original paper, appendix or cited study. All four surveys remain mainline guides, not full-survey replacements.
 
-The two new readings are *Efficient Streaming Language Models with Attention Sinks* and *A Survey on Concept Drift Adaptation*. They develop complementary foundations: bounded computation for a continuing token stream, and adaptation/evaluation when predictive distributions change. Selection and fixed-source evidence are in [StreamingLLM review](streamingllm-review.md), [concept-drift review](concept-drift-survey-review.md) and the [public learning route](../LEARNING-ROUTE.md). The previously prepared [Agent memory survey](agent-memory-survey-review.md) is also included in this source update.
+The two new readings are *Efficient Streaming Language Models with Attention Sinks* and *A Survey on Concept Drift Adaptation*. They develop complementary foundations: bounded computation for a continuing token stream, and adaptation/evaluation when predictive distributions change. Selection and fixed-source evidence are in [StreamingLLM review](streamingllm-review.md), [concept-drift review](concept-drift-survey-review.md) and the [public learning route](../content/LEARNING-ROUTE.md). The previously prepared [Agent memory survey](agent-memory-survey-review.md) is also included in this source update.
 
 ## Scholarly review
 
@@ -53,12 +53,12 @@ The source repository follows its own single-main policy and existing date-prefi
 | `npm run build -- --logLevel warn` | Content validation, TypeScript and production build passed: 18 retained revisions, 153 retained units, 133 unique cited URLs, 3 lenses, 12 pinned targets. Existing >500 kB chunk warning remains. |
 | `npm run test:e2e` | Final 73/73 passed after the two corrections. |
 | `node tests/preview-smoke.mjs` | Final production build passed all 14 current guides, retained original readers and synthetic save/packet/backup flows; no page/console errors or unsolicited outbound requests; development fixture absent. |
-| `node tests/content-update-browser.mjs` | Six final update/rollback/rejection/recovery checkpoints passed; complete synthetic records and all 34 main content files unchanged. See [latest integration evidence](../evidence/content-update-check.json). |
+| `node tests/content-update-browser.mjs` | Six final update/rollback/rejection/recovery checkpoints passed; complete synthetic records and all 34 main content files unchanged. See [latest integration evidence](../history/evidence/content-update-check.json). |
 | `npm audit --json` | Zero reported known vulnerabilities in the current lockfile audit. Dependencies were not changed. |
 | Final production reader-end probe | All 14 current guide endings scroll above the fixed action bar at 390×844, with no horizontal page overflow. |
 | Independent Git-index source export | Installed 258 locked packages and passed validation, typecheck and build; all 34 content files match the working tree, index and export. Offline installation first failed because a tarball was absent from cache and reported Windows cleanup EPERM; `npm ci --no-audit --cache ../../npm` then succeeded with scoped registry access. No source/dependency workaround was needed. |
 
-Actual screenshots examined include both desktop and narrow starting viewports for every current article, the two additions' orientation/details, selected existing formula/diagram/table scroll endpoints, and desktop/narrow library views. Exact filenames are listed in [review evidence](../evidence/library-review-2026-10-24.json). The automated prose check establishes presence of every parsed non-math text segment, not strict paragraph ordering or absence of duplication. Formula counts and error checks do not replace pixel inspection.
+Actual screenshots examined include both desktop and narrow starting viewports for every current article, the two additions' orientation/details, selected existing formula/diagram/table scroll endpoints, and desktop/narrow library views. Exact filenames are listed in [review evidence](../history/evidence/library-review-2026-10-24.json). The automated prose check establishes presence of every parsed non-math text segment, not strict paragraph ordering or absence of duplication. Formula counts and error checks do not replace pixel inspection.
 
 The two curated library/orientation images were refreshed from inspected current screenshots so the documentation images show the same 14/4/10 counts as the catalog.
 

@@ -11,7 +11,7 @@
 | [rag-r2-two-token-expansion-checked.json](rag-r2-two-token-expansion-checked.json) | rag / 2 / u03 | 固定正式版第3页两种边缘化公式与教学展开；单词元充分条件及多词元特殊等价 |
 | [rag-r2-fever-dev-checked.json](rag-r2-fever-dev-checked.json) | rag / 2 / u05 | 第7–8页FEVER开发集消融与解释；不混测试集，不裁定表4与正文数值冲突 |
 
-先按 [运行说明](../../OPERATIONS.md#local-original-papers-and-evidence) 导入相同的固定原文身份，再从项目根目录逐个导入这些 JSON，最后重建索引：
+先按 [运行说明](../../development/OPERATIONS.md#local-original-papers-and-evidence) 导入相同的固定原文身份，再从项目根目录逐个导入这些 JSON，最后重建索引：
 
 ```text
 npm run reading:materials -- evidence --file docs/research/reading-evidence/memory-r2-taxonomy-checked.json
@@ -27,4 +27,4 @@ CLI 使用严格 schema、`validateEvidenceRecord` 和原文单元检查；已�
 
 检索语料为记忆综述 v1 HTML、StreamingLLM v4 HTML、RAG 正式版 PDF，共 618 个单元。另将实际用于视觉核查的记忆综述 v1 PDF 与 StreamingLLM v4 PDF 用独立 source ID 和 `--reference-only` 固定保存；它们不参与文本检索，避免与 HTML 形成重复候选，但其用途仍属于 indexGeneration 身份。已存在的 source ID 不能被改成另一种用途。
 
-材料备份应包含这五份原始文件、其 manifests/derived 和六条已导入的 evidence 记录；索引可重建，原文和核验记录不能随索引清理。AI 会话备份中的引用快照以及浏览器个人记录备份都不能替代这份材料备份。备份/恢复使用新目标目录，具体命令、暂存遗留和验证边界见 [运行说明](../../OPERATIONS.md#back-up-original-materials-separately)。实际页面/图表核验与问答限制见 [独立审查报告](../reading-upgrade-independent-review.md)。
+材料备份应包含这五份原始文件、其 manifests/derived 和六条已导入的 evidence 记录；索引可重建，原文和核验记录不能随索引清理。AI 会话备份中的引用快照以及浏览器个人记录备份都不能替代这份材料备份。备份/恢复使用新目标目录，具体命令、暂存遗留和验证边界见 [运行说明](../../development/OPERATIONS.md#back-up-original-materials-separately)。实际页面/图表核验与问答限制见 [独立审查报告](../reading-upgrade-independent-review.md)。
