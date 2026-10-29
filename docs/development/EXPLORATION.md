@@ -1,5 +1,7 @@
 # Research-direction exploration in v1
 
+The subsequent [research assistant extension](RESEARCH-ASSISTANT.md) adds optional scope, constraints, candidates, deferred directions, source-backed decision history and embedded research documents to the same Exploration. Existing evidence and status meanings remain unchanged. Explicit topic-context permission enables research conversations; complete model proposals require revision-checked adoption. Research artifacts, frozen tasks and receipts use personal archive v3. See [contracts](RESEARCH-CONTRACTS.md).
+
 ## Purpose and public starting material
 
 Exploration is a first-release capability, not a future label. It connects concrete reading questions over time without pretending to select a thesis automatically. The platform can be useful before the reader has a settled direction.

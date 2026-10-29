@@ -1,4 +1,7 @@
+import type { ResearchSnapshot, ResearchProposal } from '../../shared/research-contract.mjs';
+import type { ResearchMaterials } from '../../shared/research-materials.mjs';
 export type AiProvider = 'api' | 'chatgpt';
+export type ConversationScope = { kind: 'guide'; guideId: string; revision: number; bodySha256: string } | { kind: 'exploration'; explorationId: string };
 export interface ChatGptAvailability {
   state: 'unknown' | 'available' | 'quota_exhausted';
   checkedAt: string | null; model: string | null; checking: boolean; lastError: string | null;
@@ -21,7 +24,7 @@ export interface ChatGptModels {
   models: { id: string; name: string; reasoningEfforts?: string[]; defaultReasoningEffort?: string | null }[];
   selectedModelId: string;
 }
-export interface AiConversation { id: string; title: string; guideId: string; revision: number; updatedAt: string }
+export interface AiConversation { id: string; title: string; guideId?: string; revision?: number; conversationScope?: ConversationScope; updatedAt: string }
 export interface AiSource {
   id: string; kind: 'guide' | 'web' | 'original'; title: string; url?: string;
   guideId?: string; revision?: number; unitId?: string; text: string; version?: string | null;
@@ -31,6 +34,10 @@ export interface AiSource {
   gaps?: string[]; verification?: 'unreviewed' | 'text-checked' | 'visually-checked';
 }
 export interface AiContext {
+  researchSnapshot?: ResearchSnapshot;
+  researchProposals?: ResearchProposal[];
+  researchMaterials?: ResearchMaterials;
+  topicHistory?: { explorationId: string; turns: { turnId: string; conversationId: string; question: string; answer: string; createdAt: string; questionTruncated: boolean; answerTruncated: boolean }[]; windowCount: number; omittedCount: number; omittedTurnIds: string[] };
   provider?: AiProvider;
   model?: string | null;
   fallback?: {
@@ -49,8 +56,9 @@ export interface AiConversationDetail { conversation: AiConversation; turns: AiT
 export interface AiBackupPreview { counts: { conversations: number; turns: number }; schemaVersion: number; exportedAt: string }
 export interface AiMaterialView { text: string; title: string; locator: NonNullable<AiSource['locator']>; gaps: string[]; verification: NonNullable<AiSource['verification']> }
 export interface AskInput {
-  requestId: string; conversationId?: string; guideId: string; revision: number;
-  bodySha256: string; unitId: string; selection?: string; question: string; webSearch: boolean;
+  requestId: string; conversationId?: string; guideId?: string; revision?: number;
+  bodySha256?: string; unitId?: string; selection?: string; question: string; webSearch: boolean;
+  conversationScope?: ConversationScope; researchSnapshot?: ResearchSnapshot; researchMaterials?: ResearchMaterials;
 }
 export type AiEvent =
   | { type: 'accepted'; conversationId: string; turnId: string }
@@ -145,6 +153,7 @@ export function aiClient(token: string) {
     disconnectChatGpt: () => request<AiStatus>('/chatgpt/disconnect', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then(statusDefaults),
     provider: (provider: AiProvider) => request<AiStatus>('/provider', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ provider }) }).then(statusDefaults),
     conversations: (guideId: string, revision: number, signal?: AbortSignal, cursor?: string) => request<{ conversations: AiConversation[]; nextCursor?: string | null }>(`/conversations?${new URLSearchParams({ guideId, revision: String(revision), ...(cursor ? { cursor } : {}) })}`, { signal }),
+    researchConversations: (explorationId: string, signal?: AbortSignal, cursor?: string) => request<{ conversations: AiConversation[]; nextCursor?: string | null }>(`/conversations?${new URLSearchParams({ explorationId, ...(cursor ? { cursor } : {}) })}`, { signal }),
     conversation: (id: string, signal?: AbortSignal, cursor?: string) => request<AiConversationDetail>(`/conversations/${encodeURIComponent(id)}?summary=1${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`, { signal }),
     turn: (id: string, signal?: AbortSignal) => request<{ turn: AiTurn }>(`/turns/${encodeURIComponent(id)}`, { signal }),
     material: (source: AiSource, signal?: AbortSignal) => request<AiMaterialView>(`/materials/${encodeURIComponent(source.sourceRevisionId ?? '')}/${encodeURIComponent(source.parserRevision ?? '')}/${encodeURIComponent(source.sourceUnitId ?? '')}`, { signal }),

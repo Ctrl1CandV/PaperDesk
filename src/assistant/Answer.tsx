@@ -9,6 +9,8 @@ import { Dialog } from '../ui/Dialog';
 import { Formula } from '../reader/Markdown';
 import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
 import { getAiStatus, type AiSource, type AiTurn } from './api';
+import { ResearchSnapshotView } from './ResearchProposals';
+import { ResearchMaterialsView } from './ResearchMaterials';
 
 const errorText = (error: unknown) => error instanceof Error && error.message ? error.message : '操作未完成，请保留草稿并重试。';
 
@@ -120,6 +122,9 @@ export function TurnMaterial({ turn }: { turn: AiTurn }) {
   const target = guide && unit ? `/read/${guide.metadata.id}/${guide.metadata.revision}#${unit.id}` : undefined;
   const historyCount = Array.isArray(context?.historyTurnIds) ? context.historyTurnIds.length : undefined;
   return <details className="ai-turn-material"><summary>提问时的资料{unit && <span>{selected ? '选文' : '章节'} · {unit.heading ?? '阅读起点'}</span>}</summary>
+    {context?.researchSnapshot && <details><summary>研究快照 · {context.researchSnapshot.title} · r{context.researchSnapshot.recordRevision}</summary><ResearchSnapshotView snapshot={context.researchSnapshot} /><p className="ai-fine-print">快照摘要：{context.researchSnapshot.snapshotSha256}</p></details>}
+    {context?.researchMaterials && <ResearchMaterialsView materials={context.researchMaterials} />}
+    {context?.topicHistory && <details><summary>带入的主题历史 · {context.topicHistory.turns.length} 条讨论摘要</summary><p>以下用于恢复研究讨论；旧回答不能替代论文证据。</p>{context.topicHistory.turns.map(item => <details key={item.turnId}><summary>{item.question}{item.questionTruncated ? '（问题节选）' : ''}</summary><p>{item.answer}</p>{item.answerTruncated && <p>此回答为预算内节选，可从历史对话回看完整问答。</p>}</details>)}{context.topicHistory.omittedCount > 0 && <p>本次历史窗口另有 {context.topicHistory.omittedCount} 条未纳入，完整历史仍可按主题查找。</p>}</details>}
     {target ? <AppLink to={target}>返回提问位置 · 导读 r{guide!.metadata.revision}</AppLink> : <p>这条记录没有可定位的提问章节；可查看下方保留的来源。</p>}
     {selected && <blockquote>{selected}</blockquote>}
     {context?.scope === 'full-guide' ? <p>本篇完整导读，包含来源与覆盖说明；不含原论文全文。</p> : context?.scope === 'section' ? <p>导读开篇与提问章节的预算内材料，可能为节选；包含来源与覆盖说明，其余文本未随问题发送。</p> : null}

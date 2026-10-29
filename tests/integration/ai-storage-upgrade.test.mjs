@@ -61,7 +61,7 @@ test('synthetic v1 migration preserves identities, fallback, sources and history
   const backup = source.store.export(), file = join(source.directory, 'legacy.sqlite');
   legacyDatabase(file, backup, true);
   const migrated = new AiStore(file);
-  assert.equal(migrated.db.prepare('PRAGMA user_version').get().user_version, 2);
+  assert.equal(migrated.db.prepare('PRAGMA user_version').get().user_version, 3);
   assert.deepEqual(migrated.turn(first.id), first);
   assert.deepEqual(migrated.turn(second.id), { ...second, status: 'interrupted' });
   assert.equal(migrated.usage().reservedBytes, 0);

@@ -2,6 +2,10 @@
 
 PaperDesk 0.1.0 的功能开发已收口，产品规格为 1.1。先从[项目学习导览](../learning/README.md)认识代码，再看[当前状态](PROJECT-STATE.md)。
 
+后续研究助手工作的最新入口是[问题到方向与选文文件的交接](RESEARCH-ASSISTANT-HANDOFF.md)。它明确了已实现基础与尚未实施的新要求，确保接手者通过 Git 获取主要代码、内容和需求说明；无需原始聊天或截图。此轮仅整合远程配色、提交既有实现和整理交接，没有重设计探索界面。
+
+研究助手扩展从[产品与三阶段流程](RESEARCH-ASSISTANT.md)、[数据契约](RESEARCH-CONTRACTS.md)、[第一版检查](RESEARCH-ACCEPTANCE.md)继续。本次优先交付可用版本，工程检查和真实模型使用情况分别记录。
+
 在项目根目录运行：
 
 ```text

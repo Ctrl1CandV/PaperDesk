@@ -2,6 +2,34 @@
 
 PaperDesk 0.1.0，产品规格 1.1。书架、导读、深度阅读、研究探索、笔记与 AI 阅读功能已完成收口，后续围绕实际使用问题维护。
 
+## 最新交接 · 2026-10-29
+
+已快进合并远程 `78324c2` 的暖灰与酒红配色，恢复此前研究助手未提交更新；唯一文本冲突在 `src/assistant/ai.css` 开头，保留远程面板背景和本地研究助手新增样式。此轮只整合、文档交接和提交，没有实施新的探索交互。
+
+最新要求是让读者从局部阅读问题开始，由 AI 在持续讨论中协助形成两类成果：下一轮论文/综述的方向与筛选条件，以及研究方向与研究主线。探索页面仍有价值，但“加入探索”提前展示过多规划字段、需要用户归纳的负担过重。现有主题会话、授权资料和文档出口是基础，尚不等于已解决该需求。详见[完整交接](RESEARCH-ASSISTANT-HANDOFF.md)，后续以此澄清为准。
+
+交接文档覆盖当前能力、具体缺口、代码入口和两类文件的信息要求，接手者通过 Git 更新即可获取主要实现与任务背景。私人记录、AI 历史、原文材料和模型凭据不随仓库同步，但不影响理解与开发本任务。已核对源码相对引用与工作流 hash。
+
+本轮合并后复验：`npm run build -- --logLevel warn` 通过；`node --test --test-reporter=spec tests/unit/research-artifacts.test.mjs tests/integration/research-backend.test.mjs tests/integration/ai-storage-upgrade.test.mjs tests/integration/ai-fallback.test.mjs` 为 **63/63**；`npm run test:e2e -- tests/e2e/research-assistant.spec.ts tests/e2e/research-records.spec.ts tests/e2e/research-workspace.spec.ts --reporter=line` 为 **12/12**。保留已有大 chunk 警告，没有测试失败。已查看新配色下 `.cache/screenshots/research/assistant-desktop.png` 和 `materials-picker-narrow.png`，面板与选择入口可读；窄视口检查仍为模拟，并非真机验证。所有模型请求为模拟，未使用私人记录。下节 404 项 Node 结果是上一轮记录，本轮没有重复全量 Node 检查。
+
+## 研究助手扩展 · 2026-10-29
+
+本次交付三阶段计划的第一版可用实现，终点为“理解论文/综述与授权记录 → 同主题跨会话讨论 → 生成可交接的实施文件”。外部 Harness 执行、技能和插件配置、实验及结果回流不作为本次门槛。测试集中于主流程与保存安全，不要求大型模型评测；见[第一版检查](RESEARCH-ACCEPTANCE.md)。
+
+研究对话现在可主动选择、预览笔记和当前探索的已保存文档，默认不发送。选择固定具体修订；发送前核对修改和删除，变化时保留问题草稿并要求更新或撤销选择。资料快照独立计算摘要，保存在实际问答与 AI 备份中；模型切换和备用 API 使用同一份已选材料。一次最多 8 条笔记、3 份文档、48 KiB，模型总额度仍另行检查；不会静默截断。题内记录与私人笔记始终区别于论文证据。
+
+同主题支持跨论文或无论文接续，未选择旧会话时显示“继续最近研究对话”。新会话可带入最多两条、1600 字节预算内的同主题近期问答摘录，记录截断和遗漏；历史工具改为多关键词、中文分词与双字片段匹配，仍不是语义检索。研究当前状态唯一保存在 IndexedDB，优先于旧讨论。有效决定每轮带入，已替代决定和超出 14000 字节证据预算的条目明确列为未纳入。
+
+探索页“让助手整理实施文件”预填问题，读者发送后才调用模型，已有问题草稿保留。完整回答可保存为研究文档，标题优先使用回答的首个 H1；编辑后的版本可以主动选入后续对话。文档直接下载 Markdown，包含正文、固定来源与摘录、覆盖限制、来源讨论和修订，以及导出时的研究状态与决定理由；无需重复填写任务表单。固定任务版本与回执保留在可选展开区，不扩张当前工作范围。
+
+IndexedDB/SQLite layout 均升级至 3，保留升级前恢复副本；个人新备份 v3、AI 新备份 v4，旧格式继续可读。研究决定和采纳审计不可通过普通保存覆盖；任务与回执同样追加保留，重复提交、并发更新和旧版本结果有独立处理。未改动 `content/` 的审核正文。
+
+实现边界：自然语言“记下来”生成待采纳提案，正式保存需要界面动作；没有自动生成的长期摘要。历史搜索和近期摘录不能保证所有改述的召回，探索证据仍按时间与预算选取。当前固定任务编辑器是单执行任务。后续按实际使用中的回答质量、连续性和文档完整性问题增量改进。详见[研究助手](RESEARCH-ASSISTANT.md)和[契约](RESEARCH-CONTRACTS.md)。
+
+本次实际检查：`npm test` **404/404**；`npm run build -- --logLevel warn` 通过内容校验、类型检查和构建，保留已有大 chunk 警告。`npm run test:e2e -- tests/e2e/research-records.spec.ts tests/e2e/research-assistant.spec.ts tests/e2e/research-workspace.spec.ts --reporter=line` **12/12**。检查只使用隔离 4174 来源、合成记录与模拟模型。后端专项初次受限运行遇到 loopback EACCES，批准本机测试后通过；浏览器启动审批首次超时，重试后成功，无测试失败。
+
+已查看本次 `.cache/screenshots/research/materials-picker-desktop.png`、`materials-picker-narrow.png` 与 `.cache/screenshots/research-workspace-narrow.png`，资料正文、选择/撤销和文档入口可读，390px 模拟视口无横向溢出。窄工作区截图包含焦点显示的跳转链接，不声称真机验收。此前初版研究流程已有全量浏览器 154/154 的记录；本次只复跑相关 12 项，不沿用旧数字声称全量覆盖。未调用真实模型或执行外部 Harness；这不阻止第一版工程交付，也不代表已证明真实回答质量。没有 Git 提交、推送或部署。
+
 ## 当前能力
 
 - 14 篇当前阅读材料：4 篇综述、10 篇论文；保留 21 个导读修订、180 个单元和 166 个来源链接。

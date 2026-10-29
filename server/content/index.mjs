@@ -131,7 +131,7 @@ export class ContentIndex {
     const existing = sources.find(source => source.url === url);
     if (existing) { if (text.length > existing.text.length) existing.text = text; return existing; }
     if (sources.length >= 64) reject('来源数量超过本轮上限。');
-    const source = { id: `L${sources.filter(item => item.kind === 'guide').length + 1}`, kind: 'guide', title: `${guide.metadata.title} · ${unit.heading ?? '导读开篇'}`,
+    const source = { id: `L${sources.filter(item => item.kind === 'guide').length + 1}`, kind: 'guide', bodySha256: guide.metadata.bodySha256, title: `${guide.metadata.title} · ${unit.heading ?? '导读开篇'}`,
       url, guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: unit.id, text, version: guide.metadata.source.version };
     sources.push(source); return source;
   }

@@ -1,0 +1,17 @@
+.research-workspace{margin:2.5rem 0;padding-top:1.75rem;border-top:1px solid var(--border,#dce2dd)}
+.research-heading,.research-actions{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.research-actions{justify-content:flex-start;margin:1rem 0}
+.research-workspace label{display:flex;flex-direction:column;gap:.4rem;margin:.8rem 0;font-size:.95rem}
+.research-workspace textarea,.research-workspace input,.research-workspace select{box-sizing:border-box;max-width:100%;width:100%;padding:.65rem;border:1px solid var(--border,#c8d0ca);border-radius:6px;background:var(--surface,#fff);color:inherit;font:inherit}
+.research-workspace textarea{resize:vertical;min-height:5rem;line-height:1.7}
+.research-workspace button{font:inherit;font-size:14px;padding:.5rem .8rem;min-height:40px;cursor:pointer;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--accent)}
+.research-workspace button:hover:not(:disabled){background:var(--surface-selected);border-color:var(--control-border)}
+.research-workspace button:focus-visible,.research-workspace input:focus-visible,.research-workspace select:focus-visible,.research-workspace textarea:focus-visible,.research-workspace summary:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.research-workspace button:disabled{cursor:default;opacity:.5}
+.research-workspace button.research-primary{background:var(--accent);border-color:var(--accent);color:var(--surface,#fff);font-weight:600}
+.research-workspace button.research-primary:hover:not(:disabled){background:var(--accent);filter:brightness(.93)}
+.research-advanced{padding:1rem 0;border-top:1px solid var(--line)}
+.research-editor,.research-receipt{padding:1rem;border:1px solid var(--border,#dce2dd);border-radius:8px;margin:1rem 0}
+.research-prose,.research-task-preview{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.85}
+.research-task-preview{font:inherit;max-height:30rem;overflow:auto;padding:1rem;background:var(--surface,#f6f8f5)}
+.research-workspace details{margin:1rem 0}.research-workspace summary{cursor:pointer}.research-workspace blockquote{white-space:pre-wrap;overflow-wrap:anywhere;border-left:3px solid #81998a;padding-left:1rem;margin-left:0}

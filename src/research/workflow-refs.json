@@ -1,0 +1,18 @@
+[
+  {
+    "path": "docs/content/ASSISTED-DISCOVERY.md",
+    "sha256": "c69b40f49b06293ac98d908f19505a5efbc98b220fbfeb7dbc50091b118dc800"
+  },
+  {
+    "path": "docs/content/workflows/CONTENT-WORKFLOW.md",
+    "sha256": "916572ae5730c3e0dc7e6fb1889c123ee323f7ef82f3e28c65afbc4f7d7f4b7c"
+  },
+  {
+    "path": "docs/content/workflows/SOURCES-AND-VISUALS.md",
+    "sha256": "940a995eadf2533884c7a650526ad752a23094c75aabd619235357269b55597f"
+  },
+  {
+    "path": "docs/content/CONTENT-UPDATES.md",
+    "sha256": "7b274c4e9a8f7e45205032033b69a3f3431645e59bd29c1b7330cab758f1e0f4"
+  }
+]

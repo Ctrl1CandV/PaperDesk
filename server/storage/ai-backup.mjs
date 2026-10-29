@@ -20,7 +20,7 @@ export async function* exportBackupStream(store, signal) {
   try {
     snapshot = new DatabaseSync(file, { readOnly: true });
     const totals = snapshot.prepare('SELECT conversations, turns FROM storage_totals WHERE id = 1').get();
-    const manifest = { type: 'manifest', format: 'paperdesk-ai-backup', schemaVersion: 3,
+    const manifest = { type: 'manifest', format: 'paperdesk-ai-backup', schemaVersion: snapshot.prepare('SELECT 1 FROM conversations WHERE exploration_id IS NOT NULL LIMIT 1').get() ? 4 : 3,
       exportedAt: new Date().toISOString(), counts: { conversations: totals.conversations, turns: totals.turns } };
     const hash = createHash('sha256');
     const first = line(manifest); hash.update(first); yield first;
@@ -57,7 +57,7 @@ export async function importBackupStream(store, input, signal, { preview = false
       if (!manifest) {
         object(value, ['type', 'format', 'schemaVersion', 'exportedAt', 'counts']);
         object(value.counts, ['conversations', 'turns']);
-        if (value.type !== 'manifest' || value.format !== 'paperdesk-ai-backup' || value.schemaVersion !== 3 || !isTime(value.exportedAt)
+        if (value.type !== 'manifest' || value.format !== 'paperdesk-ai-backup' || ![3, 4].includes(value.schemaVersion) || !isTime(value.exportedAt)
           || !Number.isSafeInteger(value.counts.conversations) || value.counts.conversations < 0 || value.counts.conversations > AI_STORE_LIMITS.conversations
           || !Number.isSafeInteger(value.counts.turns) || value.counts.turns < 0 || value.counts.turns > AI_STORE_LIMITS.turns) reject('AI 分块备份格式或版本无效。');
         manifest = value; hash.update(raw + '\n'); return;
@@ -73,7 +73,7 @@ export async function importBackupStream(store, input, signal, { preview = false
       const item = value.data;
       if (value.kind === 'conversation') {
         if (turnPhase || ++counts.conversations > manifest.counts.conversations) reject('备份会话分块顺序或数量无效。');
-        validateBackup({ format: 'paperdesk-ai-backup', schemaVersion: 3, exportedAt: manifest.exportedAt, conversations: [item], turns: [] });
+        validateBackup({ format: 'paperdesk-ai-backup', schemaVersion: manifest.schemaVersion, exportedAt: manifest.exportedAt, conversations: [item], turns: [] });
         if (staged.conversation(item.id)) reject('备份包含重复会话。');
         staged.insertConversation(item);
       } else {
@@ -82,7 +82,7 @@ export async function importBackupStream(store, input, signal, { preview = false
         const conversation = staged.conversation(item?.conversationId);
         if (!conversation) reject('备份问答没有对应的会话。');
         validateContext(item.context);
-        validateBackup({ format: 'paperdesk-ai-backup', schemaVersion: 3, exportedAt: manifest.exportedAt, conversations: [conversation],
+        validateBackup({ format: 'paperdesk-ai-backup', schemaVersion: manifest.schemaVersion, exportedAt: manifest.exportedAt, conversations: [conversation],
           turns: [{ ...item, context: { ...item.context, historyTurnIds: [] } }] });
         // Validate the original context too; do not allow a missing/malformed history list.
         if (!Array.isArray(item.context.historyTurnIds) || item.context.historyTurnIds.length > 6) reject('备份历史引用无效。');
@@ -106,7 +106,7 @@ export async function importBackupStream(store, input, signal, { preview = false
     if (!complete) reject('备份没有完整结束清单；未导入任何记录。');
     signal?.throwIfAborted();
     staged.db.exec('COMMIT');
-    if (preview) return { counts, schemaVersion: 3, exportedAt: manifest.exportedAt };
+    if (preview) return { counts, schemaVersion: manifest.schemaVersion, exportedAt: manifest.exportedAt };
     return { counts: store.importRecords(parsed(staged.db.prepare('SELECT data FROM conversations ORDER BY rowid').iterate()),
       parsed(staged.db.prepare('SELECT data FROM turns ORDER BY rowid').iterate()), counts, signal) };
   } finally { staged?.close(); removeTemporary(file); }

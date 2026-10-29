@@ -6,6 +6,9 @@ import { Dialog } from '../ui/Dialog';
 import { EvidenceCard } from './EvidenceCard';
 import { SaveFeedback, useExplorationSave } from './SaveFeedback';
 import { actionLabels, statusLabels, targetLabel } from './model';
+import { emptyResearchState } from '../../shared/research-contract.mjs';
+import type { ResearchDecision } from '../../shared/research-contract.mjs';
+import { decisionKinds, decisionStatuses } from '../assistant/ResearchProposals';
 
 export interface CachedExplorationDraft { draft: ExplorationDraft; expectedRevision: number | null }
 const encodeTarget = (target?: GuideTarget) => target ? `${target.guideId}/${target.revision}/${target.unitId}` : '';
@@ -38,6 +41,10 @@ export function ExplorationEditor({ initial, expectedRevision, draftKey, onSaved
   const [draft, setDraft] = useState(restored?.draft ?? initial);
   const [expected, setExpected] = useState(restored?.expectedRevision ?? expectedRevision);
   const [notice, setNotice] = useState(restored ? '已恢复这页尚未保存的草稿。' : '');
+  const [decisionText, setDecisionText] = useState(''), [decisionReason, setDecisionReason] = useState('');
+  const [decisionKind, setDecisionKind] = useState<ResearchDecision['kind']>('hypothesis');
+  const [decisionStatus, setDecisionStatus] = useState<ResearchDecision['status']>('adopted');
+  const [supersedes, setSupersedes] = useState('');
   const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
   useUnloadWarning(dirty);
   const state = useExplorationSave(record => { clearDraft(draftKey); onSaved(record); });
@@ -63,6 +70,23 @@ export function ExplorationEditor({ initial, expectedRevision, draftKey, onSaved
       {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
     </select></label>
     {creating ? <details className="exploration-extra"><summary>补充解释与未知（可稍后再写）</summary>{extraFields}</details> : extraFields}
+    <details className="exploration-extra"><summary>研究范围、约束与候选方向</summary>
+      {([['scope', '研究范围'], ['constraints', '明确约束'], ['candidates', '候选方向'], ['deferred', '暂缓方向及原因']] as const).map(([field, label]) => <label key={field}>{label}<textarea aria-label={label} value={draft.research?.[field] ?? ''} rows={3} maxLength={12000} onChange={event => update({ research: { ...(draft.research ?? emptyResearchState()), [field]: event.target.value } })} /></label>)}
+    </details>
+    <details className="exploration-extra"><summary>记录一项研究决定或修订</summary>
+      <p className="exploration-small">旧决定保留。修订时选择被替代的决定；采纳假设只表示准备调查它。</p>
+      <label>决定类型<select aria-label="决定类型" value={decisionKind} onChange={event => setDecisionKind(event.target.value as ResearchDecision['kind'])}>{Object.entries(decisionKinds).map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+      <label>处理状态<select aria-label="决定处理状态" value={decisionStatus} onChange={event => setDecisionStatus(event.target.value as ResearchDecision['status'])}>{Object.entries(decisionStatuses).map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+      <label>决定内容<textarea aria-label="决定内容" value={decisionText} maxLength={12000} rows={3} onChange={event => setDecisionText(event.target.value)} /></label>
+      <label>形成理由<textarea aria-label="形成理由" value={decisionReason} maxLength={12000} rows={2} onChange={event => setDecisionReason(event.target.value)} /></label>
+      <label>替代旧决定<select aria-label="替代旧决定" value={supersedes} onChange={event => setSupersedes(event.target.value)}><option value="">新增独立决定</option>{draft.research?.decisions.map(item => <option key={item.id} value={item.id}>{item.text}</option>)}</select></label>
+      <button type="button" disabled={!decisionText.trim()} onClick={() => {
+        const research = draft.research ?? emptyResearchState();
+        update({ research: { ...research, decisions: [...research.decisions, { id: crypto.randomUUID(), kind: decisionKind, status: decisionStatus, text: decisionText.trim(), rationale: decisionReason, sourceTurnId: null, evidenceRefs: [], createdAt: new Date().toISOString(), ...(supersedes ? { supersedes } : {}) }] } });
+        setDecisionText(''); setDecisionReason(''); setSupersedes(''); setNotice('决定已加入编辑草稿，点击保存修改后写入研究记录。');
+      }}>加入决定草稿</button>
+      {draft.research?.decisions.map(item => <p className="exploration-small" key={item.id}>{decisionKinds[item.kind]} · {decisionStatuses[item.status]}：{item.text}</p>)}
+    </details>
     <fieldset><legend>下一步</legend>
       <label>行动类型<select aria-label="行动类型" value={draft.nextAction?.kind ?? ''} onChange={event => {
         const kind = event.target.value as NextAction['kind'] | '';

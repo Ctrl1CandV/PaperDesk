@@ -420,13 +420,13 @@ test('fallback disabled at ask start cannot be enabled halfway through that answ
   assert.equal(stream.find(event => event.type === 'error').turn.context.fallback, undefined);
 });
 
-test('fallback backup v2 retains all evidence and imports into SQLite layout v2', async t => {
+test('fallback backup v2 retains all evidence and imports into SQLite layout v3', async t => {
   const f = await httpFixture(t, { chatgptAnswer: async ({ turn, emit }) => { turn.sources.push(extraSource()); turn.context.toolEvents.push(toolEvent()); emit({ type: 'delta', text: 'Synthetic archived partial.' }); throw quota(); } });
   const turn = doneTurn(await f.call('/ask', ask(), f.token)), backup = f.store.export();
   assert.equal(backup.schemaVersion, 2); validateBackup(backup); noSecrets(backup);
   const restored = new AiStore(':memory:'); t.after(() => restored.close());
   assert.deepEqual(restored.import(backup), { conversations: 1, turns: 1 });
-  assert.equal(restored.db.prepare('PRAGMA user_version').get().user_version, 2);
+  assert.equal(restored.db.prepare('PRAGMA user_version').get().user_version, 3);
   assert.deepEqual(restored.turn(turn.id), turn); assert.deepEqual(restored.export().turns, backup.turns);
   assert.equal(restored.export().turns[0].context.fallback.previousAnswer, 'Synthetic archived partial.');
   assert.deepEqual(restored.export().turns[0].context.toolEvents, [toolEvent()]); assert.equal(restored.export().turns[0].sources.length, 2);
@@ -439,7 +439,7 @@ test('legacy backup v1 imports without invented provider metadata and exports as
   const restored = new AiStore(':memory:'); t.after(() => restored.close()); restored.import(old);
   const upgraded = restored.export(); assert.equal(upgraded.schemaVersion, 2);
   assert.deepEqual(upgraded.turns, old.turns); assert.equal(restored.turn(turn.id).context.provider, undefined);
-  assert.equal(restored.db.prepare('PRAGMA user_version').get().user_version, 2); validateBackup(upgraded);
+  assert.equal(restored.db.prepare('PRAGMA user_version').get().user_version, 3); validateBackup(upgraded);
 });
 
 test('backup rejects malformed provider/fallback metadata without importing partial records', async t => {

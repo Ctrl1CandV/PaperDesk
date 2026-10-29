@@ -1,12 +1,13 @@
 import type { ArchivePreview, Exploration, ExplorationDraft, GuideState, GuideTarget, ImportChoice, ImportConflict, ImportPreview, Note, NoteDraft, OriginalState, PersonalBackup, Preferences, RecordMap, RecordPage, RecordPageOptions, RecordStats, ResumeRecord, StoreName } from './types';
-import { byteLength, canonical, guideKey, MAX_BACKUP_BYTES, MAX_PERSONAL_BYTES, MAX_PERSONAL_RECORDS, originalKey, recordKey, validateBackup, validateRecord, ValidationError } from './validation';
+import { byteLength, canonical, guideKey, MAX_BACKUP_BYTES, MAX_PERSONAL_BYTES, MAX_PERSONAL_RECORDS, originalKey, recordKey, validateBackup, validateRecord, verifyResearchRecord, ValidationError } from './validation';
 import { exportPersonalArchive, previewPersonalArchive, applyPersonalArchive, discardPersonalArchive, archiveConflicts } from './archive';
+import { createResearchSnapshot, emptyResearchState, validateResearchProposal, type ResearchProposal } from '../../shared/research-contract.mjs';
 
 export { guideKey, originalKey, validateBackup, ValidationError };
 export const DATABASE_NAME = 'paperdesk-personal-v1';
 const storeNames: StoreName[] = ['notes', 'explorations', 'resume', 'guideStates', 'originalStates'];
 const allStores = [...storeNames, 'preferences'];
-const metaStore = '_metadata', stageStore = '_backupStage', migrationStore = '_migrationV1';
+const metaStore = '_metadata', stageStore = '_backupStage', migrationStore = '_migrationV1', researchMigrationStore = '_migrationV2';
 type ChangeStore = StoreName | 'preferences';
 export const emptyStats = (): RecordStats => ({ bytes: 0, counts: { notes: 0, explorations: 0, resume: 0, guideStates: 0, originalStates: 0 }, revision: 0, limitBytes: MAX_PERSONAL_BYTES, migrationBackupAvailable: false });
 export class ConflictError extends Error {
@@ -52,20 +53,35 @@ export class PersonalRecordStore {
     this.opening = new Promise<IDBDatabase>((resolve, reject) => {
       if (typeof indexedDB === 'undefined') { reject(new StorageError('浏览器没有提供本地记录存储。可以继续阅读，并将草稿另存。')); return; }
       let operation: IDBOpenDBRequest;
-      try { operation = indexedDB.open(this.name, 2); } catch (error) { reject(storageError(error)); return; }
+      try { operation = indexedDB.open(this.name, 3); } catch (error) { reject(storageError(error)); return; }
       operation.onupgradeneeded = event => {
         const database = operation.result, transaction = operation.transaction!;
         for (const name of allStores) if (!database.objectStoreNames.contains(name)) database.createObjectStore(name);
-        const metadata = database.createObjectStore(metaStore);
-        database.createObjectStore(stageStore);
-        const recovery = database.createObjectStore(migrationStore);
+        if (event.oldVersion < 2) {
+          database.createObjectStore(metaStore);
+          database.createObjectStore(stageStore);
+          database.createObjectStore(migrationStore);
+        }
+        if (event.oldVersion < 3) database.createObjectStore(researchMigrationStore);
+        const metadata = transaction.objectStore(metaStore);
+        const recovery = transaction.objectStore(migrationStore);
+        const researchRecovery = transaction.objectStore(researchMigrationStore);
         const stats = emptyStats(); stats.migrationBackupAvailable = event.oldVersion === 1;
+        stats.researchMigrationBackupAvailable = event.oldVersion > 0;
+        // Preserve v2 counters/revision and the original v1 recovery flag. Cursor
+        // validation below recounts live bytes rather than trusting old counters.
+        const priorStats = event.oldVersion >= 2 ? metadata.get('stats') : null;
+        if (priorStats) priorStats.onsuccess = () => {
+          if (!priorStats.result || !Number.isSafeInteger(priorStats.result.revision)) { transaction.abort(); return; }
+          stats.revision = priorStats.result.revision;
+          stats.migrationBackupAvailable = priorStats.result.migrationBackupAvailable === true;
+        };
         let remaining = allStores.length;
         for (const name of allStores) {
           const store = transaction.objectStore(name);
-          if (name !== 'preferences') {
-            store.createIndex('updatedAt', ['updatedAt']);
-            store.createIndex('guideRevision', ['guideId', 'revision']);
+          if (name !== 'preferences' && event.oldVersion < 2) {
+            if (!store.indexNames.contains('updatedAt')) store.createIndex('updatedAt', ['updatedAt']);
+            if (!store.indexNames.contains('guideRevision')) store.createIndex('guideRevision', ['guideId', 'revision']);
           }
           // Versionchange is atomic: an invalid row or quota failure aborts the upgrade,
           // retaining the complete v1 database. A successful migration also retains raw v1 rows.
@@ -75,11 +91,12 @@ export class PersonalRecordStore {
             const row = cursor.result;
             try {
               if (row) {
-                validateRecord(name as ChangeStore, row.value);
+                validateRecord(name as ChangeStore, row.value, false);
                 if (row.primaryKey !== (name === 'preferences' ? 'preferences' : recordKey(name as StoreName, row.value))) throw new ValidationError('旧记录标识不一致，迁移未提交。');
                 stats.bytes += byteLength(row.value);
                 if (name !== 'preferences') stats.counts[name as StoreName]++;
-                if (stats.migrationBackupAvailable) recovery.put(row.value, [name, row.primaryKey]);
+                if (event.oldVersion === 1) recovery.put(row.value, [name, row.primaryKey]);
+                if (event.oldVersion > 0) researchRecovery.put(row.value, [name, row.primaryKey]);
                 row.continue();
               } else if (--remaining === 0) {
                 if (stats.bytes > MAX_PERSONAL_BYTES || Object.values(stats.counts).some(count => count > MAX_PERSONAL_RECORDS)) throw new ValidationError('旧记录超过运行容量，迁移未提交。');
@@ -153,14 +170,52 @@ export class PersonalRecordStore {
   async list<K extends StoreName>(name: K): Promise<RecordMap[K][]> {
     return this.run([name], 'readonly', transaction => request(transaction.objectStore(name).getAll()));
   }
+  async hasResearchRecords(): Promise<boolean> {
+    return this.run(['explorations'], 'readonly', transaction => new Promise((resolve, reject) => {
+      const cursor = transaction.objectStore('explorations').openCursor();
+      cursor.onerror = () => reject(cursor.error);
+      cursor.onsuccess = () => {
+        const row = cursor.result;
+        if (!row) resolve(false);
+        else if (row.value.research !== undefined) resolve(true);
+        else row.continue();
+      };
+    }));
+  }
   async get<K extends StoreName>(name: K, key: string): Promise<RecordMap[K] | undefined> {
     return this.run([name], 'readonly', transaction => request(transaction.objectStore(name).get(key)));
   }
   private async saveVersioned<T extends Note | Exploration>(name: 'notes' | 'explorations', draft: NoteDraft | ExplorationDraft, expectedRevision: number | null): Promise<T> {
+    draft = structuredClone(draft);
+    if (name === 'explorations') {
+      const research = (draft as ExplorationDraft).research;
+      if (research) {
+        // Validate before hashing, and complete all WebCrypto work before IDB opens.
+        validateRecord('explorations', { ...draft, recordRevision: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+        await verifyResearchRecord(draft as Exploration);
+      }
+    }
     const saved = await this.run([name, metaStore], 'readwrite', async transaction => {
       const objectStore = transaction.objectStore(name);
       const current = await request<Note | Exploration | undefined>(objectStore.get(draft.id));
       if (expectedRevision === null ? current !== undefined : current?.recordRevision !== expectedRevision) throw new ConflictError(current ?? null);
+      if (name === 'explorations' && current) {
+        const previousResearch = (current as Exploration).research;
+        const nextResearch = (draft as ExplorationDraft).research;
+        // Decisions are revised by appending a replacement, and adoption audit
+        // records remain the exact proposal that was accepted.
+        for (const field of ['decisions', 'appliedProposalIds', 'appliedProposals'] as const) {
+          const prior = previousResearch?.[field] ?? [], next = nextResearch?.[field] ?? [];
+          if (canonical(next.slice(0, prior.length)) !== canonical(prior)) throw new ValidationError('决定与采纳记录不可覆盖或删除；请保留旧记录并追加变化。');
+        }
+        const nextArtifacts = nextResearch?.artifacts ?? [];
+        for (const previous of previousResearch?.artifacts ?? []) {
+          if (!previous.taskVersions.length && !previous.receipts.length) continue;
+          const next = nextArtifacts.find(item => item.id === previous.id);
+          if (!next || canonical(next.taskVersions.slice(0, previous.taskVersions.length)) !== canonical(previous.taskVersions)
+            || canonical(next.receipts.slice(0, previous.receipts.length)) !== canonical(previous.receipts)) throw new ValidationError('已交付任务版本和执行回执不可覆盖或删除；请追加新版本。');
+        }
+      }
       const timestamp = new Date().toISOString();
       const value = { ...draft, recordRevision: (current?.recordRevision ?? 0) + 1, createdAt: current?.createdAt ?? timestamp, updatedAt: timestamp } as T;
       validateRecord(name, value);
@@ -174,6 +229,52 @@ export class PersonalRecordStore {
   }
   saveNote(draft: NoteDraft, expectedRevision: number | null) { return this.saveVersioned<Note>('notes', draft, expectedRevision); }
   saveExploration(draft: ExplorationDraft, expectedRevision: number | null) { return this.saveVersioned<Exploration>('explorations', draft, expectedRevision); }
+  async adoptResearchProposal(input: ResearchProposal): Promise<Exploration> {
+    const proposal = structuredClone(input);
+    try { validateResearchProposal(proposal); } catch (error) { throw new ValidationError(error instanceof Error ? error.message : '研究提案无效。'); }
+    const baseline = await this.get('explorations', proposal.explorationId);
+    if (!baseline) throw new ConflictError(null);
+    const alreadyApplied = (record: Exploration) => {
+      if (!record.research?.appliedProposalIds.includes(proposal.id)) return false;
+      const previous = record.research.appliedProposals?.find(item => item.id === proposal.id);
+      if (!previous || canonical(previous) !== canonical(proposal)) throw new ValidationError('同一提案标识对应不同内容，未重复采纳。');
+      return true;
+    };
+    if (alreadyApplied(baseline)) return baseline;
+    if (baseline.recordRevision !== proposal.baseRecordRevision) throw new ConflictError(baseline);
+    // WebCrypto runs before opening the write transaction, which must not idle
+    // across non-IDB asynchronous work. Recheck the record inside the transaction.
+    const snapshot = await createResearchSnapshot(baseline);
+    if (snapshot.snapshotSha256 !== proposal.baseSnapshotSha256) throw new ValidationError('研究提案与当前探索快照不一致，未保存。');
+    const saved = await this.run(['explorations', metaStore], 'readwrite', async transaction => {
+      const target = transaction.objectStore('explorations');
+      const current = await request<Exploration | undefined>(target.get(proposal.explorationId));
+      if (!current) throw new ConflictError(null);
+      if (alreadyApplied(current)) return current;
+      if (current.recordRevision !== baseline.recordRevision || canonical(current) !== canonical(baseline)) throw new ConflictError(current);
+      const next = structuredClone(current);
+      next.research ??= emptyResearchState();
+      for (const change of proposal.changes) {
+        if (change.kind === 'set-field') {
+          if (change.field === 'question' || change.field === 'interpretation' || change.field === 'unknowns') next[change.field] = change.value;
+          else next.research[change.field] = change.value;
+        } else {
+          if (next.research.decisions.some(item => item.id === change.decision.id)) throw new ValidationError('提案包含重复决定标识，未保存。');
+          if (change.decision.supersedes && !next.research.decisions.some(item => item.id === change.decision.supersedes)) throw new ValidationError('提案要替代的决定不存在，未保存。');
+          next.research.decisions.push(change.decision);
+        }
+      }
+      next.research.appliedProposalIds.push(proposal.id);
+      (next.research.appliedProposals ??= []).push(proposal);
+      next.recordRevision++; next.updatedAt = new Date().toISOString();
+      validateRecord('explorations', next);
+      await this.accountChange(transaction, 'explorations', current, next);
+      await request(target.put(next, next.id));
+      return next;
+    });
+    this.notifyChange('explorations');
+    return saved;
+  }
   private async deleteVersioned(name: 'notes' | 'explorations', id: string, expectedRevision: number) {
     await this.run([name, metaStore], 'readwrite', async transaction => {
       const objectStore = transaction.objectStore(name);
@@ -238,6 +339,7 @@ export class PersonalRecordStore {
     const stats = await this.getStats();
     if (stats.bytes + Object.values(stats.counts).reduce((a, b) => a + b, 2048) > MAX_BACKUP_BYTES) throw new ValidationError('当前记录超过旧 v1 备份容量，请使用分块备份 v2。');
     const snapshot = await this.run(allStores, 'readonly', transaction => this.snapshot(transaction));
+    if (snapshot.explorations.some(record => record.research !== undefined)) throw new ValidationError('研究记录需要分块备份 v3，旧 v1 格式不会丢弃研究字段。');
     return validateBackup(snapshot);
   }
   async previewImport(input: unknown, targetAvailable?: (target: GuideTarget) => boolean): Promise<ImportPreview> {
@@ -328,6 +430,7 @@ export class PersonalRecordStore {
   }
   exportArchive(signal?: AbortSignal) { return exportPersonalArchive(this, signal); }
   exportMigrationArchive(signal?: AbortSignal) { return exportPersonalArchive(this, signal, true); }
+  exportResearchMigrationArchive(signal?: AbortSignal) { return exportPersonalArchive(this, signal, 'v2'); }
   async exportMigrationBackup(): Promise<PersonalBackup> {
     const backup: PersonalBackup = { format: 'paperdesk-personal-backup', schemaVersion: 1, exportedAt: new Date().toISOString(), notes: [], explorations: [], resume: [], guideStates: [], originalStates: [], preferences: {} };
     await this.run([migrationStore, metaStore], 'readonly', async transaction => {
@@ -352,9 +455,9 @@ export class PersonalRecordStore {
   discardArchive(jobId: string) { return discardPersonalArchive(this, jobId); }
   archiveConflictPage(preview: ArchivePreview, offset = 0) { return archiveConflicts(this, preview.jobId, offset); }
   async clearAll() {
-    await this.run([...allStores, metaStore, stageStore, migrationStore], 'readwrite', async transaction => {
+    await this.run([...allStores, metaStore, stageStore, migrationStore, researchMigrationStore], 'readwrite', async transaction => {
       const stats = await request<RecordStats>(transaction.objectStore(metaStore).get('stats'));
-      for (const name of [...allStores, stageStore, migrationStore]) transaction.objectStore(name).clear();
+      for (const name of [...allStores, stageStore, migrationStore, researchMigrationStore]) transaction.objectStore(name).clear();
       transaction.objectStore(metaStore).clear(); transaction.objectStore(metaStore).put({ ...emptyStats(), revision: stats.revision + 1 }, 'stats');
     });
     const backup = await this.exportBackup();

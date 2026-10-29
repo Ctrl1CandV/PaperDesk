@@ -2,7 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, statfsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
-import { object, reject, isUuid, isId, isRevision, isHash, isTime, isText, validateSource, validateContext } from '../http/validation.mjs';
+import { object, reject, isUuid, isId, isRevision, isHash, isTime, isText, validateSource, validateContext, validateConversationScope } from '../http/validation.mjs';
 
 const now = () => new Date().toISOString();
 const BACKUP_BYTES = 16 * 1024 * 1024;
@@ -14,15 +14,29 @@ const parse = row => row ? JSON.parse(row.data) : undefined;
 const turnSummary = turn => JSON.stringify({ id: turn.id, question: turn.question.slice(0, 300), answer: turn.answer.slice(0, 800), status: turn.status, createdAt: turn.createdAt,
   sources: [], context: { provider: turn.context.provider, model: turn.context.model }, summaryOnly: true, sourceCount: turn.sources.length });
 
+// Query words and Chinese bigrams tolerate natural-language spacing and phrasing
+// without reading any other topic or relying on an external embedding service.
+export function topicSearchTerms(query) {
+  const normalized=query.toLocaleLowerCase().trim();
+  const ignored=new Set(['的','了','和','与','在','是','我','我们','如何','什么','是否','这个','那个','可以','the','a','an','and','or','of','to','how','what']);
+  const segments=[...new Intl.Segmenter('zh',{granularity:'word'}).segment(normalized)].filter(item=>item.isWordLike).map(item=>item.segment);
+  const bigrams=(normalized.match(/\p{Script=Han}+/gu)??[]).flatMap(run=>{const chars=Array.from(run);return chars.slice(0,-1).map((char,index)=>char+chars[index+1]);});
+  return [...new Set([...segments,...bigrams])].filter(term=>!ignored.has(term)&&term.length>1).slice(0,24);
+}
+
 export function validateBackup(value) {
   object(value, ['format', 'schemaVersion', 'exportedAt', 'conversations', 'turns']);
-  if (value.format !== 'paperdesk-ai-backup' || ![1, 2, 3].includes(value.schemaVersion) || !isTime(value.exportedAt)
+  if (value.format !== 'paperdesk-ai-backup' || ![1, 2, 3, 4].includes(value.schemaVersion) || !isTime(value.exportedAt)
     || !Array.isArray(value.conversations) || value.conversations.length > AI_STORE_LIMITS.conversations || !Array.isArray(value.turns) || value.turns.length > AI_STORE_LIMITS.turns) reject('AI 备份格式或版本无效。');
   const conversations = new Map(), ids = new Set(), requests = new Set();
   for (const conversation of value.conversations) {
-    object(conversation, ['id', 'title', 'guideId', 'revision', 'bodySha256', 'createdAt', 'updatedAt']);
-    if (!isUuid(conversation.id) || conversations.has(conversation.id) || !isText(conversation.title, 100, 1) || !isId(conversation.guideId)
-      || !isRevision(conversation.revision) || !isHash(conversation.bodySha256) || !isTime(conversation.createdAt) || !isTime(conversation.updatedAt)) reject('备份包含无效或重复会话。');
+    object(conversation, ['id', 'title', 'guideId', 'revision', 'bodySha256', 'createdAt', 'updatedAt'], ['conversationScope']);
+    const research = conversation.conversationScope?.kind === 'exploration';
+    if (conversation.conversationScope !== undefined) validateConversationScope(conversation.conversationScope);
+    if (conversation.conversationScope?.kind === 'guide' && ['guideId','revision','bodySha256'].some(key=>conversation.conversationScope[key] !== conversation[key])) reject('会话的导读范围不一致。');
+    if (research && (value.schemaVersion < 4 || conversation.guideId !== null || conversation.revision !== null || conversation.bodySha256 !== null)) reject('研究会话需要独立范围及备份版本 4。');
+    if (!isUuid(conversation.id) || conversations.has(conversation.id) || !isText(conversation.title, 100, 1) || !research && (!isId(conversation.guideId)
+      || !isRevision(conversation.revision) || !isHash(conversation.bodySha256)) || !isTime(conversation.createdAt) || !isTime(conversation.updatedAt)) reject('备份包含无效或重复会话。');
     conversations.set(conversation.id, conversation);
   }
   for (const turn of value.turns) {
@@ -33,12 +47,18 @@ export function validateBackup(value) {
     const conversation = conversations.get(turn.conversationId);
     validateContext(turn.context);
     if (value.schemaVersion === 1 && (Object.hasOwn(turn.context, 'provider') || Object.hasOwn(turn.context, 'fallback'))) reject('回答服务来源需要 AI 备份版本 2。');
+    if (value.schemaVersion < 4 && turn.context.researchSnapshot) reject('研究快照需要 AI 备份版本 4。');
+    for (const proposal of turn.context.researchProposals ?? []) {
+      if (proposal.sourceTurnId !== turn.id) reject('研究提案来源问答不一致。');
+      for (const ref of proposal.evidenceRefs) if (ref.turnId !== turn.id || !turn.sources.some(source => includesEvidence(source, ref.source))) reject('研究提案证据不属于本轮。');
+      for (const change of proposal.changes) if (change.kind === 'add-decision' && JSON.stringify(change.decision.evidenceRefs) !== JSON.stringify(proposal.evidenceRefs)) reject('研究决定证据与提案不一致。');
+    }
     if (value.schemaVersion < 3 && needsBackupV3(turn)) reject('原文与检索记录需要 AI 备份版本 3。');
     if (bytes(turn) > TURN_BYTES) reject('问答快照超过 2 MiB。', 413);
-    if (!conversation || conversation.guideId !== turn.context.guideId || conversation.revision !== turn.context.revision || conversation.bodySha256 !== turn.context.bodySha256) reject('备份的会话与文章版本不一致。');
+    if (!conversation || !sameScope(conversation, turn.context)) reject('备份的会话与文章版本不一致。');
     const sourceIds = new Set();
     for (const source of turn.sources) { validateSource(source); if (sourceIds.has(source.id)) reject('备份包含重复来源编号。'); sourceIds.add(source.id); }
-    if (!turn.sources.some(source => source.kind === 'guide' && source.guideId === turn.context.guideId && source.revision === turn.context.revision && source.unitId === turn.context.unitId)) reject('备份缺少当前文章章节的来源快照。');
+    if (turn.context.guideId !== null && !turn.sources.some(source => source.kind === 'guide' && source.guideId === turn.context.guideId && source.revision === turn.context.revision && source.unitId === turn.context.unitId)) reject('备份缺少当前文章章节的来源快照。');
     ids.add(turn.id); requests.add(turn.requestId);
   }
   const turnMap = new Map(value.turns.map((turn, index) => [turn.id, { turn, index }]));
@@ -83,10 +103,11 @@ export class AiStore {
     this.db = new DatabaseSync(file);
     this.db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 3000;');
     const version = this.db.prepare('PRAGMA user_version').get().user_version;
-    if (version > 2) { this.db.close(); reject('AI 数据库版本较新，请使用匹配的软件版本。', 503); }
+    if (version > 3) { this.db.close(); reject('AI 数据库版本较新，请使用匹配的软件版本。', 503); }
     try {
     if (version < 2) this.migrate(version, options.migrationHook);
     this.ensureSummaries();
+    if (version < 3) this.migrateResearch(version);
     this.transaction(() => {
       for (const row of this.db.prepare("SELECT data FROM turns WHERE status = 'running'").all()) {
         const turn = parse(row); turn.status = 'interrupted'; this.writeTurn(turn);
@@ -145,6 +166,16 @@ export class AiStore {
     });
     hook?.('committed');
   }
+  migrateResearch(version) {
+    if (version > 0 && this.file !== ':memory:') {
+      const backup = this.file + '.pre-v3-' + randomUUID() + '.sqlite';
+      this.db.prepare('VACUUM INTO ?').run(backup);
+      const check = new DatabaseSync(backup, { readOnly: true });
+      try { if (check.prepare('PRAGMA integrity_check').get().integrity_check !== 'ok') reject('研究会话迁移恢复副本校验失败。', 503); } finally { check.close(); }
+      this.researchMigrationBackup = backup;
+    }
+    this.transaction(() => { this.db.exec('ALTER TABLE conversations ADD COLUMN exploration_id TEXT; CREATE INDEX conversations_topic ON conversations(exploration_id, updated_at DESC, id DESC); PRAGMA user_version = 3;'); });
+  }
   transaction(action) {
     this.db.exec('BEGIN IMMEDIATE');
     try { const result = action(); this.db.exec('COMMIT'); return result; }
@@ -174,7 +205,7 @@ export class AiStore {
   }
   insertConversation(item) {
     const data = JSON.stringify(item);
-    this.db.prepare('INSERT INTO conversations (id, data, guide_id, revision, updated_at, bytes) VALUES (?, ?, ?, ?, ?, ?)').run(item.id, data, item.guideId, item.revision, item.updatedAt, Buffer.byteLength(data));
+    this.db.prepare('INSERT INTO conversations (id, data, guide_id, revision, updated_at, bytes, exploration_id) VALUES (?, ?, ?, ?, ?, ?, ?)').run(item.id, data, item.guideId, item.revision, item.updatedAt, Buffer.byteLength(data), item.conversationScope?.explorationId ?? null);
   }
   insertTurn(turn) {
     const data = JSON.stringify(turn), size = Buffer.byteLength(data);
@@ -196,6 +227,31 @@ export class AiStore {
       : this.db.prepare('SELECT data FROM conversations WHERE guide_id = ? AND revision = ? ORDER BY updated_at DESC, id DESC LIMIT ?').all(guideId, revision, limit + 1);
     const conversations = rows.slice(0, limit).map(parse), last = conversations.at(-1);
     return { conversations, nextCursor: rows.length > limit ? encodeCursor({ kind: 'conversations', updatedAt: last.updatedAt, id: last.id }) : null };
+  }
+  topicPage(explorationId, options = {}) {
+    if (!isUuid(explorationId)) reject('研究主题编号无效。');
+    const limit = pageLimit(options.limit), after = decodeCursor(options.cursor, 'conversations');
+    const rows = after ? this.db.prepare('SELECT data FROM conversations WHERE exploration_id = ? AND (updated_at < ? OR (updated_at = ? AND id < ?)) ORDER BY updated_at DESC, id DESC LIMIT ?').all(explorationId, after.updatedAt, after.updatedAt, after.id, limit + 1)
+      : this.db.prepare('SELECT data FROM conversations WHERE exploration_id = ? ORDER BY updated_at DESC, id DESC LIMIT ?').all(explorationId, limit + 1);
+    const conversations = rows.slice(0, limit).map(parse), last = conversations.at(-1);
+    return { conversations, nextCursor: rows.length > limit ? encodeCursor({kind:'conversations',updatedAt:last.updatedAt,id:last.id}) : null };
+  }
+  searchTopic(explorationId, query) {
+    if (!isUuid(explorationId) || !isText(query,300,1)) reject('研究历史查询无效。');
+    const terms=topicSearchTerms(query),score=['CASE WHEN instr(body,?)>0 THEN 8 ELSE 0 END',...terms.map(()=> 'CASE WHEN instr(body,?)>0 THEN 1 ELSE 0 END')].join(' + ');
+    const rows=this.db.prepare(`WITH scoped AS (SELECT t.summary_json,t.rowid AS sequence,lower(json_extract(t.data,'$.question') || ' ' || json_extract(t.data,'$.answer')) AS body FROM turns t JOIN conversations c ON c.id=t.conversation_id WHERE c.exploration_id=? AND t.status='complete') SELECT summary_json,(${score}) AS score FROM scoped WHERE score>0 ORDER BY score DESC,sequence DESC LIMIT 8`).all(explorationId,query.toLocaleLowerCase().trim(),...terms);
+    return rows.map(row => JSON.parse(row.summary_json));
+  }
+  recentTopic(explorationId, excludeIds=[]) {
+    if (!isUuid(explorationId) || !Array.isArray(excludeIds) || excludeIds.length>6 || !excludeIds.every(isUuid)) reject('研究历史范围无效。');
+    const exclude=excludeIds.length?` AND t.id NOT IN (${excludeIds.map(()=>'?').join(',')})`:'';
+    return this.db.prepare(`SELECT t.summary_json,t.conversation_id,json_extract(t.data,'$.question')!=json_extract(t.summary_json,'$.question') AS question_truncated,json_extract(t.data,'$.answer')!=json_extract(t.summary_json,'$.answer') AS answer_truncated FROM turns t JOIN conversations c ON c.id=t.conversation_id WHERE c.exploration_id=? AND t.status='complete'${exclude} ORDER BY t.rowid DESC LIMIT 8`).all(explorationId,...excludeIds)
+      .map(row=>({...JSON.parse(row.summary_json),conversationId:row.conversation_id,questionTruncated:!!row.question_truncated,answerTruncated:!!row.answer_truncated}));
+  }
+  readTopicTurn(explorationId, id) {
+    const turn = this.turn(id);
+    if (!turn || turn.status !== 'complete' || this.conversation(turn.conversationId)?.conversationScope?.explorationId !== explorationId) return null;
+    return turn;
   }
   turnsPage(id, options = {}) {
     const limit = pageLimit(options.limit), after = decodeCursor(options.cursor, 'turns');
@@ -236,10 +292,11 @@ export class AiStore {
       this.checkCapacity(TURN_BYTES + 4096, true);
       let conversation = request.conversationId ? this.conversation(request.conversationId) : undefined;
       if (request.conversationId && !conversation) reject('会话不存在，请开始新对话。', 404);
-      if (conversation && (conversation.guideId !== request.guideId || conversation.revision !== request.revision || conversation.bodySha256 !== request.bodySha256)) reject('会话绑定了不同文章版本，请开始新对话。', 409);
+      if (conversation && !sameScope(conversation, request)) reject('会话绑定了不同文章版本，请开始新对话。', 409);
       if (!conversation) {
         if (this.usage().conversations >= AI_STORE_LIMITS.conversations) reject('AI 会话达到运行容量上限，请先导出并整理。', 409);
-        conversation = { id: randomUUID(), title: request.question.trim().slice(0, 100), guideId: request.guideId, revision: request.revision, bodySha256: request.bodySha256, createdAt: now(), updatedAt: now() };
+        const research = request.conversationScope?.kind === 'exploration';
+        conversation = { id: randomUUID(), title: request.question.trim().slice(0, 100), guideId: research ? null : request.guideId, revision: research ? null : request.revision, bodySha256: research ? null : request.bodySha256, ...(request.conversationScope ? { conversationScope: request.conversationScope } : {}), createdAt: now(), updatedAt: now() };
         this.insertConversation(conversation);
       }
       if (this.db.prepare("SELECT id FROM turns WHERE status = 'running' AND conversation_id = ? LIMIT 1").get(conversation.id)) reject('当前会话正在回答，请等待或停止后再试。', 409);
@@ -259,7 +316,7 @@ export class AiStore {
     const previous = this.turn(turn.id);
     if (!previous || previous.conversationId !== turn.conversationId || previous.requestId !== turn.requestId || previous.requestHash !== turn.requestHash || previous.createdAt !== turn.createdAt) reject('问答身份与已存记录不一致。', 409);
     if (!['running', 'complete', 'interrupted', 'error'].includes(turn.status)) reject('问答状态无效。');
-    validateBackup({ format: 'paperdesk-ai-backup', schemaVersion: 3, exportedAt: now(), conversations: [this.conversation(turn.conversationId)],
+    validateBackup({ format: 'paperdesk-ai-backup', schemaVersion: 4, exportedAt: now(), conversations: [this.conversation(turn.conversationId)],
       turns: [{ ...turn, status: turn.status === 'running' ? 'interrupted' : turn.status, context: { ...turn.context, historyTurnIds: [] } }] });
     validateHistory(turn, id => this.turn(id));
     this.transaction(() => {
@@ -278,6 +335,7 @@ export class AiStore {
     const result = this.snapshot();
     result.turns = result.turns.map(turn => turn.status === 'running' ? { ...turn, status: 'interrupted' } : turn);
     if (result.turns.some(needsBackupV3)) result.schemaVersion = 3;
+    if (result.conversations.some(item => item.conversationScope?.kind === 'exploration')) result.schemaVersion = 4;
     return result;
   }
   import(value) {
@@ -307,4 +365,22 @@ export class AiStore {
     this.db.prepare('VACUUM INTO ?').run(file); return file;
   }
   close() { this.db.close(); }
+}
+
+export function sameScope(conversation, value) {
+  const scope = conversation.conversationScope;
+  if (scope?.kind === 'exploration' || value.conversationScope?.kind === 'exploration') return scope?.kind === 'exploration' && value.conversationScope?.kind === 'exploration' && scope.explorationId === value.conversationScope.explorationId;
+  return conversation.guideId === value.guideId && conversation.revision === value.revision && conversation.bodySha256 === value.bodySha256;
+}
+
+function includesEvidence(source, saved) {
+  if (JSON.stringify(source) === JSON.stringify(saved)) return true;
+  // Later original-unit reads can widen the same source. An earlier proposal
+  // keeps its exact excerpt, with ranges demonstrably contained in the final one.
+  if (source.kind !== 'original' || saved.kind !== 'original' || !saved.readRanges?.length || !source.readRanges?.length) return false;
+  const {text:currentText,readRanges:currentRanges,...currentIdentity}=source;
+  const {text:savedText,readRanges:savedRanges,...savedIdentity}=saved;
+  if (JSON.stringify(currentIdentity)!==JSON.stringify(savedIdentity)) return false;
+  if (!savedRanges.every(range=>currentRanges.some(current=>current.total===range.total && current.start<=range.start && current.end>=range.end))) return false;
+  return savedText.split(/\n\n(?=\[原文单元字符 )/u).every(part=>currentText.includes(part.replace(/^\[原文单元字符 \d+–\d+\/\d+\]\n/u,'')));
 }

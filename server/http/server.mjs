@@ -1,3 +1,5 @@
+import { prepareAssistantContext, researchToolsForTurn } from '../ai/research.mjs';
+import { sameScope } from '../storage/ai-store.mjs';
 import { createServer } from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { once } from 'node:events';
@@ -142,6 +144,8 @@ export function createAiServer(dependencies) {
         return;
       }
       if (request.method === 'GET' && url.pathname === '/api/ai/conversations') {
+        const explorationId = url.searchParams.get('explorationId');
+        if (explorationId) { if (!isUuid(explorationId)) reject('研究主题编号无效。'); json(response, 200, store.topicPage(explorationId, { cursor: url.searchParams.get('cursor'), limit: Number(url.searchParams.get('limit') ?? 50) })); return; }
         const guideId = url.searchParams.get('guideId'), revision = Number(url.searchParams.get('revision'));
         if (!isId(guideId) || !isRevision(revision)) reject('请提供有效的文章与修订编号。');
         json(response, 200, store.listPage(guideId, revision, { cursor: url.searchParams.get('cursor'), limit: Number(url.searchParams.get('limit') ?? 50) })); return;
@@ -210,7 +214,7 @@ export function createAiServer(dependencies) {
       }
       if (request.method !== 'POST' || url.pathname !== '/api/ai/ask') reject('未找到该 AI 接口。', 404);
       if (importing) reject('AI 备份正在恢复，请稍后再提问。', 409);
-      const input = validateAsk(await readJson(request, 64 * 1024));
+      const input = validateAsk(await readJson(request, 256 * 1024));
       // An already committed idempotency key can be replayed without paying for another model call.
       const existing = store.byRequest(input.requestId);
       if (existing) {
@@ -229,13 +233,14 @@ export function createAiServer(dependencies) {
       if (active.has(input.requestId)) reject('该问题仍在准备或回答中，请稍后加载会话。', 409);
       if (input.conversationId && activeConversations.has(input.conversationId)) reject('当前会话正在准备或回答，请等待或停止后再试。', 409);
       if (active.size >= 2) reject('已有两个问题在回答，请稍后再试。', 429);
+      if (input.conversationId) { const conversation = store.conversation(input.conversationId); if (!conversation) reject('会话不存在。', 404); if (!sameScope(conversation, input)) reject('会话属于不同研究主题或文章版本。', 409); }
       const previous = input.conversationId ? store.recentTurns(input.conversationId) : [];
       // Validate guide identity before any model/catalog request. The actual
       // selected model replaces this placeholder before committing the turn.
       // Pin credentials, target and fallback preference for this entire request,
       // even if a settings read notices an external file edit while it runs.
       const activeConfig = structuredClone(dependencies.runtime?.config ?? config);
-      const prepared = content.prepare(input, previous, { ...activeConfig, modelId: activeConfig.modelId || 'chatgpt' });
+      const prepared = prepareAssistantContext(content, input, previous, { ...activeConfig, modelId: activeConfig.modelId || 'chatgpt' }, store);
       const controller = new AbortController();
       active.set(input.requestId, controller);
       if (input.conversationId) activeConversations.add(input.conversationId);
@@ -260,6 +265,7 @@ export function createAiServer(dependencies) {
           return;
         }
         turn = begun.turn;
+        Object.defineProperty(prepared, 'runResearchTool', {value:researchToolsForTurn(store, turn),configurable:true});
         send = stream(response);
         const emit = event => {
           controller.signal.throwIfAborted();
@@ -277,7 +283,7 @@ export function createAiServer(dependencies) {
           send(event);
         };
         send({ type: 'accepted', conversationId: turn.conversationId, turnId: turn.id });
-        send({ type: 'status', text: prepared.context.scope === 'full-guide' ? '已载入完整压缩导读、覆盖说明和出处' : '全文导读超过预算：仅载入开篇、当前章节与覆盖说明' });
+        send({ type: 'status', text: prepared.context.scope === 'research' ? '已载入当前研究快照；本轮未附加论文' : prepared.context.scope === 'full-guide' ? '已载入完整压缩导读、覆盖说明和出处' : '全文导读超过预算：仅载入开篇、当前章节与覆盖说明' });
         send({ type: 'sources', sources: turn.sources });
         if (selected.fallback) send({ type: 'status', text: '订阅或此应用额度已达上限，本轮改用备用 API 回答。' });
         try {
@@ -292,8 +298,11 @@ export function createAiServer(dependencies) {
           const replacement = structuredClone(turn);
           replacement.context.fallback = { ...fallback.fallback, previousAnswer: turn.answer, previousToolCount: turn.context.toolEvents.length };
           replacement.context.provider = 'api'; replacement.context.model = fallback.config.modelId;
+          // A proposal from the interrupted provider must not become adoptable
+          // merely because the fallback finishes a different answer.
+          if (replacement.context.researchProposals) replacement.context.researchProposals = [];
           replacement.answer = '';
-          store.save(replacement); turn = replacement; persistedAt = Date.now();
+          store.save(replacement); turn = replacement; Object.defineProperty(prepared, 'runResearchTool', {value:researchToolsForTurn(store, turn),configurable:true}); persistedAt = Date.now();
           send({ type: 'reset', turn });
           send({ type: 'status', text: '订阅或此应用额度已达上限，备用 API 正在重新回答；已保留订阅的未完成内容。' });
           await fallback.run({ config: fallback.config, content, prepared, request: input, turn, signal: controller.signal, emit, persist, fetchImpl });

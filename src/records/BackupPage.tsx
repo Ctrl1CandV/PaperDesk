@@ -34,17 +34,17 @@ export function BackupPage() {
     return () => { alive = false; unsubscribe(); pending.current?.abort(); if (stagedJob.current) void personalStore.discardArchive(stagedJob.current).catch(() => {}); };
   }, []);
 
-  async function exportFile(migration = false) {
+  async function exportFile(migration: boolean | 'v2' = false) {
     setBusy(true); setError(''); setNotice('');
     const controller = new AbortController(); pending.current = controller;
     try {
       const stats = await personalStore.getStats();
-      const legacy = migration || stats.bytes + Object.values(stats.counts).reduce((a, b) => a + b, 2048) < MAX_BACKUP_BYTES && Object.entries(stats.counts).every(([name, count]) => count <= (name === 'notes' || name === 'explorations' ? 5000 : 10000));
-      const blob = migration ? new Blob([JSON.stringify(await personalStore.exportMigrationBackup())], { type: 'application/json' }) : legacy ? new Blob([JSON.stringify(await personalStore.exportBackup())], { type: 'application/json' }) : await personalStore.exportArchive(controller.signal);
+      const legacy = migration === true || !migration && stats.bytes + Object.values(stats.counts).reduce((a, b) => a + b, 2048) < MAX_BACKUP_BYTES && Object.entries(stats.counts).every(([name, count]) => count <= (name === 'notes' || name === 'explorations' ? 5000 : 10000)) && !await personalStore.hasResearchRecords();
+      const blob = migration === 'v2' ? await personalStore.exportResearchMigrationArchive(controller.signal) : migration ? new Blob([JSON.stringify(await personalStore.exportMigrationBackup())], { type: 'application/json' }) : legacy ? new Blob([JSON.stringify(await personalStore.exportBackup())], { type: 'application/json' }) : await personalStore.exportArchive(controller.signal);
       if (controller.signal.aborted) return;
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
-      anchor.href = url; anchor.download = `paperdesk-${migration ? 'migration-v1-' : ''}backup-${new Date().toISOString().slice(0, 10)}.${legacy ? 'json' : 'jsonl'}`;
+      anchor.href = url; anchor.download = `paperdesk-${migration === 'v2' ? 'pre-research-' : migration ? 'migration-v1-' : ''}backup-${new Date().toISOString().slice(0, 10)}.${legacy ? 'json' : 'jsonl'}`;
       anchor.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setNotice('已生成备份下载。请在浏览器下载列表确认文件已保存。');
     } catch (reason) { setError(message(reason)); }
@@ -118,8 +118,9 @@ export function BackupPage() {
       <div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void exportFile()}>导出完整备份</button><button className="secondary-action" disabled={busy} onClick={() => fileInput.current?.click()}>选择备份并预览</button></div>
       {busy && <button className="secondary-action" onClick={() => pending.current?.abort()}>取消当前备份操作</button>}
       <input className="records-file-input" ref={fileInput} type="file" accept=".json,.jsonl,application/json,application/x-ndjson" aria-label="选择个人记录备份" onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = ''; }} />
-      <p className="records-muted">接受个人备份 v1（5 MiB）和分块备份 v2（768 MiB 传输上限）。大库自动导出 v2，逐块校验后一次提交；旧版应用不能读取 v2。仅选择文件不会修改记录。</p>
+      <p className="records-muted">接受个人备份 v1（5 MiB）和分块备份 v2 / v3（768 MiB 传输上限）。含研究决定、文档或任务回执的记录自动导出 v3，逐块校验后一次提交；旧版应用不能读取 v3。仅选择文件不会修改记录。</p>
       {snapshot?.migrationBackupAvailable && <p className="records-muted">已保留升级前 v1 原始记录。<button className="secondary-action" disabled={busy} onClick={() => void exportFile(true)}>导出升级前记录副本</button> 此副本不包含升级后的编辑；恢复旧程序前先另存当前完整备份。</p>}
+      {snapshot?.researchMigrationBackupAvailable && <p className="records-muted">已保留研究助手升级前的完整记录。<button className="secondary-action" disabled={busy} onClick={() => void exportFile('v2')}>导出研究助手升级前副本</button> 此 v2 副本不包含升级后的编辑。降级前另存当前 v3 备份，在独立来源恢复旧副本。</p>}
     </section>
     <aside className="records-scope" aria-label="备份范围与迁移"><div><h2>保留一份可迁移的记录</h2><p className="records-muted">浏览器清理或回收存储可能删除记录；更换浏览器或访问地址时，请用备份迁移。目前没有同步服务，也不保证离线可用。</p></div><div><h2>AI 对话单独保存</h2><p className="records-muted">AI 对话需在阅读页的 AI 解读中单独备份、恢复或删除，不受本页操作影响。连接同一本机服务的浏览器共享 AI 对话。</p></div></aside>
     {shown && <section className="records-section records-preview" aria-labelledby="import-preview-title">

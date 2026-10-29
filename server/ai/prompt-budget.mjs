@@ -18,7 +18,7 @@ export function localResultBudget(context, search = false) {
 export function checkPromptBudget(payload, config, context) {
   const inputTokens = Buffer.byteLength(JSON.stringify(payload), 'utf8') + 512;
   const outputTokens = config.maxOutputTokens ?? 3000, limit = config.contextTokenLimit ?? 32768;
-  if (inputTokens + outputTokens > limit) throw new PublicError('本轮资料达到保守 token 预算；已保存来源，请缩小问题或章节范围。未发送超预算请求。', 413);
+  if (inputTokens + outputTokens > limit) throw new PublicError('本轮资料达到保守 token 预算；已保存来源，请减少所选研究材料或缩小问题、章节范围。未发送超预算请求。', 413);
   const budget = { method: 'utf8-bytes-upper-bound', inputTokens, outputTokens, limit };
   if (context) context.budget = budget;
   return budget;

@@ -1,5 +1,11 @@
 # Minimal implementation context
 
+## Research assistant extension
+
+The reader can explicitly enable the current exploration as model context. Each submission then sends that topic's question, interpretation, unknowns, selected evidence, scope, constraints, candidates, deferred directions and decisions with a fixed version/hash. Consent is remembered per topic in session storage; only consent flags/IDs are stored there, not the research text. The reader may additionally select individual notes and saved documents from the current exploration, inspect their text/revision and withdraw selection. These attachments are off by default; changed or deleted records require a renewed selection rather than silently substituting new text. Both providers and API fallback use the same submitted snapshots. Other explorations, unselected notes/documents and receipts are excluded. Topic history can include previously sent questions and answers; withdrawing a current attachment does not erase prior conversation records. Exported research/task files contain deliberately downloaded personal research context; they are private handoff files, never public content packages.
+
+The backend stores historical snapshots, not a second authoritative research state. Complete answers may propose changes; only explicit adoption writes to IndexedDB. Source excerpts retain model/guide/original/web provenance. Deleting an AI conversation does not erase source excerpts deliberately retained in research documents or decisions. Provider credentials remain backend-only and are not included in any research backup or handoff.
+
 The permitted audience description is a computer-science graduate reader with some prior paper-reading experience who wants survey guidance, paper assistance and research exploration. Agent applications are the initial content area. These functional facts are sufficient; do not ask for or infer a more specific biography.
 
 No requester/operator name, institution, city, country, nationality, age, contact details, account handles, device identifiers, private hypothesis, personal reading history, original machine path or old repository identity belongs in the project. Do not add sample identity fields, analytics, personal screenshots or environment inventories. Tests use clearly synthetic text and records, never a copy of the operator's real notes.

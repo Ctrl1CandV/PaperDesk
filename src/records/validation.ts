@@ -1,4 +1,7 @@
 import schema from '../../schemas/personal-backup.schema.json';
+import { validateResearchState } from '../../shared/research-contract.mjs';
+import { verifyTaskBrief } from '../../shared/research-artifacts.mjs';
+import type { Exploration } from './types';
 import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
 import type { PersonalBackup, StoreName } from './types';
 
@@ -74,9 +77,22 @@ function semantic(value: unknown, path: string): void {
   }
 }
 
-export function validateRecord(store: StoreName | 'preferences', value: unknown): void {
-  check(definitions[ruleNames[store]], value, store); semantic(value, store);
+export function validateRecord(store: StoreName | 'preferences', value: unknown, allowResearch = true): void {
+  let base = value;
+  if (allowResearch && store === 'explorations' && value && typeof value === 'object' && Object.hasOwn(value, 'research')) {
+    const { research, ...rest } = value as Record<string, unknown>;
+    try { validateResearchState(research); } catch (error) { fail('explorations.research', error instanceof Error ? error.message : '研究状态无效'); }
+    base = rest;
+  }
+  // Research has its own source validator: saved AI guide citations use pinned
+  // relative reader URLs, unlike legacy evidence's external source URLs.
+  check(definitions[ruleNames[store]], base, store); semantic(base, store);
   if (byteLength(value) > MAX_RECORD_BYTES) fail(store, '单条记录超过 8 MiB 限制');
+}
+export async function verifyResearchRecord(value: Exploration): Promise<void> {
+  for (const artifact of value.research?.artifacts ?? []) for (const task of artifact.taskVersions) {
+    try { await verifyTaskBrief(task); } catch (error) { fail('研究任务', error instanceof Error ? error.message : '摘要校验失败'); }
+  }
 }
 export function guideKey(guideId: string, revision: number) { return `${guideId}/${revision}`; }
 export function originalKey(sourceId: string, version: string | null) { return JSON.stringify([sourceId, version]); }

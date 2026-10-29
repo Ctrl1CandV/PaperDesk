@@ -9,6 +9,9 @@ import { EvidenceCard, ReadingTarget } from './EvidenceCard';
 import { ExplorationEditor, type CachedExplorationDraft } from './ExplorationEditor';
 import { actionLabels, statusLabels, useExploration } from './model';
 import { NextReading } from './NextReading';
+import { AiPanel } from '../assistant/AiPanel';
+import { decisionKinds, decisionStatuses } from '../assistant/ResearchProposals';
+import { ResearchWorkspace } from '../research/ResearchWorkspace';
 import './exploration.css';
 
 export function ExplorationPage({ explorationId, onHandoff }: { explorationId: string; onHandoff?: (record: Exploration) => void }) {
@@ -16,6 +19,17 @@ export function ExplorationPage({ explorationId, onHandoff }: { explorationId: s
   const draftKey = `exploration:edit:${explorationId}`;
   const [editing, setEditing] = useState(() => Boolean(getDraft<CachedExplorationDraft>(draftKey)));
   const [adding, setAdding] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [suggestedQuestion, setSuggestedQuestion] = useState('');
+  useEffect(() => {
+    const receive = (event: Event) => {
+      const detail = (event as CustomEvent<{ explorationId: string; question: string }>).detail;
+      if (detail?.explorationId !== explorationId || typeof detail.question !== 'string' || detail.question.length > 6000 || assistantOpen) return;
+      setSuggestedQuestion(detail.question); setAssistantOpen(true);
+    };
+    window.addEventListener('paperdesk:research-question', receive);
+    return () => window.removeEventListener('paperdesk:research-question', receive);
+  }, [explorationId, assistantOpen]);
   const [saved, setSaved] = useState(false);
   const [noteIds, setNoteIds] = useState<Set<string>>();
   useEffect(() => { document.title = `${record?.title ?? '我的探索'} · PaperDesk`; }, [record?.title]);
@@ -60,6 +74,12 @@ export function ExplorationPage({ explorationId, onHandoff }: { explorationId: s
         </section>
         <section className="exploration-thinking"><div><h2>我的解释</h2><p className={!record.interpretation ? 'exploration-small' : ''}>{record.interpretation || '尚未填写。可以先保留问题，等材料充分后再解释。'}</p></div><div><h2>尚不确定的地方</h2><p className={!record.unknowns ? 'exploration-small' : ''}>{record.unknowns || '尚未填写。未知可以继续保持开放。'}</p></div></section>
         <NextReading record={record} onSaved={completed} />
+        {record.research && <section className="exploration-research-state" aria-label="研究状态与决定">
+          {([['scope', '研究范围'], ['constraints', '明确约束'], ['candidates', '候选方向'], ['deferred', '暂缓方向及原因']] as const).filter(([field]) => record.research![field]).map(([field, label]) => <div key={field}><h2>{label}</h2><p>{record.research![field]}</p></div>)}
+          {record.research.decisions.length > 0 && <div><h2>决定与变化记录</h2><p className="exploration-small">采纳假设表示准备调查它，不表示已经取得证实。</p>{record.research.decisions.map(item => <details key={item.id}><summary>{decisionKinds[item.kind]} · {decisionStatuses[item.status]}：{item.text}</summary><p>理由：{item.rationale || '尚未填写'}</p><p className="exploration-small">{item.sourceTurnId ? '来源：AI 研究对话' : '来源：手动记录'} · {item.createdAt}{item.supersedes && <> · 替代决定 {item.supersedes}</>}</p>{item.evidenceRefs.map((ref, index) => <blockquote key={index}>[{ref.citationId}] {ref.source.text}</blockquote>)}</details>)}</div>}
+        </section>}
+        <section className="exploration-assistant"><div className="exploration-section-heading"><h2>继续研究讨论</h2><button className="exploration-secondary" onClick={() => { setSuggestedQuestion(''); setAssistantOpen(value => !value); }}>{assistantOpen ? '收起研究助手' : '打开研究助手'}</button></div><p>围绕这条探索跨论文讨论。发送前可预览将带入的研究记录。</p>{assistantOpen && <AiPanel exploration={record} suggestedQuestion={suggestedQuestion} onClose={() => { setSuggestedQuestion(''); setAssistantOpen(false); }} />}</section>
+        <ResearchWorkspace record={record} />
         <p className="exploration-record-footer">状态由你选择；这些材料与解释并不代表原文已读、结论已验证或研究空白已成立。</p>
       </>}
       {adding && <ManualEvidenceDialog record={record} onClose={() => setAdding(false)} onSaved={completed} />}

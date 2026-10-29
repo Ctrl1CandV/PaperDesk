@@ -1,3 +1,5 @@
+import type { ResearchState } from '../../shared/research-contract.mjs';
+
 export type ReadingStatus = 'unread' | 'reading' | 'read' | 'deferred';
 export interface GuideTarget { guideId: string; revision: number; unitId: string }
 export interface SourceSnapshot { url: string; label: string; version: string | null }
@@ -22,6 +24,7 @@ export interface NextAction {
   description: string; target?: GuideTarget;
 }
 export interface Exploration {
+  research?: ResearchState;
   id: string; title: string; question: string; origin: 'reader' | 'adapted-editorial';
   seedRef?: { revision: number; lensId: string };
   status: 'inbox' | 'exploring' | 'deferred' | 'archived'; interpretation: string; unknowns: string;
@@ -47,12 +50,12 @@ export interface ImportPreview {
 /** Storage layout, backup format and content revisions are independent versions. */
 export interface RecordStats {
   bytes: number; counts: Record<StoreName, number>; revision: number;
-  limitBytes: number; migrationBackupAvailable: boolean;
+  limitBytes: number; migrationBackupAvailable: boolean; researchMigrationBackupAvailable?: boolean;
 }
 export interface RecordPage<T> { records: T[]; nextCursor?: string }
 export interface RecordPageOptions { limit?: number; cursor?: string; guideId?: string; revision?: number }
 export interface ArchivePreview {
-  format: 'paperdesk-personal-archive'; schemaVersion: 2; jobId: string; exportedAt: string;
+  format: 'paperdesk-personal-archive'; schemaVersion: 2 | 3; jobId: string; exportedAt: string;
   counts: Record<StoreName, number>; bytes: number; baselineRevision: number;
   duplicates: number; conflictCount: number; conflicts: ImportConflict[];
   unavailable: string[]; unavailableCount: number; missingNotes: string[]; missingNoteCount: number;

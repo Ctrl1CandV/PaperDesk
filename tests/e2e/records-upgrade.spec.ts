@@ -32,7 +32,7 @@ test('v1 layout migrates atomically with original identities, counters, indexes 
   expect(result.saved).toEqual(result.note); expect(result.restored).toEqual(result.note);
   expect(result.stats.counts.notes).toBe(1); expect(result.stats.bytes).toBeGreaterThan(0);
   expect(result.stats.migrationBackupAvailable).toBe(true); expect(result.again).toEqual(result.stats);
-  expect(result.shape.version).toBe(2); expect(result.shape.indexes).toContain('guideRevision'); expect(result.shape.indexes).toContain('updatedAt');
+  expect(result.shape.version).toBe(3); expect(result.shape.indexes).toContain('guideRevision'); expect(result.shape.indexes).toContain('updatedAt');
   expect(result.legacyRecovery.schemaVersion).toBe(1); expect(result.legacyRecovery.notes).toEqual([result.note]); expect(pageErrors).toEqual([]);
 });
 

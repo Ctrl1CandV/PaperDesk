@@ -1,9 +1,9 @@
 import type { ArchivePreview, Exploration, GuideTarget, ImportChoice, ImportConflict, Preferences, RecordStats, StoreName } from './types';
 import type { PersonalRecordStore } from './store';
 import { StaleImportError } from './store';
-import { byteLength, canonical, MAX_PERSONAL_BYTES, MAX_PERSONAL_RECORDS, MAX_RECORD_BYTES, recordKey, validateRecord, ValidationError } from './validation';
+import { byteLength, canonical, MAX_PERSONAL_BYTES, MAX_PERSONAL_RECORDS, MAX_RECORD_BYTES, recordKey, validateRecord, verifyResearchRecord, ValidationError } from './validation';
 
-// Version 2 is an ordered, bounded NDJSON archive. It never JSON.parse's a whole file.
+// Version 3 adds research records to the ordered, bounded NDJSON archive. It never JSON.parse's a whole file.
 // A private IndexedDB staging area provides a consistent export and atomic restore.
 const names: StoreName[] = ['notes', 'explorations', 'resume', 'guideStates', 'originalStates'];
 const recordStores = [...names, 'preferences'];
@@ -12,7 +12,7 @@ const targetBlockBytes = 128 * 1024;
 const maxLineBytes = MAX_RECORD_BYTES + 256 * 1024;
 export const MAX_ARCHIVE_BYTES = 768 * 1024 * 1024;
 type ArchiveRow = { store: StoreName | 'preferences'; key: string; value: any };
-type Header = { kind: 'manifest'; format: 'paperdesk-personal-archive'; schemaVersion: 2; exportedAt: string; snapshotRevision: number; counts: Record<StoreName, number>; bytes: number; records: number; origin: 'current' | 'migration-v1' };
+type Header = { kind: 'manifest'; format: 'paperdesk-personal-archive'; schemaVersion: 2 | 3; exportedAt: string; snapshotRevision: number; counts: Record<StoreName, number>; bytes: number; records: number; origin: 'current' | 'migration-v1' };
 type StageManifest = { header: Header; baselineRevision?: number; conflictCount?: number; ready?: boolean };
 const request = <T>(operation: IDBRequest<T>) => new Promise<T>((resolve, reject) => { operation.onsuccess = () => resolve(operation.result); operation.onerror = () => reject(operation.error); });
 const jobRange = (id: string) => IDBKeyRange.bound([id], [id, []]);
@@ -25,16 +25,16 @@ function fields(value: any, keys: string[]) {
 }
 function validateHeader(value: any): asserts value is Header {
   fields(value, ['kind', 'format', 'schemaVersion', 'exportedAt', 'snapshotRevision', 'counts', 'bytes', 'records', 'origin']);
-  if (value.kind !== 'manifest' || value.format !== 'paperdesk-personal-archive' || value.schemaVersion !== 2) fail('格式或版本不受支持。');
+  if (value.kind !== 'manifest' || value.format !== 'paperdesk-personal-archive' || ![2, 3].includes(value.schemaVersion)) fail('格式或版本不受支持。');
   if (!['current', 'migration-v1'].includes(value.origin) || typeof value.exportedAt !== 'string' || !Number.isFinite(Date.parse(value.exportedAt)) || new Date(value.exportedAt).toISOString() !== value.exportedAt) fail('清单时间或来源无效。');
   fields(value.counts, names);
   for (const count of Object.values(value.counts)) if (!Number.isSafeInteger(count) || (count as number) < 0 || (count as number) > MAX_PERSONAL_RECORDS) fail('记录数量无效。');
   if (!Number.isSafeInteger(value.snapshotRevision) || value.snapshotRevision < 0 || !Number.isSafeInteger(value.bytes) || value.bytes < 0 || value.bytes > MAX_PERSONAL_BYTES || value.records !== Object.values<number>(value.counts).reduce((a, b) => a + b, 1)) fail('清单容量或数量无效。');
 }
-function validateRow(row: any): ArchiveRow {
+function validateRow(row: any, version: 2 | 3): ArchiveRow {
   fields(row, ['store', 'value']);
   if (!recordStores.includes(row.store)) fail('记录类型无效。');
-  validateRecord(row.store, row.value);
+  validateRecord(row.store, row.value, version >= 3);
   return { ...row, key: row.store === 'preferences' ? 'preferences' : recordKey(row.store, row.value) };
 }
 async function visit(store: IDBObjectStore, range: IDBKeyRange | undefined, work: (cursor: IDBCursorWithValue) => Promise<void> | void) {
@@ -51,13 +51,14 @@ async function visit(store: IDBObjectStore, range: IDBKeyRange | undefined, work
 export async function discardPersonalArchive(store: PersonalRecordStore, jobId: string) {
   await store.transaction([stageName], 'readwrite', transaction => request(transaction.objectStore(stageName).delete(jobRange(jobId))));
 }
-async function stageExport(store: PersonalRecordStore, signal?: AbortSignal, migration = false) {
+async function stageExport(store: PersonalRecordStore, signal?: AbortSignal, migration: boolean | 'v2' = false) {
   const jobId = crypto.randomUUID();
-  const header: Header = { kind: 'manifest', format: 'paperdesk-personal-archive', schemaVersion: 2, exportedAt: new Date().toISOString(), snapshotRevision: 0, counts: { notes: 0, explorations: 0, resume: 0, guideStates: 0, originalStates: 0 }, bytes: 0, records: 0, origin: migration ? 'migration-v1' : 'current' };
+  const header: Header = { kind: 'manifest', format: 'paperdesk-personal-archive', schemaVersion: migration ? 2 : 3, exportedAt: new Date().toISOString(), snapshotRevision: 0, counts: { notes: 0, explorations: 0, resume: 0, guideStates: 0, originalStates: 0 }, bytes: 0, records: 0, origin: migration === true ? 'migration-v1' : 'current' };
+  const recoveryStore = migration === 'v2' ? '_migrationV2' : '_migrationV1';
   try {
-    await store.transaction([...(migration ? ['_migrationV1'] : recordStores), stageName, metaName], 'readwrite', async transaction => {
+    await store.transaction([...(migration ? [recoveryStore] : recordStores), stageName, metaName], 'readwrite', async transaction => {
       const stats: RecordStats = await request(transaction.objectStore(metaName).get('stats'));
-      if (migration && !stats.migrationBackupAvailable) fail('没有保留的 v1 迁移副本。');
+      if (migration && !(migration === 'v2' ? stats.researchMigrationBackupAvailable : stats.migrationBackupAvailable)) fail('没有保留的对应迁移副本。');
       header.snapshotRevision = stats.revision;
       const stage = transaction.objectStore(stageName);
       let preferences = false;
@@ -67,7 +68,7 @@ async function stageExport(store: PersonalRecordStore, signal?: AbortSignal, mig
         if (name === 'preferences') preferences = true; else header.counts[name]++;
         await request(stage.add({ store: name, key, value }, [jobId, 'record', name, key]));
       };
-      if (migration) await visit(transaction.objectStore('_migrationV1'), undefined, cursor => { const [name, key] = cursor.key as [ArchiveRow['store'], string]; return copy(name, key, cursor.value); });
+      if (migration) await visit(transaction.objectStore(recoveryStore), undefined, cursor => { const [name, key] = cursor.key as [ArchiveRow['store'], string]; return copy(name, key, cursor.value); });
       else for (const name of recordStores) await visit(transaction.objectStore(name), undefined, cursor => copy(name as ArchiveRow['store'], String(cursor.key), cursor.value));
       if (!preferences) await copy('preferences', 'preferences', {});
       await request(stage.add({ header } satisfies StageManifest, [jobId, 'manifest']));
@@ -87,7 +88,7 @@ async function nextRows(store: PersonalRecordStore, jobId: string, after?: IDBVa
     };
   }));
 }
-export async function exportPersonalArchive(store: PersonalRecordStore, signal?: AbortSignal, migration = false): Promise<Blob> {
+export async function exportPersonalArchive(store: PersonalRecordStore, signal?: AbortSignal, migration: boolean | 'v2' = false): Promise<Blob> {
   const { jobId, header } = await stageExport(store, signal, migration);
   try {
     const line = JSON.stringify(header); let chain = await digest(line), sequence = 0, after: IDBValidKey | undefined;
@@ -144,10 +145,14 @@ export async function previewPersonalArchive(store: PersonalRecordStore, file: B
       fields(value, ['kind', 'sequence', 'records', 'sha256']);
       if (value.kind !== 'block' || value.sequence !== sequence || !Array.isArray(value.records) || !value.records.length || value.records.length > 4096 || typeof value.sha256 !== 'string') fail('块顺序或内容无效。');
       if (await digest(JSON.stringify(value.records)) !== value.sha256) fail('块校验和不符。');
+      for (const item of value.records) {
+        const row = validateRow(item, header.schemaVersion);
+        if (row.store === 'explorations') await verifyResearchRecord(row.value);
+      }
       await store.transaction([stageName], 'readwrite', async transaction => {
         const stage = transaction.objectStore(stageName);
         for (const item of value.records) {
-          checkAbort(signal); const row = validateRow(item);
+          checkAbort(signal); const row = validateRow(item, header!.schemaVersion);
           count++; bytes += byteLength(row.value);
           if (row.store !== 'preferences') counts[row.store]++;
           if (bytes > MAX_PERSONAL_BYTES || count > 5 * MAX_PERSONAL_RECORDS + 1) fail('超过运行容量。');
@@ -159,7 +164,7 @@ export async function previewPersonalArchive(store: PersonalRecordStore, file: B
       chain = await digest(chain + value.sha256); sequence++;
     }
     if (!header || !ended || header.records !== count || header.bytes !== bytes || canonical(header.counts) !== canonical(counts)) fail('文件缺块或清单数量不一致。');
-    const preview: ArchivePreview = { format: 'paperdesk-personal-archive', schemaVersion: 2, jobId, exportedAt: header!.exportedAt, counts, bytes, baselineRevision: 0, duplicates: 0, conflictCount: 0, conflicts: [], unavailable: [], unavailableCount: 0, missingNotes: [], missingNoteCount: 0 };
+    const preview: ArchivePreview = { format: 'paperdesk-personal-archive', schemaVersion: header!.schemaVersion, jobId, exportedAt: header!.exportedAt, counts, bytes, baselineRevision: 0, duplicates: 0, conflictCount: 0, conflicts: [], unavailable: [], unavailableCount: 0, missingNotes: [], missingNoteCount: 0 };
     await store.transaction([...recordStores, stageName, metaName], 'readwrite', async transaction => {
       const stage = transaction.objectStore(stageName);
       if (!await request(stage.getKey([jobId, 'record', 'preferences', 'preferences']))) fail('缺少阅读设置。');
