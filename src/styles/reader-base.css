@@ -1,7 +1,7 @@
 :root {
   font-family:var(--font-body);
   color:var(--ink);
-  background:var(--surface-soft);
+  background:var(--workspace-background);
   font-synthesis:none;
   text-rendering:optimizeLegibility;
   font-smooth:always;

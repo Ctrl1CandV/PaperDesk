@@ -41,4 +41,8 @@ PaperDesk 0.1.0，产品规格 1.1。书架、导读、深度阅读、研究探�
 
 ## 后续维护
 
+2026-10-27 配色维护：按已给参考图将共享色板、书架独立颜色、页头、目录当前项和 AI 面板调整为暖灰与墨酒红。六个 CSS 文件的非颜色声明及原有规则顺序经解析核对保持一致；未改布局、字号、间距、内容、交互或数据格式。独立只读审查通过，辅助文字在工作区底色上的静态对比度为 4.59:1。
+
+本次 `npm test` 383/383 通过，`npm run build -- --logLevel warn` 和 `git diff --check` 通过；构建提示部分压缩产物超过 500 kB。在隔离来源 4174 的应用内浏览器实际查看了书架、Toolformer 选中卡与导学、阅读正文/目录/AI 面板、空笔记弹窗和教学图，截图位于忽略的 `.cache/palette-review/`。本地 Playwright 浏览器缺失，`npx playwright install chromium` 因 `ECONNRESET` 失败，本次未运行自动化浏览器套件，也未做窄视口或真机检查；隔离来源未连接 AI 服务，未调用模型或读取正常来源的个人记录。
+
 先通过[学习导览](../learning/README.md)定位负责模块，再进行必要改动。增加阅读内容遵循[内容工作流](../content/workflows/CONTENT-WORKFLOW.md)和[来源与图示规范](../content/workflows/SOURCES-AND-VISUALS.md)。部署、同步和云服务仍需另行确定范围。

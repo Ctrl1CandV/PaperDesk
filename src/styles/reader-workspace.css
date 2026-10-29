@@ -1,9 +1,11 @@
 /* Reading workspace: use the window for tools while keeping prose at a readable measure. */
 html { scroll-padding-block:28px 140px; }
-.site-header { background:var(--surface); }
-.brand { font-weight:700; letter-spacing:-.5px; }
-.brand-mark { color:white; background:var(--heading); border-color:var(--heading); border-radius:8px; }
-.brand-mark span { color:#acbce9; }
+.site-header { background:var(--header-background); border-bottom-color:var(--header-line); }
+.brand { font-weight:700; letter-spacing:-.5px; color:var(--header-ink); }
+.brand:hover { color:var(--header-ink); }
+.brand-mark { color:var(--header-background); background:var(--header-ink); border-color:var(--header-ink); border-radius:8px; }
+.brand-mark span { color:var(--accent); }
+.site-header :focus-visible { outline-color:var(--header-ink); }
 .reader-layout { max-width:2280px; grid-template-columns:240px minmax(0,1fr); gap:28px; padding:32px var(--workspace-gutter) 80px; }
 .reading-main { min-width:0; background:var(--surface); padding:28px clamp(28px,2.5vw,52px) 38px; border:1px solid var(--line); border-radius:6px; }
 .reading-main > .prose,.reading-main > .article-topline,.reading-main > .reading-identity,.reading-main > .reading-footer { max-width:52rem; margin-inline:auto; }
@@ -12,7 +14,8 @@ html { scroll-padding-block:28px 140px; }
 .toc-heading { padding:0 12px 14px; justify-content:space-between; color:var(--heading); font-size:15px; font-weight:700; }
 .toc-heading span { letter-spacing:0; font-size:12px; }
 .reading-sidebar nav li a { padding:11px 12px; gap:10px; font-size:14px; line-height:1.7; color:var(--muted); border-radius:0 5px 5px 0; }
-.reading-sidebar nav li a[aria-current] { color:var(--accent); font-weight:700; background:var(--surface-selected); }
+.reading-sidebar nav li a[aria-current] { color:var(--selected-ink); font-weight:700; background:var(--selected-background); border-left-color:var(--selected-border); }
+.reading-sidebar nav li a[aria-current] .toc-number { color:var(--selected-muted); }
 .toc-number { min-width:16px; font-family:var(--font-data); font-size:10px; font-weight:400; }
 .sidebar-footer { margin-top:18px; padding:14px 12px 0; }
 .article-topline { min-height:0; margin-bottom:10px; }
