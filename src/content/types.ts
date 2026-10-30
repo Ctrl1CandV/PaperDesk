@@ -29,7 +29,7 @@ export interface Guide {
 }
 /** Navigation and orientation data only; no body, citations, assets or review inventory. */
 export interface GuideSummary {
-  metadata: Pick<GuideMetadata, 'id' | 'paperId' | 'revision' | 'title' | 'paperTitle' | 'type' | 'purpose' | 'source' | 'orientation'> & {
+  metadata: Pick<GuideMetadata, 'id' | 'paperId' | 'revision' | 'title' | 'paperTitle' | 'type' | 'purpose' | 'source' | 'orientation' | 'related'> & {
     coverage: Pick<GuideMetadata['coverage'], 'limitations'>;
   };
   units: GuideMetadata['units'];

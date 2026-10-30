@@ -26,8 +26,9 @@ export type ResearchRequest = { explorationId: string; question: string; artifac
 const conversationSelections = new Map<string, string | undefined>();
 const handledTopicRequests = new Set<number>(), handledResearchRequests = new Set<number>();
 const errorText = (error: unknown) => error instanceof Error && error.message ? error.message : '操作未完成，请保留草稿并重试。';
-const suggestions = ['这一节的核心思路是什么？请结合文章解释。', '这里的结论依赖哪些条件，有什么局限？', '把文中的方法串起来，解释它们之间的关系。'];
-const suggestionLabels = ['解释这一节的核心思路', '梳理结论的条件与局限', '串起文中方法的关系'];
+const recapPrompt = '我对这一节的理解是：';
+const suggestions = [`${recapPrompt}\n\n请对照导读和原文指出我的遗漏或偏差，先不要直接给出完整讲解。`, '请就这一节提两个检验理解的问题，先不要给答案；等我回答后，再对照导读和原文指出遗漏或偏差。', '这一节的核心思路是什么？请结合文章解释。'];
+const suggestionLabels = ['我先复述，请你检查', '就这一节考我两个问题', '解释这一节的核心思路'];
 const researchSuggestions = ['请帮我把这个问题想清楚：它背后可能有哪些值得调查的方向？已有材料能说明什么、还缺什么？', '比较目前能想到的几个方向：区别在哪里，各自有什么依据和主要疑点？', '当前判断还缺哪些证据？什么发现会改变我们的判断？'];
 const researchSuggestionLabels = ['把问题想清楚', '比较可能的方向', '检查依据与反例'];
 const timeLabel = (value: string) => Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }) : '';
@@ -36,6 +37,7 @@ function PanelIcon({ kind }: { kind: 'new' | 'history' }) {
 }
 
 type PanelProps = { guide?: Guide; unitId?: string; selection?: string; exploration?: Exploration; suggestedQuestion?: string; topicRequest?: TopicRequest; researchRequest?: ResearchRequest; onClose?: () => void };
+const topicSelectId = 'ai-topic-select';
 function readSession(key: string) { try { return sessionStorage.getItem(key) ?? ''; } catch { return ''; } }
 function writeSession(key: string, value: string) { try { sessionStorage.setItem(key, value); } catch { /* Session memory remains usable. */ } }
 export function AiPanel(props: PanelProps) {
@@ -47,7 +49,10 @@ export function AiPanel(props: PanelProps) {
   const topics = useRecords('explorations');
   // Reading-accumulation entries hold files for a learning goal; conversations link to directions.
   const directions = topics.records.filter(item => item.research?.purpose !== 'accumulation');
+  const refocusPicker = useRef(false);
   function switchTopic(id: string, question?: string, notice = '') { setTopicId(id); writeSession('paperdesk-ai-topic', id); setSuggestion(question); setShellNotice(notice); }
+  // The picker sits inside the remounted panel; keep keyboard focus on it after a switch.
+  useEffect(() => { if (refocusPicker.current) { refocusPicker.current = false; document.getElementById(topicSelectId)?.focus({ preventScroll: true }); } });
   useEffect(() => {
     // Apply each request once, even if the panel is closed and reopened later.
     const request = props.topicRequest;
@@ -62,18 +67,20 @@ export function AiPanel(props: PanelProps) {
   const exploration = props.exploration ?? selected.record;
   const topicMissing = Boolean(!props.exploration && topicId && !selected.loading && !selected.record);
   const key = `${exploration ? `exploration:${exploration.id}:` : ''}${props.guide?.metadata.id}/${props.guide?.metadata.revision}`;
-  return <div className="ai-research-shell">
-    {!props.exploration && <div className="ai-topic-picker"><label><span>方向</span><select aria-label="关联方向" title="关联后，提问会带上这个方向的记录；不关联则只讨论这篇导读" disabled={locked || selected.loading} value={topicId} onChange={event => switchTopic(event.target.value)}>
+  const picker = !props.exploration && <div className="ai-topic-picker"><label><span>方向</span><select id={topicSelectId} aria-label="关联方向" title="关联后，提问会带上这个方向的记录；不关联则只讨论这篇导读" disabled={locked || selected.loading} value={topicId} onChange={event => { refocusPicker.current = true; switchTopic(event.target.value); }}>
       <option value="">不关联方向</option>
       {topicId && !directions.some(item => item.id === topicId) && <option value={topicId}>{exploration?.title ?? '正在读取方向'}</option>}
       {directions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-    </select></label>{topics.hasMore && <button type="button" disabled={locked || topics.loading} onClick={() => void topics.loadMore()}>更多</button>}{topics.error && <p role="alert">{topics.error}</p>}{pendingTopic && <p role="status">当前回答结束后切换方向。</p>}{shellNotice && <p role="status">{shellNotice}</p>}</div>}
-    {topicMissing ? <p role="alert">关联的方向当前不可用，请选择另一个方向或不关联。不会从旧会话恢复你的研究记录。</p> : topicId && !props.exploration && selected.loading ? <p role="status">正在读取方向…</p> : <AiPanelContent key={key} {...props} suggestedQuestion={props.suggestedQuestion ?? suggestion} exploration={exploration} onBusyChange={setLocked}
+    </select></label>{topics.hasMore && <button type="button" disabled={locked || topics.loading} onClick={() => void topics.loadMore()}>更多</button>}{topics.error && <p role="alert">{topics.error}</p>}{pendingTopic && <p role="status">当前回答结束后切换方向。</p>}{shellNotice && <p role="status">{shellNotice}</p>}</div>;
+  const content = !topicMissing && !(topicId && !props.exploration && selected.loading);
+  return <div className="ai-research-shell">
+    {!content && picker}
+    {topicMissing ? <p role="alert">关联的方向当前不可用，请选择另一个方向或不关联。不会从旧会话恢复你的研究记录。</p> : !content ? <p role="status">正在读取方向…</p> : <AiPanelContent key={key} {...props} picker={picker || undefined} suggestedQuestion={props.suggestedQuestion ?? suggestion} exploration={exploration} onBusyChange={setLocked}
       onDirectionCreated={props.exploration ? undefined : record => switchTopic(record.id, undefined, `已建立并关联方向《${record.title}》，之后的讨论会归入这个方向。`)} />}
   </div>;
 }
 
-function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuestion, researchRequest, onClose, onBusyChange, onDirectionCreated }: PanelProps & { onBusyChange: (busy: boolean) => void; onDirectionCreated?: (record: Exploration) => void }) {
+function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuestion, researchRequest, picker, onClose, onBusyChange, onDirectionCreated }: PanelProps & { picker?: React.ReactNode; onBusyChange: (busy: boolean) => void; onDirectionCreated?: (record: Exploration) => void }) {
   const guideKey = exploration ? `exploration:${exploration.id}` : `${guide?.metadata.id}/${guide?.metadata.revision}`;
   const draftKey = `ai:${guideKey}${exploration ? `:${guide?.metadata.id ?? 'topic'}/${guide?.metadata.revision ?? 0}` : ''}`;
   const [cached] = useState(() => getDraft<SessionDraft>(draftKey));
@@ -478,6 +485,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       <div className="ai-heading-actions"><button type="button" className="ai-icon-button" aria-label="开始新对话" title="新对话" disabled={locked || connecting} onClick={() => void chooseConversation('')}><PanelIcon kind="new" /></button><button type="button" className="ai-icon-button" aria-label="查看历史对话" title="历史对话" disabled={locked} onClick={() => { setHistoryOpen(true); setError(''); setNotice(''); }}><PanelIcon kind="history" /></button>{onClose && <button type="button" className="ai-icon-button" aria-label="收起 AI 解读" title="收起" onClick={onClose}>×</button>}</div>
     </header>
     <div className="ai-context">
+      {picker}
       {exploration && <div className="ai-research-line">{!guide && <strong>{exploration.title}</strong>}<details className="ai-research-preview"><summary>方向记录 r{exploration.recordRevision}</summary><p>关联方向后，每次提问会带上这个方向的问题、认识、决定、材料和下一步，并参考同方向的旧讨论；其他方向和未选笔记不会发送。</p><ResearchSnapshotView snapshot={researchSnapshotData(exploration)} /></details>
         <button type="button" className="ai-inline-action" disabled={locked} onClick={() => setMaterialsPickerOpen(true)}>{selectedMaterials.notes.length || selectedMaterials.artifacts.length ? `资料 · 已选 ${selectedMaterials.notes.length} 条笔记、${selectedMaterials.artifacts.length} 份文档` : '资料 · 默认不发送'}</button></div>}
       {unit && <>
@@ -490,7 +498,10 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     <div className="ai-messages" ref={messages} role="region" aria-label="AI 解读对话" tabIndex={0} onScroll={event => { const node = event.currentTarget; if (autoTop.current !== undefined && Math.abs(node.scrollTop - autoTop.current) < 2) return; autoTop.current = undefined; nearBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }}>
       {exploration && !conversationId && conversations.length > 0 && !connecting && !connectionError && <div className="ai-service-state"><p>这个方向已有讨论：{conversations[0].title}</p><button type="button" className="ai-inline-action" disabled={locked} onClick={() => void chooseConversation(conversations[0].id)}>继续最近的讨论</button><p>只恢复对话，当前问题草稿与资料选择保持不变。</p></div>}
       {connecting ? <p className="ai-service-state" role="status">正在连接…</p> : connectionError ? <div className="ai-service-state"><p>{connectionError}</p><button type="button" className="ai-inline-action" onClick={() => void connect()}>重试连接</button></div> : status && !status.configured ? <div className="ai-service-state"><p>{status.provider === 'chatgpt' ? '连接 ChatGPT 后即可提问。' : '连接 ChatGPT 订阅，或配置自己的 API。'}</p><button type="button" className="ai-inline-action" onClick={() => setSettingsOpen(true)}>打开 AI 设置</button></div> : null}
-      {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">{exploration ? `继续讨论《${exploration.title}》` : '从这篇导读继续追问'}</p><p className="ai-empty-copy">{exploration ? '说出新的疑惑或想法即可。讨论有了变化时输入 /方向 更新这个方向；需要更多论文时输入 /选文。' : '读到想深入的地方，可以输入 /方向 建立研究方向，或输入 /选文 让 Harness 补充综述和论文。'}</p><div className="ai-suggestions">{(exploration ? researchSuggestions : suggestions).map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => { editQuestion(value); input.current?.focus(); }}>{exploration ? researchSuggestionLabels[index] : suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
+      {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">{exploration ? `继续讨论《${exploration.title}》` : '从这篇导读继续追问'}</p><p className="ai-empty-copy">{exploration ? '说出新的疑惑或想法即可。讨论有了变化时输入 /方向 更新这个方向；需要更多论文时输入 /选文。' : '读到想深入的地方，可以输入 /方向 建立研究方向，或输入 /选文 让 Harness 补充综述和论文。'}</p><div className="ai-suggestions">{(exploration ? researchSuggestions : suggestions).map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => {
+        editQuestion(value); const caret = value.startsWith(recapPrompt) ? recapPrompt.length : value.length;
+        requestAnimationFrame(() => { input.current?.focus(); input.current?.setSelectionRange(caret, caret); });
+      }}>{exploration ? researchSuggestionLabels[index] : suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
       {turnCursor && <button type="button" className="ai-inline-action" disabled={locked} onClick={() => void loadMore('turns')}>读取更早的问答</button>}
       {turns.map((turn, index) => <section className="ai-turn" key={turn.id} aria-label={`问题 ${index + 1}`}>
         <div className="ai-question"><span className="ai-speaker">{turn.context?.command ? '指令' : '你的问题'}{turn.summaryOnly ? ' · 历史摘要' : ''}</span><p>{turn.question}</p>{!turn.summaryOnly && <TurnMaterial turn={turn} />}</div>

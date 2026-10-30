@@ -3,12 +3,15 @@ import { contentRepository } from '../content/repository';
 import type { GuideSummary } from '../content/types';
 import { AppLink, navigate } from '../app/navigation';
 import { guideKey, personalStore } from '../records/store';
-import type { ResumeRecord } from '../records/types';
+import type { Exploration, ReadingStatus, ResumeRecord } from '../records/types';
+import { marksText, useReadingMarks, type ReadingMarks } from '../records/reading-marks';
 import { libraryBrief, publicationName, sourceVersionLabel } from './briefs';
 import { venueRanking } from './venueRankings';
 import './library.css';
 
 type Category = 'all' | 'survey' | 'paper';
+type MarkFilter = 'unmarked' | Exclude<ReadingStatus, 'unread'>;
+const markFilters: [MarkFilter, string][] = [['unmarked', '未读'], ['reading', '阅读中'], ['read', '已读'], ['deferred', '暂缓']];
 const categories: [Category, string][] = [['all', '全部'], ['survey', '综述'], ['paper', '论文']];
 const typeLabel = (type: string) => type === 'survey' ? '综述' : type === 'evaluation' ? '评价研究' : type === 'method' ? '方法研究' : '研究论文';
 const normalized = (value: string) => value.normalize('NFKC').trim().toLocaleLowerCase().replace(/\s+/g, ' ');
@@ -31,7 +34,7 @@ export function matchesTitleOrTopic(guide: GuideSummary, query: string) {
   return terms.every(term => fields.some(field => /^[a-z0-9-]+$/i.test(term) ? field.split(/[^a-z0-9-]+/i).some(word => word === term) : field.includes(term)));
 }
 
-function Orientation({ guide, resumes, returnToList }: { guide: GuideSummary; resumes: ResumeRecord[]; returnToList: () => void }) {
+function Orientation({ guide, resumes, marks, returnToList, openRelated }: { guide: GuideSummary; resumes: ResumeRecord[]; marks: ReadingMarks; returnToList: () => void; openRelated: (id: string) => void }) {
   const { metadata } = guide, orientation = metadata.orientation;
   const bibliography = orientation?.bibliography;
   const title = titleParts(orientation?.shortTitle ?? metadata.title);
@@ -45,6 +48,9 @@ function Orientation({ guide, resumes, returnToList }: { guide: GuideSummary; re
   const resumeLabel = currentResume ? brief.chapterLabels[resume.unitId] ?? resumeUnit?.heading : resumeUnit?.heading;
   const venue = publicationName(bibliography?.venue) || (bibliography?.publicationKind === 'preprint' ? '预印本' : '');
   const ranking = venueRanking(metadata);
+  const recorded = marksText(marks, metadata.id, metadata.source);
+  const aims = new Map(orientation?.readingTargets.map(target => [target.unitId, target]) ?? []);
+  const related = metadata.related.map(item => contentRepository.list().find(entry => entry.guide.metadata.id === item.guideId)?.guide).filter((item): item is GuideSummary => Boolean(item));
   return <section className="article-orientation" aria-labelledby="orientation-title">
     <button className="orientation-back text-action" onClick={returnToList}>← 返回筛选结果</button>
     <header className="orientation-masthead">
@@ -55,6 +61,7 @@ function Orientation({ guide, resumes, returnToList }: { guide: GuideSummary; re
         {canResume && <p className="orientation-resume" title={resumeUnit?.heading ?? undefined}>上次读到：{resumeLabel ?? '阅读起点'}{!currentResume && <span> · 导读修订 {resume.revision}</span>}</p>}
         <AppLink id={`start-${metadata.id}`} className="primary-action" to={canResume ? `/read/${resume.guideId}/${resume.revision}` : `/read/${metadata.id}/${metadata.revision}`}>{canResume ? '继续阅读' : '开始导读'} <span aria-hidden="true">→</span></AppLink>
         {canResume && <AppLink className="text-action" to={`/read/${metadata.id}/${metadata.revision}#orientation`}>从头阅读</AppLink>}
+        {recorded && <p className="orientation-marks">{recorded}</p>}
       </div>
     </header>
     <div className="orientation-body">
@@ -64,8 +71,12 @@ function Orientation({ guide, resumes, returnToList }: { guide: GuideSummary; re
         {brief.advice && <section><h3>阅读建议</h3><p>{brief.advice}</p></section>}
       </div>
       <nav className="orientation-outline" aria-label="阅读章节"><div className="orientation-section-heading"><h3>阅读章节</h3><span>{chapters.length} 节</span></div><ol>{chapters.map((unit, index) =>
-        <li key={unit.id}><AppLink to={`/read/${metadata.id}/${metadata.revision}#${unit.id}`} title={unit.heading ?? undefined} aria-current={currentResume && resume.unitId === unit.id ? 'location' : undefined}><span className="outline-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span>{brief.chapterLabels[unit.id] ?? unit.heading}</span></AppLink></li>
+        <li key={unit.id}><AppLink to={`/read/${metadata.id}/${metadata.revision}#${unit.id}`} title={unit.heading ?? undefined} aria-current={currentResume && resume.unitId === unit.id ? 'location' : undefined}><span className="outline-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span>{brief.chapterLabels[unit.id] ?? unit.heading}</span></AppLink>{aims.get(unit.id) && <p className="outline-aim">{aims.get(unit.id)!.purpose}</p>}</li>
       )}</ol></nav>
+      {related.length > 0 && <nav className="orientation-related" aria-label="相关导读"><h3>相关导读</h3><ul>{related.map(item => {
+        const text = marksText(marks, item.metadata.id, item.metadata.source);
+        return <li key={item.metadata.id}><button type="button" className="text-action" onClick={() => openRelated(item.metadata.id)}>{titleParts(item.metadata.orientation?.shortTitle ?? item.metadata.title).name}</button>{text && <span>{text}</span>}</li>;
+      })}</ul></nav>}
       <footer className="orientation-source"><span>{metadata.paperId} · 原文 {sourceVersionLabel(metadata.source.version)}</span>{brief.sourceUpdatedAt && <a href={brief.sourceRecordUrl ?? metadata.source.url} target="_blank" rel="noopener noreferrer">原文版本日期 <time dateTime={brief.sourceUpdatedAt}>{brief.sourceUpdatedAt}</time></a>}<span>导读修订 {metadata.revision}</span></footer>
     </div>
   </section>;
@@ -77,13 +88,18 @@ export function Library({ home = false }: { home?: boolean }) {
   const type = parameters.get('type');
   const category: Category = type === 'survey' || type === 'paper' ? type : 'all';
   const selectedId = parameters.get('article');
+  const markParameter = parameters.get('mark');
+  const markFilter = markFilters.find(([value]) => value === markParameter)?.[0];
+  const marks = useReadingMarks();
+  const [direction, setDirection] = useState<Exploration>();
   const [resumes, setResumes] = useState<ResumeRecord[]>([]);
   const [resumesLoading, setResumesLoading] = useState(true);
   const [storageError, setStorageError] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const layoutRef = useRef<HTMLDivElement>(null);
   const entries = contentRepository.list();
-  const filtered = entries.filter(({ guide }) => (category === 'all' || (category === 'survey' ? guide.metadata.type === 'survey' : guide.metadata.type !== 'survey')) && matchesTitleOrTopic(guide, query));
+  const guideMark = (id: string) => { const status = marks.guides.get(id)?.status; return !status || status === 'unread' ? 'unmarked' : status; };
+  const filtered = entries.filter(({ guide }) => (category === 'all' || (category === 'survey' ? guide.metadata.type === 'survey' : guide.metadata.type !== 'survey')) && matchesTitleOrTopic(guide, query) && (!markFilter || guideMark(guide.metadata.id) === markFilter));
   const selected = filtered.find(entry => entry.guide.metadata.id === selectedId);
   const detailOpen = Boolean(selected);
   useLayoutEffect(() => {
@@ -112,7 +128,16 @@ export function Library({ home = false }: { home?: boolean }) {
     if (shelf) observer.observe(shelf);
     if (preview) observer.observe(preview);
     return () => { observer.disconnect(); cancelAnimationFrame(frame); };
-  }, [selected, query, category]);
+  }, [selected, query, category, markFilter]);
+  useEffect(() => {
+    // The most recently updated direction that has a recorded next step; nothing is inferred.
+    let live = true;
+    personalStore.list('explorations').then(items => {
+      const next = items.filter(item => item.status !== 'archived' && item.research?.purpose !== 'accumulation' && item.nextAction).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
+      if (live) setDirection(next);
+    }).catch(() => {});
+    return () => { live = false; };
+  }, []);
   useEffect(() => {
     document.title = `${home ? '阅读与探索' : '阅读书架'} · PaperDesk`;
     let live = true;
@@ -140,6 +165,9 @@ export function Library({ home = false }: { home?: boolean }) {
     }
     change({ article: id }, false, { focusId: 'orientation-title', scrollToId: 'article-preview' });
   }
+  function openRelated(id: string) {
+    change({ article: id, q: null, type: null, mark: null }, false, { focusId: 'orientation-title', scrollToId: 'article-preview' });
+  }
   function returnToList() {
     const id = selected?.guide.metadata.id;
     change({ article: null }, false, { focusId: `choose-${id}`, scrollToId: `choose-${id}` });
@@ -147,25 +175,29 @@ export function Library({ home = false }: { home?: boolean }) {
   const latest = [...resumes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
   const resumeGuide = latest && contentRepository.getSummary(latest.guideId, latest.revision);
   return <main id="main-content" data-navigation-pending={resumesLoading} className={`library-page library-workspace${detailOpen ? ' has-selection' : ''}`}>
-    <header className="library-heading"><h1>阅读书架</h1><AppLink className="text-action library-explore-link" to="/explore">研究探索 <span aria-hidden="true">↗</span></AppLink></header>
-    {latest && <div className="home-resume"><div><span className="eyebrow">上次停留</span><p>{resumeGuide?.metadata.orientation?.shortTitle ?? resumeGuide?.metadata.title ?? '原阅读版本暂不可用'}</p></div><AppLink className="secondary-action" to={`/read/${latest.guideId}/${latest.revision}`}>继续阅读 →</AppLink></div>}
+    <header className="library-heading"><h1>阅读书架</h1><AppLink className="text-action library-explore-link" to="/explore">探索 <span aria-hidden="true">↗</span></AppLink></header>
+    {(latest || direction) && <div className="home-resume">
+      {latest && <div className="home-resume-item"><span className="eyebrow">上次停留</span><p>{resumeGuide?.metadata.orientation?.shortTitle ?? resumeGuide?.metadata.title ?? '原阅读版本暂不可用'}</p><AppLink className="text-action" to={`/read/${latest.guideId}/${latest.revision}`}>继续阅读 →</AppLink></div>}
+      {direction?.nextAction && <div className="home-resume-item"><span className="eyebrow">方向《{direction.title}》的下一步</span><p>{direction.nextAction.description}</p><AppLink className="text-action" to={`/explore/questions/${direction.id}`}>查看方向 →</AppLink></div>}
+    </div>}
     {storageError && <p className="status-error" role="status">本地位置暂时无法读取，仍可浏览和阅读。</p>}
     <div ref={layoutRef} className="library-layout"><section className="library-shelf" aria-label="选择文章">
       <label className="visually-hidden" htmlFor="library-search">查找文章</label><div className="library-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input ref={searchRef} id="library-search" type="search" className="library-search" value={query} onChange={event => change({ q: event.target.value || null, article: null }, true)} placeholder="搜索标题或主要主题" />{query && <button aria-label="清除搜索" onClick={() => { change({ q: null, article: null }, true); searchRef.current?.focus(); }}>×</button>}</div>
       <div className="library-categories" role="group" aria-label="文章类型">{categories.map(([value, label]) => <button id={`library-type-${value}`} key={value} aria-pressed={category === value} onClick={() => change({ type: value === 'all' ? null : value, article: null })}>{label}<span>{entries.filter(({ guide }) => value === 'all' || (value === 'survey' ? guide.metadata.type === 'survey' : guide.metadata.type !== 'survey')).length}</span></button>)}</div>
-      <p className="library-result-count" role="status">{query ? `“${query}” · ` : ''}{filtered.length} 篇文章</p>
+      <div className="library-result-row"><p className="library-result-count" role="status">{query ? `“${query}” · ` : ''}{markFilter ? `${markFilters.find(([value]) => value === markFilter)?.[1]} · ` : ''}{filtered.length} 篇文章</p>
+        <label className="library-mark-filter"><span className="visually-hidden">按导读阅读状态筛选</span><select value={markFilter ?? ''} onChange={event => change({ mark: event.target.value || null, article: null }, true)}><option value="">全部阅读状态</option>{markFilters.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label></div>
       <div className="guide-list">{filtered.map(({ guide, recommendation }) => {
         const { metadata } = guide, orientation = metadata.orientation;
         const title = titleParts(orientation?.shortTitle ?? metadata.title);
         return <button key={metadata.id} id={`choose-${metadata.id}`} className="guide-entry" aria-label={`${orientation?.shortTitle ?? metadata.title}，查看导学`} aria-pressed={selected?.guide.metadata.id === metadata.id} aria-expanded={selected?.guide.metadata.id === metadata.id} aria-controls="article-preview" onClick={() => select(metadata.id)}>
-          <span className="guide-card-meta"><span><DocumentIcon survey={metadata.type === 'survey'} />{typeLabel(metadata.type)}</span><span>{orientation?.bibliography.year ?? '年份待补充'}</span></span>
+          <span className="guide-card-meta"><span><DocumentIcon survey={metadata.type === 'survey'} />{typeLabel(metadata.type)}</span><span>{orientation?.bibliography.year ?? '年份待补充'}{marksText(marks, metadata.id, metadata.source) && <span className="guide-card-marks">{marksText(marks, metadata.id, metadata.source)}</span>}</span></span>
           <h2><span className="guide-card-name">{title.name}</span>{title.subtitle && <span className="guide-card-subtitle">{title.subtitle}</span>}</h2>
           {!title.subtitle && <span className="guide-card-summary">{orientation?.summary ?? metadata.purpose}</span>}
           <span className="guide-card-purpose">{orientation?.value ?? metadata.purpose}</span>
           <span className="guide-card-bottom"><span>{orientation?.topics.map(topic => topic.label).join(' / ') ?? recommendation.reason}</span><span className="guide-card-arrow" aria-hidden="true">↗</span></span>
         </button>;
       })}</div>
-      {!filtered.length && <div className="empty-state"><h2>没有匹配的文章</h2><p>当前只匹配标题和主要主题。可以换一个主题，或查看全部文章。</p><button className="secondary-action" onClick={() => change({ q: null, type: null, article: null })}>查看全部文章</button></div>}
-    </section><aside id="article-preview" className="library-preview" hidden={!selected} aria-label="文章导学" onKeyDown={event => { if (event.key === 'Escape' && !event.defaultPrevented && !(event.target instanceof Element && event.target.closest('dialog'))) { event.preventDefault(); event.stopPropagation(); returnToList(); } }}>{selected && <Orientation key={`${selected.guide.metadata.id}/${selected.guide.metadata.revision}`} guide={selected.guide} resumes={resumes} returnToList={returnToList} />}</aside></div>
+      {!filtered.length && <div className="empty-state"><h2>没有匹配的文章</h2><p>{markFilter ? '当前阅读状态下没有文章。' : '当前只匹配标题和主要主题。可以换一个主题，或查看全部文章。'}</p><button className="secondary-action" onClick={() => change({ q: null, type: null, mark: null, article: null })}>查看全部文章</button></div>}
+    </section><aside id="article-preview" className="library-preview" hidden={!selected} aria-label="文章导学" onKeyDown={event => { if (event.key === 'Escape' && !event.defaultPrevented && !(event.target instanceof Element && event.target.closest('dialog'))) { event.preventDefault(); event.stopPropagation(); returnToList(); } }}>{selected && <Orientation key={`${selected.guide.metadata.id}/${selected.guide.metadata.revision}`} guide={selected.guide} resumes={resumes} marks={marks} returnToList={returnToList} openRelated={openRelated} />}</aside></div>
   </main>;
 }

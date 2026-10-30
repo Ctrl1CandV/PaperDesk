@@ -85,8 +85,8 @@ export function LensPage({ lensId }: { lensId: string }) {
   const [creating, setCreating] = useState(false);
   useEffect(() => { document.title = `${lens?.title ?? '编辑起点'} · PaperDesk`; }, [lens]);
   if (loading) return <main id="main-content" className="exploration-page" data-navigation-pending="true"><p role="status">正在读取编辑起点…</p></main>;
-  if (!seed || !lens) return <main id="main-content" className="exploration-page"><AppLink to="/explore">← 返回研究探索</AppLink><h1>这个编辑起点暂不可用</h1><p>已保存的个人问题与材料仍会保留。</p></main>;
-  return <main id="main-content" className="exploration-page exploration-lens-page"><AppLink className="exploration-back" to="/explore">← 返回研究探索</AppLink>
+  if (!seed || !lens) return <main id="main-content" className="exploration-page"><AppLink to="/explore">← 返回探索</AppLink><h1>这个编辑起点暂不可用</h1><p>已保存的个人问题与材料仍会保留。</p></main>;
+  return <main id="main-content" className="exploration-page exploration-lens-page"><AppLink className="exploration-back" to="/explore">← 返回探索</AppLink>
     <span className="eyebrow">编辑起点 {String(lens.rank).padStart(2, '0')} · {lens.id === 'collaboration' ? '可选延伸' : '阅读与理解'}</span>
     <h1>{lens.title}</h1><p className="exploration-intro">{lens.orientation}</p>
     <section><h2>为什么现在看这个角度</h2><p>{lens.whyNow}</p></section>

@@ -1,11 +1,14 @@
 import { useEffect, useId, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { isSafeDiagram } from '../../shared/content-policy.mjs';
+import { useActiveTheme } from '../app/theme';
 
 export function Diagram({ source }: { source: string }) {
   const id = `diagram-${useId().replace(/[^a-z0-9]/gi, '')}`;
   const [svg, setSvg] = useState('');
   const [failed, setFailed] = useState(false);
+  // Mermaid bakes colours into the SVG, so a theme change redraws it.
+  const activeTheme = useActiveTheme();
   const labels = new Map([...source.matchAll(/([A-Za-z][A-Za-z0-9_]*)\[([^\]]+)\]/g)].map(match => [match[1], match[2]]));
   const steps = source.trim().split(/\r?\n/).slice(1).map(line => line.trim().split(/\s*-->\s*/).map(node => labels.get(node.match(/^[A-Za-z][A-Za-z0-9_]*/)?.[0] ?? '')).filter(Boolean).join(' → ')).filter(Boolean);
   useEffect(() => {
@@ -19,12 +22,12 @@ export function Diagram({ source }: { source: string }) {
         flowchart: { htmlLabels: false, useMaxWidth: false, padding: 18, nodeSpacing: 26, rankSpacing: 34 },
         themeVariables: { primaryColor: color('--surface-selected'), primaryTextColor: color('--ink'), primaryBorderColor: color('--line-strong'), lineColor: color('--accent'), secondaryColor: color('--surface-soft'), tertiaryColor: color('--surface'), edgeLabelBackground: color('--surface'), fontSize: '16px', dropShadow: 'none' },
       });
-      const result = await mermaid.render(id, source);
+      const result = await mermaid.render(`${id}-${activeTheme}`, source);
       const safe = DOMPurify.sanitize(result.svg, { USE_PROFILES: { svg: true, svgFilters: true }, FORBID_TAGS: ['foreignObject', 'a', 'image', 'script'], FORBID_ATTR: ['href', 'xlink:href'] });
       if (!cancelled) setSvg(safe);
     }).catch(() => { if (!cancelled) setFailed(true); });
     return () => { cancelled = true; };
-  }, [id, source]);
+  }, [id, source, activeTheme]);
   return <figure className="teaching-diagram">
     <figcaption><span className="figure-label">教学示意</span><span>组成之间的联系 · 非原论文图</span></figcaption>
     {failed ? <p role="status">图示暂时无法绘制，可阅读下方文字流程与相邻讲解。</p> :

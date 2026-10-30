@@ -4,7 +4,7 @@ The research extension uses IndexedDB layout 3 and personal archive v3, preservi
 
 This document governs browser records. AI conversations use a separate backend SQLite store; original papers and evidence mappings use a third materials directory. See [AI reading](AI-READING.md) and [operations](OPERATIONS.md). Exporting or clearing one collection does not include the others.
 
-PaperDesk retains the IndexedDB name `paperdesk-personal-v1` and opens **database version 3**. Notes, explorations, resume positions, guide marks, original-paper marks and preferences remain separate stores. Reviewed guides and editorial exploration seeds are read-only and never imported from a personal backup.
+PaperDesk retains the IndexedDB name `paperdesk-personal-v1` and opens **database version 3**. Notes, explorations, resume positions, guide marks, original-paper marks and preferences remain separate stores. Preferences hold the reader's font size and day/night theme; the theme is also mirrored in `localStorage` (`paperdesk-theme`) only so the page opens without flashing the other theme, and the stored preference remains the record that backups carry. Reviewed guides and editorial exploration seeds are read-only and never imported from a personal backup.
 
 ## Normal use
 

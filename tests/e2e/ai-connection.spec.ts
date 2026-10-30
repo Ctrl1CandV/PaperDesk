@@ -791,11 +791,12 @@ test('compact sidebar keeps the composer visible and separates settings, history
   const service = await syntheticService(context, { connected: true }); await openReader(page);
   await expect(page.getByRole('heading', { name: 'AI解读', exact: true })).toBeVisible();
   await expect(page.getByRole('textbox', { name: '向 AI 提问', exact: true })).toBeInViewport();
-  const geometry = await page.locator('.ai-panel').evaluate(panel => ({
-    topHeight: panel.querySelector('.ai-context')!.getBoundingClientRect().bottom - panel.getBoundingClientRect().top,
-    messagesHeight: panel.querySelector('.ai-messages')!.clientHeight,
+  // Measured from the shell: the direction picker now sits inside the panel context, so it counts here.
+  const geometry = await page.locator('.ai-research-shell').evaluate(shell => ({
+    topHeight: shell.querySelector('.ai-context')!.getBoundingClientRect().bottom - shell.getBoundingClientRect().top,
+    messagesHeight: shell.querySelector('.ai-messages')!.clientHeight,
   }));
-  expect(geometry.topHeight).toBeLessThan(150);
+  expect(geometry.topHeight).toBeLessThan(180);
   expect(geometry.messagesHeight).toBeGreaterThan(200);
   await mkdir('.cache/ai-settings-ui', { recursive: true });
   await page.screenshot({ path: '.cache/ai-settings-ui/desktop-panel.png', fullPage: false });

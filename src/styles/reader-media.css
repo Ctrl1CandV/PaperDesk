@@ -101,6 +101,10 @@
   background:var(--surface-muted);
   font-weight:600
 }
+/* Short row labels such as 来源 / 形式 must not break one character per line. */
+.table-scroll :is(th,td):first-child {
+  min-width:5.5em
+}
 .formula-scroll {
   padding:20px 12px;
   border:1px solid var(--line);

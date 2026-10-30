@@ -233,3 +233,8 @@
 .ai-command-label{display:block;color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.3px}
 .ai-command-title{display:block;margin-top:2px;color:var(--heading);font-size:15px;font-weight:600;overflow-wrap:anywhere}
 .ai-command-actions{display:flex;flex-wrap:wrap;gap:4px 16px}
+/* The direction picker is the first line of the panel's context, not a separate strip. */
+.ai-context>.ai-topic-picker{padding:0 0 6px;background:transparent}
+.ai-context>.ai-topic-picker select{background:var(--panel-background);border-color:transparent;color:var(--ink);font-size:13px}
+.ai-context>.ai-topic-picker select:hover,.ai-context>.ai-topic-picker select:focus-visible{border-color:var(--line);background:var(--surface)}
+.ai-research-shell>.ai-panel{border:0;border-radius:inherit}

@@ -20,6 +20,7 @@ for (const entry of catalog.entries) {
   entries.push({ ...entry, metadataSha256: sha256(bytes), bodySha256: metadata.bodySha256,
     guide: { metadata: { id, paperId, revision, title, paperTitle, type, purpose, source,
       ...(current && orientation ? { orientation } : {}),
+      related: current ? metadata.related ?? [] : [],
       coverage: { limitations: current ? metadata.coverage.limitations : [] } },
     units, bodyPath: directory + metadata.bodyFile, packageDirectory: directory } });
 }

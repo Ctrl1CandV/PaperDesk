@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Citation, Guide } from '../content/types';
-import { coverageLabel } from '../content/labels';
+import { coverageHint, coverageLabel } from '../content/labels';
+import { contentRepository } from '../content/repository';
+import { marksText, useReadingMarks } from '../records/reading-marks';
+import { readingLens } from './reading-lens';
 import { AppLink, isHistoryNavigation, isReloadNavigation, libraryReturnPath, navigate } from '../app/navigation';
 import { personalStore, guideKey, originalKey } from '../records/store';
 import type { GuideEvidence, GuideState, OriginalState, ReadingStatus, ResumeRecord } from '../records/types';
@@ -15,12 +18,14 @@ import { SourceDialog, type SourceSelection } from './SourceDialog';
 import { sectionContext } from './readingContext';
 import { ReaderAssistant } from './ReaderAssistant';
 
-function Contents({ guide, active, onChoose }: { guide: Guide; active: string; onChoose?: () => void }) {
+type ReadingTarget = NonNullable<Guide['metadata']['orientation']>['readingTargets'][number];
+function Contents({ guide, active, aim, onChoose }: { guide: Guide; active: string; aim?: ReadingTarget; onChoose?: () => void }) {
   return <nav aria-label="章节目录"><ol>{guide.units.map((unit, index) => <li key={unit.id}>
     <a href={`#${unit.id}`} aria-label={unit.heading ?? '阅读起点'} title={unit.heading ?? '阅读起点'} aria-current={active === unit.id ? 'location' : undefined} onClick={event => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); onChoose?.(); navigate(`#${unit.id}`);
     }}><span className="toc-number" aria-hidden="true">{String(index).padStart(2, '0')}</span><span>{navigationLabels[unit.heading ?? ''] ?? unit.heading ?? '阅读起点'}</span></a>
+    {aim && aim.unitId === unit.id && active === unit.id && <div className="toc-aim"><p><span>本节要弄清</span>{aim.purpose}</p>{aim.limit && <p className="toc-aim-limit">留意：{aim.limit}</p>}</div>}
   </li>)}</ol></nav>;
 }
 // Presentation-only aliases; approved headings, section IDs and accessible names stay intact.
@@ -60,6 +65,7 @@ export function Reader({ guide }: { guide: Guide }) {
   const [assistantWide, setAssistantWide] = useState(() => window.matchMedia('(min-width:1100px)').matches);
   const [assistantOpen, setAssistantOpen] = useState(() => window.matchMedia('(min-width:1100px)').matches);
   const [topicRequest, setTopicRequest] = useState<TopicRequest>();
+  const marks = useReadingMarks();
   useEffect(() => {
     const media = window.matchMedia('(min-width:1100px)');
     const sidebarMedia = window.matchMedia('(min-width: 801px) and (max-width: 1099px), (min-width: 1200px)');
@@ -126,6 +132,10 @@ export function Reader({ guide }: { guide: Guide }) {
   const context = () => selection ?? sectionContext(guide, active);
   const contextHeading = guide.units.find(unit => unit.id === (selection?.unitId ?? active))?.heading ?? '阅读起点';
   const statusLabel = (status?: ReadingStatus) => statuses.find(item => item[0] === status)?.[1] ?? '未记录';
+  // Authored reading targets for this section, shown quietly beside the article.
+  const aim = guide.metadata.orientation?.readingTargets.find(target => target.unitId === active);
+  const lens = readingLens(guide.metadata.type);
+  const related = guide.metadata.related.map(item => contentRepository.list().find(entry => entry.guide.metadata.id === item.guideId)?.guide).filter(item => item !== undefined);
   function adjustFont(delta: number) { const next = fontSize + delta; setFontSize(next); personalStore.savePreferences({ fontSize: next }).catch(() => setStorageError('本次字号已调整，但偏好未能保存。')); }
   async function mark(kind: 'guide' | 'original', status: ReadingStatus) {
     setSaving(true); setStateMessage('');
@@ -140,12 +150,18 @@ export function Reader({ guide }: { guide: Guide }) {
   const readingTools = <div className="reader-action-bar reading-tools" role="group" aria-label="阅读积累"><div className="reading-tool-context"><span>{selection ? '选中文本' : '当前章节'}</span><strong title={contextHeading}>{contextHeading}</strong></div>{selection && <button className="text-action clear-selection" onClick={() => { setSelection(undefined); window.getSelection()?.removeAllRanges(); }}>清除选择</button>}<button id="reader-note-action" className="tool-primary" aria-haspopup="dialog" onClick={() => setNoteContext(context())}><ReadingActionIcon kind="note" /><span>记笔记</span></button><button id="reader-explore-action" className="tool-primary" aria-haspopup="dialog" onClick={() => { const selected = context(); setEvidence({ id: crypto.randomUUID(), provenance: 'guide-excerpt', text: selected.text, target: { guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: selected.unitId }, sources: selected.sources }); }}><ReadingActionIcon kind="explore" /><span>加入探索</span></button><button id="reader-packet-action" className="tool-secondary" aria-haspopup="dialog" onClick={() => setPacket(context())}><ReadingActionIcon kind="copy" /><span>复制上下文</span></button></div>;
   return <>
     <div className={`mobile-tools${assistantWide ? ' assistant-mobile-tools' : ''}`}><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
-    <div className={`reader-layout${assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>{guide.units.length - 1} 节</span></div><Contents guide={guide} active={active} /><div className="sidebar-footer"><AppLink to="/explore">研究探索 →</AppLink></div>{sidebarTools && readingTools}</aside>
-      <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述解读' : '论文解读'}</span><span>导读修订 {guide.metadata.revision}</span><span>{coverageLabel(guide.metadata.coverage.scope)}</span></div></div>
+    <div className={`reader-layout${assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>{guide.units.length - 1} 节</span></div><Contents guide={guide} active={active} aim={aim} /><details className="reading-lens"><summary>读{lens.name}时可以留意</summary><ul>{lens.questions.map(question => <li key={question}>{question}</li>)}</ul></details><div className="sidebar-footer"><AppLink to="/explore">探索 →</AppLink></div>{sidebarTools && readingTools}</aside>
+      <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述解读' : '论文解读'}</span><span>导读修订 {guide.metadata.revision}</span><span title={coverageHint(guide.metadata.coverage.scope) || undefined}>{coverageLabel(guide.metadata.coverage.scope)}</span></div></div>
         <div className="reading-identity"><a className="reading-original" href={guide.metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 · {guide.metadata.source.version ?? '版本未指定'} ↗</a><div className="reader-heading-actions"><div className="desktop-font">{controls}</div><button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)} title={`本篇解读 · ${statusLabel(guideState?.status)}；原论文 · ${statusLabel(originalState?.status)}`}><strong>阅读记录</strong><span aria-hidden="true">⌄</span></button></div></div>
         {storageError && <p className="status-warning" role="status">{storageError}</p>}
         <article className="prose" style={{ '--reading-size': `${fontSize}px` } as React.CSSProperties}>{guide.units.map(unit => <section id={unit.id} tabIndex={-1} key={unit.id} data-unit={unit.id}><Markdown guide={guide} markdown={unit.markdown} unitId={unit.id} onCitation={openCitation} /></section>)}</article>
-        <footer className="reading-footer"><AppLink to="#orientation">回到阅读起点 ↑</AppLink><AppLink to="/explore">研究探索 →</AppLink></footer>
+        <footer className="reading-footer">
+          <div className="reading-close" role="group" aria-label="读完这篇">
+            <p className="reading-close-marks"><span>这篇导读：{statusLabel(guideState?.status)}</span>{guideState?.status !== 'read' && <button type="button" className="text-action" disabled={saving} onClick={() => void mark('guide', 'read')}>标为已读</button>}<span>原论文：{statusLabel(originalState?.status)}</span><button type="button" className="text-action" onClick={() => setStateOpen(true)}>修改记录</button>{stateMessage && !stateOpen && <span role="status">{stateMessage}</span>}</p>
+            {related.length > 0 && <p className="reading-close-next"><span>相关导读</span>{related.map(item => <span key={item.metadata.id}><AppLink to={`/read/${item.metadata.id}/${item.metadata.revision}`} title={item.metadata.title}>{(item.metadata.orientation?.shortTitle ?? item.metadata.title).split(/[：:]/)[0]}</AppLink>{marksText(marks, item.metadata.id, item.metadata.source) && <small>{marksText(marks, item.metadata.id, item.metadata.source)}</small>}</span>)}</p>}
+          </div>
+          <div className="reading-footer-links"><AppLink to="#orientation">回到阅读起点 ↑</AppLink><AppLink to="/explore">探索 →</AppLink></div>
+        </footer>
       </main>
       {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={selection?.text} wide={assistantWide} topicRequest={topicRequest} onClose={() => { setAssistantOpen(false); setTopicRequest(undefined); }} />}
     </div>

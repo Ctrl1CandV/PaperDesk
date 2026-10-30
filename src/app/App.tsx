@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { contentRepository } from '../content/repository';
 import { AppLink, useLocation } from './navigation';
+import { useTheme } from './theme';
 import { Reader } from '../reader/Reader';
 import { Markdown } from '../reader/Markdown';
 import { Library } from '../library/Library';
@@ -14,9 +15,18 @@ import type { Guide } from '../content/types';
 function Header({ pathname }: { pathname: string }) {
   const library = pathname === '/' || pathname === '/library' || pathname.startsWith('/read/');
   return <header className="site-header"><div className="header-inner">
-    <AppLink to="/" className="brand"><span className="brand-mark" aria-hidden="true">p<span>.</span></span>PaperDesk</AppLink>
-    <nav className="header-navigation" aria-label="主导航"><AppLink to="/library" current={library}>书架</AppLink><AppLink to="/explore" current={pathname.startsWith('/explore')}>探索</AppLink><AppLink to="/notes" current={pathname === '/notes'}>笔记</AppLink><AppLink to="/backup" current={pathname === '/backup'}>备份</AppLink></nav>
+    <AppLink to="/" className="brand"><span className="brand-mark" aria-hidden="true">p<span>.</span></span><span className="brand-name">PaperDesk</span></AppLink>
+    <div className="header-right"><nav className="header-navigation" aria-label="主导航"><AppLink to="/library" current={library}>书架</AppLink><AppLink to="/explore" current={pathname.startsWith('/explore')}>探索</AppLink><AppLink to="/notes" current={pathname === '/notes'}>笔记</AppLink><AppLink to="/backup" current={pathname === '/backup'}>备份</AppLink></nav><ThemeToggle /></div>
   </div></header>;
+}
+function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  const label = theme === 'dark' ? '切换到白天模式' : '切换到夜间模式';
+  return <button type="button" className="theme-toggle" aria-label={label} title={label} onClick={toggle}>
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {theme === 'dark' ? <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" /></> : <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />}
+    </svg>
+  </button>;
 }
 function Missing({ id }: { id?: string }) {
   const revision = id && contentRepository.currentRevision(id);
