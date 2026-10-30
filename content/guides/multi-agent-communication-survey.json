@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 2,
+  "id": "multi-agent-communication-survey",
+  "paperId": "arxiv:2502.14321",
+  "revision": 1,
+  "title": "多智能体通信综述：谁在何时把什么交给谁",
+  "paperTitle": "Beyond Self-Talk: A Communication-Centric Survey of LLM-Based Multi-Agent Systems",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "按架构、目标、时序和内容拆解多智能体通信，并为后续系统与通信优化论文建立阅读条件。",
+  "source": {
+    "id": "arxiv:2502.14321",
+    "version": "v3",
+    "url": "https://arxiv.org/pdf/2502.14321v3"
+  },
+  "bodyFile": "multi-agent-communication-survey.md",
+  "bodySha256": "f50470cd704f10eefb10f7b32f27874acd17442c859c47d1939716ad0b8c70cb",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从任务结果追回消息的作用"
+    },
+    {
+      "id": "u02",
+      "heading": "架构决定信息能沿什么关系流动"
+    },
+    {
+      "id": "u03",
+      "heading": "共同目标与互通协议解决不同问题"
+    },
+    {
+      "id": "u04",
+      "heading": "发言顺序改变了每个人看到的信息"
+    },
+    {
+      "id": "u05",
+      "heading": "消息、共享空间与行为信号如何承载内容"
+    },
+    {
+      "id": "u06",
+      "heading": "评价应当检验通信带来的收益与代价"
+    },
+    {
+      "id": "u07",
+      "heading": "把分类地图变成后续阅读条件"
+    },
+    {
+      "id": "u08",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-1",
+      "url": "https://arxiv.org/abs/2502.14321v3",
+      "labels": [
+        "论文身份与版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-2",
+      "url": "https://arxiv.org/html/2502.14321v3#S2",
+      "labels": [
+        "背景与系统通信入口"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-3",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS1",
+      "labels": [
+        "§3.1 与图 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-4",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS2",
+      "labels": [
+        "通信目标"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-5",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS3",
+      "labels": [
+        "协议讨论"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-6",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS1",
+      "labels": [
+        "§4.1 与图 6"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-7",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS2",
+      "labels": [
+        "通信范式"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-8",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS3",
+      "labels": [
+        "通信对象"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-9",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS4",
+      "labels": [
+        "通信内容"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-10",
+      "url": "https://arxiv.org/html/2502.14321v3#S5",
+      "labels": [
+        "挑战与评价"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c-11",
+      "url": "https://arxiv.org/pdf/2502.14321v3",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "multi-agent-collaboration-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§2–§5（系统通信与内部通信主线）"
+    ],
+    "figuresViewed": [
+      "Figure 3（PDF第4页，AI查看）",
+      "Figure 6（PDF第7页，AI查看）"
+    ],
+    "limitations": [
+      "未逐篇重读被引工作或复现其结果。",
+      "协议只解释概念层次；未验证现行协议实现。",
+      "多模态、安全和社会仿真应用没有完整展开；不是full-survey。"
+    ],
+    "reviewBasis": "AI基于固定v3正文提取并查看所列PDF页面，逐主张自审见docs/research/communication-surveys-review.md；独立审阅状态以该记录后续结论为准。"
+  },
+  "orientation": {
+    "shortTitle": "通信综述：谁在何时把什么交给谁",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "LLM-MAS",
+          "消息传递"
+        ]
+      },
+      {
+        "id": "communication-architecture",
+        "label": "通信架构与时序",
+        "aliases": [
+          "扁平结构",
+          "层级结构",
+          "并行通信",
+          "汇总者"
+        ]
+      },
+      {
+        "id": "communication-evaluation",
+        "label": "通信效率与评价",
+        "aliases": [
+          "消息成本",
+          "协调效率",
+          "时延"
+        ]
+      }
+    ],
+    "summary": "多个 Agent 交换消息之后，信息仍可能被忽略、误解或反复放大。本文从系统架构、目标与协议出发，继续分析发言顺序、交互范式、对象和内容，把多智能体通信拆成可以追踪的设计选择。",
+    "value": "适合进入 Multi-Agent Communication 方向时阅读：分清允许连接与实际消息轨迹，解释顺序、并行和汇总如何改变信息依赖，并把最终任务表现与通信成本、过程诊断联系起来。",
+    "prerequisites": [
+      "了解语言模型、输入上下文与工具调用的基本区别。",
+      "知道Agent会根据输入或环境反馈采取行动；无需先实现多智能体系统。"
+    ],
+    "boundaries": [
+      "主线讲解，不逐篇展开全部被引工作。",
+      "教学情境和对照建议未作为实验执行。",
+      "分类、角色名称与互通接口都不能单独证明协作有效。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Bingyu Yan",
+        "Zhibo Zhou",
+        "Litian Zhang",
+        "Lian Zhang",
+        "Ziyi Zhou",
+        "Dezhuang Miao",
+        "Zhoujun Li",
+        "Chaozhuo Li",
+        "Xiaoming Zhang"
+      ],
+      "year": 2025,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2502.14321v3",
+      "preprintYear": 2025
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "沿任务中的消息追踪接收、理解和行动之间的关系。",
+        "concepts": [
+          "通信",
+          "信息依赖",
+          "Agent"
+        ],
+        "limit": "教学场景未执行，通信存在不等于有效。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "区分五类组织架构及可用连接与实际通信轨迹。",
+        "concepts": [
+          "扁平",
+          "层级",
+          "团队",
+          "社会",
+          "混合架构"
+        ],
+        "limit": "分类图不是性能比较；组织类型可以组合。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "分开共同目标、局部竞争与互通接口的作用。",
+        "concepts": [
+          "合作",
+          "竞争",
+          "辩论",
+          "通信协议"
+        ],
+        "limit": "协议概念不代替现行文档，也不保证语义正确。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "说明顺序、并行与汇总如何影响信息依赖和错误传播。",
+        "concepts": [
+          "逐个发言",
+          "同时发言",
+          "汇总者",
+          "状态陈旧"
+        ],
+        "limit": "没有据此证明一种策略普遍最好。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "区分消息、共享空间、交互功能和显隐式内容。",
+        "concepts": [
+          "消息传递",
+          "言语行为",
+          "黑板",
+          "结构化数据"
+        ],
+        "limit": "结构正确与事实正确需要分别检查。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "把任务质量、资源代价和消息作用分别作为评价问题。",
+        "concepts": [
+          "通信成本",
+          "时延",
+          "消融",
+          "过程评价"
+        ],
+        "limit": "具体对照建议是教学延伸，没有执行新实验。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "根据编排或通信优化问题形成后续论文筛选条件。",
+        "concepts": [
+          "编排",
+          "通信优化",
+          "阅读主线"
+        ],
+        "limit": "编辑建议不证明历史挑战仍是当前空白。"
+      },
+      {
+        "unitId": "u08",
+        "purpose": "定位固定版本图表并识别覆盖边界。",
+        "concepts": [
+          "原文定位",
+          "覆盖边界"
+        ],
+        "limit": "没有逐篇审计全部参考工作。"
+      }
+    ]
+  }
+}

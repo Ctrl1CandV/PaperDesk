@@ -3,7 +3,9 @@ import { mkdir } from 'node:fs/promises';
 import catalog from '../../content/catalog.json' with { type: 'json' };
 
 const revisions = catalog.currentRevisions as Record<string, number>;
-const currentEntries = catalog.entries.filter(entry => revisions[entry.guideId] === entry.revision).sort((a, b) => a.recommendation.rank - b.recommendation.rank);
+const archivedGuideIds = new Set<string>(catalog.archivedGuideIds ?? []);
+const currentEntries = catalog.entries.filter(entry => revisions[entry.guideId] === entry.revision && !archivedGuideIds.has(entry.guideId))
+  .sort((a, b) => a.recommendation.rank - b.recommendation.rank);
 const lastGuide = currentEntries.at(-1)!;
 const noPageOverflow = async (page: Page) => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 const noNestedVerticalScroll = async (page: Page) => {
@@ -64,6 +66,7 @@ const previewBesideSelected = async (page: Page, guideId: string) => {
 test('keyboard browsing uses the page scroll and the last article opens a dismissible preview', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 520 });
   await page.goto('/library');
+  await expect(page.locator('.guide-entry')).toHaveCount(currentEntries.length);
   await expect(page.locator('#orientation-title')).toHaveCount(0);
   await page.getByRole('searchbox', { name: '查找文章' }).focus();
   let reachedLast = false;

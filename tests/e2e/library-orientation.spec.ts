@@ -5,10 +5,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const revision = catalog.currentRevisions as Record<string, number>;
-const currentMetadata = catalog.entries.filter(entry => revision[entry.guideId] === entry.revision)
+const archivedGuideIds = new Set<string>(catalog.archivedGuideIds ?? []);
+const shelfEntries = catalog.entries.filter(entry => revision[entry.guideId] === entry.revision && !archivedGuideIds.has(entry.guideId));
+const currentMetadata = shelfEntries
   .map(entry => JSON.parse(readFileSync(resolve('content', entry.metadataFile), 'utf8')) as { id: string; type: string });
 const paperCount = currentMetadata.filter(metadata => metadata.type !== 'survey').length;
-const lastGuide = catalog.entries.filter(entry => revision[entry.guideId] === entry.revision)
+const lastGuide = [...shelfEntries]
   .sort((a, b) => a.recommendation.rank - b.recommendation.rank).at(-1)!;
 
 test('title/topic search excludes incidental mentions and filtering clears the preview without marking reading', async ({ page }) => {
@@ -18,7 +20,9 @@ test('title/topic search excludes incidental mentions and filtering clears the p
   const search = page.getByRole('searchbox', { name: '查找文章' });
   await search.fill('Agent');
   const matches = await page.locator('.guide-entry').evaluateAll(elements => elements.map(element => element.id));
-  expect(matches).toEqual(expect.arrayContaining(['choose-agent-survey', 'choose-react', 'choose-reflexion']));
+  expect(matches).toEqual(expect.arrayContaining(['agent-survey', 'react', 'reflexion']
+    .filter(id => !archivedGuideIds.has(id)).map(id => `choose-${id}`)));
+  for (const id of archivedGuideIds) expect(matches).not.toContain(`choose-${id}`);
   expect(matches).not.toContain('choose-instructgpt');
   await expect(page.locator('#orientation-title')).toHaveCount(0);
   await page.locator('#choose-agent-survey').click();

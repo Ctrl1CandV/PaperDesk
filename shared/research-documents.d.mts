@@ -1,7 +1,7 @@
 import type { BriefPurpose } from './research-artifacts.mjs';
 import type { ResearchStage } from './research-contract.mjs';
-export type ResearchCommand = { name: 'direction' } | { name: 'reading-brief'; purpose: BriefPurpose };
-export type ParsedCommand = { command: { name: 'direction' } | { name: 'reading-brief'; purpose?: BriefPurpose }; rest: string };
+export type ResearchCommand = { name: 'direction' } | {name:'notebook'} | { name: 'reading-brief'; purpose: BriefPurpose };
+export type ParsedCommand = { command: { name: 'direction' } | {name:'notebook'} | { name: 'reading-brief'; purpose?: BriefPurpose }; rest: string };
 export interface ReadingBriefSection { title:string; keywords:string[]; hint:Record<BriefPurpose,string> }
 export const BRIEF_PURPOSES: Readonly<Record<BriefPurpose,{label:string;description:string}>>;
 export const STAGE_LABELS: Readonly<Record<ResearchStage,{label:string;doing:string;done:string}>>;

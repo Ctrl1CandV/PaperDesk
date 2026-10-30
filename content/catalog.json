@@ -14,7 +14,17 @@
     "rag": 2,
     "agent-memory-survey": 2,
     "streamingllm": 2,
-    "concept-drift-survey": 2
+    "concept-drift-survey": 2,
+    "rag-survey": 1,
+    "multi-agent-communication-survey": 1,
+    "multi-agent-collaboration-survey": 1,
+    "autogen": 1,
+    "camel": 1,
+    "agentprune": 1,
+    "llm-evaluation-survey": 1,
+    "agent-evaluation-survey": 1,
+    "agentbench": 1,
+    "tau-bench": 1
   },
   "entries": [
     {
@@ -22,9 +32,9 @@
       "revision": 1,
       "metadataFile": "guides/agent-survey.json",
       "recommendation": {
-        "rank": 1,
+        "rank": 7,
         "relation": "editorial-reading-order",
-        "reason": "先理解 Agent 怎样与环境持续交互，再认识系统构建、应用与评价的关系。"
+        "reason": "从模型能力转向环境中的持续行动。"
       }
     },
     {
@@ -32,9 +42,9 @@
       "revision": 1,
       "metadataFile": "guides/instructgpt.json",
       "recommendation": {
-        "rank": 2,
+        "rank": 4,
         "relation": "editorial-reading-order",
-        "reason": "理解使用目标怎样转化为人工材料、优化方法和可观察的模型行为。"
+        "reason": "理解指令跟随与偏好对齐的训练链路。"
       }
     },
     {
@@ -42,9 +52,9 @@
       "revision": 1,
       "metadataFile": "guides/helm.json",
       "recommendation": {
-        "rank": 3,
+        "rank": 16,
         "relation": "editorial-reading-order",
-        "reason": "理解场景、适配和指标如何共同决定一次评价能说明什么。"
+        "reason": "具体理解场景、适配和多指标的评价协议。"
       }
     },
     {
@@ -52,9 +62,9 @@
       "revision": 2,
       "metadataFile": "guides/agent-survey.r2.json",
       "recommendation": {
-        "rank": 1,
+        "rank": 7,
         "relation": "editorial-reading-order",
-        "reason": "先理解 Agent 怎样与环境持续交互，再认识系统构建、应用与评价的关系。"
+        "reason": "从模型能力转向环境中的持续行动。"
       }
     },
     {
@@ -62,9 +72,9 @@
       "revision": 2,
       "metadataFile": "guides/instructgpt.r2.json",
       "recommendation": {
-        "rank": 2,
+        "rank": 4,
         "relation": "editorial-reading-order",
-        "reason": "理解使用目标怎样转化为人工材料、优化方法和可观察的模型行为。"
+        "reason": "理解指令跟随与偏好对齐的训练链路。"
       }
     },
     {
@@ -72,9 +82,9 @@
       "revision": 2,
       "metadataFile": "guides/helm.r2.json",
       "recommendation": {
-        "rank": 3,
+        "rank": 16,
         "relation": "editorial-reading-order",
-        "reason": "理解场景、适配和指标如何共同决定一次评价能说明什么。"
+        "reason": "具体理解场景、适配和多指标的评价协议。"
       }
     },
     {
@@ -82,9 +92,9 @@
       "revision": 1,
       "metadataFile": "guides/react.json",
       "recommendation": {
-        "rank": 4,
+        "rank": 8,
         "relation": "editorial-reading-order",
-        "reason": "把推理、行动和环境反馈连接为可检查的任务循环。"
+        "reason": "串起推理、行动与观察的最小循环。"
       }
     },
     {
@@ -92,9 +102,9 @@
       "revision": 1,
       "metadataFile": "guides/toolformer.json",
       "recommendation": {
-        "rank": 5,
+        "rank": 19,
         "relation": "editorial-reading-order",
-        "reason": "进一步理解如何从候选调用、真实返回与筛选目标构造工具学习数据。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -102,9 +112,9 @@
       "revision": 1,
       "metadataFile": "guides/reflexion.json",
       "recommendation": {
-        "rank": 6,
+        "rank": 20,
         "relation": "editorial-reading-order",
-        "reason": "比较不更新参数时，反馈和文本经验怎样影响下一次尝试。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -112,9 +122,9 @@
       "revision": 1,
       "metadataFile": "guides/llm-survey.json",
       "recommendation": {
-        "rank": 7,
+        "rank": 1,
         "relation": "editorial-reading-order",
-        "reason": "先用综述把预训练、后训练、使用策略与评价放在同一张技术地图上。"
+        "reason": "先建立语言模型的能力、训练与使用地图。"
       }
     },
     {
@@ -122,9 +132,9 @@
       "revision": 1,
       "metadataFile": "guides/transformer.json",
       "recommendation": {
-        "rank": 8,
+        "rank": 2,
         "relation": "editorial-reading-order",
-        "reason": "理解注意力、位置和自回归生成如何组成后续大模型的计算基础。"
+        "reason": "理解注意力与序列建模基础。"
       }
     },
     {
@@ -132,9 +142,9 @@
       "revision": 1,
       "metadataFile": "guides/gpt3.json",
       "recommendation": {
-        "rank": 9,
+        "rank": 3,
         "relation": "editorial-reading-order",
-        "reason": "区分预训练得到的参数能力与通过上下文示例临时指定任务的使用方式。"
+        "reason": "理解预训练模型怎样利用上下文中的任务示例。"
       }
     },
     {
@@ -142,9 +152,9 @@
       "revision": 1,
       "metadataFile": "guides/chain-of-thought.json",
       "recommendation": {
-        "rank": 10,
+        "rank": 21,
         "relation": "editorial-reading-order",
-        "reason": "理解中间推理文本怎样改变提示与计算过程，并检查规模与任务条件。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -152,9 +162,9 @@
       "revision": 1,
       "metadataFile": "guides/rag.json",
       "recommendation": {
-        "rank": 11,
+        "rank": 6,
         "relation": "editorial-reading-order",
-        "reason": "区分参数记忆和外部检索，理解知识接入、概率组合与可更新性的边界。"
+        "reason": "具体理解检索结果如何进入生成过程。"
       }
     },
     {
@@ -162,9 +172,9 @@
       "revision": 1,
       "metadataFile": "guides/agent-memory-survey.json",
       "recommendation": {
-        "rank": 12,
+        "rank": 22,
         "relation": "editorial-reading-order",
-        "reason": "承接 RAG、ReAct 与 Reflexion，用综述建立记忆来源、形式、操作及评价的概念地图，再进入动态决策与持续推理。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -172,9 +182,9 @@
       "revision": 1,
       "metadataFile": "guides/streamingllm.json",
       "recommendation": {
-        "rank": 13,
+        "rank": 23,
         "relation": "editorial-reading-order",
-        "reason": "接续 Transformer 与记忆综述，区分有限 KV 缓存下的持续语言建模与长期历史记忆。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -182,9 +192,9 @@
       "revision": 1,
       "metadataFile": "guides/concept-drift-survey.json",
       "recommendation": {
-        "rank": 14,
+        "rank": 24,
         "relation": "editorial-reading-order",
-        "reason": "理解环境中的数据规律变化、检测与适应，以及不使用未来信息的在线评价。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -192,9 +202,9 @@
       "revision": 2,
       "metadataFile": "guides/concept-drift-survey.r2.json",
       "recommendation": {
-        "rank": 14,
+        "rank": 24,
         "relation": "editorial-reading-order",
-        "reason": "理解环境中的数据规律变化、检测与适应，以及不使用未来信息的在线评价。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -202,9 +212,9 @@
       "revision": 2,
       "metadataFile": "guides/streamingllm.r2.json",
       "recommendation": {
-        "rank": 13,
+        "rank": 23,
         "relation": "editorial-reading-order",
-        "reason": "接续 Transformer 与记忆综述，区分有限 KV 缓存下的持续语言建模与长期历史记忆。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -212,9 +222,9 @@
       "revision": 2,
       "metadataFile": "guides/agent-memory-survey.r2.json",
       "recommendation": {
-        "rank": 12,
+        "rank": 22,
         "relation": "editorial-reading-order",
-        "reason": "承接 RAG、ReAct 与 Reflexion，用综述建立记忆来源、形式、操作及评价的概念地图，再进入动态决策与持续推理。"
+        "reason": "本轮阅读集合之外；保留旧导读与引用，可按需回看。"
       }
     },
     {
@@ -222,9 +232,109 @@
       "revision": 2,
       "metadataFile": "guides/rag.r2.json",
       "recommendation": {
+        "rank": 6,
+        "relation": "editorial-reading-order",
+        "reason": "具体理解检索结果如何进入生成过程。"
+      }
+    },
+    {
+      "guideId": "rag-survey",
+      "revision": 1,
+      "metadataFile": "guides/rag-survey.json",
+      "recommendation": {
+        "rank": 5,
+        "relation": "editorial-reading-order",
+        "reason": "建立外部知识接入、控制和评价的全局地图。"
+      }
+    },
+    {
+      "guideId": "multi-agent-communication-survey",
+      "revision": 1,
+      "metadataFile": "guides/multi-agent-communication-survey.json",
+      "recommendation": {
+        "rank": 9,
+        "relation": "editorial-reading-order",
+        "reason": "先沿通信架构、策略和范式认识设计空间。"
+      }
+    },
+    {
+      "guideId": "multi-agent-collaboration-survey",
+      "revision": 1,
+      "metadataFile": "guides/multi-agent-collaboration-survey.json",
+      "recommendation": {
+        "rank": 10,
+        "relation": "editorial-reading-order",
+        "reason": "补齐角色关系、结构与编排的比较轴。"
+      }
+    },
+    {
+      "guideId": "autogen",
+      "revision": 1,
+      "metadataFile": "guides/autogen.json",
+      "recommendation": {
+        "rank": 12,
+        "relation": "editorial-reading-order",
+        "reason": "把消息、工具反馈和控制流程放入可执行系统。"
+      }
+    },
+    {
+      "guideId": "camel",
+      "revision": 1,
+      "metadataFile": "guides/camel.json",
+      "recommendation": {
         "rank": 11,
         "relation": "editorial-reading-order",
-        "reason": "区分参数记忆和外部检索，理解知识接入、概率组合与可更新性的边界。"
+        "reason": "用双角色协议观察交流如何推进或偏离任务。"
+      }
+    },
+    {
+      "guideId": "agentprune",
+      "revision": 1,
+      "metadataFile": "guides/agentprune.json",
+      "recommendation": {
+        "rank": 13,
+        "relation": "editorial-reading-order",
+        "reason": "检查通信连接是否必要及减少交流的成本条件。"
+      }
+    },
+    {
+      "guideId": "llm-evaluation-survey",
+      "revision": 1,
+      "metadataFile": "guides/llm-evaluation-survey.json",
+      "recommendation": {
+        "rank": 14,
+        "relation": "editorial-reading-order",
+        "reason": "先确定测什么、在哪里测和怎样解释分数。"
+      }
+    },
+    {
+      "guideId": "agent-evaluation-survey",
+      "revision": 1,
+      "metadataFile": "guides/agent-evaluation-survey.json",
+      "recommendation": {
+        "rank": 15,
+        "relation": "editorial-reading-order",
+        "reason": "把模型能力、行动过程和任务结果联系起来。"
+      }
+    },
+    {
+      "guideId": "agentbench",
+      "revision": 1,
+      "metadataFile": "guides/agentbench.json",
+      "recommendation": {
+        "rank": 17,
+        "relation": "editorial-reading-order",
+        "reason": "比较交互环境中的表现、汇总指标与失败类型。"
+      }
+    },
+    {
+      "guideId": "tau-bench",
+      "revision": 1,
+      "metadataFile": "guides/tau-bench.json",
+      "recommendation": {
+        "rank": 18,
+        "relation": "editorial-reading-order",
+        "reason": "检查最终状态、过程要求与多次运行可靠性的差别。"
       }
     }
   ],
@@ -233,5 +343,83 @@
     "revisions": {
       "1": "exploration.json"
     }
+  },
+  "archivedGuideIds": [
+    "toolformer",
+    "reflexion",
+    "chain-of-thought",
+    "agent-memory-survey",
+    "streamingllm",
+    "concept-drift-survey"
+  ],
+  "readingAssignments": {
+    "batches": [
+      {
+        "id": "communication-reading-2026-10",
+        "collectionId": "multi-agent-communication",
+        "titleAliases": [
+          "Multi-Agent Communication",
+          "Muti-Agent Communication"
+        ],
+        "guides": [
+          {
+            "guideId": "multi-agent-communication-survey",
+            "revision": 1
+          },
+          {
+            "guideId": "multi-agent-collaboration-survey",
+            "revision": 1
+          },
+          {
+            "guideId": "camel",
+            "revision": 1
+          },
+          {
+            "guideId": "autogen",
+            "revision": 1
+          },
+          {
+            "guideId": "agentprune",
+            "revision": 1
+          }
+        ]
+      },
+      {
+        "id": "evaluation-reading-2026-10",
+        "collectionId": "agent-model-evaluation",
+        "titleAliases": [
+          "Agent/Model Evaluation",
+          "Agent/Modle Evaluation",
+          "Agent / Model Evaluation",
+          "Agent / Modle Evaluation"
+        ],
+        "guides": [
+          {
+            "guideId": "llm-evaluation-survey",
+            "revision": 1
+          },
+          {
+            "guideId": "agent-evaluation-survey",
+            "revision": 1
+          },
+          {
+            "guideId": "helm",
+            "revision": 2
+          },
+          {
+            "guideId": "agentbench",
+            "revision": 1
+          },
+          {
+            "guideId": "tau-bench",
+            "revision": 1
+          }
+        ]
+      }
+    ],
+    "activeBatchIds": [
+      "communication-reading-2026-10",
+      "evaluation-reading-2026-10"
+    ]
   }
 }

@@ -2,7 +2,8 @@ import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import catalog from '../../content/catalog.json' with { type: 'json' };
 
-const currentGuideCount = Object.keys(catalog.currentRevisions).length;
+const activeGuideIds = Object.keys(catalog.currentRevisions).filter(id => !((catalog as { archivedGuideIds?: string[] }).archivedGuideIds ?? []).includes(id));
+const currentGuideCount = activeGuideIds.length;
 
 // All personal text and storage/clipboard failures below are synthetic test fixtures.
 const syntheticText = '合成测试笔记：需要核对行动成立的条件。';
@@ -46,7 +47,7 @@ test('current guides and local search have honest empty and fresh-home states', 
   await expect(page.locator('.guide-entry').nth(0)).toHaveAttribute('id', 'choose-agent-survey');
   await expect(page.locator('.guide-entry').nth(1)).toHaveAttribute('id', 'choose-instructgpt');
   await expect(page.locator('.guide-entry').nth(2)).toHaveAttribute('id', 'choose-helm');
-  for (const id of ['react', 'toolformer', 'reflexion']) await expect(page.locator(`#choose-${id}`)).toBeAttached();
+  for (const id of activeGuideIds) await expect(page.locator(`#choose-${id}`)).toBeAttached();
   await page.getByRole('searchbox', { name: '查找文章' }).fill('合成测试不存在的关键词-9bf1');
   await expect(page.getByRole('heading', { name: '没有匹配的文章' })).toBeVisible();
   await expect(page.locator('.guide-entry')).toHaveCount(0);
@@ -232,52 +233,11 @@ test('optional notes arriving asynchronously never overwrite an edited packet pr
   await expect.poll(() => preview.inputValue()).toContain(syntheticText);
 });
 
-test('exploration packets include only explicitly chosen personal fields and preserve all attribution categories', async ({ page }) => {
+test('direction navigation no longer offers a second context-export workflow', async ({ page }) => {
   await page.goto('/explore');
-  const seeded = await page.evaluate(async () => {
-    const { personalStore } = await import('/src/records/store.ts');
-    return personalStore.saveExploration({
-      id: crypto.randomUUID(), title: '合成测试：探索交接问题标题', question: '合成测试：探索交接的私人问题', origin: 'reader',
-      status: 'exploring', interpretation: '合成测试：没有选择的私人解释', unknowns: '合成测试：没有选择的未知条件',
-      nextAction: { kind: 'read-guide', description: '合成测试：没有选择的下一步行动', target: { guideId: 'helm', revision: 1, unitId: 'u02' } },
-      evidence: [
-        { id: crypto.randomUUID(), provenance: 'guide-excerpt', text: '合成测试：被单独选择的导读材料', comment: '合成测试：导读材料的读者备注', target: { guideId: 'agent-survey', revision: 1, unitId: 'u01' }, sources: [{ url: 'https://example.org/synthetic-source#section-2', label: '合成测试 §2', version: 'v3' }] },
-        { id: crypto.randomUUID(), provenance: 'original-excerpt', text: '合成测试：独立原文摘录', source: { identity: 'doi:10.0000/synthetic-packet', locator: '合成测试 page 7', version: null } },
-        { id: crypto.randomUUID(), provenance: 'reader-observation', text: '合成测试：无来源的个人观察' },
-      ],
-    }, null);
-  });
-  await page.goto(`/explore/questions/${seeded.id}`);
-  await page.getByRole('button', { name: '复制上下文', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: '复制探索上下文' }), preview = dialog.getByLabel('完整复制预览', { exact: true });
-  await expect(preview).not.toHaveValue('');
-  const initial = await preview.inputValue();
-  for (const text of [seeded.title, seeded.question, seeded.interpretation, seeded.unknowns, seeded.nextAction.description, ...seeded.evidence.map(item => item.text)]) expect(initial).not.toContain(text);
-  await dialog.getByRole('checkbox', { name: '问题', exact: true }).check();
-  await dialog.getByRole('checkbox', { name: /^证据 1/ }).check();
-  await expect.poll(() => preview.inputValue()).toContain(seeded.evidence[0].text);
-  const guidePacket = await preview.inputValue();
-  expect(guidePacket).toContain(seeded.title); expect(guidePacket).toContain(seeded.question);
-  expect(guidePacket).toContain('导读摘录，修订 1'); expect(guidePacket).toContain('返回：/read/agent-survey/1#u01');
-  expect(guidePacket).toContain('合成测试 §2 | v3 | https://example.org/synthetic-source#section-2');
-  expect(guidePacket).toContain('读者备注：合成测试：导读材料的读者备注');
-  for (const text of [seeded.interpretation, seeded.unknowns, seeded.nextAction.description, seeded.evidence[1].text, seeded.evidence[2].text]) expect(guidePacket).not.toContain(text);
-  await dialog.getByRole('checkbox', { name: '问题', exact: true }).uncheck();
-  await dialog.getByRole('checkbox', { name: /^证据 1/ }).uncheck();
-  await dialog.getByRole('checkbox', { name: /^证据 2/ }).check();
-  await expect.poll(() => preview.inputValue()).toContain(seeded.evidence[1].text);
-  const originalPacket = await preview.inputValue();
-  expect(originalPacket).toContain('原文摘录（由读者手动标注，未独立核验）');
-  expect(originalPacket).toContain('来源：doi:10.0000/synthetic-packet'); expect(originalPacket).toContain('定位：合成测试 page 7'); expect(originalPacket).toContain('版本：未指定');
-  expect(originalPacket).not.toContain(seeded.question); expect(originalPacket).not.toContain(seeded.evidence[0].text);
-  await dialog.getByRole('checkbox', { name: /^证据 2/ }).uncheck(); await dialog.getByRole('checkbox', { name: /^证据 3/ }).check();
-  await expect.poll(() => preview.inputValue()).toContain('读者观察（读者撰写）');
-  expect(await preview.inputValue()).toContain(seeded.evidence[2].text); expect(await preview.inputValue()).not.toContain(seeded.evidence[1].text);
-  const edited = '合成测试：经过主动编辑后只复制这一段探索上下文。'; await preview.fill(edited);
-  await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (text: string) => { (window as any).syntheticExplorationCopy = text; } } }); });
-  await dialog.getByRole('button', { name: '复制预览内容', exact: true }).click();
-  await expect(dialog.getByRole('status')).toContainText('已复制');
-  expect(await page.evaluate(() => (window as any).syntheticExplorationCopy)).toBe(edited);
-  const after = await page.evaluate(async id => (await import('/src/records/store.ts')).personalStore.get('explorations', id), seeded.id);
-  expect(after).toEqual(seeded);
+  const record = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.saveExploration({ id: crypto.randomUUID(), title: 'SYNTHETIC 简化方向', question: 'SYNTHETIC 保留问题与证据', origin: 'reader', status: 'exploring', interpretation: '', unknowns: '', nextAction: null, evidence: [] }, null));
+  await page.goto(`/explore/questions/${record.id}`);
+  await expect(page.getByRole('button', { name: '复制上下文', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '继续讨论', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '一键生成积累选文文件', exact: true })).toBeVisible();
 });

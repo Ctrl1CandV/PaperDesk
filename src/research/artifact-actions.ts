@@ -26,14 +26,17 @@ const turnRefs = (turn: AiTurn): PersistentEvidenceRef[] => turn.sources.map(sou
 
 /**
  * Stores a reading file produced by /选文. Each save is a new document, so earlier
- * versions remain; the current guide list lets the page show what arrived later.
+ * versions remain; the catalog snapshot records the inventory at generation time.
+ * New library arrivals alone are not evidence that a paper belongs to this topic.
  */
 export async function saveReadingBrief(record: Exploration, turn: AiTurn, purpose: BriefPurpose, topic: string): Promise<{ record: Exploration; artifact: ResearchArtifact }> {
   const research = record.research ?? emptyResearchState();
   const existing = research.artifacts?.find(item => item.sourceTurnId === turn.id);
   if (existing) return { record, artifact: existing };
+  const snapshot = turn.context?.researchSnapshot as { explorationId?: string; recordRevision?: number } | undefined;
+  if (snapshot?.explorationId && snapshot.explorationId !== record.id) throw Error('这份选文文件属于另一个方向，未保存。');
   const artifact = createResearchArtifact({ kind: 'reading-brief', title: `${READING_BRIEF.label}：${topic}`.slice(0, 300), body: turn.answer,
-    recordRevision: record.recordRevision, sourceTurnId: turn.id, evidenceRefs: turnRefs(turn), purpose, librarySnapshot: currentGuideIds() });
+    recordRevision: snapshot?.recordRevision ?? record.recordRevision, sourceTurnId: turn.id, evidenceRefs: turnRefs(turn), purpose, librarySnapshot: currentGuideIds() });
   const saved = await personalStore.saveExploration({ ...record, research: { ...research, artifacts: [...(research.artifacts ?? []), artifact] } }, record.recordRevision);
   return { record: saved, artifact };
 }
@@ -77,6 +80,16 @@ export async function portableResearchSources(record: Exploration, artifact: Res
   return JSON.parse(JSON.stringify(sources));
 }
 
+/** Explicit library links describe scope, not reading progress or evidence. */
+function relatedBibliography(record: Exploration): string {
+  return (record.research?.relatedGuides ?? []).map(target => {
+    const guide = contentRepository.getSummary(target.guideId, target.revision);
+    if (!guide) return `- ${target.guideId} / r${target.revision}：固定导读当前不可用；保留关联，待恢复后核对书目信息。`;
+    const meta = guide.metadata;
+    return `- ${meta.paperTitle}（${meta.type === 'survey' ? '综述' : '论文'}）\n  学术身份：${meta.paperId}；来源：${meta.source.url}；版本：${meta.source.version ?? '未知'}\n  固定导读：${meta.id} / r${meta.revision}`;
+  }).join('\n') || '尚未关联文献。';
+}
+
 /** A deliberate local download; it does not select documents for model context. */
 export async function renderResearchDocument(record: Exploration, artifact: ResearchArtifact): Promise<string> {
   const sources=await portableResearchSources(record,artifact);
@@ -94,11 +107,12 @@ export async function renderResearchDocument(record: Exploration, artifact: Rese
   const observations=record.evidence.filter(e=>e.provenance==='reader-observation').map(e=>`- 读者观察（未自动核验）：${e.text}`).join('\n');
   // The two primary files open with a short guide for an executor who never saw the discussion.
   const preamble=artifact.kind==='reading-brief'&&artifact.purpose?documentPreamble({purpose:artifact.purpose,savedAt:artifact.updatedAt,containerTitle:record.title,workflows}):'';
+  const notebook=snapshot.notebook ? `\n\n## 导出时的研究记录（第 ${snapshot.notebook.version} 版）\n\n${snapshot.notebook.author==='reader'?'读者写入':'AI 整理'} · ${snapshot.notebook.createdAt}。这是当前保存的思考与阶段结果，不表示选文正文已经据此更新。\n\n${snapshot.notebook.body}` : '';
   const body=artifact.body||'正文尚未填写。';
   const [first,...rest]=body.split('\n');
   const titled=/^ {0,3}#[ \t]/.test(first);
   const opening=preamble?(titled?`${first}\n\n${preamble}\n\n${rest.join('\n').replace(/^\s+/,'')}`:`# ${artifact.title}\n\n${preamble}\n\n${body}`):`# ${artifact.title}\n\n${body}`;
-  return `${opening}\n\n---\n\n## 文档来源与版本\n\n文档 ID：${artifact.id}\n文档修订：${artifact.recordRevision}\n关联探索：${record.title}（${record.id}）\n文档形成时研究记录修订：${artifact.sourceRecordRevision}\n来源讨论：${artifact.sourceTurnId??'手动文档'}\n创建时间：${artifact.createdAt}\n更新时间：${artifact.updatedAt}\n\n正文来自上述已保存文档。以下附录包含文档保留的引用，以及本次导出时探索第 ${record.recordRevision} 版的材料和决定依据；新增材料不表示正文已据此修订。用户采纳、生成文档或下载均不表示结论已证实。\n\n${currentState}\n\n## 来源、摘录与覆盖限制\n\n${sourceText||'尚无可携带的来源摘录。执行前需要取得并核查必要公开资料，不得据此假定已有证据支持。'}\n\n${observations?`## 读者观察\n\n${observations}\n\n`:''}## 执行前核对\n\n执行者应区分已有依据、尚待验证的判断和行动建议。缺失的预算、资源或行动授权保持待确认；本文件本身不新增工具安装、费用、部署、发布或内容入库的授权。发现会改变方向的新证据或条件时，应返回讨论。\n`;
+  return `${opening}\n\n---\n\n## 文档来源与版本\n\n文档 ID：${artifact.id}\n文档修订：${artifact.recordRevision}\n关联探索：${record.title}（${record.id}）\n文档形成时研究记录修订：${artifact.sourceRecordRevision}\n来源讨论：${artifact.sourceTurnId??'手动文档'}\n创建时间：${artifact.createdAt}\n更新时间：${artifact.updatedAt}\n\n正文来自上述已保存文档。以下附录包含文档保留的引用，以及本次导出时探索第 ${record.recordRevision} 版的材料和决定依据；新增材料不表示正文已据此修订。用户采纳、生成文档或下载均不表示结论已证实。\n\n${currentState}${notebook}\n\n## 明确关联的论文与综述\n\n以下书目通过内容交付或手动操作关联到当前方向；关联不表示已读或作为证据核验。\n\n${relatedBibliography(record)}\n\n## 来源、摘录与覆盖限制\n\n${sourceText||'尚无可携带的来源摘录。执行前需要取得并核查必要公开资料，不得据此假定已有证据支持。'}\n\n${observations?`## 读者观察\n\n${observations}\n\n`:''}## 执行前核对\n\n执行者应区分已有依据、尚待验证的判断和行动建议。缺失的预算、资源或行动授权保持待确认；本文件本身不新增工具安装、费用、部署、发布或内容入库的授权。发现会改变方向的新证据或条件时，应返回讨论。\n`;
 }
 
 export function documentFileName(artifact: ResearchArtifact) {
@@ -118,6 +132,7 @@ export function renderDirectionSummary(record: Exploration): string {
     `> 根据 PaperDesk 中此方向的当前记录生成（第 ${record.recordRevision} 版，${record.updatedAt.slice(0, 10)}）。“已采纳”表示读者的工作选择，不表示已经证实；本文件不新增任何行动授权。`,
     block('阶段', research.stage ? `${STAGE_LABELS[research.stage].label}：${STAGE_LABELS[research.stage].doing}` : '尚未确定'),
     block('核心问题', record.question), block('目前的认识', record.interpretation), block('候选方向', research.candidates), block('暂缓方向及原因', research.deferred),
+    ...(research.notebook ? [block('当前研究记录', research.notebook.versions.at(-1)!.body)] : []),
     block('尚不确定', record.unknowns), block('范围', research.scope), block('约束', research.constraints),
-    block('读者确认的决定', decisions), block('下一步', record.nextAction?.description ?? ''), block('已有选文实施文件', files)].join('\n\n') + '\n';
+    block('读者确认的决定', decisions), block('明确关联的论文与综述（不代表已读或证据）', relatedBibliography(record)), block('下一步', record.nextAction?.description ?? ''), block('已有选文实施文件', files)].join('\n\n') + '\n';
 }

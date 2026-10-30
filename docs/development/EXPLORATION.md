@@ -1,8 +1,14 @@
 # Research-direction exploration in v1
 
-The subsequent [research assistant extension](RESEARCH-ASSISTANT.md) adds optional scope, constraints, candidates, deferred directions, source-backed decision history and embedded research documents to the same Exploration. Existing evidence and status meanings remain unchanged. Explicit topic-context permission enables research conversations; complete model proposals require revision-checked adoption. Research artifacts, frozen tasks and receipts use personal archive v3. See [contracts](RESEARCH-CONTRACTS.md).
+The current direction page centers a living Markdown research notebook, editable by the reader and by the explicit `/记录` command. Saved versions preserve the process, questions, tentative ideas and stage results without automatically declaring completion. History restore appends a version; the current saved body accompanies deliberate direction-context requests. See [research notebook](RESEARCH-NOTEBOOK.md).
+
+Explicit content-delivery batches can also associate pinned guides with a direction on browser startup. Public collection aliases establish an unambiguous initial binding; local receipts keep repeated delivery idempotent and preserve manual removal. This is a declared relationship, not keyword matching or inference from arrival time. See [reading assignments](../content/READING-ASSOCIATIONS.md).
+
+The subsequent [research assistant extension](RESEARCH-ASSISTANT.md) adds optional scope, constraints, candidates, deferred directions, source-backed decision history and embedded research documents to the same Exploration. Existing evidence and status meanings remain unchanged. Linking a direction permits its snapshot to accompany the reader's requests. Ordinary model proposals require revision-checked adoption; an explicit `/方向` command authorizes applying a valid completed proposal through the same audited path. Research artifacts, frozen tasks and receipts remain compatible with personal archive v3. See [contracts](RESEARCH-CONTRACTS.md).
 
 In the current version a research direction is normally created or updated in the reading conversation with `/方向`, and reading files are produced with `/选文` (see [对话指令](RESEARCH-ASSISTANT.md)). Manual creation needs only the reader's question (the title defaults to its opening; a reading excerpt, when present, is kept as guide evidence). Directions may carry a stage; reading-accumulation entries (`research.purpose = accumulation`) hold files for a learning goal. Record fields and their meanings below are unchanged; the full editor remains for manual maintenance.
+
+The direction page now groups current understanding/questions, research process/materials, related papers/surveys, and reading-selection files. The separate stage track and the “more” area for local matching, manual documents, frozen tasks and receipts are no longer page controls. Existing records are retained; non-selection documents remain readable within the research process. Both accumulation and problem-focused selection use the same AI conversation. The one-click accumulation action sends its explicit command after the reader clicks; discussion prompts only prefill the composer. Connection or request failure requires an explicit retry, while an existing composer draft and its selected materials remain intact.
 
 ## Purpose and public starting material
 
@@ -10,13 +16,15 @@ Exploration is a first-release capability, not a future label. It connects concr
 
 `content/exploration.json`, validated by `schemas/exploration.schema.json`, contains an immutable editorial seed revision. Its lenses give an order, rationale, what to understand, pinned guide sections, one starting prompt, a self-check and a next action. These are editorial suggestions built from the supplied guides, not a new survey or private research agenda. Links provide background only. Keep the explicit evidence limits next to the prompts.
 
-The first two lenses establish applications and evaluation; collaboration is optional. Priorities express a suggested learning order, not value scores. Show the first reading action even with no personal records. Do not manufacture recent papers, source-backed novelty, experimental results or personal interest levels to fill a screen.
+The original seed's first two lenses establish applications and evaluation; collaboration is optional in that editorial revision. Priorities express a suggested learning order, not value scores or the reader's current direction. Show the first reading action even with no personal records. Do not manufacture recent papers, source-backed novelty, experimental results or personal interest levels to fill a screen.
 
 Opening a lens never creates a personal record. The reader may adapt a prompt, start their own question, or leave without saving. A created record remembers its editorial origin when relevant, but becomes personal text only through a deliberate save. Editorial seeds and personal records live in separate stores.
 
 ## Personal exploration record
 
 The minimal record is `id` (UUID), `title`, `question`, `origin` (reader or adapted-editorial), optional `seedRef` (seed revision and lens ID), `status` (inbox/exploring/deferred/archived), `interpretation`, `unknowns`, optional `nextAction`, an ordered `evidence` array, optimistic `recordRevision`, and UTC timestamps. Empty interpretation/unknowns/evidence are allowed; never invent contents. Status is chosen by the reader, not inferred from reading or generated material. No resolved/validated-novelty state is offered.
+
+Optional `research.relatedGuides` stores explicit `{guideId, revision}` links, at most 50 with one entry per guide ID. The related-literature picker saves these links with the expected exploration revision. Linking does not change guide/original reading marks, add quotations, or establish evidence support. Related literature also displays existing excerpt, discussion and next-action links; a new catalog arrival alone does not establish a relationship. Fixed links remain removable and readable when the guide is later taken off the default shelf.
 
 `nextAction` is null or a small record: kind read-guide/check-concept/compare-evidence/search-literature, user-readable description and optional pinned guide target. A missing action is shown as not yet chosen. A literature-search action stores a question to investigate, not an invented recommendation or an automatic network task.
 
@@ -34,7 +42,7 @@ Expose quote, attribution, interpretation and unknowns as distinct concepts, wit
 4. Choose a next reading or investigation action and an explicit status.
 5. Follow the reading target and return; revise the same exploration instead of manufacturing a new topic each visit.
 
-The three initial guides support this flow, but cannot demonstrate a current research gap. The UI must say so. No specific thesis, technique, budget, private hypothesis, venue or research outcome is prefilled.
+The initial release demonstrated this flow with three guides; that historical collection size is not the current library contract. The flow cannot demonstrate a current research gap. No specific thesis, technique, budget, private hypothesis, venue or research outcome is prefilled.
 
 ## Persistence and privacy
 
@@ -42,4 +50,4 @@ Explorations, their evidence and next actions are included in the same transacti
 
 Do not rewrite old anchors when new content arrives. Keep old content revisions; if unavailable, show the saved quote and missing locator. Content rollback never rolls back personal thinking. No personal record is shipped in a content update or projected into public editorial seeds.
 
-For a harness packet, allow selection of a question, relevant evidence, interpretation, unknowns and next action in an editable preview. Personal text requires explicit inclusion; mark it as reader-authored, preserve source/guide versions and apply the same size limit/manual-copy fallback as reading packets. Nothing is sent automatically.
+Reading-selection files are produced only through a reader-triggered command or the explicit one-click accumulation action. Their local download preserves the saved body, source versions and the separately labelled export-time research state and associated bibliography. It does not send anything to an external Harness or expand execution permission. Notes and saved documents enter model context only through deliberate selection; the quick accumulation request leaves the composer's selected materials out. Legacy fixed-task and receipt records remain compatible with backup/restore, without being required for the current page workflow.

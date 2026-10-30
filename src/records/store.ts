@@ -204,10 +204,12 @@ export class PersonalRecordStore {
         const nextResearch = (draft as ExplorationDraft).research;
         // Decisions are revised by appending a replacement, and adoption audit
         // records remain the exact proposal that was accepted.
-        for (const field of ['decisions', 'appliedProposalIds', 'appliedProposals'] as const) {
+        for (const field of ['decisions', 'appliedProposalIds', 'appliedProposals', 'readingAssignmentReceipts'] as const) {
           const prior = previousResearch?.[field] ?? [], next = nextResearch?.[field] ?? [];
           if (canonical(next.slice(0, prior.length)) !== canonical(prior)) throw new ValidationError('决定与采纳记录不可覆盖或删除；请保留旧记录并追加变化。');
         }
+        const priorNotebook = previousResearch?.notebook?.versions ?? [], nextNotebook = nextResearch?.notebook?.versions ?? [];
+        if (canonical(nextNotebook.slice(0, priorNotebook.length)) !== canonical(priorNotebook)) throw new ValidationError('研究记录历史不可覆盖或删除；请保存新版本或恢复旧版为新版本。');
         const nextArtifacts = nextResearch?.artifacts ?? [];
         for (const previous of previousResearch?.artifacts ?? []) {
           if (!previous.taskVersions.length && !previous.receipts.length) continue;

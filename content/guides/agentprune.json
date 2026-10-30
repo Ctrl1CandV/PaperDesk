@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 2,
+  "id": "agentprune",
+  "paperId": "arxiv:2410.02506",
+  "revision": 1,
+  "title": "AgentPrune：哪些智能体消息可以不再发送",
+  "paperTitle": "Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "连接系统编排与通信效率：把消息图、低秩约束、一次裁剪和多查询复用拆开理解，按相同任务与模型条件检查性能和 token 消耗。",
+  "source": {
+    "id": "arxiv:2410.02506",
+    "version": "v1",
+    "url": "https://arxiv.org/html/2410.02506v1"
+  },
+  "bodyFile": "agentprune.md",
+  "bodySha256": "799a4215497dc4bdca7b9dfe0c66ece31dfe8a55a2e6649bbf1969bbe2ef58c5",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "把同一轮与跨轮消息分开"
+    },
+    {
+      "id": "u02",
+      "heading": "为什么通信冗余需要实验证据"
+    },
+    {
+      "id": "u03",
+      "heading": "先学习连接的重要程度，再固定稀疏图"
+    },
+    {
+      "id": "u04",
+      "heading": "节省成本必须算上学习阶段"
+    },
+    {
+      "id": "u05",
+      "heading": "实验中的性能与代价怎样一起读"
+    },
+    {
+      "id": "u06",
+      "heading": "从删边走向可解释的通信选择"
+    },
+    {
+      "id": "u07",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-1",
+      "url": "https://arxiv.org/abs/2410.02506v1",
+      "labels": [
+        "arXiv v1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-2",
+      "url": "https://arxiv.org/html/2410.02506v1#S2",
+      "labels": [
+        "图建模 §2",
+        "§2 与图 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-3",
+      "url": "https://arxiv.org/html/2410.02506v1#S3",
+      "labels": [
+        "方法 §3.1–3.3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-4",
+      "url": "https://arxiv.org/html/2410.02506v1#S3.SS4",
+      "labels": [
+        "适用条件与多查询设置"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-5",
+      "url": "https://arxiv.org/html/2410.02506v1#S4",
+      "labels": [
+        "实验设置与表 1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-6",
+      "url": "https://arxiv.org/html/2410.02506v1#S4.SS3",
+      "labels": [
+        "接入实验与表 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-7",
+      "url": "https://arxiv.org/html/2410.02506v1#S4.SS4",
+      "labels": [
+        "攻击实验 §4.4"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-8",
+      "url": "https://arxiv.org/pdf/2410.02506v1",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-9",
+      "url": "https://arxiv.org/html/2410.02506v1",
+      "labels": [
+        "HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "autogen",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "camel",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§2–3.4",
+      "§4.1–4.5（重点图5、表3与攻击边界）"
+    ],
+    "figuresViewed": [
+      "图建模（PDF 第3页，AI查看）",
+      "Figure 3（PDF 第4页，AI查看）",
+      "Figure 5（PDF 第8页，AI查看）",
+      "Table 3 / Figure 6（PDF 第9页，AI查看）"
+    ],
+    "limitations": [
+      "未复现训练、重算全部表格或完整审阅全部附录。",
+      "低秩优化解释作用，没有完整数学推导。",
+      "v1 部分表格比例不一致，不外推统一节省率。",
+      "攻击实验不构成通用安全保证。"
+    ],
+    "reviewBasis": "AI依据固定版本HTML与PDF提取并自审；具体已查看页面和版本疑点见docs/research/communication-papers-review.md。独立审阅另记。"
+  },
+  "orientation": {
+    "shortTitle": "AgentPrune：哪些智能体消息可以不再发送",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "通信冗余"
+        ]
+      },
+      {
+        "id": "communication-efficiency",
+        "label": "通信效率",
+        "aliases": [
+          "AgentPrune",
+          "图剪枝",
+          "token成本"
+        ]
+      }
+    ],
+    "summary": "AgentPrune 把轮内和跨轮通信分别表示成图，先短期学习连接掩码，再一次性删除部分边。阅读重点是怎样减少消息传递，以及怎样同时核算效果和学习成本。",
+    "value": "连接系统编排与通信效率：把消息图、低秩约束、一次裁剪和多查询复用拆开理解，按相同任务与模型条件检查性能和 token 消耗。",
+    "prerequisites": [
+      "了解语言模型的对话与上下文；涉及图结构处给出直观解释。"
+    ],
+    "boundaries": [
+      "未复现训练、重算全部表格或完整审阅全部附录。",
+      "低秩优化解释作用，没有完整数学推导。",
+      "v1 部分表格比例不一致，不外推统一节省率。",
+      "攻击实验不构成通用安全保证。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Guibin Zhang",
+        "Yanwei Yue",
+        "Zhixun Li",
+        "Sukwon Yun",
+        "Guancheng Wan",
+        "Kun Wang",
+        "Dawei Cheng",
+        "Jeffrey Xu Yu",
+        "Tianlong Chen"
+      ],
+      "year": 2024,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2410.02506v1",
+      "preprintYear": 2024
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "区分同轮与跨轮消息及DAG执行假设。",
+        "concepts": [
+          "空间边",
+          "时间边",
+          "DAG"
+        ],
+        "limit": "不把该抽象当作所有系统的天然结构。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "理解相对任务效用的通信冗余。",
+        "concepts": [
+          "随机删边",
+          "子图"
+        ],
+        "limit": "定义不能保证找到泛化有效的结构。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "分清掩码学习、低秩偏好和一次裁剪。",
+        "concepts": [
+          "策略梯度",
+          "核范数",
+          "掩码"
+        ],
+        "limit": "不是模型权重剪枝。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "把学习开销和复用次数纳入成本。",
+        "concepts": [
+          "输入token",
+          "输出token",
+          "多查询"
+        ],
+        "limit": "历史费用不等于当前价格。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "按配置核查性能、成本与稳健性证据。",
+        "concepts": [
+          "HumanEval",
+          "MMLU",
+          "攻击"
+        ],
+        "limit": "保留原表数值不一致。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "将边选择与消息内容联系成候选问题。",
+        "concepts": [
+          "消息价值",
+          "任务变化"
+        ],
+        "limit": "后续建议未实验验证。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "定位固定图表和边界。",
+        "concepts": [
+          "原文定位",
+          "覆盖范围"
+        ],
+        "limit": "没有完整复现。"
+      }
+    ]
+  }
+}

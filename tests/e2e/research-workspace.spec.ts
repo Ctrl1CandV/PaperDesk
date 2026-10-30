@@ -1,106 +1,21 @@
 import { test, expect } from '@playwright/test';
-import { mkdir, readFile } from 'node:fs/promises';
 
-test('implementation document request preserves drafts, never sends, and directly downloads sources', async ({page})=>{
-  let inferenceCalls=0;
-  await page.route('**/api/ai/**',route=>{
-    const path=new URL(route.request().url()).pathname;
-    if(path==='/api/ai/ask')inferenceCalls++;
-    const value=path==='/api/ai/status'?{configured:true,model:'synthetic-model',searchAvailable:false,csrfToken:'synthetic-token',provider:'api',apiConfigured:true,chatgpt:{connected:false,loginPending:false,needsLogin:false,fallbackToApi:false}}:path==='/api/ai/conversations'?{conversations:[]}:{error:'SYNTHETIC unexpected model request'};
-    return route.fulfill({status:path==='/api/ai/ask'?400:200,contentType:'application/json',body:JSON.stringify(value)});
-  });
+// Existing documents remain readable when the optional execution workspace is removed.
+test('saved research documents remain in the research process without execution controls', async ({ page }) => {
+  await page.route('**/api/ai/**', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'SYNTHETIC offline' }) }));
   await page.goto('/explore');
-  const seeded=await page.evaluate(async()=>{
-    const storePath='/src/records/store.ts',artifactPath='/src/research/artifact-actions.ts',contractPath='/shared/research-contract.mjs';
-    const {personalStore}=await import(storePath),{saveAnswerArtifact}=await import(artifactPath),{emptyResearchState,createResearchSnapshot}=await import(contractPath);
-    const record=await personalStore.saveExploration({id:crypto.randomUUID(),title:'合成研究：实施文件',question:'合成问题：下一步核查什么？',origin:'reader',status:'exploring',interpretation:'',unknowns:'合成未知：缺少条件证据',evidence:[],nextAction:{kind:'compare-evidence',description:'合成下一步：核对条件'},research:{...emptyResearchState(),scope:'合成范围：公开材料',constraints:'合成约束：暂不运行实验',candidates:'合成候选：条件比较',deferred:'合成暂缓：扩大规模，原因是条件尚未核清'}},null);
-    const turnId=crypto.randomUUID();
-    await saveAnswerArtifact(record.id,{id:turnId,question:'合成整理请求，不应作为完整文档标题。'.repeat(20),answer:'# 合成实施计划\n\n## 下一阶段\n\n合成计划：先核查条件，再比较解释。假设仍待验证。',status:'complete',createdAt:new Date().toISOString(),context:{researchSnapshot:await createResearchSnapshot(record)},sources:[{id:'W1',kind:'web',title:'合成来源材料',url:'https://example.org/synthetic-source',text:'SYNTHETIC 固定来源摘录',version:'synthetic-v1'}]});
-    const saved=await personalStore.get('explorations',record.id);
-    return {id:record.id,turnId,artifactId:saved.research.artifacts[0].id};
+  const record = await page.evaluate(async () => {
+    const { personalStore } = await import('/src/records/store.ts');
+    const { emptyResearchState } = await import('/shared/research-contract.mjs');
+    const { createResearchArtifact } = await import('/shared/research-artifacts.mjs');
+    return personalStore.saveExploration({ id: crypto.randomUUID(), title: 'SYNTHETIC 旧研究记录', question: 'SYNTHETIC 核查条件', origin: 'reader', status: 'exploring', interpretation: '', unknowns: '', nextAction: null, evidence: [], research: { ...emptyResearchState(), artifacts: [createResearchArtifact({ title: 'SYNTHETIC 保存的研究结论', body: 'SYNTHETIC 旧结论及材料应保持完整。', recordRevision: 1 })] } }, null);
   });
-  await page.goto(`/explore/questions/${seeded.id}`);
-  await page.getByText('更多：本库匹配与文档记录',{exact:true}).click();
-  await page.getByRole('combobox',{name:'选择文档',exact:true}).selectOption(seeded.artifactId);
-  await page.getByRole('button',{name:'编辑文档',exact:true}).click();
-  await page.getByRole('textbox',{name:'研究文档正文',exact:true}).fill('合成未保存草稿，不应被整理动作覆盖。');
-  await page.getByRole('button',{name:'取消编辑',exact:true}).click();
-  // The document's own action opens the same conversation with that version selected; nothing is sent.
-  await page.getByRole('button',{name:'围绕此文档继续讨论',exact:true}).click();
-  const composer=page.getByRole('textbox',{name:'向 AI 提问',exact:true});
-  await expect(composer).toHaveValue(/围绕我选入的《合成实施计划》/);
-  await expect(page.getByRole('button',{name:/^资料 ·/})).toContainText('已选 0 条笔记、1 份文档');
-  await composer.fill('合成已有问题草稿');
-  await page.keyboard.press('Escape');
-  await page.getByRole('button',{name:'围绕此文档继续讨论',exact:true}).click();
-  await expect(composer).toHaveValue('合成已有问题草稿');
-  await expect(page.locator('.ai-notice')).toContainText('现有问题草稿已保留');
-  await page.keyboard.press('Escape');
-  expect(inferenceCalls).toBe(0);
-  const [file]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'下载研究文档.md',exact:true}).click()]);
-  expect(file.suggestedFilename()).toBe('研究文档.md');
-  await mkdir('.cache/test-results',{recursive:true});
-  const savedPath='.cache/test-results/synthetic-research-document.md';await file.saveAs(savedPath);
-  const markdown=await readFile(savedPath,'utf8');
-  for(const text of ['# 合成实施计划','先核查条件，再比较解释','SYNTHETIC 固定来源摘录','https://example.org/synthetic-source','synthetic-v1','联网搜索摘录，不代表已读全文',seeded.turnId,'文档修订：1','导出时的研究状态（探索 r2）','合成范围：公开材料','合成约束：暂不运行实验','合成候选：条件比较','合成暂缓：扩大规模','合成未知：缺少条件证据','合成下一步：核对条件','此附录不新增行动权限'])expect(markdown).toContain(text);
-  expect(markdown).not.toContain('合成整理请求');
-  expect(markdown).not.toContain('合成未保存草稿');
-  expect(inferenceCalls).toBe(0);
-  expect(await page.evaluate(async id=>{const path='/src/records/store.ts';const {personalStore}=await import(path);return (await personalStore.get('explorations',id)).research.artifacts[0].taskVersions.length;},seeded.id)).toBe(0);
-});
-
-// Synthetic end-to-end handoff, never a real execution receipt or private note.
-test('research document freezes, exports, accepts partial receipt, and prepares next discussion', async ({page})=>{
-  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.route('**/api/ai/status',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'合成测试：未启用模型'})}));
-  await page.goto('/explore');
-  const id=await page.evaluate(async()=>{const path='/src/records/store.ts';const {personalStore}=await import(path);const r=await personalStore.saveExploration({id:crypto.randomUUID(),title:'合成研究：条件比较',question:'合成问题：哪些条件需要核查？',origin:'reader',status:'exploring',interpretation:'合成待核查解释',unknowns:'合成材料缺口',nextAction:null,evidence:[]},null);return r.id;});
-  await page.goto(`/explore/questions/${id}`);
-  await page.getByText('更多：本库匹配与文档记录',{exact:true}).click();
-  await page.getByRole('button',{name:'新建研究文档',exact:true}).click();
-  await page.getByRole('textbox',{name:'文档标题',exact:true}).fill('合成下一阶段计划');
-  await page.getByRole('textbox',{name:'研究文档正文',exact:true}).fill('合成计划：核对两份材料的条件。假设尚未验证。');
-  const cachedDraft=()=>page.evaluate(async(id)=>{const path='/src/ui/drafts.ts';const {getDraft}=await import(path);return getDraft(`research-workspace:${id}`);},id);
-  expect((await cachedDraft())?.draft?.body).toBe('合成计划：核对两份材料的条件。假设尚未验证。');
-  await page.getByRole('button',{name:'手动编辑记录',exact:true}).click();
-  expect((await cachedDraft())?.draft?.body).toBe('合成计划：核对两份材料的条件。假设尚未验证。');
-  await page.getByRole('button',{name:'收起编辑（保留草稿）',exact:true}).click();
-  await page.getByText('更多：本库匹配与文档记录',{exact:true}).click();
-  await expect(page.getByRole('textbox',{name:'研究文档正文',exact:true})).toHaveValue('合成计划：核对两份材料的条件。假设尚未验证。');
-  await page.getByRole('button',{name:'保存文档草稿',exact:true}).click();
-  await expect(page.locator('.research-workspace').getByRole('status')).toContainText('文档已保存');
-  await page.reload();await page.getByText('更多：本库匹配与文档记录',{exact:true}).click();await page.getByRole('combobox',{name:'选择文档',exact:true}).selectOption({label:'合成下一阶段计划 · 阶段计划'});
-  await page.getByText('可选：固定任务版本与执行回执',{exact:true}).click();
-  await page.getByRole('button',{name:'准备执行任务',exact:true}).click();
-  await page.getByRole('textbox',{name:'交付物',exact:true}).fill('合成条件对照表\n合成缺口清单');
-  await page.getByRole('textbox',{name:'完成与验收条件',exact:true}).fill('保留全部必要条件');
-  await page.getByRole('textbox',{name:'停止或返回讨论的条件',exact:true}).fill('缺少来源时返回讨论');
-  await page.getByRole('textbox',{name:'行动范围与预算',exact:true}).fill('合成测试，仅生成本地文本，不执行外部操作');
-  await page.getByRole('button',{name:'预览固定任务',exact:true}).click();
-  await expect(page.locator('.research-task-preview')).toContainText('合成问题');
-  await page.getByRole('textbox',{name:'行动范围与预算',exact:true}).fill('合成测试，只核查公开材料，不执行外部操作');
-  await expect(page.getByRole('button',{name:'确定并保存任务版本',exact:true})).toHaveCount(0);
-  await page.getByRole('button',{name:'预览固定任务',exact:true}).click();
-  await page.getByRole('button',{name:'确定并保存任务版本',exact:true}).click();
-  await page.getByText(/执行任务 v1 ·/).click();
-  const [md]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'下载 brief.md',exact:true}).click()]);expect(md.suggestedFilename()).toBe('brief.md');
-  const [json]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'下载 brief.json',exact:true}).click()]);expect(json.suggestedFilename()).toBe('brief.json');
-  const receipt=await page.evaluate(async(id)=>{const storePath='/src/records/store.ts',artifactPath='/shared/research-artifacts.mjs';const {personalStore}=await import(storePath);const {receiptTemplate}=await import(artifactPath);const r=await personalStore.get('explorations',id);const receipt=receiptTemplate(r.research.artifacts[0].taskVersions[0]);receipt.taskResults[0].summary='合成部分结果：条件仍有缺口';receipt.taskResults[0].outputs=['合成条件表'];receipt.unresolvedQuestions=['合成新问题：需要核查哪个条件？'];return receipt;},id);
-  const upload=()=>page.getByLabel('选择回执 JSON',{exact:true}).setInputFiles({name:'synthetic-receipt.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(receipt))});
-  await page.getByLabel('选择回执 JSON',{exact:true}).setInputFiles({name:'synthetic-invalid.json',mimeType:'application/json',buffer:Buffer.from('{}')});
-  await page.getByRole('button',{name:'取消回执导入',exact:true}).click();
-  await expect(page.getByRole('combobox',{name:'选择文档',exact:true})).toBeEnabled();
-  await upload();await page.getByRole('button',{name:'预览回执',exact:true}).click();await page.getByRole('button',{name:'保存执行回执',exact:true}).click();
-  await expect(page.locator('.research-workspace').getByRole('status')).toContainText('执行结果已保存');
-  await upload();await page.getByRole('button',{name:'预览回执',exact:true}).click();await page.getByRole('button',{name:'保存执行回执',exact:true}).click();await expect(page.locator('.research-workspace').getByRole('status')).toContainText('重复回执');
-  await page.getByText('执行结果 · v1 · 部分完成',{exact:true}).click();
-  await page.getByRole('button',{name:'带着结果继续讨论',exact:true}).click();
-  await expect(page.getByRole('textbox',{name:'向 AI 提问',exact:true})).toHaveValue(/合成部分结果/);
-  await page.keyboard.press('Escape');
-  await mkdir('.cache/screenshots',{recursive:true});
-  await page.locator('.research-workspace').screenshot({path:'.cache/screenshots/research-workspace-desktop.png'});
-  await page.setViewportSize({width:390,height:844});
-  await page.locator('.research-workspace').screenshot({path:'.cache/screenshots/research-workspace-narrow.png'});
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
-  expect(errors).toEqual([]);
+  await page.goto(`/explore/questions/${record.id}`);
+  await page.getByText('SYNTHETIC 保存的研究结论', { exact: true }).click();
+  await expect(page.locator('.direction-saved-document')).toContainText('SYNTHETIC 旧结论及材料应保持完整。');
+  await expect(page.getByRole('button', { name: '新建研究文档', exact: true })).toHaveCount(0);
+  await expect(page.getByText('可选：固定任务版本与执行回执', { exact: true })).toHaveCount(0);
+  await page.reload();
+  const saved = await page.evaluate(async id => (await import('/src/records/store.ts')).personalStore.get('explorations', id), record.id);
+  expect(saved).toEqual(record);
 });

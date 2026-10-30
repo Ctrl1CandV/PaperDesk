@@ -11,6 +11,36 @@ import { ExplorePage, LensPage, ExplorationPage } from '../exploration';
 import { PacketDialog } from '../handoff/PacketDialog';
 import type { Exploration } from '../records/types';
 import type { Guide } from '../content/types';
+import { personalStore } from '../records/store';
+import { reconcileReadingAssignments, readingAssignmentIssueText } from '../research/reading-assignments';
+
+/** Content delivery is explicit and local; consuming it never sends a model request. */
+function ReadingAssignments() {
+  const [issue, setIssue] = useState('');
+  const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    let live = true, running = false, again = false;
+    const refresh = async () => {
+      again = true;
+      if (running) return;
+      running = true;
+      do {
+        again = false;
+        try {
+          const result = await reconcileReadingAssignments();
+          if (live) setIssue(readingAssignmentIssueText(result));
+        } catch {
+          if (live) setIssue('暂时无法保存入库文献的方向关联。现有记录仍保留，可以重试。');
+        }
+      } while (live && again);
+      running = false;
+    };
+    const unsubscribe = personalStore.subscribe(store => { if (!store || store === 'explorations') void refresh(); });
+    void refresh();
+    return () => { live = false; unsubscribe(); };
+  }, [retry]);
+  return issue ? <div className="reading-assignment-notice" role="status"><p>{issue}</p><button type="button" className="text-action" onClick={() => setRetry(value => value + 1)}>重试关联</button></div> : null;
+}
 
 function Header({ pathname }: { pathname: string }) {
   const library = pathname === '/' || pathname === '/library' || pathname.startsWith('/read/');
@@ -68,5 +98,5 @@ export function App() {
   else if (question) page = <ExplorationPage key={question[1]} explorationId={question[1]} onHandoff={setPacket} />;
   else if (import.meta.env.DEV && pathname === '/__fixtures/reader') page = <GuidePage key="fixture" id="agent-survey" revision={1} synthetic />;
   else page = <Missing id={match?.[1]} />;
-  return <><a href="#main-content" className="skip-link">跳至正文</a><Header pathname={pathname} />{page}{packet && <PacketDialog exploration={packet} onClose={() => setPacket(undefined)} />}</>;
+  return <><a href="#main-content" className="skip-link">跳至正文</a><Header pathname={pathname} /><ReadingAssignments />{page}{packet && <PacketDialog exploration={packet} onClose={() => setPacket(undefined)} />}</>;
 }

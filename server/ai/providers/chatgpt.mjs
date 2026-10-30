@@ -386,7 +386,7 @@ export async function answerWithChatGpt({ config, content, prepared, request, tu
       else {
         emit({ type: 'status', text: call.name === 'web_search' ? '正在搜索公开网页' : call.name === 'read_section' ? '正在读取导读章节' : '正在检索本地书库' });
         try {
-          output = call.name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes','create_research_direction'].includes(call.name) ? prepared.runResearchTool(call.name,args) : content.runLocal(call.name, args, turn.sources, turn.context);
+          output = call.name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes','create_research_direction','update_research_notebook'].includes(call.name) ? prepared.runResearchTool(call.name,args) : content.runLocal(call.name, args, turn.sources, turn.context);
         } catch (error) {
           signal?.throwIfAborted();
           if (call.name !== 'web_search' || !(error instanceof PublicError) || error.status !== 502) throw error;

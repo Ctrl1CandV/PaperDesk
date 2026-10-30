@@ -5,6 +5,8 @@ import { cp, mkdir, mkdtemp, readFile, readdir, rename, rm, symlink, writeFile }
 import path from 'node:path';
 import { importContent, planImport, recoverContent, rollbackContent, SimulatedInterruption } from '../../server/content/import.mjs';
 import { projectRoot, validateContent } from '../../server/content/validation.mjs';
+import { ContentIndex } from '../../server/content/index.mjs';
+import { RetrievalIndex } from '../../server/content/retrieval-index.mjs';
 
 const retainedCatalog = JSON.parse(await readFile(path.join(projectRoot, 'content/catalog.json'), 'utf8'));
 const retainedRevisionCount = retainedCatalog.entries.length;
@@ -75,6 +77,45 @@ test('dry-run validates a synthetic fourth guide and writes nothing', async t =>
   await unchanged(f);
 });
 
+test('synthetic reading delivery imports atomically; rollback deactivates but preserves immutable batch identities', async t => {
+  const f = await fixture(t);
+  await addGuide(f.input);
+  const catalog = await json(path.join(f.input, 'catalog.json'));
+  const batch = { id: 'synthetic-assignment', collectionId: 'synthetic-collection', titleAliases: ['Synthetic delivery direction'], guides: [{ guideId: 'synthetic-fourth', revision: 1 }] };
+  catalog.readingAssignments ??= { batches: [], activeBatchIds: [] };
+  catalog.readingAssignments.batches.push(batch);
+  catalog.readingAssignments.activeBatchIds.push(batch.id);
+  await putJson(path.join(f.input, 'catalog.json'), catalog);
+  const dryRun = await importContent(f);
+  assert.ok(dryRun.activeReadingAssignmentIds.includes(batch.id));
+  await unchanged(f);
+  await importContent({ ...f, apply: true });
+  assert.ok((await json(path.join(f.rootDir, 'content/catalog.json'))).readingAssignments.activeBatchIds.includes(batch.id));
+  await rollbackContent({ rootDir: f.rootDir, apply: true });
+  const rolledBack = await json(path.join(f.rootDir, 'content/catalog.json'));
+  assert.ok(!rolledBack.readingAssignments.activeBatchIds.includes(batch.id));
+  assert.deepEqual(rolledBack.readingAssignments.batches.find(item => item.id === batch.id), batch);
+  assert.deepEqual(await readFile(path.join(f.rootDir, 'synthetic-personal-records.txt')), f.personal);
+  catalog.readingAssignments.batches.at(-1).guides[0].revision = 2;
+  await addGuide(f.input, { revision: 2 });
+  // addGuide reads the package catalog; retain its new revision while changing the batch.
+  const changed = await json(path.join(f.input, 'catalog.json'));
+  changed.readingAssignments = catalog.readingAssignments;
+  await putJson(path.join(f.input, 'catalog.json'), changed);
+  await assert.rejects(planImport(f), /Immutable reading assignment conflict/);
+});
+
+test('reading delivery rejects unavailable targets before changing active content', async t => {
+  const f = await fixture(t);
+  const catalog = await json(path.join(f.input, 'catalog.json'));
+  catalog.readingAssignments ??= { batches: [], activeBatchIds: [] };
+  catalog.readingAssignments.batches.push({ id: 'synthetic-missing-delivery', collectionId: 'synthetic-collection', titleAliases: ['Synthetic target'], guides: [{ guideId: 'synthetic-unavailable', revision: 1 }] });
+  catalog.readingAssignments.activeBatchIds.push('synthetic-missing-delivery');
+  await putJson(path.join(f.input, 'catalog.json'), catalog);
+  await assert.rejects(importContent({ ...f, apply: true }), /pinned guide revision is unavailable/);
+  await unchanged(f);
+});
+
 test('apply publishes the fourth guide once and JSON whitespace/key-order reimport is a no-op', async t => {
   const f = await fixture(t);
   await addGuide(f.input);
@@ -122,6 +163,41 @@ test('new guide and editorial revisions coexist and selection rollback retains t
   assert.deepEqual(await readFile(path.join(f.rootDir, 'synthetic-personal-records.txt')), f.personal);
 });
 
+test('archiving removes a synthetic guide from discovery while retaining exact reads and reversible selections', async t => {
+  const f = await fixture(t);
+  await addGuide(f.input);
+  await importContent({ ...f, apply: true });
+  const catalog = await json(path.join(f.input, 'catalog.json'));
+  catalog.archivedGuideIds = [...(catalog.archivedGuideIds ?? []), 'synthetic-fourth'];
+  await putJson(path.join(f.input, 'catalog.json'), catalog);
+  const preview = await importContent(f);
+  assert.ok(preview.archivedGuideIds.includes('synthetic-fourth'));
+  await importContent({ ...f, apply: true });
+  const validated = await validateContent({ rootDir: f.rootDir });
+  const index = new ContentIndex(validated, { index: new RetrievalIndex(':memory:') });
+  try {
+    assert.ok(!index.libraryOverview().some(item => item.guideId === 'synthetic-fourth'));
+    assert.ok(!index.index.search('Synthetic fourth', { generation: index.generation, kind: 'guide', limit: 8 }).some(item => item.guideId === 'synthetic-fourth'));
+    assert.match(index.get('synthetic-fourth', 1).body, /Synthetic test data only/);
+    const result = index.runLocal('read_section', { guideId: 'synthetic-fourth', revision: 1, unitId: 'mechanism' }, []);
+    assert.match(result.source.text, /Revision 1 synthetic text/);
+  } finally { index.close(); }
+  await rollbackContent({ rootDir: f.rootDir, apply: true });
+  const restored = await validateContent({ rootDir: f.rootDir });
+  assert.ok(!restored.catalog.archivedGuideIds?.includes('synthetic-fourth'));
+  assert.ok(restored.guides.some(item => item.metadata.id === 'synthetic-fourth'));
+  assert.deepEqual(await readFile(path.join(f.rootDir, 'synthetic-personal-records.txt')), f.personal);
+});
+
+test('an archive selection must refer to retained content', async t => {
+  const f = await fixture(t);
+  const catalog = await json(path.join(f.input, 'catalog.json'));
+  catalog.archivedGuideIds = ['synthetic-not-in-catalog'];
+  await putJson(path.join(f.input, 'catalog.json'), catalog);
+  await assert.rejects(importContent(f), /archived guide target missing/);
+  await unchanged(f);
+});
+
 test('same-key changed metadata conflicts even with identical body hash', async t => {
   const f = await fixture(t);
   const file = path.join(f.input, 'guides/agent-survey.json');
@@ -136,6 +212,7 @@ test('v2 metadata can upgrade a v1 catalog while preserving each approved body a
   const f = await fixture(t);
   const activeFile = path.join(f.rootDir, 'content/catalog.json');
   const legacy = await json(activeFile);
+  delete legacy.readingAssignments; // Synthetic legacy catalog predates delivery metadata.
   legacy.entries = legacy.entries.filter(entry => entry.revision === 1);
   for (const id of Object.keys(legacy.currentRevisions)) legacy.currentRevisions[id] = 1;
   await putJson(activeFile, legacy);

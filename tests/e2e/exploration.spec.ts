@@ -100,7 +100,7 @@ test('two exact guide excerpts accumulate with question, interpretation, deferra
   expect(appended.evidence.map((item: any) => item.provenance)).toEqual(['guide-excerpt', 'guide-excerpt']);
   expect(appended.evidence.map((item: any) => item.target.guideId)).toEqual(['agent-survey', 'instructgpt']);
   await page.goto(`/explore/questions/${initial.id}`);
-  await page.getByRole('button', { name: '手动编辑记录' }).click();
+  await page.getByRole('button', { name: '编辑方向' }).click();
   await page.getByLabel('我的解释', { exact: true }).fill('合成测试解释：这里只记录当前理解，不作有效性判断。');
   await page.getByLabel('尚不确定的地方', { exact: true }).fill('合成测试未知：仍需核对实验条件。');
   await page.getByLabel('当前状态', { exact: true }).selectOption('deferred');
@@ -111,10 +111,11 @@ test('two exact guide excerpts accumulate with question, interpretation, deferra
   await expect(page.locator('.exploration-saved')).toContainText('已保存');
   await page.reload();
   await expect(page.locator('.exploration-status')).toHaveText('暂缓');
+  await page.getByText('方向概况与决定', { exact: true }).click();
   await expect(page.locator('.direction-overview')).toContainText('合成测试未知');
   await expect(page.locator('.exploration-evidence')).toHaveCount(2);
   await capture(page, 'w4-question-desktop');
-  const target = page.locator('.now-panel').getByRole('link', { name: '去阅读' });
+  const target = page.locator('.direction-next').getByRole('link', { name: '去阅读' });
   await target.click();
   await expect(page).toHaveURL(new RegExp(`/read/helm/${catalog.currentRevisions.helm}#u03$`));
   await page.goBack();
@@ -156,7 +157,7 @@ test('independent manual original excerpt and reader observation need no unrelat
 
 test('editing draft survives internal navigation and browser Back; cancellation discards it', async ({ page }) => {
   await createSynthetic(page);
-  await page.getByRole('button', { name: '手动编辑记录' }).click();
+  await page.getByRole('button', { name: '编辑方向' }).click();
   await page.getByLabel('尚不确定的地方', { exact: true }).fill('合成未保存草稿：从书架返回后还在。');
   await page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '书架', exact: true }).click();
   await expect(page).toHaveURL(/\/library$/);
@@ -164,7 +165,7 @@ test('editing draft survives internal navigation and browser Back; cancellation 
   await expect(page.getByLabel('尚不确定的地方', { exact: true })).toHaveValue('合成未保存草稿：从书架返回后还在。');
   expect((await records(page))[0].unknowns).toBe('');
   await page.getByRole('button', { name: '丢弃草稿', exact: true }).click();
-  await page.getByRole('button', { name: '手动编辑记录' }).click();
+  await page.getByRole('button', { name: '编辑方向' }).click();
   await expect(page.getByLabel('尚不确定的地方', { exact: true })).toHaveValue('');
 });
 
@@ -172,8 +173,8 @@ test('two-tab conflict preserves both alternatives and saves the losing draft se
   await createSynthetic(page);
   const second = await context.newPage();
   await second.goto(page.url());
-  await page.getByRole('button', { name: '手动编辑记录' }).click();
-  await second.getByRole('button', { name: '手动编辑记录' }).click();
+  await page.getByRole('button', { name: '编辑方向' }).click();
+  await second.getByRole('button', { name: '编辑方向' }).click();
   await page.getByLabel('我的解释', { exact: true }).fill('合成测试：第一个页面已保存的解释。');
   await second.getByLabel('我的解释', { exact: true }).fill('合成测试：第二个页面仍保留的解释。');
   await page.getByRole('button', { name: '保存修改', exact: true }).click();
@@ -208,7 +209,7 @@ test('missing anchors and notes preserve snapshots; failed save offers selectabl
   }, id);
   await expect(page.getByText('对应导读版本或章节暂不可用；已保存的文字仍保留。')).toBeVisible();
   await expect(page.getByText('关联笔记已不可用；此处的摘录和批注仍完整保留。')).toBeVisible();
-  await page.getByRole('button', { name: '手动编辑记录' }).click();
+  await page.getByRole('button', { name: '编辑方向' }).click();
   await page.getByLabel('我的解释', { exact: true }).fill('合成失败恢复草稿，不能丢失。');
   await page.evaluate(async () => {
     const modulePath = '/src/records/store.ts';

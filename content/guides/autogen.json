@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 2,
+  "id": "autogen",
+  "paperId": "arxiv:2308.08155",
+  "revision": 1,
+  "title": "AutoGen：把多智能体通信组织成可执行的协作",
+  "paperTitle": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+  "language": "zh-Hans",
+  "type": "system",
+  "mode": "standard",
+  "purpose": "从代码执行反馈理解消息怎样改变行动，再区分双 Agent、动态群聊与实验条件，为后续比较消息路由、广播和终止策略建立基础。",
+  "source": {
+    "id": "arxiv:2308.08155",
+    "version": "v2",
+    "url": "https://arxiv.org/html/2308.08155v2"
+  },
+  "bodyFile": "autogen.md",
+  "bodySha256": "b92f5301e5be2df29c3f13fe26c21720861dea2a0617cd2f29125d311252ec33",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从一条执行错误理解通信的作用"
+    },
+    {
+      "id": "u02",
+      "heading": "一个 Agent 如何接收、处理和回复"
+    },
+    {
+      "id": "u03",
+      "heading": "对话同时承载信息和控制"
+    },
+    {
+      "id": "u04",
+      "heading": "六类应用说明了什么"
+    },
+    {
+      "id": "u05",
+      "heading": "把框架读成通信研究问题"
+    },
+    {
+      "id": "u06",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-1",
+      "url": "https://arxiv.org/abs/2308.08155v2",
+      "labels": [
+        "固定版本记录"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-2",
+      "url": "https://arxiv.org/html/2308.08155v2#S2.SS1",
+      "labels": [
+        "论文 §2.1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-3",
+      "url": "https://arxiv.org/html/2308.08155v2#S2.SS2",
+      "labels": [
+        "论文 §2.2 与图 2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-4",
+      "url": "https://arxiv.org/html/2308.08155v2#S3",
+      "labels": [
+        "群聊应用 A5",
+        "应用与实验"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-5",
+      "url": "https://arxiv.org/pdf/2308.08155v2",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-6",
+      "url": "https://arxiv.org/html/2308.08155v2",
+      "labels": [
+        "HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "camel",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentprune",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–4（重点 §2.1–2.2，§3 A1–A6）"
+    ],
+    "figuresViewed": [
+      "Figure 2（PDF 第4页，AI查看）",
+      "Agent 能力说明（PDF 第3页，AI查看）"
+    ],
+    "limitations": [
+      "未逐项复现六类应用或完整审阅全部附录。",
+      "固定于 2023 年 v2，不验证当前 SDK。",
+      "跨系统比较保留模型、任务范围和配置差异。"
+    ],
+    "reviewBasis": "AI依据固定版本HTML与PDF提取并自审；具体已查看页面和版本疑点见docs/research/communication-papers-review.md。独立审阅另记。"
+  },
+  "orientation": {
+    "shortTitle": "AutoGen：把多智能体通信组织成可执行的协作",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "消息路由"
+        ]
+      },
+      {
+        "id": "agent-orchestration",
+        "label": "Agent 编排",
+        "aliases": [
+          "AutoGen",
+          "群聊",
+          "反馈循环"
+        ]
+      }
+    ],
+    "summary": "多个模型怎样通过对话协作，取决于消息触发的动作、反馈和控制流程。AutoGen 用可交谈 Agent 与对话编排把模型、工具和人连接起来，提供研究通信结构的系统视角。",
+    "value": "从代码执行反馈理解消息怎样改变行动，再区分双 Agent、动态群聊与实验条件，为后续比较消息路由、广播和终止策略建立基础。",
+    "prerequisites": [
+      "了解语言模型的对话与上下文；涉及图结构处给出直观解释。"
+    ],
+    "boundaries": [
+      "未逐项复现六类应用或完整审阅全部附录。",
+      "固定于 2023 年 v2，不验证当前 SDK。",
+      "跨系统比较保留模型、任务范围和配置差异。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Qingyun Wu",
+        "Gagan Bansal",
+        "Jieyu Zhang",
+        "Yiran Wu",
+        "Beibin Li",
+        "Erkang Zhu",
+        "Li Jiang",
+        "Xiaoyun Zhang",
+        "Shaokun Zhang",
+        "Jiale Liu",
+        "Ahmed Hassan Awadallah",
+        "Ryen W. White",
+        "Doug Burger",
+        "Chi Wang"
+      ],
+      "year": 2023,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2308.08155v2",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "用实际反馈区分消息转发与能改变下一步的通信。",
+        "concepts": [
+          "工具反馈",
+          "代码执行"
+        ],
+        "limit": "教学例子未运行。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "理解收发接口、回复能力和消息驱动循环。",
+        "concepts": [
+          "send",
+          "receive",
+          "generate_reply"
+        ],
+        "limit": "具体能力依配置决定。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "区分回复计算、控制流程与群聊路由。",
+        "concepts": [
+          "控制流",
+          "GroupChatManager"
+        ],
+        "limit": "框架支持不等于方案有效。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "按任务与模型条件理解应用证据。",
+        "concepts": [
+          "ALFWorld",
+          "检索问答",
+          "评价"
+        ],
+        "limit": "不能把底座模型差异归因于通信。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "把消息接收者、内容和时机转成研究变量。",
+        "concepts": [
+          "路由",
+          "广播",
+          "停止条件"
+        ],
+        "limit": "候选问题未经本文实验验证。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "回到固定方法图和实验条件。",
+        "concepts": [
+          "原文定位",
+          "覆盖范围"
+        ],
+        "limit": "没有完整附录或当前实现核验。"
+      }
+    ]
+  }
+}

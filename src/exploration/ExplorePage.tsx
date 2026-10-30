@@ -6,7 +6,6 @@ import { ReadingTarget } from './EvidenceCard';
 import { createExploration, pendingDiscussions, statusLabels, useExplorations } from './model';
 import { RESEARCH_STAGES } from '../../shared/research-contract.mjs';
 import { STAGE_LABELS } from '../../shared/research-documents.mjs';
-import { guidesAddedSince } from '../research/artifact-actions';
 import './direction.css';
 import type { Exploration } from '../records/types';
 
@@ -59,12 +58,11 @@ export function ExplorePage() {
 const latestBrief = (record: Exploration) => (record.research?.artifacts ?? []).filter(item => item.kind === 'reading-brief').sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
 function DirectionTile({ record }: { record: Exploration }) {
   const stage = record.research?.stage, at = stage ? RESEARCH_STAGES.indexOf(stage) : -1;
-  const brief = latestBrief(record), arrivals = brief ? guidesAddedSince(brief).length : 0;
   const files = (record.research?.artifacts ?? []).filter(item => item.kind === 'reading-brief').length;
   return <AppLink id={`exploration-open-${record.id}`} className="direction-tile exploration-record-row" to={`/explore/questions/${record.id}`}>
     <div className="tile-top"><span className="tile-stage">{stage ? STAGE_LABELS[stage].label : '阶段未定'}</span>
       <span className="tile-dots" aria-hidden="true">{RESEARCH_STAGES.map((item, index) => <i key={item} className={index <= at ? 'is-on' : ''} />)}</span>
-      {arrivals > 0 && <span className="tile-new">新入库 {arrivals}</span>}{record.status !== 'exploring' && <span className={`exploration-status status-${record.status}`}>{statusLabels[record.status]}</span>}</div>
+      {record.status !== 'exploring' && <span className={`exploration-status status-${record.status}`}>{statusLabels[record.status]}</span>}</div>
     <h3>{record.title}</h3>
     <p className="tile-question">{record.question}</p>
     {record.nextAction && <p className="tile-next exploration-row-next"><span>下一步</span>{record.nextAction.description}</p>}
@@ -72,10 +70,10 @@ function DirectionTile({ record }: { record: Exploration }) {
   </AppLink>;
 }
 function AccumulationRow({ record }: { record: Exploration }) {
-  const brief = latestBrief(record), arrivals = brief ? guidesAddedSince(brief).length : 0;
+  const brief = latestBrief(record);
   return <AppLink className="accumulation-row" to={`/explore/questions/${record.id}`}>
     <div><h3>{record.title}</h3><p>{record.question}</p></div>
-    <p className="accumulation-meta">{brief ? `选文文件 ${brief.updatedAt.slice(0, 10)}` : '尚无文件'}{arrivals > 0 && <span className="tile-new">新入库 {arrivals}</span>}</p>
+    <p className="accumulation-meta">{brief ? `选文文件 ${brief.updatedAt.slice(0, 10)}` : '尚无文件'}</p>
   </AppLink>;
 }
 

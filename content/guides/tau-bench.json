@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 2,
+  "id": "tau-bench",
+  "paperId": "arxiv:2406.12045",
+  "revision": 1,
+  "title": "τ-bench：任务做对一次，离可靠完成还有多远",
+  "paperTitle": "τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains",
+  "language": "zh-Hans",
+  "type": "evaluation",
+  "mode": "standard",
+  "purpose": "它帮助区分一次成功与重复可靠、最终结果与过程合规，以及Agent错误与模拟环境问题。理解奖励与pass^k后，可以更准确地设计任务判据、解读多轮试验，并发现单一成功率可能隐藏的失败。",
+  "source": {
+    "id": "arxiv:2406.12045",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2406.12045v1"
+  },
+  "bodyFile": "tau-bench.md",
+  "bodySha256": "8cf2edcc962670a1f3840a6f1ad569c75a52da009c7b0afc292e0e9d91acfd79",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "用户、工具与规则形成三方约束"
+    },
+    {
+      "id": "u02",
+      "heading": "任务必须有可判定目标，构建过程因此很重要"
+    },
+    {
+      "id": "u03",
+      "heading": "评分同时检查状态与必要输出，但仍会漏掉过程约束"
+    },
+    {
+      "id": "u04",
+      "heading": "pass^k 与 pass@k 区分可靠执行和多次尝试找解"
+    },
+    {
+      "id": "u05",
+      "heading": "读实验时把领域、方法和重复次数一起保留"
+    },
+    {
+      "id": "u06",
+      "heading": "失败分类把低分变成可以调查的问题"
+    },
+    {
+      "id": "u07",
+      "heading": "模拟用户与固定规则也需要被评价"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=2",
+      "labels": [
+        "原文 v1，§1，PDF 第1–2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2406.12045v1",
+      "labels": [
+        "arXiv 2406.12045v1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=4",
+      "labels": [
+        "§3 与图2，PDF 第3–4页",
+        "§3 Reward，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=5",
+      "labels": [
+        "§4 与表1，PDF 第5–6页",
+        "§3 Pass^k，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=6",
+      "labels": [
+        "§3 User simulation 与 §5，PDF 第3、6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=7",
+      "labels": [
+        "表2与图3–4，PDF 第7页",
+        "§5.2 与图5，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=8",
+      "labels": [
+        "表3与对应讨论，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=9",
+      "labels": [
+        "§6，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-evaluation-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentbench",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–4: 任务、状态、奖励、指标和基准构建",
+      "§5: 主实验、方法比较与失败分析",
+      "§6: 用户模拟与构建局限"
+    ],
+    "figuresViewed": [
+      "Figure 2, PDF p4",
+      "Table 1 and metric formulas, PDF p5",
+      "Table 2 and Figures 3–5, PDF p7",
+      "Table 3 and Figure 6, PDF p8"
+    ],
+    "limitations": [
+      "固定 arXiv v1；未覆盖后续修订或τ²-bench，没有复现实验。",
+      "未逐项审查全部数据库、政策与对话附录；模拟用户不能证明真实人群可靠性。",
+      "终点奖励可能漏掉过程违规；表2与表3的航空基线有差异，未合并为同一增益计算。"
+    ],
+    "reviewBasis": "AI authoring review: downloaded the fixed PDF and HTML, read the declared sections and visually inspected the listed local PDF renders. Source hashes, claim checks, limitations and exact scope are recorded in docs/research/evaluation-reading-review.md. No human review or experimental reproduction; independent integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "τ-bench：工具、规则与可靠执行",
+    "topics": [
+      {
+        "id": "agent-model-evaluation",
+        "label": "Agent与模型评测",
+        "aliases": [
+          "evaluation",
+          "benchmark",
+          "评测"
+        ]
+      },
+      {
+        "id": "interactive-benchmarks",
+        "label": "交互任务与可靠性",
+        "aliases": [
+          "任务成功率",
+          "过程评价"
+        ]
+      }
+    ],
+    "summary": "τ-bench 把模拟用户、数据库API和领域政策放进同一段动态对话，通过最终状态与必要输出判定任务结果，并用 pass^k 测量多次运行都成功的可靠性。零售与航空任务展示了工具调用正确、遵守规则和稳定完成之间的距离。",
+    "value": "它帮助区分一次成功与重复可靠、最终结果与过程合规，以及Agent错误与模拟环境问题。理解奖励与pass^k后，可以更准确地设计任务判据、解读多轮试验，并发现单一成功率可能隐藏的失败。",
+    "prerequisites": [
+      "了解语言模型输入输出与基本Agent交互即可；正文解释任务、指标和必要公式。"
+    ],
+    "boundaries": [
+      "固定 arXiv v1；未覆盖后续修订或τ²-bench，没有复现实验。",
+      "未逐项审查全部数据库、政策与对话附录；模拟用户不能证明真实人群可靠性。",
+      "终点奖励可能漏掉过程违规；表2与表3的航空基线有差异，未合并为同一增益计算。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Shunyu Yao",
+        "Noah Shinn",
+        "Pedram Razavi",
+        "Karthik Narasimhan"
+      ],
+      "year": 2024,
+      "venue": "arXiv v1",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2406.12045v1",
+      "preprintYear": 2024
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "理解Agent、用户模拟器和数据库各自可见的信息与行动边界。",
+        "concepts": [
+          "工具使用",
+          "政策约束"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "说明唯一目标状态为何重要，以及任务验证怎样影响评分可信度。",
+        "concepts": [
+          "基准构建",
+          "目标状态"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "解释状态与必要输出共同评分，识别终点正确仍可能过程违规。",
+        "concepts": [
+          "状态评价",
+          "过程合规"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "计算并区分至少一次成功和每次均成功，理解任务内统计条件。",
+        "concepts": [
+          "pass^k",
+          "pass@k",
+          "可靠性"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "保留领域权重、运行预算、采样条件和模型接口后解读结果。",
+        "concepts": [
+          "实验协议",
+          "领域加权"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "从失败分类提出可调查原因，并区分单次样本与主表平均。",
+        "concepts": [
+          "失败分析",
+          "条件核对"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "识别模拟用户、任务构建偏向与后续版本的覆盖缺口。",
+        "concepts": [
+          "用户模拟",
+          "评测边界"
+        ],
+        "limit": "固定 arXiv v1；未覆盖后续修订或τ²-bench，没有复现实验。"
+      }
+    ]
+  }
+}

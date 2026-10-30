@@ -8,6 +8,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import { isSafeExternalUrl, validateDiagram } from '../../shared/content-policy.mjs';
+import { validateReadingAssignments } from '../../shared/reading-assignments.mjs';
 
 export const projectRoot = fileURLToPath(new URL('../../', import.meta.url));
 export const limits = Object.freeze({ json: 2 * 1024 * 1024, body: 1024 * 1024, asset: 10 * 1024 * 1024, package: 64 * 1024 * 1024 });
@@ -104,6 +105,7 @@ export async function validateContent({ rootDir = projectRoot, catalogFile = 'co
     return value;
   }
   const catalog = await json(catalogFile, 'catalog');
+  validateReadingAssignments(catalog.readingAssignments, (id, revision) => catalog.entries.some(entry => entry.guideId === id && entry.revision === revision));
   unique(catalog.entries.map((entry) => `${entry.guideId}/${entry.revision}`), 'Catalog guide revisions');
   unique(catalog.entries.map((entry) => entry.metadataFile.toLowerCase()), 'Catalog metadata paths');
   const guides = [];
@@ -206,6 +208,9 @@ export async function validateContent({ rootDir = projectRoot, catalogFile = 'co
     currentEntries.push(selected);
   }
   if (currentEntries.length !== identities.size) reject('Catalog', 'every guide requires a current revision');
+  for (const id of catalog.archivedGuideIds ?? []) {
+    if (!Object.hasOwn(catalog.currentRevisions, id)) reject('Catalog', 'archived guide target missing');
+  }
   unique(currentEntries.map((guide) => guide.recommendation.rank), 'Current recommendation ranks');
   for (const guide of guides) {
     const { metadata, bodyFile, metadataFile, links, images } = guide;

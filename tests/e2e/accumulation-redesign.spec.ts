@@ -64,9 +64,10 @@ test('existing exploration appears before editorial choices and its next action 
   await expect(page.locator('.exploration-row-next')).toContainText('合成测试行动');
   await capture(page, 'explore-saved-desktop');
   await page.locator('.exploration-record-row').click();
+  await page.getByText('方向概况与决定', { exact: true }).click();
   const next = page.locator(`#exploration-next-${explorationId}`);
   await expect(next).toHaveAttribute('href', '/read/agent-survey/1#u01');
-  const nextBox = await page.locator('.now-panel').boundingBox();
+  const nextBox = await page.locator('.direction-next').boundingBox();
   const evidenceBox = await page.locator('.exploration-evidence').boundingBox();
   expect(nextBox!.y).toBeLessThan(evidenceBox!.y);
   await capture(page, 'exploration-detail-desktop');

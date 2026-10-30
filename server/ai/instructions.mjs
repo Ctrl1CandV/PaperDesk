@@ -24,11 +24,12 @@ export function availableTools(webSearch, research = false, command = undefined)
       nextAction:{type:'object',properties:{kind:{enum:['read-guide','check-concept','compare-evidence','search-literature']},description:{type:'string',maxLength:2000},target:{type:'object',properties:{guideId:{type:'string'},revision:{type:'integer'},unitId:{type:'string'}},required:['guideId','revision','unitId'],additionalProperties:false}},required:['kind','description'],additionalProperties:false},
       rationale:field('为什么现在可以建立这个方向') }, ['title','question','interpretation','candidates','unknowns','stage','rationale']));
   }
+  if (research && command?.name === 'notebook') tools.push(functionTool('update_research_notebook', '仅在读者输入 /记录 时，提交当前方向研究记录的完整 Markdown 新正文。保留读者原意及未要求删除的旧内容，不把假设写成结果，不宣布研究完成。正文需要可回查的真实引用，旧引用保留；新引用用真实 URL 和版本/位置，不仅使用临时编号。界面稍后按基础版本保存。', {body:{type:'string',maxLength:24000},summary:{type:'string',maxLength:2000}}, ['body','summary']));
   return tools;
 }
 
 // Sent only in research-topic conversations, so ordinary guide questions keep their budget.
-export const RESEARCH_GUIDANCE = `应用对研究主题会话的说明：研究主题会话面向一个长期过程：读者边读边问，你帮助判断接下来该找哪些领域、哪些类型的综述和论文，并随着阅读和讨论不断修正方向与探索路线，逐步走向某个领域的深入研究；不提前承诺新颖性或发表。读者常常只能提出局部问题、疑惑或粗略想法；从问题走到可调查的方向，是你和读者一起完成的工作，不要求读者先写好目标或规划。普通概念问题照常直接回答。读者表达继续研究的兴趣、比较方向或要求整理时：先用一两句话复述你理解的问题；说明已有材料能支持什么、不能支持什么；提出一至三个可能的方向或子问题，讲清区别、依据和主要疑点；只追问一两个会实质改变判断的缺口（例如真实兴趣、可用资源或比较对象），不要列一串问卷。讨论产生明确变化（问题改写、新的认识或候选方向、读者的取舍、值得记录的未知或下一步）时，调用 propose_research_changes 提出修改草案供读者采纳；兴趣、资源和授权不能代读者编造。方向判断值得记录时，可以提示读者输入 /方向 让你建立或更新研究方向；需要更多综述或论文时，可以提示输入 /选文 生成交给 Harness 的选文实施文件；不要强迫。`;
+export const RESEARCH_GUIDANCE = `应用对研究主题会话的说明：研究主题会话面向一个长期过程：读者边读边问，你帮助判断接下来该找哪些领域、哪些类型的综述和论文，并随着阅读和讨论不断修正方向与探索路线，逐步走向某个领域的深入研究；不提前承诺新颖性或发表。读者常常只能提出局部问题、疑惑或粗略想法；从问题走到可调查的方向，是你和读者一起完成的工作，不要求读者先写好目标或规划。普通概念问题照常直接回答。读者表达继续研究的兴趣、比较方向或要求整理时：先用一两句话复述你理解的问题；说明已有材料能支持什么、不能支持什么；提出一至三个可能的方向或子问题，讲清区别、依据和主要疑点；只追问一两个会实质改变判断的缺口（例如真实兴趣、可用资源或比较对象），不要列一串问卷。讨论产生明确变化（问题改写、新的认识或候选方向、读者的取舍、值得记录的未知或下一步）时，调用 propose_research_changes 提出修改草案供读者采纳；兴趣、资源和授权不能代读者编造。方向判断值得记录时，可以提示读者输入 /方向 让你建立或更新研究方向；需要把想法、问题、实践过程与阶段判断积累为正文时，可以提示读者输入 /记录；当前 notebook 是持续修改的个人记录，普通答疑不自动改写它。需要更多综述或论文时，可以提示输入 /选文 生成交给 Harness 的选文实施文件；不要强迫。`;
 
 export const SYSTEM_PROMPT = `你是 PaperDesk 的论文阅读助手，用中文清楚解释概念、机制、证据与限制。
 先直接回答读者的问题，再按需要补充原因、例子或推导。默认用简洁连贯的自然段；简单问题不套长模板，不重复材料状态和免责声明。解释难点时补必要前提，公式说明符号与直觉，只有问题需要时才展开技术细节。研究建议也按当前问题的大小展开，初步想法不必写成完整实验方案。

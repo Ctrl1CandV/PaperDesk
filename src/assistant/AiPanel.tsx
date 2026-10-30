@@ -22,7 +22,7 @@ type QuestionMaterial = { unitId: string; selection?: string };
 type SessionDraft = { question: string; conversationId?: string; webSearch: boolean; material?: QuestionMaterial; selectedMaterials?: MaterialSelection };
 export type TopicRequest = { explorationId: string; question?: string; notice?: string; nonce: number };
 /** A prepared question for a topic; applied once, after the panel is ready. */
-export type ResearchRequest = { explorationId: string; question: string; artifactIds?: string[]; nonce: number };
+export type ResearchRequest = { explorationId: string; question: string; artifactIds?: string[]; autoSend?: boolean; nonce: number };
 const conversationSelections = new Map<string, string | undefined>();
 const handledTopicRequests = new Set<number>(), handledResearchRequests = new Set<number>();
 const errorText = (error: unknown) => error instanceof Error && error.message ? error.message : '操作未完成，请保留草稿并重试。';
@@ -97,6 +97,10 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
   const [connectionError, setConnectionError] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [quickRetry, setQuickRetry] = useState<{ question: string; turn?: AiTurn }>();
+  const quickCommandTurn = useRef<string | undefined>(undefined);
+  const commandSaving = useRef(false);
+  const submitting = useRef(false);
   const [conversations, setConversations] = useState<AiConversation[]>([]);
   const [conversationCursor, setConversationCursor] = useState<string | null>(null), [turnCursor, setTurnCursor] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | undefined>(cached?.conversationId ?? conversationSelections.get(guideKey) ?? (exploration ? readSession(`paperdesk-ai-conversation:${guideKey}`) || undefined : undefined));
@@ -140,8 +144,15 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     // The owning page keeps the request, so one prepared while the panel was busy or remounting is not lost.
     const detail = researchRequest;
     if (!detail || handledResearchRequests.has(detail.nonce)) return;
+    if (detail.autoSend && connecting) return;
     handledResearchRequests.add(detail.nonce);
     if (detail.explorationId !== exploration?.id || typeof detail.question !== 'string' || detail.question.length > 6000) return;
+    if (detail.autoSend) {
+      setQuickRetry({ question: detail.question });
+      if (!ready || locked || hasRunning) { setError('暂时无法生成选文文件。请连接 AI 或等待当前回答结束，再点“重试生成”。原有问题草稿已保留。'); return; }
+      void send(detail.question);
+      return;
+    }
     if (question || locked) { setNotice('现有问题草稿已保留。请先处理草稿，再带着结果继续讨论。'); return; }
     editQuestion(detail.question);
     // A document chosen through its own “update” action is an explicit, still revocable selection.
@@ -152,7 +163,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       setNotice(`已选入《${chosen.map(item => item.title).join('》《')}》作为本轮参考，可在“选择笔记与研究文档”中撤销。`);
     }
     input.current?.scrollIntoView({ block: 'center' }); input.current?.focus();
-  }, [researchRequest?.nonce]);
+  }, [researchRequest?.nonce, connecting]);
 
   useEffect(() => {
     if (question || selectedMaterials.notes.length || selectedMaterials.artifacts.length) keepDraft(draftKey, { question, conversationId, webSearch, material, selectedMaterials } satisfies SessionDraft);
@@ -299,18 +310,23 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     } catch (reason) { setError(errorText(reason)); }
     finally { if (alive.current) setBusy(false); }
   }
-  async function send() {
-    if (!ready || !status || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000) return;
-    const text = question.trim();
-    // A leading /方向 or /选文 is the reader's explicit request to create or save a result.
+  async function send(quickQuestion?: string) {
+    const text = (quickQuestion ?? question).trim();
+    if (!ready || !status || locked || hasRunning || submitting.current || (!quickQuestion && selectionTooLong) || !text || text.length > 6000) return;
+    // A leading command is the reader's explicit request to create or save a result.
     const parsed = parseCommand(text);
     let command: ResearchCommand | undefined;
     if (parsed?.command.name === 'direction') command = { name: 'direction' };
+    else if (parsed?.command.name === 'notebook') {
+      if (!exploration) { setError('研究记录需要先关联方向：在上方选择方向，或先输入 /方向 建立。问题草稿已保留。'); return; }
+      command = { name: 'notebook' };
+    }
     else if (parsed) {
       const purpose = parsed.command.purpose ?? (exploration ? 'research' : 'accumulation');
       if (purpose === 'research' && !exploration) { setError('推进类选文需要先关联方向：在上方选择方向，或先输入 /方向 建立。问题草稿已保留。'); return; }
       command = { name: 'reading-brief', purpose };
     }
+    submitting.current = true;
     let researchSnapshot, researchMaterials, progress;
     if (exploration || command?.name === 'reading-brief') {
       setBusy(true);
@@ -319,12 +335,12 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
           const current = await personalStore.get('explorations', exploration.id);
           if (!current) throw new Error('关联的方向已不可用。问题草稿仍保留。');
           researchSnapshot = await createResearchSnapshot(current);
-          researchMaterials = await prepareSelectedMaterials(exploration.id, selectedMaterials);
+          researchMaterials = quickQuestion ? undefined : await prepareSelectedMaterials(exploration.id, selectedMaterials);
         }
         if (command?.name === 'reading-brief') progress = await readingProgress();
-      } catch (reason) { setError(errorText(reason)); setBusy(false); return; }
+      } catch (reason) { setError(errorText(reason)); setBusy(false); submitting.current = false; return; }
       setBusy(false);
-      if (!alive.current) return;
+      if (!alive.current) { submitting.current = false; return; }
     }
     const base = { conversationId, ...(guide && unit ? { guideId: guide.metadata.id, revision: guide.metadata.revision,
       bodySha256: guide.metadata.bodySha256, unitId: unit.id, ...(questionSelection ? { selection: questionSelection } : {}) } : {}),
@@ -377,6 +393,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
         setError(abort.signal.aborted ? '已停止接收回答。问题仍保留；刷新对话可确认服务端最终保存的内容。' : errorText(reason));
       }
     } finally {
+      submitting.current = false;
       if (alive.current) {
         setPhase('正在确认对话已保存'); controller.current = undefined;
         // A reload also resolves ambiguous failures and preserves a partial response already saved by the service.
@@ -386,10 +403,17 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
           // A provider may have reported an expired login or refreshed model choice.
           try { const next = await getAiStatus(); receiveStatus(next); } catch { /* Keep the answer and the last known status. */ }
           if (alive.current) {
-            if (completed) { setQuestion(''); setMaterial(undefined); clearDraft(draftKey); pendingRequest.current = undefined; }
+            if (completed) {
+              if (!quickQuestion) { setQuestion(''); setMaterial(undefined); clearDraft(draftKey); }
+              else if (finished?.context?.command) {
+                quickCommandTurn.current = finished.id;
+                setQuickRetry({ question: quickQuestion, turn: finished });
+              }
+              pendingRequest.current = undefined;
+            }
             setSending(false); setPhase('');
             // Keep the composer locked until the result is saved; a new direction switches the panel.
-            if (completed && finished?.context?.command) { setBusy(true); try { await runCommand(finished, acceptedId); } finally { if (alive.current) setBusy(false); } }
+            if (completed && finished?.context?.command) await runCommand(finished, acceptedId);
           }
         }
       }
@@ -402,17 +426,31 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
   }
   turnsRef.current = turns;
   async function runCommand(turn: AiTurn, owner = connectedId.current) {
+    if (commandSaving.current) return;
+    commandSaving.current = true; setBusy(true);
     setOutcomes(current => { const next = { ...current }; delete next[turn.id]; return next; });
     try {
       const linked = exploration ? await personalStore.get('explorations', exploration.id) : undefined;
       const outcome = await applyCommandTurn(turn, { linked, conversation: turnsRef.current, conversationId: owner });
       if (!alive.current) return;
       setOutcomes(current => ({ ...current, [turn.id]: outcome }));
+      if (quickCommandTurn.current === turn.id) {
+        if (outcome.kind === 'brief-saved') {
+          setQuickRetry(undefined); quickCommandTurn.current = undefined; setError('');
+          setNotice(question ? '选文文件已生成并保存，原有问题草稿已保留。' : '选文文件已生成并保存。');
+        } else if (outcome.kind === 'declined') {
+          setQuickRetry(undefined); quickCommandTurn.current = undefined; setError('');
+          setNotice(`这次没有生成选文文件，请根据回答补充信息后继续讨论。${question ? '原有问题草稿已保留。' : ''}`);
+        }
+      }
       if (outcome.kind === 'direction-created') onDirectionCreated?.(outcome.record);
     } catch (reason) {
       if (!alive.current) return;
       setOutcomes(current => ({ ...current, [turn.id]: { kind: 'pending' } }));
       setError(`指令结果未能保存：${errorText(reason)} 可以点这一轮下方的“保存结果”重试。`);
+    } finally {
+      commandSaving.current = false;
+      if (alive.current) setBusy(false);
     }
   }
   // History shows what earlier commands produced, read from saved records without writing.
@@ -486,7 +524,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     </header>
     <div className="ai-context">
       {picker}
-      {exploration && <div className="ai-research-line">{!guide && <strong>{exploration.title}</strong>}<details className="ai-research-preview"><summary>方向记录 r{exploration.recordRevision}</summary><p>关联方向后，每次提问会带上这个方向的问题、认识、决定、材料和下一步，并参考同方向的旧讨论；其他方向和未选笔记不会发送。</p><ResearchSnapshotView snapshot={researchSnapshotData(exploration)} /></details>
+      {exploration && <div className="ai-research-line">{!guide && <strong>{exploration.title}</strong>}<details className="ai-research-preview"><summary>方向记录 r{exploration.recordRevision}</summary><p>每次提问会带上这个方向的问题、认识、决定、材料、下一步和最新保存的研究记录，并参考同方向的旧讨论。未保存的草稿、其他方向和未选笔记不会发送。</p><ResearchSnapshotView snapshot={researchSnapshotData(exploration)} /></details>
         <button type="button" className="ai-inline-action" disabled={locked} onClick={() => setMaterialsPickerOpen(true)}>{selectedMaterials.notes.length || selectedMaterials.artifacts.length ? `资料 · 已选 ${selectedMaterials.notes.length} 条笔记、${selectedMaterials.artifacts.length} 份文档` : '资料 · 默认不发送'}</button></div>}
       {unit && <>
       <button type="button" className="ai-material-trigger" onClick={() => setMaterialOpen(true)} aria-label="查看本次提问资料">
@@ -498,7 +536,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     <div className="ai-messages" ref={messages} role="region" aria-label="AI 解读对话" tabIndex={0} onScroll={event => { const node = event.currentTarget; if (autoTop.current !== undefined && Math.abs(node.scrollTop - autoTop.current) < 2) return; autoTop.current = undefined; nearBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }}>
       {exploration && !conversationId && conversations.length > 0 && !connecting && !connectionError && <div className="ai-service-state"><p>这个方向已有讨论：{conversations[0].title}</p><button type="button" className="ai-inline-action" disabled={locked} onClick={() => void chooseConversation(conversations[0].id)}>继续最近的讨论</button><p>只恢复对话，当前问题草稿与资料选择保持不变。</p></div>}
       {connecting ? <p className="ai-service-state" role="status">正在连接…</p> : connectionError ? <div className="ai-service-state"><p>{connectionError}</p><button type="button" className="ai-inline-action" onClick={() => void connect()}>重试连接</button></div> : status && !status.configured ? <div className="ai-service-state"><p>{status.provider === 'chatgpt' ? '连接 ChatGPT 后即可提问。' : '连接 ChatGPT 订阅，或配置自己的 API。'}</p><button type="button" className="ai-inline-action" onClick={() => setSettingsOpen(true)}>打开 AI 设置</button></div> : null}
-      {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">{exploration ? `继续讨论《${exploration.title}》` : '从这篇导读继续追问'}</p><p className="ai-empty-copy">{exploration ? '说出新的疑惑或想法即可。讨论有了变化时输入 /方向 更新这个方向；需要更多论文时输入 /选文。' : '读到想深入的地方，可以输入 /方向 建立研究方向，或输入 /选文 让 Harness 补充综述和论文。'}</p><div className="ai-suggestions">{(exploration ? researchSuggestions : suggestions).map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => {
+      {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">{exploration ? `继续讨论《${exploration.title}》` : '从这篇导读继续追问'}</p><p className="ai-empty-copy">{exploration ? '说出新的疑惑或想法即可。输入 /记录 整理研究过程，/方向 更新问题与安排，/选文 准备下一轮阅读。' : '读到想深入的地方，可以输入 /方向 建立研究方向，或输入 /选文 让 Harness 补充综述和论文。'}</p><div className="ai-suggestions">{(exploration ? researchSuggestions : suggestions).map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => {
         editQuestion(value); const caret = value.startsWith(recapPrompt) ? recapPrompt.length : value.length;
         requestAnimationFrame(() => { input.current?.focus(); input.current?.setSelectionRange(caret, caret); });
       }}>{exploration ? researchSuggestionLabels[index] : suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
@@ -523,6 +561,8 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       {notice && <p className="ai-notice" role="status">{notice}</p>}
       {loginPending && <p className="ai-notice" role="status">正在等待 ChatGPT 授权。完成或取消这次登录后即可发送，问题草稿仍保留。</p>}
       {selectionTooLong && <p className="ai-error" role="alert">选文超过 12,000 字符。请打开“资料”，选择“不附带选文”，或改用较短的当前选文；没有自动截断。</p>}
+      {exploration && <div className="ai-brief-shortcuts" aria-label="生成选文文件"><span>生成选文文件</span><button type="button" disabled={locked} onClick={() => editQuestion(`/选文 积累 ${parseCommand(question)?.rest ?? question.trim()}`)}>继续积累</button><button type="button" disabled={locked} onClick={() => editQuestion(`/选文 推进 ${parseCommand(question)?.rest ?? question.trim()}`)}>探索问题</button></div>}
+      {quickRetry && !sending && <p className="ai-quick-retry" role="status">{quickRetry.turn ? '积累选文文件尚未保存。' : '积累选文文件尚未生成。'}<button type="button" className="ai-inline-action" disabled={locked || hasRunning || (!quickRetry.turn && !ready)} onClick={() => quickRetry.turn ? void runCommand(quickRetry.turn) : void send(quickRetry.question)}>{quickRetry.turn ? '重试保存' : '重试生成'}</button><button type="button" className="ai-inline-action" disabled={locked} onClick={() => { setQuickRetry(undefined); quickCommandTurn.current = undefined; }}>取消</button></p>}
       {menuOptions.length > 0 && <CommandMenu options={menuOptions} active={Math.min(commandMenu, menuOptions.length - 1)} onHover={setCommandMenu} onPick={pickCommand} />}
       {commandHint(question, exploration) && <p className="ai-command-hint">{commandHint(question, exploration)}</p>}
       <div className="ai-input-surface"><label className="ai-visually-hidden" htmlFor={questionId}>向 AI 提问</label><textarea id={questionId} ref={input} rows={3} value={question} maxLength={6000} disabled={locked} placeholder={exploration ? '继续讨论这个方向；输入 / 使用指令' : '关于这篇文章，你想进一步理解什么？输入 / 使用指令'} onChange={event => editQuestion(event.target.value)} onKeyDown={event => {

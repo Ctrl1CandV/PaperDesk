@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 2,
+  "id": "camel",
+  "paperId": "arxiv:2303.17760",
+  "revision": 1,
+  "title": "CAMEL：用角色和对话协议组织双智能体协作",
+  "paperTitle": "CAMEL: Communicative Agents for “Mind” Exploration of Large Language Model Society",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "用一个小而完整的消息循环理解角色分工、共享历史和停止条件，并辨别回答偏好、执行成功与微调模型结果这些不同证据。",
+  "source": {
+    "id": "arxiv:2303.17760",
+    "version": "v2",
+    "url": "https://arxiv.org/html/2303.17760v2"
+  },
+  "bodyFile": "camel.md",
+  "bodySha256": "1997a919ff33275d422ba57d29a1ec5b329c1d32a260e9b6e1f9b1e000d9ce7f",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "先把任务具体化，再分配交谈角色"
+    },
+    {
+      "id": "u02",
+      "heading": "下一条指令来自上一轮的结果"
+    },
+    {
+      "id": "u03",
+      "heading": "Inception prompting 约束的是交流协议"
+    },
+    {
+      "id": "u04",
+      "heading": "四种失败让通信质量可以被观察"
+    },
+    {
+      "id": "u05",
+      "heading": "评价支持了什么，又没有支持什么"
+    },
+    {
+      "id": "u06",
+      "heading": "下一步怎样研究角色间通信"
+    },
+    {
+      "id": "u07",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-1",
+      "url": "https://arxiv.org/abs/2303.17760v2",
+      "labels": [
+        "论文 v2 记录"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-2",
+      "url": "https://arxiv.org/html/2303.17760v2#S3.SS1",
+      "labels": [
+        "方法 §3.1 与图 1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-3",
+      "url": "https://arxiv.org/html/2303.17760v2#S3.SS2",
+      "labels": [
+        "提示设计 §3.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-4",
+      "url": "https://arxiv.org/html/2303.17760v2#S4.SS1",
+      "labels": [
+        "行为观察与停止条件"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-5",
+      "url": "https://arxiv.org/html/2303.17760v2#S5.SS1",
+      "labels": [
+        "评价 §5.1 与表 1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-6",
+      "url": "https://arxiv.org/html/2303.17760v2#S5.SS3",
+      "labels": [
+        "微调模型评价 §5.3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-7",
+      "url": "https://arxiv.org/pdf/2303.17760v2",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c-8",
+      "url": "https://arxiv.org/html/2303.17760v2",
+      "labels": [
+        "HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "autogen",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentprune",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§3.1–3.2",
+      "§4.1",
+      "§5.1–5.3（评价口径）"
+    ],
+    "figuresViewed": [
+      "Figure 1（PDF 第4页，AI查看）",
+      "公式1–4（PDF 第5页，AI查看）",
+      "停止条件（PDF 第8页，AI查看）",
+      "Table 1（PDF 第9页，AI查看）"
+    ],
+    "limitations": [
+      "没有覆盖全部数据生成附录、提示模板或 critic 案例。",
+      "没有复现对话或微调训练。",
+      "评价偏好不能当作真实环境任务成功率。"
+    ],
+    "reviewBasis": "AI依据固定版本HTML与PDF提取并自审；具体已查看页面和版本疑点见docs/research/communication-papers-review.md。独立审阅另记。"
+  },
+  "orientation": {
+    "shortTitle": "CAMEL：用角色和对话协议组织双智能体协作",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "CAMEL"
+        ]
+      },
+      {
+        "id": "role-protocol",
+        "label": "角色与协议",
+        "aliases": [
+          "role-playing",
+          "inception prompting",
+          "停止条件"
+        ]
+      }
+    ],
+    "summary": "CAMEL 让 AI user 给出下一步指令、AI assistant 提供方案，用角色与交流协议组织双智能体协作。论文同时记录角色反转、空泛承诺和无进展循环。",
+    "value": "用一个小而完整的消息循环理解角色分工、共享历史和停止条件，并辨别回答偏好、执行成功与微调模型结果这些不同证据。",
+    "prerequisites": [
+      "了解语言模型的对话与上下文；涉及图结构处给出直观解释。"
+    ],
+    "boundaries": [
+      "没有覆盖全部数据生成附录、提示模板或 critic 案例。",
+      "没有复现对话或微调训练。",
+      "评价偏好不能当作真实环境任务成功率。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Guohao Li",
+        "Hasan Abed Al Kader Hammoud",
+        "Hani Itani",
+        "Dmitrii Khizbullin",
+        "Bernard Ghanem"
+      ],
+      "year": 2023,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2303.17760v2",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "区分任务具体化和双角色分工。",
+        "concepts": [
+          "task specifier",
+          "AI user",
+          "AI assistant"
+        ],
+        "limit": "模型补全假设不代表人已授权。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "沿指令、方案和历史更新理解循环。",
+        "concepts": [
+          "消息历史",
+          "交互式规划"
+        ],
+        "limit": "给出方案不等于执行。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "理解角色提示如何约束交流。",
+        "concepts": [
+          "inception prompting",
+          "角色协议"
+        ],
+        "limit": "提示不能保证协议永不失效。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "识别无进展消息与不同停止原因。",
+        "concepts": [
+          "角色反转",
+          "终止",
+          "重复"
+        ],
+        "limit": "停止不等于成功。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "区分回答偏好、执行结果与训练后模型评价。",
+        "concepts": [
+          "人类评价",
+          "GPT-4评价",
+          "HumanEval"
+        ],
+        "limit": "不同预算与汇总过程限制因果解释。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "形成可比较的协议和历史传递问题。",
+        "concepts": [
+          "共享历史",
+          "通信预算"
+        ],
+        "limit": "候选方向尚未验证。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "检查固定版本的流程与评价表。",
+        "concepts": [
+          "原文定位",
+          "覆盖范围"
+        ],
+        "limit": "未完整分析全部附录。"
+      }
+    ]
+  }
+}

@@ -1,3 +1,5 @@
+import { type NotebookVersion } from '../../shared/research-notebook.mjs';
+import { saveNotebookTurn } from './notebook-actions';
 import { createSeedDiscussion, emptyResearchState, validateResearchProposal, type ResearchProposal } from '../../shared/research-contract.mjs';
 import { checkDocumentSections, readingBriefTitle, READING_BRIEF, STAGE_LABELS } from '../../shared/research-documents.mjs';
 import type { ResearchArtifact } from '../../shared/research-artifacts.mjs';
@@ -13,6 +15,7 @@ export type CommandOutcome =
   | { kind: 'direction-created'; record: Exploration }
   | { kind: 'direction-updated'; record: Exploration; proposal: ResearchProposal }
   | { kind: 'brief-saved'; record: Exploration; artifact: ResearchArtifact; missing: string[] }
+  | { kind: 'notebook-saved'; record: Exploration; version: NotebookVersion }
   | { kind: 'declined' }
   | { kind: 'pending' };
 
@@ -34,6 +37,13 @@ const briefTopic = (turn: AiTurn) => readingBriefTitle(turn.answer);
 export async function commandOutcome(turn: AiTurn, linked?: Exploration): Promise<CommandOutcome> {
   const command = turn.context?.command;
   if (!command || turn.status !== 'complete') return { kind: 'declined' };
+  if (command.name === 'notebook') {
+    if (!turn.context?.notebookDraft) return { kind: 'declined' };
+    const topic = turn.context?.researchSnapshot?.explorationId;
+    const owner = topic ? await personalStore.get('explorations', topic) : undefined;
+    const version = owner?.research?.notebook?.versions.find(item => item.sourceTurnId === turn.id);
+    return owner && version ? { kind: 'notebook-saved', record: owner, version } : { kind: 'pending' };
+  }
   if (command.name === 'direction') {
     if (turn.context?.directionDraft) { const record = await createdFrom(turn.id); return record ? { kind: 'direction-created', record } : { kind: 'pending' }; }
     const proposal = turn.context?.researchProposals?.[0];
@@ -53,6 +63,11 @@ export async function commandOutcome(turn: AiTurn, linked?: Exploration): Promis
 export async function applyCommandTurn(turn: AiTurn, { linked, conversation, conversationId }: { linked?: Exploration; conversation: AiTurn[]; conversationId?: string }): Promise<CommandOutcome> {
   const command = turn.context?.command;
   if (!command || turn.status !== 'complete' || turn.summaryOnly) return { kind: 'declined' };
+  if (command.name === 'notebook') {
+    if (!turn.context?.notebookDraft) return { kind: 'declined' };
+    if (linked && linked.id !== turn.context.researchSnapshot?.explorationId) throw Error('这份研究记录属于另一个方向，未保存。');
+    return { kind: 'notebook-saved', ...await saveNotebookTurn(turn) };
+  }
   if (command.name === 'direction') {
     const draft = turn.context?.directionDraft;
     if (draft) {
@@ -77,7 +92,15 @@ export async function applyCommandTurn(turn: AiTurn, { linked, conversation, con
   }
   const topic = briefTopic(turn);
   if (!topic) return { kind: 'declined' };
-  let owner = linked ?? (await personalStore.list('explorations')).find(item => item.research?.artifacts?.some(artifact => artifact.sourceTurnId === turn.id));
+  const snapshotTopic = (turn.context?.researchSnapshot as { explorationId?: string } | undefined)?.explorationId;
+  const scope = turn.context?.conversationScope as { kind?: string; explorationId?: string } | undefined;
+  const scopeTopic = scope?.kind === 'exploration' ? scope.explorationId : undefined;
+  if (snapshotTopic && scopeTopic && snapshotTopic !== scopeTopic) throw new Error('这份选文回答的方向身份不一致，未保存。');
+  const originalTopic = snapshotTopic ?? scopeTopic;
+  if (originalTopic && linked && linked.id !== originalTopic) throw new Error('这份选文回答属于另一个方向，未保存。');
+  let owner = originalTopic ? await personalStore.get('explorations', originalTopic)
+    : linked ?? (await personalStore.list('explorations')).find(item => item.research?.artifacts?.some(artifact => artifact.sourceTurnId === turn.id));
+  if (originalTopic && !owner) throw new Error('原来关联的研究方向已不存在；回答仍保留在 AI 历史中，未建立新的阅读积累。');
   if (!owner) {
     // A learning goal without a direction gets its own entry under 阅读积累.
     const base = createExploration();
@@ -90,6 +113,7 @@ export async function applyCommandTurn(turn: AiTurn, { linked, conversation, con
 }
 
 export function outcomeSummary(outcome: CommandOutcome) {
+  if (outcome.kind === 'notebook-saved') return `已更新《${outcome.record.title}》的研究记录 · 第 ${outcome.version.version} 版`;
   if (outcome.kind === 'direction-created') return `已建立研究方向《${outcome.record.title}》${outcome.record.research?.stage ? ` · ${STAGE_LABELS[outcome.record.research.stage].label}` : ''}`;
   if (outcome.kind === 'direction-updated') return `已更新《${outcome.record.title}》：${outcome.proposal.changes.length} 项变化`;
   if (outcome.kind === 'brief-saved') return `已生成《${READING_BRIEF.label}》，保存在《${outcome.record.title}》`;

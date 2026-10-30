@@ -94,7 +94,7 @@ test('synthetic proposal previews exact edits, saves once and blocks a stale pro
 test('synthetic manual decision is explicit and a receipt question never overwrites or sends a draft', async ({ page, context, baseURL }) => {
   const mock = await service(context, baseURL!); await seed(page);
   await page.goto(`/explore/questions/${topic}`);
-  await page.getByRole('button', { name: '手动编辑记录' }).click();
+  await page.getByRole('button', { name: '编辑方向' }).click();
   await page.getByText('记录一项研究决定或修订', { exact: true }).click();
   await page.getByRole('textbox', { name: '决定内容', exact: true }).fill('SYNTHETIC 优先检查约束');
   await page.getByRole('textbox', { name: '形成理由', exact: true }).fill('SYNTHETIC 决定理由');

@@ -29,6 +29,8 @@ for (const [revision, file] of Object.entries(catalog.exploration.revisions)) {
   seeds[revision] = { file, sha256: sha256(await readFile(resolve(root, file))) };
 }
 const index = { schemaVersion: 1, catalogSha256: sha256(catalogBytes), currentRevisions: catalog.currentRevisions,
+  archivedGuideIds: catalog.archivedGuideIds ?? [],
+  ...(catalog.readingAssignments ? { readingAssignments: catalog.readingAssignments } : {}),
   entries, exploration: { currentRevision: catalog.exploration.currentRevision, revisions: seeds } };
 const output = resolve(project, 'src/content/catalog-index.json');
 const serialized = JSON.stringify(index) + '\n';

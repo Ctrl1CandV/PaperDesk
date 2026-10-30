@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 2,
+  "id": "agentbench",
+  "paperId": "arxiv:2308.03688",
+  "revision": 1,
+  "title": "AgentBench：在交互环境中解释 Agent 的能力与失败",
+  "paperTitle": "AgentBench: Evaluating LLMs as Agents",
+  "language": "zh-Hans",
+  "type": "evaluation",
+  "mode": "standard",
+  "purpose": "这篇适合练习解读 Agent 评测：逐项确认分数的单位，检查提示和历史截断，理解归一化综合分数为什么不是成功概率，再利用格式、动作和轮次等终止现象提出更具体的诊断问题。",
+  "source": {
+    "id": "arxiv:2308.03688",
+    "version": "v2",
+    "url": "https://arxiv.org/pdf/2308.03688v2"
+  },
+  "bodyFile": "agentbench.md",
+  "bodySha256": "fb12f0e58064e16c5eb8d58654eb3d674271c527cf86cc0811838903b5757295",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从一次输出改为观察与行动的循环"
+    },
+    {
+      "id": "u02",
+      "heading": "八种环境让不同能力暴露在不同条件下"
+    },
+    {
+      "id": "u03",
+      "heading": "被测模型之外，提示与预算也决定表现"
+    },
+    {
+      "id": "u04",
+      "heading": "综合分数是归一化汇总，不是任务成功概率"
+    },
+    {
+      "id": "u05",
+      "heading": "终止原因帮助诊断，但不等于成功与失败的完整解释"
+    },
+    {
+      "id": "u06",
+      "heading": "历史比较支持哪些判断，又不能支持哪些判断"
+    },
+    {
+      "id": "u07",
+      "heading": "怎样把这篇用于后续评价设计"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2308.03688v2#page=3",
+      "labels": [
+        "原文 v2，§1–2，PDF 第2–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2308.03688v2",
+      "labels": [
+        "arXiv v2 的 Technical Report v0.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2308.03688v2#page=4",
+      "labels": [
+        "§2–3.1，PDF 第3–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2308.03688v2#page=6",
+      "labels": [
+        "§3 与表2，PDF 第4–6页",
+        "表2与实验设置，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2308.03688v2#page=7",
+      "labels": [
+        "§2、§4.1，PDF 第3、6–7页",
+        "§4.1 Overall Score Calculation 与表2–3，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2308.03688v2#page=8",
+      "labels": [
+        "§2 与表4，PDF 第4、8页",
+        "§4.2–4.3，PDF 第8–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c07",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/e9df36b21ff4ee211a8b71ee8b7e9f57-Abstract-Conference.html",
+      "labels": [
+        "ICLR 2024 正式记录"
+      ],
+      "role": "background",
+      "sourceVersion": "publication record"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-evaluation-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "tau-bench",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–3: 交互定义、终止类型与八种环境",
+      "§4.1: 数据划分、提示、截断与分数汇总",
+      "§4.2–4.3: 主结果与选定失败分析"
+    ],
+    "figuresViewed": [
+      "Table 2, PDF p6",
+      "Table 3, PDF p7",
+      "Table 4 and Figure 3, PDF p8"
+    ],
+    "limitations": [
+      "固定 arXiv v2/Technical Report v0.2，27模型；正式ICLR版29模型的结果没有混入。",
+      "未逐项审查全部环境附录、任务实现、轨迹及消融，没有实验复现。",
+      "综合分数不是成功概率；正常终止不等于任务正确，历史结果不是当前排行榜。"
+    ],
+    "reviewBasis": "AI authoring review: downloaded the fixed PDF and HTML, read the declared sections and visually inspected the listed local PDF renders. Source hashes, claim checks, limitations and exact scope are recorded in docs/research/evaluation-reading-review.md. No human review or experimental reproduction; independent integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "AgentBench：交互任务与失败诊断",
+    "topics": [
+      {
+        "id": "agent-model-evaluation",
+        "label": "Agent与模型评测",
+        "aliases": [
+          "evaluation",
+          "benchmark",
+          "评测"
+        ]
+      },
+      {
+        "id": "interactive-benchmarks",
+        "label": "交互任务与可靠性",
+        "aliases": [
+          "任务成功率",
+          "过程评价"
+        ]
+      }
+    ],
+    "summary": "AgentBench 将语言模型放入操作系统、数据库、游戏和网页等八种交互环境，考察它们能否沿观察与行动完成任务。论文同时记录分项指标、综合分数和终止原因，把静态答题能力与连续任务表现连接起来。",
+    "value": "这篇适合练习解读 Agent 评测：逐项确认分数的单位，检查提示和历史截断，理解归一化综合分数为什么不是成功概率，再利用格式、动作和轮次等终止现象提出更具体的诊断问题。",
+    "prerequisites": [
+      "了解语言模型输入输出与基本Agent交互即可；正文解释任务、指标和必要公式。"
+    ],
+    "boundaries": [
+      "固定 arXiv v2/Technical Report v0.2，27模型；正式ICLR版29模型的结果没有混入。",
+      "未逐项审查全部环境附录、任务实现、轨迹及消融，没有实验复现。",
+      "综合分数不是成功概率；正常终止不等于任务正确，历史结果不是当前排行榜。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Xiao Liu",
+        "Hao Yu",
+        "Hanchen Zhang",
+        "Yifan Xu",
+        "Xuanyu Lei",
+        "Hanyu Lai",
+        "Yu Gu",
+        "Hangliang Ding",
+        "Kaiwen Men",
+        "Kejuan Yang",
+        "Shudan Zhang",
+        "Xiang Deng",
+        "Aohan Zeng",
+        "Zhengxiao Du",
+        "Chenhui Zhang",
+        "Sheng Shen",
+        "Tianjun Zhang",
+        "Yu Su",
+        "Huan Sun",
+        "Minlie Huang",
+        "Yuxiao Dong",
+        "Jie Tang"
+      ],
+      "year": 2024,
+      "venue": "ICLR 2024（本文采用 arXiv v2）",
+      "publicationKind": "conference",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/e9df36b21ff4ee211a8b71ee8b7e9f57-Abstract-Conference.html",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "沿状态、动作和观察解释交互评价与静态答题的差别。",
+        "concepts": [
+          "部分可观察",
+          "交互评价"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "辨别成功率、F1、奖励和步骤成功率的不同对象。",
+        "concepts": [
+          "基准",
+          "任务成功率"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "识别提示方式、历史截断与运行预算对结果的影响。",
+        "concepts": [
+          "提示",
+          "上下文预算"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "理解按固定参考尺度归一化的综合分数，避免误读为概率。",
+        "concepts": [
+          "归一化",
+          "综合分数"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "区分正常结束、格式无效、动作无效和预算耗尽。",
+        "concepts": [
+          "失败分析",
+          "终止原因"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "区分跨模型关联与受控因果证据，保留历史条件。",
+        "concepts": [
+          "实验条件",
+          "因果归因"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "利用分项指标与轨迹诊断选择下一步要核对的原文。",
+        "concepts": [
+          "阅读路线",
+          "复现边界"
+        ],
+        "limit": "固定 arXiv v2/Technical Report v0.2，27模型；正式ICLR版29模型的结果没有混入。"
+      }
+    ]
+  }
+}

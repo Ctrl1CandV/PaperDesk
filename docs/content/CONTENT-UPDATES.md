@@ -18,6 +18,8 @@ For a new guide, supply its reviewed Markdown and schema-valid metadata at disti
 
 A revision includes all metadata values, exact Markdown bytes and declared asset bytes. Identical parsed JSON may differ in whitespace/object-key order; arrays and scalar values must still match exactly. An existing immutable key with any changed metadata, locator, scope, body or asset is rejected. Keep the retained metadata and seed paths stable. Recommendation reasons/order and current pointers are explicit catalog choices, not immutable guide metadata.
 
+Optional `catalog.archivedGuideIds` removes named guides from the default shelf, current-library overview and default guide retrieval index. It is a catalog selection, not deletion: keep their entries, current pointers and every immutable revision. Fixed `/read/:guideId/:revision` routes and explicit versioned references remain readable, including old notes, excerpts and direction links. Original-material retrieval has its own publication boundary; archiving a guide does not itself remove its separately stored original materials or evidence records. The importer validates archived IDs against the retained catalog and applies the selection with the atomic catalog switch.
+
 Exploration seed revisions use distinct files such as `exploration-r2.json`; keep the initial `exploration.json` and every prior revision in `exploration.revisions`. Set `exploration.currentRevision` deliberately. Changed same-revision seed content, duplicate lens IDs/ranks and unresolved guide targets are rejected. Editorial changes never rewrite an adopted personal question.
 
 ## Preview and apply
@@ -61,7 +63,7 @@ npm run validate:content
 npm run build
 ```
 
-Rollback restores previous current-version selections, editorial seed selection and prior recommendation settings while retaining all published guide/seed revisions. Newly introduced guide IDs remain accessible and are appended after earlier recommendations; the v1 catalog requires one current revision for every retained guide. It does not prune published content or undo personal thinking. Rebuild/restart the preview after any catalog switch.
+Rollback restores previous current-version selections, editorial seed selection, prior recommendation settings and prior archive selections for previously existing guides, while retaining all published guide/seed revisions. Newly introduced guide IDs retain their active archive selection, remain accessible by fixed route and are appended after earlier recommendation ranks; the v1 catalog requires one current revision for every retained guide. It does not prune published content or undo personal thinking. Rebuild/restart the preview after any catalog switch.
 
 ## Test evidence
 

@@ -5,7 +5,7 @@
   },
   {
     "path": "docs/content/workflows/CONTENT-WORKFLOW.md",
-    "sha256": "916572ae5730c3e0dc7e6fb1889c123ee323f7ef82f3e28c65afbc4f7d7f4b7c"
+    "sha256": "461612db61a7fb0ea684e68630d1b65a6717a08b6e0b450af669ca2743dcce30"
   },
   {
     "path": "docs/content/workflows/SOURCES-AND-VISUALS.md",
@@ -13,6 +13,6 @@
   },
   {
     "path": "docs/content/CONTENT-UPDATES.md",
-    "sha256": "7b274c4e9a8f7e45205032033b69a3f3431645e59bd29c1b7330cab758f1e0f4"
+    "sha256": "0df70961cec4b8d7ec986ae28490c512b9b2bebbd5554d40a5d5b9f545849d3e"
   }
 ]

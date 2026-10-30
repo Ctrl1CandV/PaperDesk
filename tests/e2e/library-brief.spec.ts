@@ -47,7 +47,7 @@ test('HELM explains its contribution in full paragraphs with immediate reading a
   const actionBounds = (await actions.boundingBox())!, proseBounds = (await prose.boundingBox())!;
   expect(actionBounds.y + actionBounds.height).toBeLessThanOrEqual(proseBounds.y);
   const outline = page.locator('.orientation-outline');
-  await expect(outline.getByRole('link')).toHaveCount(7);
+  await expect(outline.getByRole('link')).toHaveCount(chapters.length);
   await expect(outline.locator('small')).toHaveCount(0);
   await expect(outline.locator('[aria-current]')).toHaveCount(0);
   for (const unit of chapters) {
@@ -120,7 +120,7 @@ test('narrow HELM keeps full prose and every chapter on one natural page without
     await page.goto('/library?article=helm');
     await expect(page.locator('.library-shelf')).not.toBeVisible();
     await expect(page.locator('.orientation-prose p')).toHaveText(helmParagraphs);
-    await expect(page.locator('.orientation-outline a')).toHaveCount(7);
+    await expect(page.locator('.orientation-outline a')).toHaveCount(chapters.length);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
     const clipped = await page.locator('.library-preview, .article-orientation, .orientation-prose, .orientation-prose p, .orientation-outline').evaluateAll(elements => elements.filter(element => {
       const style = getComputedStyle(element);

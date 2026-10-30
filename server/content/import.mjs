@@ -77,6 +77,10 @@ function declaredFiles(validation) {
 }
 
 async function assertImmutable(active, incoming, rootDir, inputDir) {
+  const incomingBatches = new Map((incoming.catalog.readingAssignments?.batches ?? []).map(batch => [batch.id, batch]));
+  for (const batch of active.catalog.readingAssignments?.batches ?? []) {
+    if (!sameJson(batch, incomingBatches.get(batch.id))) fail(`Immutable reading assignment conflict: ${batch.id}; retain the batch and append a new identity.`);
+  }
   const incomingGuides = new Map(incoming.guides.map(guide => [key(guide), guide]));
   for (const existing of active.guides) {
     const next = incomingGuides.get(key(existing));
@@ -141,6 +145,8 @@ export async function planImport({ rootDir = projectRoot, from } = {}) {
       addedExplorationRevisions: incoming.explorations.filter(item => !oldSeeds.has(item.seed.revision)).map(item => item.seed.revision),
       newFiles: [...files.values()].filter(file => file.add).length,
       currentRevisions: incoming.catalog.currentRevisions,
+      archivedGuideIds: incoming.catalog.archivedGuideIds ?? [],
+      activeReadingAssignmentIds: incoming.catalog.readingAssignments?.activeBatchIds ?? [],
       currentExplorationRevision: incoming.catalog.exploration.currentRevision,
       retainedGuideRevisions: active.guides.length,
       retainedExplorationRevisions: active.explorations.length,
@@ -334,6 +340,12 @@ export async function rollbackContent({ rootDir = projectRoot, apply = false } =
   catalog.exploration.currentRevision = previous.exploration.currentRevision;
   catalog.exploration.revisions = { ...catalog.exploration.revisions, ...previous.exploration.revisions };
   const priorIds = new Set(Object.keys(previous.currentRevisions));
+  const archived = [...(previous.archivedGuideIds ?? []), ...(catalog.archivedGuideIds ?? []).filter(id => !priorIds.has(id))];
+  if (archived.length) catalog.archivedGuideIds = archived;
+  else delete catalog.archivedGuideIds;
+  // Retain batch identities just like retained guide revisions. Only delivery
+  // selection rolls back; already-consumed personal links remain untouched.
+  if (catalog.readingAssignments) catalog.readingAssignments.activeBatchIds = previous.readingAssignments?.activeBatchIds ?? [];
   let maxRank = Math.max(0, ...catalog.entries.filter(entry => priorIds.has(entry.guideId) && catalog.currentRevisions[entry.guideId] === entry.revision).map(entry => entry.recommendation.rank));
   for (const entry of catalog.entries) if (!priorIds.has(entry.guideId) && catalog.currentRevisions[entry.guideId] === entry.revision) entry.recommendation.rank = ++maxRank;
   if (!apply) return { applied: false, currentRevisions: catalog.currentRevisions, currentExplorationRevision: catalog.exploration.currentRevision, retainedRevisions: catalog.entries.length };

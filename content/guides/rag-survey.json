@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 2,
+  "id": "rag-survey",
+  "paperId": "arxiv:2312.10997",
+  "revision": 1,
+  "title": "RAG 综述：把知识接入拆成可以检查的过程",
+  "paperTitle": "Retrieval-Augmented Generation for Large Language Models: A Survey",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "把基础语言模型、外部知识与Agent中的检索工具连接起来，能按环节分析机制与评价。",
+  "source": {
+    "id": "arxiv:2312.10997",
+    "version": "v5",
+    "url": "https://arxiv.org/html/2312.10997v5"
+  },
+  "bodyFile": "rag-survey.md",
+  "bodySha256": "8469382784ab2d9e58b047baee5b9e148da70a123cbeed7fdfd907056b25e3d0",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从一条信息链理解检索增强"
+    },
+    {
+      "id": "u02",
+      "heading": "三种范式是在比较组织方式"
+    },
+    {
+      "id": "u03",
+      "heading": "检索粒度决定了信息怎样被切开"
+    },
+    {
+      "id": "u04",
+      "heading": "找到材料以后仍要检查如何使用"
+    },
+    {
+      "id": "u05",
+      "heading": "多次检索要有明确的控制依据"
+    },
+    {
+      "id": "u06",
+      "heading": "把检索、依据和答案分别评价"
+    },
+    {
+      "id": "u07",
+      "heading": "怎样把综述转成下一篇阅读"
+    },
+    {
+      "id": "u08",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-1",
+      "url": "https://arxiv.org/abs/2312.10997v5",
+      "labels": [
+        "论文身份与版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-2",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.SS1",
+      "labels": [
+        "基本流程"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-3",
+      "url": "https://arxiv.org/html/2312.10997v5#S2",
+      "labels": [
+        "§II 与图 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-4",
+      "url": "https://arxiv.org/html/2312.10997v5#S3",
+      "labels": [
+        "检索章节"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-5",
+      "url": "https://arxiv.org/html/2312.10997v5#S4",
+      "labels": [
+        "生成与上下文整理"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-6",
+      "url": "https://arxiv.org/html/2312.10997v5#S5",
+      "labels": [
+        "§V 与图 5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-7",
+      "url": "https://arxiv.org/html/2312.10997v5#S6",
+      "labels": [
+        "评价目标与能力"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-8",
+      "url": "https://arxiv.org/html/2312.10997v5#S7",
+      "labels": [
+        "讨论与未来方向"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-9",
+      "url": "https://arxiv.org/html/2312.10997v5",
+      "labels": [
+        "固定 HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c-10",
+      "url": "https://arxiv.org/pdf/2312.10997v5",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "rag",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "llm-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§I–VI",
+      "§VII（长上下文、鲁棒性与混合方法）"
+    ],
+    "figuresViewed": [
+      "Figure 3（PDF第4页，AI查看）",
+      "Figure 5（PDF第11页，AI查看）",
+      "Table III（PDF第14页，AI查看）"
+    ],
+    "limitations": [
+      "未逐篇重读被引工作或复现任何实验。",
+      "多模态、规模规律与工程生态没有完整展开；不是full-survey。",
+      "采用2024-03-27的v5，历史挑战与产品描述不代表当前状态。"
+    ],
+    "reviewBasis": "AI基于固定v5 HTML正文提取，查看固定PDF第4/11/14页，逐主张自审记录见docs/research/rag-survey-review.md；独立审阅状态以该记录后续结论为准。"
+  },
+  "orientation": {
+    "shortTitle": "RAG综述：检索、生成与评价的关系",
+    "topics": [
+      {
+        "id": "rag",
+        "label": "检索增强生成",
+        "aliases": [
+          "RAG",
+          "retrieval augmented generation"
+        ]
+      },
+      {
+        "id": "retrieval-design",
+        "label": "检索与上下文",
+        "aliases": [
+          "查询改写",
+          "重排",
+          "上下文压缩"
+        ]
+      },
+      {
+        "id": "rag-evaluation",
+        "label": "RAG评价",
+        "aliases": [
+          "忠实性",
+          "相关性",
+          "依据"
+        ]
+      }
+    ],
+    "summary": "连接资料库之后，回答仍可能在来源选择、上下文组织或使用材料时出错。这篇综述沿三种 RAG 范式与检索、生成、增强、评价四个环节建立方法地图，把一个宽泛的“知识接入”问题拆成可以追踪的信息过程。",
+    "value": "适合在理解原始 RAG 后继续阅读：把查询改写、切分、重排、压缩与多轮检索放回各自的操作位置，判断新方法到底修改了什么，也能分清检索命中、回答有据和事实正确这几种不同结果。",
+    "prerequisites": [
+      "了解语言模型参数与输入上下文的区别。",
+      "知道检索会从候选资料中选择相关内容；无需掌握特定向量数据库。"
+    ],
+    "boundaries": [
+      "主线讲解，不逐篇展开被引方法或全部工具。",
+      "教学情境没有作为实验运行。",
+      "检索命中、有据回答和事实正确分别检查。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Yunfan Gao",
+        "Yun Xiong",
+        "Xinyu Gao",
+        "Kangxiang Jia",
+        "Jinliu Pan",
+        "Yuxi Bi",
+        "Yi Dai",
+        "Jiawei Sun",
+        "Meng Wang",
+        "Haofen Wang"
+      ],
+      "year": 2023,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2312.10997v5",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "沿材料、检索、上下文到回答，说明错误可以发生在哪个环节。",
+        "concepts": [
+          "RAG",
+          "检索增强生成",
+          "索引",
+          "生成"
+        ],
+        "limit": "教学信息链不是所有系统的统一架构。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "区分三种范式的组织方式，识别模块变化的具体位置。",
+        "concepts": [
+          "Naive RAG",
+          "Advanced RAG",
+          "Modular RAG"
+        ],
+        "limit": "分类不构成性能阶梯，也不是互斥算法。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "解释切分粒度、元数据与查询表达如何影响证据完整性。",
+        "concepts": [
+          "粒度",
+          "切分",
+          "查询改写",
+          "元数据"
+        ],
+        "limit": "没有给出适合所有语料的最优切分尺度。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "分开候选排序、上下文压缩和生成模型对材料的使用。",
+        "concepts": [
+          "重排",
+          "上下文压缩",
+          "依据"
+        ],
+        "limit": "检索相关性不能代替事实和结论支持核查。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "区分迭代、递归与自适应检索要控制的问题。",
+        "concepts": [
+          "迭代检索",
+          "递归检索",
+          "自适应检索",
+          "Agent"
+        ],
+        "limit": "未复现被引方法，也未证明最优停止策略。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "分别解释材料召回、回答忠实和外部正确性的差别。",
+        "concepts": [
+          "评价",
+          "忠实性",
+          "相关性",
+          "噪声鲁棒性"
+        ],
+        "limit": "教学测试未执行，指标不是统一质量认证。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "按改动位置选择后续方法论文，并检查比较条件。",
+        "concepts": [
+          "原始RAG",
+          "ReAct",
+          "消融"
+        ],
+        "limit": "阅读顺序是编辑建议，历史挑战不等于当前空白。"
+      },
+      {
+        "unitId": "u08",
+        "purpose": "定位固定版本的核心图表并辨别已核与未覆盖范围。",
+        "concepts": [
+          "原文定位",
+          "覆盖边界"
+        ],
+        "limit": "没有逐篇审核全部参考工作。"
+      }
+    ]
+  }
+}

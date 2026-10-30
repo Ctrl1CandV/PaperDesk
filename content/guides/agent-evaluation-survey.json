@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 2,
+  "id": "agent-evaluation-survey",
+  "paperId": "arxiv:2503.16416",
+  "revision": 1,
+  "title": "Agent 评测综述：把能力、行动过程与任务结果连接起来",
+  "paperTitle": "Survey on Evaluation of LLM-based Agents",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "它能帮助为自己的任务建立评价地图：明确被测系统包含什么，局部能力与端到端任务怎样互补，哪些过程约束不会被终点分数捕获，以及成本、裁判和环境如何影响比较。适合在深入具体基准前整理问题和证据需求。",
+  "source": {
+    "id": "arxiv:2503.16416",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2503.16416v1"
+  },
+  "bodyFile": "agent-evaluation-survey.md",
+  "bodySha256": "a48657e94c3e9a777d5b9fbba60ed86f7ec839e0b74bb440356064652edf0429",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "先明确被测的是哪一套系统"
+    },
+    {
+      "id": "u02",
+      "heading": "能力测试让问题变小，端到端测试检查能力能否组合"
+    },
+    {
+      "id": "u03",
+      "heading": "一项应用基准同时定义任务、环境与指标"
+    },
+    {
+      "id": "u04",
+      "heading": "结果、步骤和完整轨迹回答不同问题"
+    },
+    {
+      "id": "u05",
+      "heading": "通用能力需要跨任务证据，也要保留各任务的差异"
+    },
+    {
+      "id": "u06",
+      "heading": "成本、裁判与环境都属于评价条件"
+    },
+    {
+      "id": "u07",
+      "heading": "怎样接着阅读并形成可研究的问题"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=2",
+      "labels": [
+        "原文 v1，§1 与图1，PDF 第1–2页",
+        "图1与阅读地图，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2503.16416v1",
+      "labels": [
+        "2025 年 3 月的 arXiv v1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=1",
+      "labels": [
+        "§1 与范围说明，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=3",
+      "labels": [
+        "§2，PDF 第3–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=6",
+      "labels": [
+        "§3，PDF 第6–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=10",
+      "labels": [
+        "§5，PDF 第10–11页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=9",
+      "labels": [
+        "§4，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=11",
+      "labels": [
+        "§6，PDF 第11–12页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c09",
+      "url": "https://aclanthology.org/2026.findings-acl.1330/",
+      "labels": [
+        "Findings of ACL 2026 发表记录"
+      ],
+      "role": "background",
+      "sourceVersion": "publication record"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentbench",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "tau-bench",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–2: 范围、规划、工具、反思与记忆评价",
+      "§3–4: 应用与通用Agent基准",
+      "§5: 结果、步骤、轨迹评价与框架",
+      "§6: 细粒度评价、成本与安全边界"
+    ],
+    "figuresViewed": [
+      "Figure 1, PDF p2"
+    ],
+    "limitations": [
+      "技术内容固定 arXiv v1；已核对ACL2026发表记录，但未审读正式版新增章节。",
+      "未逐篇核验综述列举的基准，也未验证评测框架当前功能；不把目录当作实施事实。",
+      "多Agent、具身和游戏不在v1主要范围；通信研究联系为编辑解释，没有实验复现。"
+    ],
+    "reviewBasis": "AI authoring review: downloaded the fixed PDF and HTML, read the declared sections and visually inspected the listed local PDF renders. Source hashes, claim checks, limitations and exact scope are recorded in docs/research/evaluation-reading-review.md. No human review or experimental reproduction; independent integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "Agent 评测：能力、过程与结果",
+    "topics": [
+      {
+        "id": "agent-model-evaluation",
+        "label": "Agent与模型评测",
+        "aliases": [
+          "evaluation",
+          "benchmark",
+          "评测"
+        ]
+      },
+      {
+        "id": "evaluation-methodology",
+        "label": "评测方法与边界",
+        "aliases": [
+          "评价协议",
+          "评分方法"
+        ]
+      }
+    ],
+    "summary": "Agent 的评价要同时面对能力、交互环境和连续行动。这篇综述按基础能力、具体应用、通用系统与评测框架组织材料，并把最终结果、单步行动和完整轨迹分开讨论，说明为什么一个总分不足以定位系统的问题。",
+    "value": "它能帮助为自己的任务建立评价地图：明确被测系统包含什么，局部能力与端到端任务怎样互补，哪些过程约束不会被终点分数捕获，以及成本、裁判和环境如何影响比较。适合在深入具体基准前整理问题和证据需求。",
+    "prerequisites": [
+      "了解语言模型输入输出与基本Agent交互即可；正文解释任务、指标和必要公式。"
+    ],
+    "boundaries": [
+      "技术内容固定 arXiv v1；已核对ACL2026发表记录，但未审读正式版新增章节。",
+      "未逐篇核验综述列举的基准，也未验证评测框架当前功能；不把目录当作实施事实。",
+      "多Agent、具身和游戏不在v1主要范围；通信研究联系为编辑解释，没有实验复现。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Asaf Yehudai",
+        "Lilach Eden",
+        "Alan Li",
+        "Guy Uziel",
+        "Yilun Zhao",
+        "Roy Bar-Haim",
+        "Arman Cohan",
+        "Michal Shmueli-Scheuer"
+      ],
+      "year": 2026,
+      "venue": "Findings of ACL 2026（本文采用 arXiv v1）",
+      "publicationKind": "conference",
+      "url": "https://aclanthology.org/2026.findings-acl.1330/",
+      "preprintYear": 2025
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "明确模型、工具、记忆与控制流程共同组成被测系统。",
+        "concepts": [
+          "Agent",
+          "系统评价"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "区分局部能力测量与完整任务成功，并识别额外反馈和预算。",
+        "concepts": [
+          "规划",
+          "工具使用",
+          "记忆"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "解释应用基准为什么同时需要任务、环境和判定指标。",
+        "concepts": [
+          "任务",
+          "环境",
+          "指标"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "比较终点、单步与完整轨迹的不同用途及参考路径的限制。",
+        "concepts": [
+          "轨迹评价",
+          "过程评价"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "理解跨任务汇总的权重选择，避免将总分当作通用能力证明。",
+        "concepts": [
+          "通用Agent",
+          "聚合"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "把资源成本、环境版本和评价者条件纳入比较解释。",
+        "concepts": [
+          "成本效率",
+          "LLM-as-judge"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "将评测缺口改写为可调查问题，并找到后续原文入口。",
+        "concepts": [
+          "研究问题",
+          "阅读路线"
+        ],
+        "limit": "技术内容固定 arXiv v1；已核对ACL2026发表记录，但未审读正式版新增章节。"
+      }
+    ]
+  }
+}

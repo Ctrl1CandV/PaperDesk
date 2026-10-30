@@ -2,6 +2,7 @@ import type { ResearchSnapshot, ResearchProposal } from '../../shared/research-c
 import type { ResearchMaterials } from '../../shared/research-materials.mjs';
 import type { ResearchCommand } from '../../shared/research-documents.mjs';
 import type { DirectionDraft } from '../../shared/research-contract.mjs';
+import type { NotebookDraft } from '../../shared/research-notebook.mjs';
 export type AiProvider = 'api' | 'chatgpt';
 export type ConversationScope = { kind: 'guide'; guideId: string; revision: number; bodySha256: string } | { kind: 'exploration'; explorationId: string };
 export interface ChatGptAvailability {
@@ -43,6 +44,7 @@ export interface AiContext {
   researchMaterials?: ResearchMaterials;
   command?: ResearchCommand;
   directionDraft?: DirectionDraft;
+  notebookDraft?: NotebookDraft;
   readingProgress?: ReadingProgress[];
   topicHistory?: { explorationId: string; turns: { turnId: string; conversationId: string; question: string; answer: string; createdAt: string; questionTruncated: boolean; answerTruncated: boolean }[]; windowCount: number; omittedCount: number; omittedTurnIds: string[] };
   provider?: AiProvider;

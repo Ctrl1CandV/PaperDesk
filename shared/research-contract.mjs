@@ -1,5 +1,6 @@
 // Shared, data-only research protocol. No provider or storage dependencies.
 import { validateResearchArtifacts } from './research-artifacts.mjs';
+import { currentNotebook, validateNotebookVersion, validateResearchNotebook } from './research-notebook.mjs';
 export const RESEARCH_FIELDS = ['question', 'interpretation', 'unknowns', 'scope', 'constraints', 'candidates', 'deferred'];
 // Proposals may also rename the topic once discussion clarifies it. The title
 // stays outside RESEARCH_FIELDS so snapshot field order and hashes are unchanged.
@@ -104,7 +105,17 @@ export function validateDirectionDraft(value) {
   return value;
 }
 export function validateResearchState(value) {
-  researchObject(value, ['scope','constraints','candidates','deferred','decisions','appliedProposalIds'], ['artifacts','appliedProposals','seedDiscussion','stage','purpose','createdFromTurnId']);
+  researchObject(value, ['scope','constraints','candidates','deferred','decisions','appliedProposalIds'], ['artifacts','appliedProposals','seedDiscussion','stage','purpose','createdFromTurnId','relatedGuides','notebook','readingAssignmentReceipts']);
+  if (value.notebook !== undefined) validateResearchNotebook(value.notebook);
+  if (value.readingAssignmentReceipts !== undefined) {
+    assert(Array.isArray(value.readingAssignmentReceipts) && value.readingAssignmentReceipts.length <= 512, '内容关联回执最多 512 条。');
+    for (const receipt of value.readingAssignmentReceipts) {
+      researchObject(receipt, ['batchId','collectionId']);
+      assert([receipt.batchId, receipt.collectionId].every(id => typeof id === 'string' && /^[a-z0-9][a-z0-9-]{0,79}$/.test(id)), '内容关联回执身份无效。');
+    }
+    assert(new Set(value.readingAssignmentReceipts.map(item => item.batchId)).size === value.readingAssignmentReceipts.length, '内容关联回执批次不能重复。');
+  }
+  if (value.relatedGuides !== undefined) validateRelatedGuides(value.relatedGuides);
   if (value.seedDiscussion !== undefined) validateSeedDiscussion(value.seedDiscussion);
   assert(value.stage === undefined || RESEARCH_STAGES.includes(value.stage), '研究阶段无效。');
   // Accumulation items hold reading files for a learning goal rather than a research direction.
@@ -124,6 +135,15 @@ export function validateResearchState(value) {
   if (value.artifacts !== undefined) validateResearchArtifacts(value.artifacts);
 }
 export const emptyResearchState = () => ({scope:'',constraints:'',candidates:'',deferred:'',decisions:[],appliedProposalIds:[]});
+/** Explicit reading associations, not quotations, reading marks or supporting evidence. */
+export function validateRelatedGuides(value) {
+  assert(Array.isArray(value) && value.length <= 50, '关联文献最多 50 篇。');
+  for (const target of value) {
+    researchObject(target, ['guideId', 'revision']);
+    assert(validLocalId(target.guideId) && validRevision(target.revision), '关联文献身份无效。');
+  }
+  assert(new Set(value.map(target => target.guideId)).size === value.length, '同一篇文献只能关联一次。');
+}
 export function researchSnapshotData(record) {
   const research = record.research ?? emptyResearchState();
   const superseded=new Set(research.decisions.flatMap(d=>d.supersedes?[d.supersedes]:[]));
@@ -132,6 +152,8 @@ export function researchSnapshotData(record) {
     // Optional keys are added only when present so older records keep their exact snapshot hash.
     ...(research.seedDiscussion ? {seedDiscussion:research.seedDiscussion} : {}),
     ...(research.stage ? {stage:research.stage} : {}),
+    ...(research.relatedGuides !== undefined ? {relatedGuides:research.relatedGuides} : {}),
+    ...(currentNotebook(research.notebook) ? {notebook:currentNotebook(research.notebook)} : {}),
     omitted:{decisionIds:research.decisions.filter(d=>superseded.has(d.id)).map(d=>d.id),evidenceIds:record.evidence.map(e=>e.id),reason:'superseded-decisions-and-14000-byte-evidence-budget'} };
   // Preserve all effective decisions and explicit fields. Admit whole evidence
   // newest first; record every omission rather than silently shortening quotes.
@@ -143,7 +165,9 @@ export function researchSnapshotData(record) {
 }
 export async function createResearchSnapshot(record) { const data = researchSnapshotData(record); return {...data,snapshotSha256:await researchHash(data)}; }
 export function validateResearchSnapshot(value) {
-  researchObject(value, ['schemaVersion','explorationId','recordRevision','title',...RESEARCH_FIELDS,'decisions','evidence','nextAction','snapshotSha256'],['omitted','seedDiscussion','stage']);
+  researchObject(value, ['schemaVersion','explorationId','recordRevision','title',...RESEARCH_FIELDS,'decisions','evidence','nextAction','snapshotSha256'],['omitted','seedDiscussion','stage','relatedGuides','notebook']);
+  if(value.notebook!==undefined)validateNotebookVersion(value.notebook);
+  if(value.relatedGuides!==undefined)validateRelatedGuides(value.relatedGuides);
   if(value.seedDiscussion!==undefined)validateSeedDiscussion(value.seedDiscussion);
   assert(value.stage===undefined||RESEARCH_STAGES.includes(value.stage));
   assert(value.schemaVersion === 1 && uuid(value.explorationId) && Number.isSafeInteger(value.recordRevision) && value.recordRevision > 0 && hash(value.snapshotSha256));

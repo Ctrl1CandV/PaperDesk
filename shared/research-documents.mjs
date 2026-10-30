@@ -30,8 +30,10 @@ export const READING_BRIEF = Object.freeze({
   ],
 });
 
-/** `/方向` and `/选文 [积累|推进]` at the start of a message. */
+/** Explicit research commands at the start of a message. */
 export function parseCommand(text) {
+  const notebook = String(text).trimStart().match(/^\/(记录|notebook)(?=$|\s)/u);
+  if (notebook) return { command: { name: 'notebook' }, rest: String(text).trimStart().slice(notebook[0].length).trim() };
   const match = String(text).trimStart().match(/^\/(方向|direction|选文|brief)(?=$|\s)(?:\s+(积累|推进))?/u);
   if (!match) return null;
   const rest = String(text).trimStart().slice(match[0].length).trim();
@@ -41,7 +43,7 @@ export function parseCommand(text) {
 export function validCommand(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const keys = Object.keys(value);
-  if (value.name === 'direction') return keys.length === 1;
+  if (value.name === 'direction' || value.name === 'notebook') return keys.length === 1;
   return value.name === 'reading-brief' && keys.length === 2 && Object.hasOwn(BRIEF_PURPOSES, value.purpose);
 }
 
@@ -53,6 +55,12 @@ const fileRules = `- 依据当前研究快照（如有）、本轮选入的资�
 
 /** Requirements the backend appends before the reader's message when a command is used. */
 export function commandInstruction(command, { linked }) {
+  if (command.name === 'notebook') return `应用附加的指令要求（不是读者原话）：读者输入 /记录，明确要求更新当前方向的研究记录。researchSnapshot.notebook 是当前完整正文和版本；没有它表示尚未开始记录。结合读者本轮要求、当前记录和讨论，调用一次 update_research_notebook，body 是完整更新后的 Markdown 正文，summary 简述变化。
+- 保留读者的原意、疑问、失败经历和个人判断，未要求删除的旧内容应保留；不要把整份记录概括为短摘要。只有读者明确授权的整理、改写或新增才写入。
+- 区分〔读者〕、〔文献〕、〔推断〕和〔待验证〕；没有结果就写尚未验证。学习/实践达到目的、暂时结束或转向论文写作，由读者的真实想法决定，不能替读者宣布完成，不改阶段状态。
+- 有文献依据的主张保留可回查来源；旧正文引用与定位原样保留，不把历史编号冒充本轮来源；新增引用使用本轮实际来源的 Markdown URL，文献、版本和位置写清楚，不只写 [L1] 等临时编号。不编造成功、论文创新性或原文阅读。
+- body 最多 24000 字，不截断旧文来满足限制，超长或意图不明时不调用工具，说明需要怎样缩小修改。无实质变化时不调用。
+- 工具接收的是草稿；回答中简短说明本次变化和仍待确认之处即可，不再重复整份正文。界面保留工具提交的完整草稿供查看或下载，成功写入后才显示已保存。`;
   if (command.name === 'direction') return linked
     ? `应用附加的指令要求（不是读者原话）：读者输入了 /方向，要求根据最近的讨论更新当前研究方向。先对照研究快照判断哪些确实变了：问题是否需要改写，认识、候选与暂缓方向、尚不确定之处、阶段（stage：broaden 拓宽了解 / narrow 收窄方向 / question 形成研究问题 / validate 准备验证 / write 准备写作）、下一步，以及读者在讨论中明确表达的取舍。
 - 有实质变化：调用一次 propose_research_changes，只包含变化的字段，字段值写完整的新内容；只有读者明确表态的选择才写成 adopted 或 rejected 决定，你的建议放进候选方向。读者已用指令授权，界面会直接写入并保留版本。

@@ -8,6 +8,7 @@ import remarkMath from 'remark-math';
 import catalog from '../../content/catalog.json' with { type: 'json' };
 import briefs from '../../content/library-briefs.json' with { type: 'json' };
 
+const archivedGuideIds = new Set<string>(catalog.archivedGuideIds ?? []);
 const compact = (value: string) => value.replace(/\s+/g, '');
 async function bounded(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
@@ -36,9 +37,10 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: `.cache/screenshots/additions-${name}.png`, animations: 'disabled' });
 }
 
-// Every current guide participates, including future reviewed catalog additions.
+// Keep full rendering coverage for every current revision, including archived
+// guides whose retained reader routes are intentionally absent from the shelf.
 for (const id of Object.keys(catalog.currentRevisions)) {
-  test(`${id}: full reviewed prose, two-level reading, media and keyboard source return`, async ({ page, context }) => {
+  test(`${id}: full reviewed prose, ${archivedGuideIds.has(id) ? 'retained reader route' : 'two-level reading'}, media and keyboard source return`, async ({ page, context }) => {
     const revision = (catalog.currentRevisions as Record<string, number>)[id];
     const entry = catalog.entries.find(item => item.guideId === id && item.revision === revision)!;
     expect(entry).toBeDefined();
@@ -52,30 +54,39 @@ for (const id of Object.keys(catalog.currentRevisions)) {
     });
     await mkdir('.cache/screenshots', { recursive: true });
     await page.goto(`/library?article=${id}`);
-    await expect(page.locator('#orientation-title')).toHaveText(metadata.orientation.shortTitle.split(/[：:]/, 1)[0]);
-    await expect(page.locator('.paper-original-title')).toHaveText(metadata.paperTitle);
-    await expect(page.locator('.orientation-masthead')).toContainText(metadata.orientation.bibliography.authors[0]);
-    await expect(page.locator('.orientation-masthead')).toContainText(String(metadata.orientation.bibliography.year));
-    const source = page.locator('.article-orientation').getByRole('link', { name: /原论文/ });
-    await expect(source).toHaveAttribute('href', metadata.source.url);
-    await expect(source).toHaveAttribute('target', '_blank');
-    await expect(source).toHaveAttribute('rel', 'noopener noreferrer');
-    await expect(page.locator('.orientation-prose').getByRole('heading')).toHaveText([metadata.type === 'survey' ? '综述概述' : '论文概述', '为什么值得读', '阅读建议']);
-    await expect(page.locator('.orientation-prose p')).toHaveCount(3);
-    await expect(page.locator('.article-orientation details, .article-orientation [role="tab"]')).toHaveCount(0);
-    const chapters = metadata.units.filter((unit: { heading?: string }) => unit.heading);
-    await expect(page.locator('.orientation-outline a')).toHaveCount(chapters.length);
-    for (const unit of chapters) {
-      const link = page.locator(`.orientation-outline a[href="/read/${id}/${revision}#${unit.id}"]`);
-      await expect(link).toHaveAttribute('title', unit.heading);
-      await expect(link).toHaveAccessibleName((brief?.chapterLabels as Record<string, string> | undefined)?.[unit.id] ?? unit.heading);
+    if (archivedGuideIds.has(id)) {
+      await expect(page.locator(`#choose-${id}`)).toHaveCount(0);
+      await expect(page.locator('#orientation-title')).toHaveCount(0);
+      const before = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.exportBackup());
+      expect(before.resume).toEqual([]); expect(before.guideStates).toEqual([]); expect(before.originalStates).toEqual([]);
+      await page.goto(`/read/${id}/${revision}`);
+    } else {
+      await expect(page.locator(`#choose-${id}`)).toHaveCount(1);
+      await expect(page.locator('#orientation-title')).toHaveText(metadata.orientation.shortTitle.split(/[：:]/, 1)[0]);
+      await expect(page.locator('.paper-original-title')).toHaveText(metadata.paperTitle);
+      await expect(page.locator('.orientation-masthead')).toContainText(metadata.orientation.bibliography.authors[0]);
+      await expect(page.locator('.orientation-masthead')).toContainText(String(metadata.orientation.bibliography.year));
+      const source = page.locator('.article-orientation').getByRole('link', { name: /原论文/ });
+      await expect(source).toHaveAttribute('href', metadata.source.url);
+      await expect(source).toHaveAttribute('target', '_blank');
+      await expect(source).toHaveAttribute('rel', 'noopener noreferrer');
+      await expect(page.locator('.orientation-prose').getByRole('heading')).toHaveText([metadata.type === 'survey' ? '综述概述' : '论文概述', '为什么值得读', '阅读建议']);
+      await expect(page.locator('.orientation-prose p')).toHaveCount(3);
+      await expect(page.locator('.article-orientation details, .article-orientation [role="tab"]')).toHaveCount(0);
+      const chapters = metadata.units.filter((unit: { heading?: string }) => unit.heading);
+      await expect(page.locator('.orientation-outline a')).toHaveCount(chapters.length);
+      for (const unit of chapters) {
+        const link = page.locator(`.orientation-outline a[href="/read/${id}/${revision}#${unit.id}"]`);
+        await expect(link).toHaveAttribute('title', unit.heading);
+        await expect(link).toHaveAccessibleName((brief?.chapterLabels as Record<string, string> | undefined)?.[unit.id] ?? unit.heading);
+      }
+      await expect(page.locator('.orientation-outline small')).toHaveCount(0);
+      await expect(page.locator('.orientation-source')).toContainText(`导读修订 ${revision}`);
+      const before = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.exportBackup());
+      expect(before.resume).toEqual([]); expect(before.guideStates).toEqual([]); expect(before.originalStates).toEqual([]);
+      await shot(page, `${id}-orientation-desktop`);
+      await page.getByRole('link', { name: '开始导读' }).click();
     }
-    await expect(page.locator('.orientation-outline small')).toHaveCount(0);
-    await expect(page.locator('.orientation-source')).toContainText(`导读修订 ${revision}`);
-    const before = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.exportBackup());
-    expect(before.resume).toEqual([]); expect(before.guideStates).toEqual([]); expect(before.originalStates).toEqual([]);
-    await shot(page, `${id}-orientation-desktop`);
-    await page.getByRole('link', { name: '开始导读' }).click();
     await expect(page).toHaveURL(new RegExp(`/read/${id}/${revision}$`));
     await expect(page.locator('.prose h1')).toHaveText(metadata.title);
     await expect(page.locator('.prose section')).toHaveCount(metadata.units.length);

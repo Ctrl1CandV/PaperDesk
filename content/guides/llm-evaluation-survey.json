@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 2,
+  "id": "llm-evaluation-survey",
+  "paperId": "arxiv:2307.03109",
+  "revision": 1,
+  "title": "大模型评测综述：先确定测什么，再解释一个分数",
+  "paperTitle": "A Survey on Evaluation of Large Language Models",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "适合把“模型好不好”缩小为可以核查的问题：样本是否覆盖目标，评分器是否识别关键错误，提示和工具是否改变了被测系统。它还能帮助区分测试集更新、训练污染与真实能力变化，为后续 Agent 评价保留测量边界。",
+  "source": {
+    "id": "arxiv:2307.03109",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2307.03109v1"
+  },
+  "bodyFile": "llm-evaluation-survey.md",
+  "bodySha256": "0c3c2d87f89025e13dddbd6dc3a0d5ef43a0cc29c3b4e9eb1cf085dbc3bb0709",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "把能力、使用场景和风险放在不同轴上"
+    },
+    {
+      "id": "u02",
+      "heading": "基准提供可重复的试验条件，也限定了结论范围"
+    },
+    {
+      "id": "u03",
+      "heading": "自动评分解决效率问题，评分含义仍需检查"
+    },
+    {
+      "id": "u04",
+      "heading": "人工评价增加语境判断，却不是无误的答案来源"
+    },
+    {
+      "id": "u05",
+      "heading": "静态测试、动态测试和污染风险需要一起考虑"
+    },
+    {
+      "id": "u06",
+      "heading": "从评价结果回到下一步研究"
+    },
+    {
+      "id": "u07",
+      "heading": "回到原文时优先核对什么"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=2",
+      "labels": [
+        "原文 v1，§1 与图1，PDF 第1–2页",
+        "图1，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2307.03109v1",
+      "labels": [
+        "2023 年 arXiv v1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=3",
+      "labels": [
+        "§3 的分类与范围，PDF 第3–12页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=13",
+      "labels": [
+        "§4 与表7，PDF 第13–14页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=14",
+      "labels": [
+        "§5.1，PDF 第14页",
+        "§5.2，PDF 第14页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=15",
+      "labels": [
+        "§6.2–7.5，PDF 第15–16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=16",
+      "labels": [
+        "§7.7–8，PDF 第16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://doi.org/10.1145/3641289",
+      "labels": [
+        "ACM 期刊页面"
+      ],
+      "role": "background",
+      "sourceVersion": "publication record"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agent-evaluation-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–2: 目标与评测背景",
+      "§3: 分类结构；选读语言任务、事实性、鲁棒性和Agent应用",
+      "§4–5: 基准、自动与人工评价",
+      "§6.2–7: 协议、动态评价与可信性"
+    ],
+    "figuresViewed": [
+      "Figure 1, PDF p2",
+      "Table 7, PDF p14"
+    ],
+    "limitations": [
+      "固定 arXiv v1；未与2024正式版逐段比较，不混用两版正文或页码。",
+      "解释评测方法主线，未逐个展开领域案例或审计全部引用工作，不能视为 full-survey。",
+      "历史评测不代表当前模型排名；没有实验复现或现代裁判模型的质量验证。"
+    ],
+    "reviewBasis": "AI authoring review: downloaded the fixed PDF and HTML, read the declared sections and visually inspected the listed local PDF renders. Source hashes, claim checks, limitations and exact scope are recorded in docs/research/evaluation-reading-review.md. No human review or experimental reproduction; independent integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "LLM 评测：目标、基准与判断",
+    "topics": [
+      {
+        "id": "agent-model-evaluation",
+        "label": "Agent与模型评测",
+        "aliases": [
+          "evaluation",
+          "benchmark",
+          "评测"
+        ]
+      },
+      {
+        "id": "evaluation-methodology",
+        "label": "评测方法与边界",
+        "aliases": [
+          "评价协议",
+          "评分方法"
+        ]
+      }
+    ],
+    "summary": "评测中的一个分数，必须连着目标、样本与判断方法才能解释。这篇综述以“测什么、在哪里测、怎样测”组织语言能力、鲁棒性和应用评价，再比较自动评分、人工评审与动态测试，帮助建立选择基准和阅读结果的基本坐标。",
+    "value": "适合把“模型好不好”缩小为可以核查的问题：样本是否覆盖目标，评分器是否识别关键错误，提示和工具是否改变了被测系统。它还能帮助区分测试集更新、训练污染与真实能力变化，为后续 Agent 评价保留测量边界。",
+    "prerequisites": [
+      "了解语言模型输入输出与基本Agent交互即可；正文解释任务、指标和必要公式。"
+    ],
+    "boundaries": [
+      "固定 arXiv v1；未与2024正式版逐段比较，不混用两版正文或页码。",
+      "解释评测方法主线，未逐个展开领域案例或审计全部引用工作，不能视为 full-survey。",
+      "历史评测不代表当前模型排名；没有实验复现或现代裁判模型的质量验证。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Yupeng Chang",
+        "Xu Wang",
+        "Jindong Wang",
+        "Yuan Wu",
+        "Kaijie Zhu",
+        "Hao Chen",
+        "Linyi Yang",
+        "Xiaoyuan Yi",
+        "Cunxiang Wang",
+        "Yidong Wang",
+        "Wei Ye",
+        "Yue Zhang",
+        "Yi Chang",
+        "Philip S. Yu",
+        "Qiang Yang",
+        "Xing Xie"
+      ],
+      "year": 2023,
+      "venue": "arXiv v1（另有 ACM TIST 2024 正式版）",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2307.03109v1",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "区分能力、场景与风险这些交叉维度，避免把一类高分推广到全部要求。",
+        "concepts": [
+          "能力评测",
+          "任务定义"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "检查基准的数据来源、任务范围和协议是否支持目标结论。",
+        "concepts": [
+          "基准",
+          "评价协议"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "区分文本相似、模型判断和事实正确，理解评分器的有效性问题。",
+        "concepts": [
+          "自动评测",
+          "评分器"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "理解人工评价能补充的语境判断，以及评审标准和分歧的影响。",
+        "concepts": [
+          "人工评价",
+          "评审分歧"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "解释固定与动态测试的取舍，区分版本变化和能力变化。",
+        "concepts": [
+          "数据污染",
+          "动态评测"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "把观察到的低分转成需要证据区分的原因，而不直接宣布因果。",
+        "concepts": [
+          "错误分析",
+          "研究问题"
+        ],
+        "limit": "解释所列固定版本的主线；教学联系不构成新实验证据或当前能力保证。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "按固定版本定位分类、方法和开放问题，并识别未覆盖部分。",
+        "concepts": [
+          "覆盖范围",
+          "来源版本"
+        ],
+        "limit": "固定 arXiv v1；未与2024正式版逐段比较，不混用两版正文或页码。"
+      }
+    ]
+  }
+}

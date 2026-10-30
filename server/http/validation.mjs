@@ -1,3 +1,4 @@
+import { validateNotebookDraft } from '../../shared/research-notebook.mjs';
 import { createHash } from 'node:crypto';
 import { canonicalResearch, validateResearchSnapshot, validateResearchProposal, validateDirectionDraft } from '../../shared/research-contract.mjs';
 import { validateResearchMaterials } from '../../shared/research-materials.mjs';
@@ -45,6 +46,7 @@ const readingStates = ['unread', 'reading', 'read', 'deferred'];
 function validateCommandFields(value, research) {
   if (value.command !== undefined) {
     if (!validCommand(value.command)) reject('指令无效。');
+    if (value.command.name === 'notebook' && !research) reject('研究记录需要先关联一个研究方向。');
     if (value.command.name === 'reading-brief' && value.command.purpose === 'research' && !research) reject('推进研究的选文需要先关联一个研究方向。');
   }
   if (value.readingProgress === undefined) return;
@@ -124,7 +126,7 @@ export function validateSource(source) {
 // A snapshot is deliberately data-only. Metadata is preserved as a bounded JSON string,
 // so future content fields survive export without becoming executable configuration.
 export function validateContext(context) {
-  object(context, ['guideId', 'revision', 'bodySha256', 'unitId', 'selection', 'scope', 'metadataJson', 'historyTurnIds', 'webSearch', 'model', 'toolEvents'], ['provider', 'fallback', 'catalogDigest', 'indexGeneration', 'budget', 'conversationScope', 'researchSnapshot', 'researchProposals', 'researchMaterials', 'topicHistory', 'command', 'readingProgress', 'directionDraft']);
+  object(context, ['guideId', 'revision', 'bodySha256', 'unitId', 'selection', 'scope', 'metadataJson', 'historyTurnIds', 'webSearch', 'model', 'toolEvents'], ['provider', 'fallback', 'catalogDigest', 'indexGeneration', 'budget', 'conversationScope', 'researchSnapshot', 'researchProposals', 'researchMaterials', 'topicHistory', 'command', 'readingProgress', 'directionDraft', 'notebookDraft']);
   if (context.conversationScope !== undefined) validateConversationScope(context.conversationScope);
   if (context.conversationScope?.kind === 'guide' && ['guideId','revision','bodySha256'].some(key=>context.conversationScope[key] !== context[key])) reject('上下文的导读范围不一致。');
   if (context.conversationScope?.kind === 'exploration') {
@@ -134,6 +136,11 @@ export function validateContext(context) {
     if (context.topicHistory !== undefined) validateTopicHistory(context.topicHistory,context.conversationScope.explorationId);
   } else if (context.researchSnapshot !== undefined || context.researchProposals !== undefined || context.researchMaterials !== undefined || context.topicHistory !== undefined || context.scope === 'research') reject('研究上下文缺少主题。');
   validateCommandFields(context, context.conversationScope?.kind === 'exploration');
+  if (context.notebookDraft !== undefined) {
+    if (context.command?.name !== 'notebook' || context.conversationScope?.kind !== 'exploration') reject('研究记录草稿缺少明确指令和方向。');
+    try { validateNotebookDraft(context.notebookDraft); } catch { reject('研究记录草稿无效。'); }
+    if (context.notebookDraft.baseNotebookVersion !== (context.researchSnapshot.notebook?.version ?? 0)) reject('研究记录草稿的基础版本不一致。');
+  }
   if (context.directionDraft !== undefined) {
     if (context.command?.name !== 'direction' || context.conversationScope?.kind === 'exploration') reject('只有建立方向的指令可以带方向草稿。');
     try { validateDirectionDraft(context.directionDraft); } catch { reject('研究方向草稿无效。'); }
@@ -173,7 +180,7 @@ export function validateContext(context) {
   try { const parsed = JSON.parse(context.metadataJson); if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw Error(); } catch { reject('文章元数据快照无效。'); }
   for (const event of context.toolEvents) {
     object(event, ['name', 'argumentsJson', 'resultJson'], ['elapsedMs']);
-    if (!['search_library', 'read_section', 'web_search', 'search_sources', 'read_source_unit', 'resolve_source_locator', 'search_topic_history', 'read_topic_turn', 'propose_research_changes', 'create_research_direction'].includes(event.name) || !isText(event.argumentsJson, 40000) || !isText(event.resultJson, 40000)
+    if (!['search_library', 'read_section', 'web_search', 'search_sources', 'read_source_unit', 'resolve_source_locator', 'search_topic_history', 'read_topic_turn', 'propose_research_changes', 'create_research_direction', 'update_research_notebook'].includes(event.name) || !isText(event.argumentsJson, 40000) || !isText(event.resultJson, 40000)
       || event.elapsedMs !== undefined && (typeof event.elapsedMs !== 'number' || !Number.isFinite(event.elapsedMs) || event.elapsedMs < 0)) reject('工具快照无效。');
     try { JSON.parse(event.argumentsJson); JSON.parse(event.resultJson); } catch { reject('工具快照不是有效 JSON。'); }
   }

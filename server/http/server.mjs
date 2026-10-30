@@ -304,6 +304,7 @@ export function createAiServer(dependencies) {
           // merely because the fallback finishes a different answer.
           if (replacement.context.researchProposals) replacement.context.researchProposals = [];
           delete replacement.context.directionDraft;
+          delete replacement.context.notebookDraft;
           replacement.answer = '';
           store.save(replacement); turn = replacement; Object.defineProperty(prepared, 'runResearchTool', {value:researchToolsForTurn(store, turn),configurable:true}); persistedAt = Date.now();
           send({ type: 'reset', turn });

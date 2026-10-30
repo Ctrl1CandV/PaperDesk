@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 2,
+  "id": "multi-agent-collaboration-survey",
+  "paperId": "arxiv:2501.06322",
+  "revision": 1,
+  "title": "多智能体协作综述：把角色、规则与编排分开理解",
+  "paperTitle": "Multi-Agent Collaboration Mechanisms: A Survey of LLMs",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "以协作通道为分析单位，分开角色规则、结构和编排，建立可比较的多智能体研究问题。",
+  "source": {
+    "id": "arxiv:2501.06322",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2501.06322v1"
+  },
+  "bodyFile": "multi-agent-collaboration-survey.md",
+  "bodySha256": "e4483f903f544632eb78ca223c72a361c4cd7c147fa5efad5e578fef986cd7c7",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "协作通道比一条连线包含更多信息"
+    },
+    {
+      "id": "u02",
+      "heading": "目标关系决定分歧意味着什么"
+    },
+    {
+      "id": "u03",
+      "heading": "规则、角色和模型依据回答三种设计问题"
+    },
+    {
+      "id": "u04",
+      "heading": "连接结构与决策责任不能互相代替"
+    },
+    {
+      "id": "u05",
+      "heading": "编排是在决定哪些通道何时出现"
+    },
+    {
+      "id": "u06",
+      "heading": "用过程证据区分协作收益与额外预算"
+    },
+    {
+      "id": "u07",
+      "heading": "下一步阅读应聚焦一个可比较的机制"
+    },
+    {
+      "id": "u08",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c-1",
+      "url": "https://arxiv.org/abs/2501.06322v1",
+      "labels": [
+        "论文身份与版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-2",
+      "url": "https://arxiv.org/html/2501.06322v1#S3",
+      "labels": [
+        "§3 与图 2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-3",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS2",
+      "labels": [
+        "协作类型"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-4",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS3",
+      "labels": [
+        "§4.3 与图 4"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-5",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS4",
+      "labels": [
+        "通信结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-6",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS5",
+      "labels": [
+        "协调与编排"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-7",
+      "url": "https://arxiv.org/html/2501.06322v1#S6.SS2",
+      "labels": [
+        "评价讨论"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-8",
+      "url": "https://arxiv.org/html/2501.06322v1#S6",
+      "labels": [
+        "共同决策与风险"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c-9",
+      "url": "https://arxiv.org/pdf/2501.06322v1",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "multi-agent-communication-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§3（分析框架）",
+      "§4（协作类型、策略、结构与编排）",
+      "§6（共同决策、评价与风险）"
+    ],
+    "figuresViewed": [
+      "Figure 2（PDF第9页，AI查看）",
+      "Figure 4（PDF第15页，AI查看）",
+      "Figure 5（PDF第17页，AI查看）"
+    ],
+    "limitations": [
+      "未逐篇重读被引工作或复现其结果。",
+      "未完整展开应用章节；联邦学习与模型级交换仅作边界说明。",
+      "采用2025-01-10的v1，历史开放问题不能直接当作当前研究空白。"
+    ],
+    "reviewBasis": "AI基于固定v1正文提取并查看所列PDF页面，逐主张自审见docs/research/communication-surveys-review.md；独立审阅状态以该记录后续结论为准。"
+  },
+  "orientation": {
+    "shortTitle": "协作综述：角色、规则与编排",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "协作通道"
+        ]
+      },
+      {
+        "id": "multi-agent-collaboration",
+        "label": "多智能体协作",
+        "aliases": [
+          "角色分工",
+          "合作",
+          "竞争",
+          "竞合"
+        ]
+      },
+      {
+        "id": "multi-agent-orchestration",
+        "label": "多智能体编排",
+        "aliases": [
+          "静态编排",
+          "动态编排",
+          "协调"
+        ]
+      }
+    ],
+    "summary": "多个 Agent 参与同一个任务，并不自动构成有效分工。本文以协作通道为中心，将参与者、目标关系、策略、连接结构和流程安排分开描述，解释信息如何被组织成共同决策。",
+    "value": "与通信综述互补：通信视角追踪消息怎样流动，本篇帮助判断角色、规则和静态或动态编排改变了什么，以及性能收益是否可能来自更多资源而非协作机制。",
+    "prerequisites": [
+      "了解语言模型、输入上下文与工具调用的基本区别。",
+      "知道Agent会根据输入或环境反馈采取行动；无需先实现多智能体系统。"
+    ],
+    "boundaries": [
+      "主线讲解，不逐篇展开全部被引工作。",
+      "教学情境和对照建议未作为实验执行。",
+      "分类、角色名称与互通接口都不能单独证明协作有效。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Khanh-Tung Tran",
+        "Dung Dao",
+        "Minh-Duong Nguyen",
+        "Quoc-Viet Pham",
+        "Barry O’Sullivan",
+        "Hoang D. Nguyen"
+      ],
+      "year": 2025,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2501.06322v1",
+      "preprintYear": 2025
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "说明协作通道除了连线还包含哪些关系。",
+        "concepts": [
+          "协作通道",
+          "目标",
+          "模型信息",
+          "推理时协作"
+        ],
+        "limit": "原文分类范围较广，参数交换与消息交换不同。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "区分系统共同目标与角色之间的局部竞争。",
+        "concepts": [
+          "合作",
+          "竞争",
+          "竞合",
+          "共同决策"
+        ],
+        "limit": "达成一致不构成结论正确的证据。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "分开规则约束、角色分工与基于模型的决策依据。",
+        "concepts": [
+          "规则策略",
+          "角色策略",
+          "模型策略"
+        ],
+        "limit": "角色名称不证明独立知识，三种设计可以组合。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "按信息和控制分布理解三类结构并检查交换对象。",
+        "concepts": [
+          "中心式",
+          "去中心化",
+          "层级",
+          "联邦学习"
+        ],
+        "limit": "边数不等于跨系统可比较的通信量。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "解释静态与动态编排怎样决定通道和任务依赖。",
+        "concepts": [
+          "编排",
+          "静态",
+          "动态",
+          "任务依赖"
+        ],
+        "limit": "动态并不意味着结果必然优于固定流程。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "核对资源条件并追踪信息沿通道被接受或纠正的过程。",
+        "concepts": [
+          "评价",
+          "预算",
+          "幻觉传播",
+          "消融"
+        ],
+        "limit": "阅读建议不是原文已经执行的统一基准。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "把宽泛兴趣缩成角色、编排或通信效率中的一个问题。",
+        "concepts": [
+          "选文条件",
+          "阅读主线",
+          "机制比较"
+        ],
+        "limit": "没有将历史开放问题直接判为当前空白。"
+      },
+      {
+        "unitId": "u08",
+        "purpose": "找到已核图表并说明没有完整展开的范围。",
+        "concepts": [
+          "原文定位",
+          "覆盖边界"
+        ],
+        "limit": "不是全综述或全部被引工作的审阅。"
+      }
+    ]
+  }
+}

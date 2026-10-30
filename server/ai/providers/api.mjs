@@ -151,7 +151,7 @@ export async function answer({ config, content, prepared, request, turn, signal,
       checkPromptBudget({ messages, tools }, config, turn.context);
       let output; const started = performance.now();
       try {
-        output = name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes','create_research_direction'].includes(name) ? prepared.runResearchTool(name,args) : content.runLocal(name, args, turn.sources, turn.context);
+        output = name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes','create_research_direction','update_research_notebook'].includes(name) ? prepared.runResearchTool(name,args) : content.runLocal(name, args, turn.sources, turn.context);
       } catch (error) {
         signal.throwIfAborted();
         if (name !== 'web_search' || !(error instanceof PublicError) || error.status !== 502) throw error;
