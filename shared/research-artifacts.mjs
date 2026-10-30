@@ -1,5 +1,6 @@
 import { canonicalResearch, researchHash, researchObject, validateEvidenceRefs, validateResearchSnapshot, verifyResearchSnapshot, validLocalId, validRevision, validateResearchLocator } from './research-contract.mjs';
-export const ARTIFACT_KINDS = ['evidence-synthesis','direction-comparison','reading-plan','experiment-plan','stage-plan','harness-task'];
+// reading-brief and research-line are the two primary research files; earlier kinds remain readable and editable.
+export const ARTIFACT_KINDS = ['reading-brief','research-line','evidence-synthesis','direction-comparison','reading-plan','experiment-plan','stage-plan','harness-task'];
 const fail = message => { throw Error(message); };
 const requireValue = (ok, message = '研究文档格式无效。') => { if (!ok) fail(message); };
 const id = value => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
@@ -69,7 +70,10 @@ export function validateResearchArtifacts(artifacts) {
   requireValue(Array.isArray(artifacts) && artifacts.length <= 100);
   requireValue(new Set(artifacts.map(a=>a.id)).size === artifacts.length);
   for (const value of artifacts) {
-    researchObject(value,['id','kind','title','body','recordRevision','sourceRecordRevision','sourceTurnId','evidenceRefs','createdAt','updatedAt','taskVersions','receipts']);
+    researchObject(value,['id','kind','title','body','recordRevision','sourceRecordRevision','sourceTurnId','evidenceRefs','createdAt','updatedAt','taskVersions','receipts'],['purpose','librarySnapshot']);
+    // A reading file records why it was written and which guides the library held then.
+    requireValue(value.purpose === undefined || ['accumulation','research'].includes(value.purpose));
+    requireValue(value.librarySnapshot === undefined || Array.isArray(value.librarySnapshot) && value.librarySnapshot.length <= 2000 && value.librarySnapshot.every(validLocalId) && new Set(value.librarySnapshot).size === value.librarySnapshot.length);
     requireValue(id(value.id) && ARTIFACT_KINDS.includes(value.kind) && text(value.title,300) && value.title.trim() && text(value.body,100000) && positive(value.recordRevision) && positive(value.sourceRecordRevision) && (value.sourceTurnId === null || id(value.sourceTurnId)) && time(value.createdAt) && time(value.updatedAt));
     validateEvidenceRefs(value.evidenceRefs);
     requireValue(Array.isArray(value.taskVersions) && value.taskVersions.length <= 50 && Array.isArray(value.receipts) && value.receipts.length <= 200);
@@ -81,9 +85,9 @@ export function validateResearchArtifacts(artifacts) {
     }
   }
 }
-export function createResearchArtifact({kind='stage-plan',title,body='',recordRevision,sourceTurnId=null,evidenceRefs=[]}) {
+export function createResearchArtifact({kind='stage-plan',title,body='',recordRevision,sourceTurnId=null,evidenceRefs=[],purpose,librarySnapshot}) {
   const now = new Date().toISOString();
-  const result = {id:crypto.randomUUID(),kind,title,body,recordRevision:1,sourceRecordRevision:recordRevision,sourceTurnId,evidenceRefs,createdAt:now,updatedAt:now,taskVersions:[],receipts:[]};
+  const result = {id:crypto.randomUUID(),kind,title,body,recordRevision:1,sourceRecordRevision:recordRevision,sourceTurnId,evidenceRefs,createdAt:now,updatedAt:now,taskVersions:[],receipts:[],...(purpose?{purpose}:{}),...(librarySnapshot?{librarySnapshot}:{})};
   validateResearchArtifacts([result]); return result;
 }
 export async function freezeTaskBrief({artifact,snapshot,sources,tasks,executionLimits,acceptanceCriteria,requiredWorkflows}) {

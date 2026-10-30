@@ -22,6 +22,7 @@ async function service(context: BrowserContext, baseURL: string, proposal = fals
     if (!url.pathname.startsWith('/api/ai/')) { await route.continue(); return; }
     const json = (value: unknown) => route.fulfill({ contentType: 'application/json', body: JSON.stringify(value) });
     if (url.pathname === '/api/ai/status') return json({ configured: true, model: 'synthetic-model', searchAvailable: false, csrfToken: 'synthetic-token', provider: 'api', apiConfigured: true, chatgpt: { connected: false, loginPending: false, needsLogin: false, fallbackToApi: false } });
+    if (/^\/api\/ai\/topics\/[^/]+\/summary$/.test(url.pathname)) return json({ conversations: 0, turns: 0, lastTurnAt: null, guides: [] });
     if (url.pathname === '/api/ai/conversations') return json({ conversations: [...conversations.values()].filter(value => value.conversation.conversationScope?.explorationId === url.searchParams.get('explorationId')).map(value => value.conversation) });
     if (url.pathname.startsWith('/api/ai/conversations/')) return json(conversations.get(url.pathname.split('/').at(-1)!));
     if (url.pathname === '/api/ai/ask') {
@@ -37,6 +38,8 @@ async function service(context: BrowserContext, baseURL: string, proposal = fals
   });
   return { requests, unexpected, conversations };
 }
+// On the direction page the same conversation opens in a drawer on request.
+const openDiscussion = (page: Page) => page.getByRole('button', { name: '继续讨论', exact: true }).click();
 async function ask(page: Page, text: string) {
   await page.getByRole('textbox', { name: '向 AI 提问', exact: true }).fill(text);
   await page.locator('.ai-send').click();
@@ -45,34 +48,30 @@ async function ask(page: Page, text: string) {
 test('synthetic research thread crosses two guides and no-guide view, preserving consent and snapshot after reload', async ({ page, context, baseURL }) => {
   const mock = await service(context, baseURL!); await seed(page);
   await page.goto('/read/agent-survey/2#u01');
-  await page.getByLabel('当前关联探索', { exact: true }).selectOption(topic);
-  await page.getByRole('textbox', { name: '向 AI 提问' }).fill('SYNTHETIC 第一篇问题');
-  await expect(page.locator('.ai-send')).toBeDisabled();
-  await page.getByLabel('随提问发送此探索的研究上下文').check();
+  // Linking a direction is the explicit permission to send its record; no separate checkbox.
+  await page.getByLabel('关联方向', { exact: true }).selectOption(topic);
   await ask(page, 'SYNTHETIC 第一篇问题');
+  expect(mock.requests[0].researchSnapshot?.explorationId).toBe(topic);
   await page.goto('/read/instructgpt/2#u01');
-  await expect(page.getByLabel('当前关联探索', { exact: true })).toHaveValue(topic);
+  await expect(page.getByLabel('关联方向', { exact: true })).toHaveValue(topic);
   await ask(page, 'SYNTHETIC 第二篇问题');
   expect(mock.requests[1].conversationId).toBe([...mock.conversations.keys()][0]);
   expect(mock.requests[1].guideId).toBe('instructgpt');
-  await page.goto(`/explore/questions/${topic}`);
-  await page.getByRole('button', { name: '打开研究助手' }).click();
+  await page.goto(`/explore/questions/${topic}`); await openDiscussion(page);
   await ask(page, 'SYNTHETIC 不附论文继续');
   expect(mock.requests[2].guideId).toBeUndefined();
   expect(mock.requests[2].researchSnapshot?.constraints).toBe('SYNTHETIC 约束 1');
-  await page.reload(); await page.getByRole('button', { name: '打开研究助手' }).click();
+  await page.reload(); await openDiscussion(page);
   await expect(page.locator('.ai-turn')).toHaveCount(3);
   await ask(page, 'SYNTHETIC 刷新后继续');
   expect(mock.requests[3].conversationId).toBe(mock.requests[1].conversationId);
-  await page.goto(`/explore/questions/${otherTopic}`); await page.getByRole('button', { name: '打开研究助手' }).click();
+  await page.goto(`/explore/questions/${otherTopic}`); await openDiscussion(page);
   await expect(page.locator('.ai-turn')).toHaveCount(0);
-  await expect(page.getByLabel('随提问发送此探索的研究上下文')).not.toBeChecked();
   expect(mock.unexpected).toEqual([]);
 });
 test('synthetic proposal previews exact edits, saves once and blocks a stale proposal', async ({ page, context, baseURL }) => {
   const mock = await service(context, baseURL!, true); await seed(page);
-  await page.goto(`/explore/questions/${topic}`); await page.getByRole('button', { name: '打开研究助手' }).click();
-  await page.getByLabel('随提问发送此探索的研究上下文').check();
+  await page.goto(`/explore/questions/${topic}`); await openDiscussion(page);
   await ask(page, 'SYNTHETIC 整理约束');
   await page.locator('.ai-research-proposal summary').first().click();
   await expect(page.locator('.ai-research-proposal')).toContainText('SYNTHETIC 新约束');
@@ -86,16 +85,16 @@ test('synthetic proposal previews exact edits, saves once and blocks a stale pro
   await expect(page.getByRole('button', { name: '采纳这些修改' })).toBeDisabled();
   await expect(page.locator('.ai-research-proposal').last()).toContainText('探索已修改');
   await mkdir('.cache/screenshots/research', { recursive: true });
-  await page.locator('.exploration-assistant').screenshot({ path: '.cache/screenshots/research/assistant-desktop.png' });
+  await page.locator('.conversation-drawer .ai-panel').screenshot({ path: '.cache/screenshots/research/assistant-desktop.png' });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator('.exploration-assistant').screenshot({ path: '.cache/screenshots/research/assistant-narrow.png' });
+  await page.locator('.conversation-drawer .ai-panel').screenshot({ path: '.cache/screenshots/research/assistant-narrow.png' });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(mock.unexpected).toEqual([]);
 });
 test('synthetic manual decision is explicit and a receipt question never overwrites or sends a draft', async ({ page, context, baseURL }) => {
   const mock = await service(context, baseURL!); await seed(page);
   await page.goto(`/explore/questions/${topic}`);
-  await page.getByRole('button', { name: '修改问题与下一步' }).click();
+  await page.getByRole('button', { name: '手动编辑记录' }).click();
   await page.getByText('记录一项研究决定或修订', { exact: true }).click();
   await page.getByRole('textbox', { name: '决定内容', exact: true }).fill('SYNTHETIC 优先检查约束');
   await page.getByRole('textbox', { name: '形成理由', exact: true }).fill('SYNTHETIC 决定理由');
@@ -124,12 +123,11 @@ test('selected synthetic notes and documents are opt-in, fixed, revocable and is
     await personalStore.saveExploration({ ...current, research: { ...current.research, artifacts: [artifact] } }, current.recordRevision);
     return note.id;
   }, topic);
-  await page.goto(`/explore/questions/${topic}`); await page.getByRole('button', { name: '打开研究助手' }).click();
-  await page.getByLabel('随提问发送此探索的研究上下文').check();
+  await page.goto(`/explore/questions/${topic}`); await openDiscussion(page);
   await ask(page, 'SYNTHETIC 默认不发送笔记');
   expect(mock.requests[0].researchMaterials).toBeUndefined();
   const picker = page.getByRole('dialog', { name: '选择笔记与研究文档', exact: true });
-  await page.getByRole('button', { name: /选择笔记与研究文档/ }).click();
+  await page.getByRole('button', { name: /^资料 ·/ }).click();
   await picker.getByRole('checkbox', { name: /SYNTHETIC 主动选择的笔记/ }).check();
   await picker.getByRole('checkbox', { name: /SYNTHETIC 已保存阶段计划/ }).check();
   await picker.getByRole('button', { name: '完成选择' }).click();
@@ -138,7 +136,7 @@ test('selected synthetic notes and documents are opt-in, fixed, revocable and is
   await composer.fill('SYNTHETIC 检查已选版本'); await page.locator('.ai-send').click();
   await expect(page.locator('.ai-error')).toContainText('已选笔记或文档已修改');
   await expect(composer).toHaveValue('SYNTHETIC 检查已选版本'); expect(mock.requests).toHaveLength(1);
-  await page.getByRole('button', { name: /选择笔记与研究文档/ }).click();
+  await page.getByRole('button', { name: /^资料 ·/ }).click();
   await picker.getByRole('button', { name: '更新已选资料到最新版本' }).click();
   await picker.locator('.ai-material-selected details summary').first().click();
   await mkdir('.cache/screenshots/research', { recursive: true });
@@ -152,24 +150,23 @@ test('selected synthetic notes and documents are opt-in, fixed, revocable and is
   await ask(page, 'SYNTHETIC 使用已确认资料');
   expect(mock.requests[1].researchMaterials?.notes[0]).toMatchObject({ id: noteId, recordRevision: 2, text: 'SYNTHETIC 修改后的笔记' });
   expect(mock.requests[1].researchMaterials?.artifacts[0].body).toBe('SYNTHETIC 文档正文');
-  await page.getByRole('button', { name: /选择笔记与研究文档/ }).click();
+  await page.getByRole('button', { name: /^资料 ·/ }).click();
   await picker.getByRole('checkbox', { name: /SYNTHETIC 修改后的笔记/ }).uncheck();
   await picker.getByRole('checkbox', { name: /SYNTHETIC 已保存阶段计划/ }).uncheck();
   await picker.getByRole('button', { name: '完成选择' }).click();
   await ask(page, 'SYNTHETIC 撤销资料后发送'); expect(mock.requests[2].researchMaterials).toBeUndefined();
-  await page.goto(`/explore/questions/${otherTopic}`); await page.getByRole('button', { name: '打开研究助手' }).click();
-  await expect(page.getByRole('button', { name: /选择笔记与研究文档/ })).toContainText('默认不发送');
+  await page.goto(`/explore/questions/${otherTopic}`); await openDiscussion(page);
+  await expect(page.getByRole('button', { name: /^资料 ·/ })).toContainText('默认不发送');
   expect(mock.unexpected).toEqual([]);
 });
 test('synthetic recent topic conversation can resume after remembered selection expires without overwriting draft', async ({ page, context, baseURL }) => {
   const mock = await service(context, baseURL!); await seed(page);
-  await page.goto(`/explore/questions/${topic}`); await page.getByRole('button', { name: '打开研究助手' }).click();
-  await page.getByLabel('随提问发送此探索的研究上下文').check(); await ask(page, 'SYNTHETIC 先前研究讨论');
-  await page.evaluate(() => sessionStorage.clear()); await page.reload();
-  await page.getByRole('button', { name: '打开研究助手' }).click();
+  await page.goto(`/explore/questions/${topic}`); await openDiscussion(page);
+  await ask(page, 'SYNTHETIC 先前研究讨论');
+  await page.evaluate(() => sessionStorage.clear()); await page.reload(); await openDiscussion(page);
   const composer = page.getByRole('textbox', { name: '向 AI 提问', exact: true });
   await composer.fill('SYNTHETIC 新写的问题草稿');
-  await page.getByRole('button', { name: '继续最近研究对话' }).click();
+  await page.getByRole('button', { name: '继续最近的讨论' }).click();
   await expect(page.locator('.ai-turn')).toHaveCount(1); await expect(composer).toHaveValue('SYNTHETIC 新写的问题草稿');
   expect(mock.requests).toHaveLength(1);
 });

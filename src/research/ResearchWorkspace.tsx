@@ -4,11 +4,11 @@ import { createResearchSnapshot, emptyResearchState } from '../../shared/researc
 import { personalStore } from '../records/store';
 import type { Exploration } from '../records/types';
 import { clearDraft, getDraft, keepDraft, useUnloadWarning } from '../ui/drafts';
-import { portableResearchSources, renderResearchDocument } from './artifact-actions';
+import { documentFileName, portableResearchSources, renderResearchDocument } from './artifact-actions';
 import workflows from './workflow-refs.json';
 import './research.css';
 
-const labels:Record<ArtifactKind,string> = {'evidence-synthesis':'证据综合','direction-comparison':'方向比较','reading-plan':'阅读计划','experiment-plan':'实验方案','stage-plan':'阶段计划','harness-task':'Harness 任务'};
+const labels:Record<ArtifactKind,string> = {'reading-brief':'选文实施文件','research-line':'研究方向与主线','evidence-synthesis':'证据综合','direction-comparison':'方向比较','reading-plan':'阅读计划','experiment-plan':'实验方案','stage-plan':'阶段计划','harness-task':'Harness 任务'};
 const receiptStatuses={completed:'已完成',partial:'部分完成',blocked:'遇到阻塞',failed:'执行失败',cancelled:'已取消'};
 const contentStatuses={'not-applicable':'未涉及内容入库',prepared:'已准备内容包',validated:'已校验内容包',imported:'已报告导入'};
 function download(name:string,value:string) { const url=URL.createObjectURL(new Blob([value],{type:name.endsWith('.json')?'application/json':'text/markdown;charset=utf-8'})); const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000); }
@@ -47,19 +47,21 @@ export function ResearchWorkspace({record}:{record:Exploration}) {
     setBase(record.recordRevision);setPreview(task);
   }
   async function confirmTask() {if(!artifact||!preview)return;await persist({...artifact,taskVersions:[...artifact.taskVersions,preview],recordRevision:artifact.recordRevision+1,updatedAt:new Date().toISOString()},base);setPreview(undefined);setTaskForm(false);setNotice('已保存固定任务版本，可以下载交接文件。后续编辑草稿不会改写此版本。');}
-  function prepareDiscussion(mode:'implementation'|'document') {
-    const question=mode==='implementation'
-      ? '请结合当前探索中我已授权带入的研究状态、资料，以及本研究主题的历史讨论，整理一份可交给新 Harness 会话独立执行的完整 Markdown 实施文件。请包含：本轮目标及选择它的理由；已有结论、尚待验证的假设和暂缓方向；依据、固定来源位置与覆盖缺口；任务顺序与依赖；具体交付物；完成条件及停止或返回讨论的条件；已经明确授权的行动和仍待确认的事项。保留研究判断的条件和不确定性，不把采纳的假设写成已证实结论。没有明确依据时，不虚构预算、资源、工具安装或执行授权。只追问会实质改变实施方案的问题，其他未知项可以明确标注待确认。若需要已保存研究文档，请仅使用我在本轮明确选入的文档；未选入的文档不要假定已读。'
-      : '请围绕我在本轮明确选入的研究文档继续讨论，结合已授权带入的当前研究状态和相关历史：核对目标与依据，指出需要修订的判断、缺失资料和下一步，帮助完善可交给 Harness 执行的实施文件。先确认本轮是否已选入该文档；未选入时请提醒我选择，不要假定已读。保留假设与结论、计划与结果的区别，不新增未经明确授权的预算、安装或执行行动。';
-    window.dispatchEvent(new CustomEvent('paperdesk:research-question',{detail:{explorationId:record.id,question}}));
+  // Prepares the conversation's composer; the model is called only after the reader presses Send.
+  function ask(question:string,artifactIds?:string[]) {
+    window.dispatchEvent(new CustomEvent('paperdesk:research-question',{detail:{explorationId:record.id,question,artifactIds}}));
     setError('');
-    setNotice(`已打开研究助手，发送前请检查问题与材料；已有问题和文档草稿会保留。${artifact?'若要参考选中文档，请在 AI 面板中将它选为本轮附件。':'只会使用你在 AI 面板中明确选入的资料。'}`);
+    setNotice('已在研究助手中准备好问题，检查后发送才会调用模型；已有的问题草稿会保留。');
   }
-  async function exportDocument() {
+  function prepareDiscussion() {
     if(!artifact)return;
-    const markdown=await renderResearchDocument(record,artifact);
-    download('研究文档.md',markdown);
-    setNotice('已生成研究文档下载，包含已保存正文和来源附录。请在浏览器下载列表确认文件已保存。');
+    ask(`请围绕我选入的《${artifact.title}》继续讨论：核对目标与依据，指出需要修订的判断、缺失资料和下一步。保留假设与结论、计划与结果的区别。`,[artifact.id]);
+  }
+  async function exportDocument(item=artifact) {
+    if(!item)return;
+    const markdown=await renderResearchDocument(record,item);
+    download(documentFileName(item),markdown);
+    setNotice('已生成文件下载，包含正文和来源附录。请在浏览器下载列表确认文件已保存。');
   }
   function discussReceipt(receipt:ExecutionReceipt) {
     const task=artifact?.taskVersions.find(t=>t.version===receipt.taskRef.version);
@@ -68,11 +70,11 @@ export function ResearchWorkspace({record}:{record:Exploration}) {
     window.dispatchEvent(new CustomEvent('paperdesk:research-question',{detail:{explorationId:record.id,question}}));
     setNotice('已准备研究问题；检查对话输入框并明确发送后才会调用模型。');
   }
-  return <section className="research-workspace" aria-labelledby="research-documents-heading">
-    <div className="research-heading"><div><span className="eyebrow">讨论形成下一步</span><h2 id="research-documents-heading">研究文档</h2></div><button className="research-primary" onClick={()=>prepareDiscussion('implementation')} disabled={busy}>让助手整理实施文件</button></div>
-    <p className="exploration-small">和助手讨论下一阶段的目标、依据与行动，保存回答后即可下载带来源的研究文档，交给 Harness 继续实施。</p>
-    <div className="research-actions"><button onClick={()=>edit()} disabled={busy||Boolean(draft)||Boolean(receiptText)}>新建研究文档</button><span className="exploration-small">整理动作先准备问题，检查后发送才会调用模型。</span></div>
+  return <section className="research-workspace" aria-label="文档与交接记录">
+    <p className="exploration-small">手写的研究文档、对话中另存的回答，以及可选的固定任务版本与执行回执。选文实施文件在上方“文件”中查看和下载。</p>
+    <div className="research-actions"><button onClick={()=>edit()} disabled={busy||Boolean(draft)||Boolean(receiptText)}>新建研究文档</button><span className="exploration-small">可以手写文档，或在研究助手中把一段回答保存为文档。</span></div>
     {artifacts.length>0 && <label>选择文档<select value={selected??''} onChange={e=>{setSelected(e.target.value||undefined);setDraft(undefined);setTaskForm(false);setPreview(undefined);setReceiptText('');setReceiptPreview(undefined);}} disabled={Boolean(draft)||Boolean(receiptText)||busy}><option value="">选择已保存的研究文档</option>{artifacts.map(a=><option key={a.id} value={a.id}>{a.title} · {labels[a.kind]}</option>)}</select></label>}
+    <div id="research-document-view">
     {draft ? <div className="research-editor">
       <label>文档类型<select value={draft.kind} onChange={e=>setDraft({...draft,kind:e.target.value as ArtifactKind})}>{ARTIFACT_KINDS.map(k=><option key={k} value={k}>{labels[k]}</option>)}</select></label>
       <label>文档标题<input value={draft.title} maxLength={300} onChange={e=>setDraft({...draft,title:e.target.value})}/></label>
@@ -82,8 +84,8 @@ export function ResearchWorkspace({record}:{record:Exploration}) {
       <h3>{artifact.title}</h3><p className="exploration-small">{labels[artifact.kind]} · 草稿修订 {artifact.recordRevision} · 基于研究记录第 {artifact.sourceRecordRevision} 版{artifact.sourceTurnId?' · 来源：AI 问答':' · 手动文档'}。保存或采纳不表示结论已验证。</p>
       <div className="research-prose">{artifact.body || '正文尚未填写。'}</div>
       {artifact.evidenceRefs.length>0 && <details><summary>保留的问答依据（{artifact.evidenceRefs.length}）</summary>{artifact.evidenceRefs.map(ref=><div key={`${ref.turnId}/${ref.citationId}`}><p>{ref.citationId} · {String(ref.source.title)} · 来源问答 {ref.turnId}</p><blockquote>{ref.source.text}</blockquote></div>)}</details>}
-      <div className="research-actions"><button className="research-primary" onClick={()=>void perform(exportDocument)} disabled={busy||!artifact.body.trim()}>下载研究文档.md</button><button onClick={()=>prepareDiscussion('document')} disabled={busy}>围绕此文档继续讨论</button><button onClick={()=>edit(artifact)} disabled={busy}>编辑文档</button></div>
-      <p className="exploration-small">下载包含已保存正文、来源讨论与修订、固定引用、摘录和覆盖限制。继续讨论时，请在 AI 面板中主动选入需要参考的文档。</p>
+      <div className="research-actions"><button className="research-primary" onClick={()=>void perform(()=>exportDocument())} disabled={busy||!artifact.body.trim()}>下载{documentFileName(artifact)}</button><button onClick={prepareDiscussion} disabled={busy}>围绕此文档继续讨论</button><button onClick={()=>edit(artifact)} disabled={busy}>编辑文档</button><button onClick={()=>setSelected(undefined)} disabled={busy}>收起</button></div>
+      <p className="exploration-small">下载包含正文、来源讨论与修订、固定引用、摘录和覆盖限制。“围绕此文档继续讨论”会把这一版选入本轮资料，发送前可以撤销。</p>
       <details className="research-advanced" open={advancedOpen} onToggle={event=>setAdvancedOpen(event.currentTarget.open)}><summary>可选：固定任务版本与执行回执</summary>
       <p className="exploration-small">需要精确追踪任务版本或接收执行结果时，可以使用这些附加记录；研究文档已可直接下载交接。</p>
       <div className="research-actions"><button onClick={()=>{setTaskForm(!taskForm);setPreview(undefined);}} disabled={busy||!artifact.body.trim()}>准备执行任务</button></div>
@@ -103,6 +105,7 @@ export function ResearchWorkspace({record}:{record:Exploration}) {
       {artifact.receipts.map(receipt=><details key={receipt.runId}><summary>执行结果 · v{receipt.taskRef.version} · {receiptStatuses[receipt.status]}</summary>{receipt.taskResults.map(result=><div key={result.taskItemId}><p className="research-prose">{result.summary}</p><p>内容状态：{contentStatuses[result.contentStatus]}</p><p>产物：{result.outputs.join('；')||'未报告'}</p><p>依据：{result.evidence.join('；')||'未报告'}</p><p>未完成：{[...result.unmetCriteria,...result.blockers].join('；')||'未报告'}</p></div>)}<p>新问题：{receipt.unresolvedQuestions.join('；')||'未报告'}</p><p>建议下一步：{receipt.suggestedNextActions.join('；')||'未报告'}</p><button onClick={()=>discussReceipt(receipt)}>带着结果继续讨论</button></details>)}
       </details>
     </>}
+    </div>
     {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   </section>;
 }

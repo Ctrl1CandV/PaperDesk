@@ -1,6 +1,13 @@
 // Shared, data-only research protocol. No provider or storage dependencies.
 import { validateResearchArtifacts } from './research-artifacts.mjs';
 export const RESEARCH_FIELDS = ['question', 'interpretation', 'unknowns', 'scope', 'constraints', 'candidates', 'deferred'];
+// Proposals may also rename the topic once discussion clarifies it. The title
+// stays outside RESEARCH_FIELDS so snapshot field order and hashes are unchanged.
+export const PROPOSAL_FIELDS = ['title', 'stage', ...RESEARCH_FIELDS];
+// Where a direction stands; chosen with the reader, not inferred from reading activity.
+export const RESEARCH_STAGES = ['broaden', 'narrow', 'question', 'validate', 'write'];
+export const NEXT_ACTION_KINDS = ['read-guide', 'check-concept', 'compare-evidence', 'search-literature'];
+export const SEED_DISCUSSION_LIMITS = Object.freeze({ turns: 3, question: 200, answer: 360, bytes: 4096 });
 export function canonicalResearch(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalResearch).join(',')}]`;
   if (value && typeof value === 'object') return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalResearch(value[key])}`).join(',')}}`;
@@ -53,8 +60,56 @@ export const validLocalId=value=>typeof value === 'string' && /^[a-z0-9][a-z0-9-
 export const validRevision=value=>Number.isSafeInteger(value)&&value>0;
 export function safeResearchUrl(value){try{const u=new URL(value);return text(value,4096)&&['https:','http:'].includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}}
 export function validateResearchLocator(value){researchObject(value,['label','physicalPage','printedPageLabel','anchor']);assert(text(value.label,1000)&&(value.physicalPage===null||validRevision(value.physicalPage))&&(value.printedPageLabel===null||text(value.printedPageLabel,100))&&(value.anchor===null||text(value.anchor,300)));}
+const validTarget=t=>{researchObject(t,['guideId','revision','unitId']);assert(validLocalId(t.guideId)&&validRevision(t.revision)&&validLocalId(t.unitId));};
+export function validateNextAction(value) {
+  if (value === null) return;
+  researchObject(value,['kind','description'],['target']);
+  assert(NEXT_ACTION_KINDS.includes(value.kind)&&text(value.description,2000)&&value.description.trim(),'下一步类型或说明无效。');
+  if(value.target!==undefined)validTarget(value.target);
+  assert(value.kind!=='read-guide'||value.target,'继续阅读需要固定导读位置。');
+}
+// A reader may promote an ordinary guide conversation into a topic. Only a short,
+// explicitly carried excerpt is stored; it is earlier model discussion, not evidence.
+export function validateSeedDiscussion(value) {
+  researchObject(value,['conversationId','guideId','revision','guideTitle','turns','createdAt']);
+  assert(uuid(value.conversationId)&&validLocalId(value.guideId)&&validRevision(value.revision)&&text(value.guideTitle,300)&&value.guideTitle.trim(),'起点讨论身份无效。');
+  assert(typeof value.createdAt==='string'&&Number.isFinite(Date.parse(value.createdAt))&&new Date(value.createdAt).toISOString()===value.createdAt);
+  assert(Array.isArray(value.turns)&&value.turns.length>0&&value.turns.length<=SEED_DISCUSSION_LIMITS.turns,'起点讨论轮数无效。');
+  for(const turn of value.turns){researchObject(turn,['turnId','question','answer','answerTruncated']);assert(uuid(turn.turnId)&&text(turn.question,SEED_DISCUSSION_LIMITS.question)&&turn.question.trim()&&text(turn.answer,SEED_DISCUSSION_LIMITS.answer)&&typeof turn.answerTruncated==='boolean');}
+  assert(new Set(value.turns.map(t=>t.turnId)).size===value.turns.length);
+  assert(new TextEncoder().encode(JSON.stringify(value)).byteLength<=SEED_DISCUSSION_LIMITS.bytes,'起点讨论超过 4 KiB。');
+}
+/** Newest turns first within the byte budget; keeps chronological order in the result. */
+export function createSeedDiscussion({conversationId,guideId,revision,guideTitle,turns}) {
+  const chosen=[];
+  for(const turn of [...turns].reverse()){
+    if(chosen.length>=SEED_DISCUSSION_LIMITS.turns)break;
+    const question=turn.question.trim().slice(0,SEED_DISCUSSION_LIMITS.question),answer=turn.answer.trim().slice(0,SEED_DISCUSSION_LIMITS.answer);
+    if(!question)continue;
+    const candidate={conversationId,guideId,revision,guideTitle:guideTitle.slice(0,300),turns:[{turnId:turn.id,question,answer,answerTruncated:answer.length<turn.answer.trim().length},...chosen],createdAt:new Date().toISOString()};
+    if(new TextEncoder().encode(JSON.stringify(candidate)).byteLength>SEED_DISCUSSION_LIMITS.bytes)break;
+    chosen.unshift(candidate.turns[0]);
+  }
+  if(!chosen.length)return undefined;
+  const value={conversationId,guideId,revision,guideTitle:guideTitle.slice(0,300),turns:chosen,createdAt:new Date().toISOString()};
+  validateSeedDiscussion(value);return value;
+}
+/** A new direction drafted by the model after the reader's /方向 command. */
+export function validateDirectionDraft(value) {
+  researchObject(value,['title','question','interpretation','unknowns','scope','constraints','candidates','deferred','stage','nextAction','rationale']);
+  assert(text(value.title,300)&&value.title.trim()&&text(value.question)&&value.question.trim(),'研究方向需要标题和问题。');
+  for (const field of ['interpretation','unknowns','scope','constraints','candidates','deferred','rationale']) assert(text(value[field]));
+  assert(RESEARCH_STAGES.includes(value.stage),'研究阶段无效。');
+  validateNextAction(value.nextAction);
+  return value;
+}
 export function validateResearchState(value) {
-  researchObject(value, ['scope','constraints','candidates','deferred','decisions','appliedProposalIds'], ['artifacts','appliedProposals']);
+  researchObject(value, ['scope','constraints','candidates','deferred','decisions','appliedProposalIds'], ['artifacts','appliedProposals','seedDiscussion','stage','purpose','createdFromTurnId']);
+  if (value.seedDiscussion !== undefined) validateSeedDiscussion(value.seedDiscussion);
+  assert(value.stage === undefined || RESEARCH_STAGES.includes(value.stage), '研究阶段无效。');
+  // Accumulation items hold reading files for a learning goal rather than a research direction.
+  assert(value.purpose === undefined || value.purpose === 'accumulation', '探索用途无效。');
+  assert(value.createdFromTurnId === undefined || uuid(value.createdFromTurnId));
   for (const field of ['scope','constraints','candidates','deferred']) assert(text(value[field]));
   assert(Array.isArray(value.decisions) && value.decisions.length <= 200);
   value.decisions.forEach(validateResearchDecision);
@@ -74,6 +129,9 @@ export function researchSnapshotData(record) {
   const superseded=new Set(research.decisions.flatMap(d=>d.supersedes?[d.supersedes]:[]));
   const data={ schemaVersion:1, explorationId:record.id, recordRevision:record.recordRevision, title:record.title, question:record.question, interpretation:record.interpretation, unknowns:record.unknowns,
     scope:research.scope, constraints:research.constraints, candidates:research.candidates, deferred:research.deferred, decisions:research.decisions.filter(d=>!superseded.has(d.id)), evidence:[], nextAction:record.nextAction,
+    // Optional keys are added only when present so older records keep their exact snapshot hash.
+    ...(research.seedDiscussion ? {seedDiscussion:research.seedDiscussion} : {}),
+    ...(research.stage ? {stage:research.stage} : {}),
     omitted:{decisionIds:research.decisions.filter(d=>superseded.has(d.id)).map(d=>d.id),evidenceIds:record.evidence.map(e=>e.id),reason:'superseded-decisions-and-14000-byte-evidence-budget'} };
   // Preserve all effective decisions and explicit fields. Admit whole evidence
   // newest first; record every omission rather than silently shortening quotes.
@@ -85,7 +143,9 @@ export function researchSnapshotData(record) {
 }
 export async function createResearchSnapshot(record) { const data = researchSnapshotData(record); return {...data,snapshotSha256:await researchHash(data)}; }
 export function validateResearchSnapshot(value) {
-  researchObject(value, ['schemaVersion','explorationId','recordRevision','title',...RESEARCH_FIELDS,'decisions','evidence','nextAction','snapshotSha256'],['omitted']);
+  researchObject(value, ['schemaVersion','explorationId','recordRevision','title',...RESEARCH_FIELDS,'decisions','evidence','nextAction','snapshotSha256'],['omitted','seedDiscussion','stage']);
+  if(value.seedDiscussion!==undefined)validateSeedDiscussion(value.seedDiscussion);
+  assert(value.stage===undefined||RESEARCH_STAGES.includes(value.stage));
   assert(value.schemaVersion === 1 && uuid(value.explorationId) && Number.isSafeInteger(value.recordRevision) && value.recordRevision > 0 && hash(value.snapshotSha256));
   for (const field of ['title',...RESEARCH_FIELDS]) assert(text(value[field]));
   assert(Array.isArray(value.decisions) && value.decisions.length <= 200); value.decisions.forEach(validateResearchDecision);
@@ -102,7 +162,7 @@ export function validateResearchSnapshot(value) {
     if(e.provenance==='original-excerpt'){researchObject(e.source,['identity','locator','version']);assert(text(e.source.identity,4096)&&e.source.identity.trim()&&!/^(?:javascript|data|file):/i.test(e.source.identity)&&(!/^https?:/i.test(e.source.identity)||safeResearchUrl(e.source.identity))&&text(e.source.locator,600)&&(e.source.version===null||text(e.source.version,100)));}
   }
   assert(new Set(value.evidence.map(e=>e.id)).size===value.evidence.length);
-  if(value.nextAction!==null){researchObject(value.nextAction,['kind','description'],['target']);assert(['read-guide','check-concept','compare-evidence','search-literature'].includes(value.nextAction.kind)&&text(value.nextAction.description,2000)&&value.nextAction.description.trim());if(value.nextAction.target!==undefined)target(value.nextAction.target);if(value.nextAction.kind==='read-guide')assert(value.nextAction.target);}
+  validateNextAction(value.nextAction);
   if(value.omitted!==undefined){researchObject(value.omitted,['decisionIds','evidenceIds','reason']);assert(value.omitted.reason==='superseded-decisions-and-14000-byte-evidence-budget');for(const field of ['decisionIds','evidenceIds'])assert(Array.isArray(value.omitted[field])&&value.omitted[field].length<=200&&value.omitted[field].every(uuid)&&new Set(value.omitted[field]).size===value.omitted[field].length);assert(!value.omitted.evidenceIds.some(id=>value.evidence.some(e=>e.id===id))&&!value.omitted.decisionIds.some(id=>value.decisions.some(d=>d.id===id)));}
   return value;
 }
@@ -115,7 +175,13 @@ export function validateResearchProposal(value) {
   assert(uuid(value.id) && uuid(value.explorationId) && uuid(value.sourceTurnId) && Number.isSafeInteger(value.baseRecordRevision) && value.baseRecordRevision > 0 && hash(value.baseSnapshotSha256));
   assert(text(value.rationale) && Array.isArray(value.changes) && value.changes.length > 0 && value.changes.length <= 12);
   for (const change of value.changes) {
-    if (change.kind === 'set-field') { researchObject(change,['kind','field','value']); assert(RESEARCH_FIELDS.includes(change.field) && text(change.value)); }
+    if (change.kind === 'set-field') {
+      researchObject(change,['kind','field','value']); assert(PROPOSAL_FIELDS.includes(change.field) && text(change.value));
+      // The title remains a required personal-record field.
+      if (change.field === 'title') assert(text(change.value,300) && change.value.trim(), '探索标题需要 1–300 字。');
+      if (change.field === 'stage') assert(RESEARCH_STAGES.includes(change.value), '研究阶段无效。');
+    }
+    else if (change.kind === 'set-next-action') { researchObject(change,['kind','action']); validateNextAction(change.action); }
     else { researchObject(change,['kind','decision']); assert(change.kind === 'add-decision'); validateResearchDecision(change.decision); assert(change.decision.sourceTurnId === value.sourceTurnId); }
   }
   validateEvidenceRefs(value.evidenceRefs); return value;

@@ -2,6 +2,8 @@
 
 The subsequent [research assistant extension](RESEARCH-ASSISTANT.md) adds optional scope, constraints, candidates, deferred directions, source-backed decision history and embedded research documents to the same Exploration. Existing evidence and status meanings remain unchanged. Explicit topic-context permission enables research conversations; complete model proposals require revision-checked adoption. Research artifacts, frozen tasks and receipts use personal archive v3. See [contracts](RESEARCH-CONTRACTS.md).
 
+In the current version a research direction is normally created or updated in the reading conversation with `/方向`, and reading files are produced with `/选文` (see [对话指令](RESEARCH-ASSISTANT.md)). Manual creation needs only the reader's question (the title defaults to its opening; a reading excerpt, when present, is kept as guide evidence). Directions may carry a stage; reading-accumulation entries (`research.purpose = accumulation`) hold files for a learning goal. Record fields and their meanings below are unchanged; the full editor remains for manual maintenance.
+
 ## Purpose and public starting material
 
 Exploration is a first-release capability, not a future label. It connects concrete reading questions over time without pretending to select a thesis automatically. The platform can be useful before the reader has a settled direction.

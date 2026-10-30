@@ -57,7 +57,7 @@ test('existing exploration appears before editorial choices and its next action 
   await page.goto('/explore');
   const { explorationId } = await seedAccumulation(page);
   await expect(page.locator('.exploration-record-row')).toHaveCount(1);
-  const personal = await page.locator('.exploration-personal').boundingBox();
+  const personal = await page.locator('.explore-directions').boundingBox();
   const editorial = await page.locator('.exploration-editorial').boundingBox();
   expect(personal!.y).toBeLessThan(editorial!.y);
   await expect(page.locator('.exploration-record-row')).toContainText('1 条材料');
@@ -66,7 +66,7 @@ test('existing exploration appears before editorial choices and its next action 
   await page.locator('.exploration-record-row').click();
   const next = page.locator(`#exploration-next-${explorationId}`);
   await expect(next).toHaveAttribute('href', '/read/agent-survey/1#u01');
-  const nextBox = await page.locator('.exploration-next-reading').boundingBox();
+  const nextBox = await page.locator('.now-panel').boundingBox();
   const evidenceBox = await page.locator('.exploration-evidence').boundingBox();
   expect(nextBox!.y).toBeLessThan(evidenceBox!.y);
   await capture(page, 'exploration-detail-desktop');

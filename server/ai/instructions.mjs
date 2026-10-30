@@ -1,7 +1,7 @@
 export const LIMITS = Object.freeze({ contextChars: 40000, historyChars: 12000, messageChars: 130000, toolCalls: 6, rounds: 4, answerChars: 40000, upstreamBytes: 2 * 1024 * 1024 });
 
 const functionTool = (name, description, properties, required) => ({ type: 'function', function: { name, description, parameters: { type: 'object', properties, required, additionalProperties: false } } });
-export function availableTools(webSearch, research = false) {
+export function availableTools(webSearch, research = false, command = undefined) {
   const tools = [functionTool('search_library', '按关键词搜索本地已审核的压缩导读。返回有固定版本的章节节选，非原论文全文。', { query: { type: 'string', maxLength: 300 } }, ['query']),
     functionTool('read_section', '读取本地导读的一个精确章节。guideId/revision/unitId 必须来自已有上下文或搜索结果。', { guideId: { type: 'string' }, revision: { type: 'integer' }, unitId: { type: 'string' } }, ['guideId', 'revision', 'unitId']),
     functionTool('search_sources', '检索已明确导入的固定原文文本；具体数字、公式、图表或导读缺口优先使用。单篇请传 metadata.paperId；英语论文优先将问题改写为英语领域关键词，保留模型/数据集/图表编号，不能加入猜测答案。最多12个候选，按剩余预算返回节选并明确omittedCount；materials共享固定身份，结果material指向该表。补读时从表中取sourceRevisionId/parserRevision，从结果取sourceUnitId；证据不全可一次改写或按nextOffset补读。', { query: { type: 'string', maxLength: 300 }, paperId: { type: 'string' }, limit: { type: 'integer', minimum: 1, maximum: 12 } }, ['query']),
@@ -10,11 +10,25 @@ export function availableTools(webSearch, research = false) {
   if (research) tools.push(
     functionTool('search_topic_history', '用多个领域关键词或中文短语检索当前研究主题内的旧讨论；返回相关度排序的最多八条摘要及可继续读取的问答ID，预算不足声明遗漏。旧模型回答不是论文证据。', {query:{type:'string',maxLength:300}}, ['query']),
     functionTool('read_topic_turn', '回看当前主题内指定已完成问答及来源摘录；不得猜测其他主题的编号。', {turnId:{type:'string'}}, ['turnId']),
-    functionTool('propose_research_changes', '读者要求整理研究状态或保存决定时，提出受限修改草案，不直接保存。普通问答无需调用；不把假设写成已验证结果。citationIds只能来自本轮已读来源。', {
-      changes:{type:'array',minItems:1,maxItems:12,items:{anyOf:[{type:'object',properties:{kind:{const:'set-field'},field:{enum:['question','interpretation','unknowns','scope','constraints','candidates','deferred']},value:{type:'string',maxLength:12000}},required:['kind','field','value'],additionalProperties:false},{type:'object',properties:{kind:{const:'add-decision'},decision:{type:'object',properties:{kind:{enum:['interpretation','hypothesis','constraint','direction','next-step']},status:{enum:['adopted','deferred','rejected']},text:{type:'string'},rationale:{type:'string'},supersedes:{type:'string'}},required:['kind','status','text','rationale'],additionalProperties:false}},required:['kind','decision'],additionalProperties:false}]}},
+    functionTool('propose_research_changes', '提出研究记录的修改。读者输入 /方向 时界面会直接写入；其他时候是待读者采纳的草案，不能声称已保存。读者表达继续研究的兴趣、比较方向、作出取舍或要求整理时使用；普通概念答疑不调用。可改写标题、阶段、问题、解释、未知、范围、约束、候选、暂缓，设置下一步，或追加决定。只有读者在讨论中明确表达的选择才写成 adopted/rejected 决定，你的建议写进候选方向或 deferred 决定。不把假设写成已验证结果。citationIds只能来自本轮已读来源；下一步的导读位置只能来自本轮读取过的导读章节。', {
+      changes:{type:'array',minItems:1,maxItems:12,items:{anyOf:[{type:'object',properties:{kind:{const:'set-field'},field:{enum:['title','stage','question','interpretation','unknowns','scope','constraints','candidates','deferred']},value:{type:'string',maxLength:12000}},required:['kind','field','value'],additionalProperties:false},
+        {type:'object',properties:{kind:{const:'set-next-action'},action:{type:'object',properties:{kind:{enum:['read-guide','check-concept','compare-evidence','search-literature']},description:{type:'string',maxLength:2000},target:{type:'object',properties:{guideId:{type:'string'},revision:{type:'integer'},unitId:{type:'string'}},required:['guideId','revision','unitId'],additionalProperties:false}},required:['kind','description'],additionalProperties:false}},required:['kind','action'],additionalProperties:false},{type:'object',properties:{kind:{const:'add-decision'},decision:{type:'object',properties:{kind:{enum:['interpretation','hypothesis','constraint','direction','next-step']},status:{enum:['adopted','deferred','rejected']},text:{type:'string'},rationale:{type:'string'},supersedes:{type:'string'}},required:['kind','status','text','rationale'],additionalProperties:false}},required:['kind','decision'],additionalProperties:false}]}},
       rationale:{type:'string'},citationIds:{type:'array',items:{type:'string'},maxItems:40}},['changes','rationale','citationIds']));
+  if (command?.name === 'direction' && !research) {
+    const field = description => ({ type: 'string', maxLength: 12000, description });
+    tools.push(functionTool('create_research_direction', '读者输入 /方向 且讨论已能说清一个值得调查的问题时调用一次，建立研究方向；界面会按读者的指令直接保存。说不清时不要调用，改为说明缺什么。不编造读者的兴趣、资源或授权。', {
+      title:{type:'string',maxLength:300,description:'简短的方向名'}, question:field('核心问题'), interpretation:field('目前的认识及依据，标明文献、读者观点、推断或假设'),
+      candidates:field('候选方向：区别、依据和主要疑点'), unknowns:field('尚不确定之处'), deferred:field('暂缓的方向及原因，没有则留空'),
+      scope:field('读者确认过的范围，没有则留空'), constraints:field('读者确认过的约束，没有则留空'),
+      stage:{enum:['broaden','narrow','question','validate','write'],description:'broaden 拓宽了解 / narrow 收窄方向 / question 形成研究问题 / validate 准备验证 / write 准备写作'},
+      nextAction:{type:'object',properties:{kind:{enum:['read-guide','check-concept','compare-evidence','search-literature']},description:{type:'string',maxLength:2000},target:{type:'object',properties:{guideId:{type:'string'},revision:{type:'integer'},unitId:{type:'string'}},required:['guideId','revision','unitId'],additionalProperties:false}},required:['kind','description'],additionalProperties:false},
+      rationale:field('为什么现在可以建立这个方向') }, ['title','question','interpretation','candidates','unknowns','stage','rationale']));
+  }
   return tools;
 }
+
+// Sent only in research-topic conversations, so ordinary guide questions keep their budget.
+export const RESEARCH_GUIDANCE = `应用对研究主题会话的说明：研究主题会话面向一个长期过程：读者边读边问，你帮助判断接下来该找哪些领域、哪些类型的综述和论文，并随着阅读和讨论不断修正方向与探索路线，逐步走向某个领域的深入研究；不提前承诺新颖性或发表。读者常常只能提出局部问题、疑惑或粗略想法；从问题走到可调查的方向，是你和读者一起完成的工作，不要求读者先写好目标或规划。普通概念问题照常直接回答。读者表达继续研究的兴趣、比较方向或要求整理时：先用一两句话复述你理解的问题；说明已有材料能支持什么、不能支持什么；提出一至三个可能的方向或子问题，讲清区别、依据和主要疑点；只追问一两个会实质改变判断的缺口（例如真实兴趣、可用资源或比较对象），不要列一串问卷。讨论产生明确变化（问题改写、新的认识或候选方向、读者的取舍、值得记录的未知或下一步）时，调用 propose_research_changes 提出修改草案供读者采纳；兴趣、资源和授权不能代读者编造。方向判断值得记录时，可以提示读者输入 /方向 让你建立或更新研究方向；需要更多综述或论文时，可以提示输入 /选文 生成交给 Harness 的选文实施文件；不要强迫。`;
 
 export const SYSTEM_PROMPT = `你是 PaperDesk 的论文阅读助手，用中文清楚解释概念、机制、证据与限制。
 先直接回答读者的问题，再按需要补充原因、例子或推导。默认用简洁连贯的自然段；简单问题不套长模板，不重复材料状态和免责声明。解释难点时补必要前提，公式说明符号与直觉，只有问题需要时才展开技术细节。研究建议也按当前问题的大小展开，初步想法不必写成完整实验方案。

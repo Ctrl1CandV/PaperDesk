@@ -130,17 +130,16 @@ test('packet drafts survive dismissal and changing source options cannot erase a
 
 test('exploration dismissal retains only a draft and explicit discard removes it', async ({ page }) => {
   await page.goto('/explore');
-  await page.getByRole('button', { name: '创建自己的问题', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: '创建一个探索问题' });
-  await dialog.getByLabel('探索标题', { exact: true }).fill('合成测试：会话中的探索草稿');
-  await dialog.getByLabel('我想继续追问的问题', { exact: true }).fill('合成测试：这条问题还没有保存');
+  await page.getByRole('button', { name: '手动新建方向', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: '手动新建方向' });
+  await dialog.getByLabel('想弄清楚的问题', { exact: true }).fill('合成测试：这条问题还没有保存');
   await page.mouse.click(4, 4); await expect(dialog).not.toBeVisible();
   expect(await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.list('explorations'))).toEqual([]);
-  await page.getByRole('button', { name: '创建自己的问题', exact: true }).click();
-  await expect(dialog.getByLabel('探索标题', { exact: true })).toHaveValue('合成测试：会话中的探索草稿');
-  await dialog.getByRole('button', { name: '丢弃草稿', exact: true }).click();
-  await page.getByRole('button', { name: '创建自己的问题', exact: true }).click();
-  await expect(dialog.getByLabel('探索标题', { exact: true })).toHaveValue('');
+  await page.getByRole('button', { name: '手动新建方向', exact: true }).click();
+  await expect(dialog.getByLabel('想弄清楚的问题', { exact: true })).toHaveValue('合成测试：这条问题还没有保存');
+  await dialog.getByRole('button', { name: '取消', exact: true }).click();
+  await page.getByRole('button', { name: '手动新建方向', exact: true }).click();
+  await expect(dialog.getByLabel('想弄清楚的问题', { exact: true })).toHaveValue('');
 });
 
 test('restored packet choices wait for delayed notes before question changes can rebuild the preview', async ({ page }) => {

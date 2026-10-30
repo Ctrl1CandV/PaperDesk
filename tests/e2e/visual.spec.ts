@@ -16,23 +16,24 @@ async function bounded(page: Page) {
 
 test('dialog name and keyboard focus survive successive edits', async ({ page }) => {
   await page.goto('/explore');
-  await page.getByRole('button', { name: '创建自己的问题' }).click();
+  await page.getByRole('button', { name: '手动新建方向' }).click();
   const dialog = page.locator('dialog');
-  await expect(dialog).toHaveAccessibleName('创建一个探索问题');
-  await dialog.getByLabel('探索标题', { exact: true }).fill('合成测试问题');
-  await expect(dialog).toHaveAccessibleName('创建一个探索问题');
-  await dialog.getByRole('button', { name: '丢弃草稿' }).click();
-  await page.getByRole('button', { name: '创建自己的问题' }).click();
+  await expect(dialog).toHaveAccessibleName('手动新建方向');
+  await dialog.getByLabel('想弄清楚的问题', { exact: true }).fill('合成测试问题');
+  await expect(dialog).toHaveAccessibleName('手动新建方向');
+  await dialog.getByRole('button', { name: '取消' }).click();
+  await page.getByRole('button', { name: '手动新建方向' }).click();
+  await dialog.getByText('标题（可选，默认取问题开头）', { exact: true }).click();
   await dialog.getByLabel('探索标题', { exact: true }).fill('合成测试重新打开');
-  await expect(dialog).toHaveAccessibleName('创建一个探索问题');
-  await dialog.getByLabel('我想继续追问的问题', { exact: true }).fill('合成测试：如何回到材料？');
-  await expect(dialog).toHaveAccessibleName('创建一个探索问题');
+  await expect(dialog).toHaveAccessibleName('手动新建方向');
+  await dialog.getByLabel('想弄清楚的问题', { exact: true }).fill('合成测试：如何回到材料？');
+  await expect(dialog).toHaveAccessibleName('手动新建方向');
   for (let index = 0; index < 15; index++) {
     await page.keyboard.press('Tab');
     expect(await dialog.evaluate(node => node.contains(document.activeElement))).toBe(true);
   }
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('button', { name: '创建自己的问题' })).toBeFocused();
+  await expect(page.getByRole('button', { name: '手动新建方向' })).toBeFocused();
 });
 
 for (const id of ['agent-survey', 'instructgpt', 'helm']) {

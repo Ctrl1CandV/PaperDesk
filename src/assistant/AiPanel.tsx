@@ -8,6 +8,9 @@ import { createResearchSnapshot, researchSnapshotData } from '../../shared/resea
 import { ResearchProposals, ResearchSnapshotView } from './ResearchProposals';
 import { ResearchMaterialsPicker, emptyMaterialSelection, prepareSelectedMaterials, type MaterialSelection } from './ResearchMaterials';
 import { saveAnswerArtifact } from '../research/artifact-actions';
+import { BRIEF_PURPOSES, parseCommand, type ResearchCommand } from '../../shared/research-documents.mjs';
+import { applyCommandTurn, commandOutcome, readingProgress, type CommandOutcome } from '../research/commands';
+import { CommandMenu, CommandResult, commandHint, matchingOptions, type CommandOption } from './Commands';
 import { Dialog } from '../ui/Dialog';
 import { clearDraft, getDraft, keepDraft, useUnloadWarning } from '../ui/drafts';
 import { aiClient, AiApiError, getAiStatus, type AiConversation, type AiStatus, type AiTurn, type AskInput } from './api';
@@ -17,44 +20,69 @@ import './ai.css';
 
 type QuestionMaterial = { unitId: string; selection?: string };
 type SessionDraft = { question: string; conversationId?: string; webSearch: boolean; material?: QuestionMaterial; selectedMaterials?: MaterialSelection };
+export type TopicRequest = { explorationId: string; question?: string; notice?: string; nonce: number };
+/** A prepared question for a topic; applied once, after the panel is ready. */
+export type ResearchRequest = { explorationId: string; question: string; artifactIds?: string[]; nonce: number };
 const conversationSelections = new Map<string, string | undefined>();
+const handledTopicRequests = new Set<number>(), handledResearchRequests = new Set<number>();
 const errorText = (error: unknown) => error instanceof Error && error.message ? error.message : '操作未完成，请保留草稿并重试。';
 const suggestions = ['这一节的核心思路是什么？请结合文章解释。', '这里的结论依赖哪些条件，有什么局限？', '把文中的方法串起来，解释它们之间的关系。'];
 const suggestionLabels = ['解释这一节的核心思路', '梳理结论的条件与局限', '串起文中方法的关系'];
+const researchSuggestions = ['请帮我把这个问题想清楚：它背后可能有哪些值得调查的方向？已有材料能说明什么、还缺什么？', '比较目前能想到的几个方向：区别在哪里，各自有什么依据和主要疑点？', '当前判断还缺哪些证据？什么发现会改变我们的判断？'];
+const researchSuggestionLabels = ['把问题想清楚', '比较可能的方向', '检查依据与反例'];
 const timeLabel = (value: string) => Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }) : '';
 function PanelIcon({ kind }: { kind: 'new' | 'history' }) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind === 'new' ? <path d="M12 5v14M5 12h14" /> : <><path d="M3 11a9 9 0 1 1 2.7 7M3 4v7h7" /><path d="M12 7v5l3 2" /></>}</svg>;
 }
 
-type PanelProps = { guide?: Guide; unitId?: string; selection?: string; exploration?: Exploration; suggestedQuestion?: string; onClose?: () => void };
+type PanelProps = { guide?: Guide; unitId?: string; selection?: string; exploration?: Exploration; suggestedQuestion?: string; topicRequest?: TopicRequest; researchRequest?: ResearchRequest; onClose?: () => void };
 function readSession(key: string) { try { return sessionStorage.getItem(key) ?? ''; } catch { return ''; } }
 function writeSession(key: string, value: string) { try { sessionStorage.setItem(key, value); } catch { /* Session memory remains usable. */ } }
 export function AiPanel(props: PanelProps) {
   const [topicId, setTopicId] = useState(() => props.exploration?.id ?? readSession('paperdesk-ai-topic'));
   const [locked, setLocked] = useState(false);
+  const [suggestion, setSuggestion] = useState<string>();
+  const [pendingTopic, setPendingTopic] = useState<TopicRequest>();
+  const [shellNotice, setShellNotice] = useState('');
   const topics = useRecords('explorations');
+  // Reading-accumulation entries hold files for a learning goal; conversations link to directions.
+  const directions = topics.records.filter(item => item.research?.purpose !== 'accumulation');
+  function switchTopic(id: string, question?: string, notice = '') { setTopicId(id); writeSession('paperdesk-ai-topic', id); setSuggestion(question); setShellNotice(notice); }
+  useEffect(() => {
+    // Apply each request once, even if the panel is closed and reopened later.
+    const request = props.topicRequest;
+    if (!request || props.exploration || handledTopicRequests.has(request.nonce)) return;
+    handledTopicRequests.add(request.nonce); setPendingTopic(request);
+  }, [props.topicRequest?.nonce]);
+  // A notice about the last switch stays until the next question starts.
+  useEffect(() => { if (locked) setShellNotice(''); }, [locked]);
+  // Never switch away from a running answer; apply the reader's request once it settles.
+  useEffect(() => { if (pendingTopic && !locked) { switchTopic(pendingTopic.explorationId, pendingTopic.question, pendingTopic.notice); setPendingTopic(undefined); } }, [pendingTopic, locked]);
   const selected = useExploration(props.exploration?.id ?? topicId);
   const exploration = props.exploration ?? selected.record;
   const topicMissing = Boolean(!props.exploration && topicId && !selected.loading && !selected.record);
   const key = `${exploration ? `exploration:${exploration.id}:` : ''}${props.guide?.metadata.id}/${props.guide?.metadata.revision}`;
   return <div className="ai-research-shell">
-    {!props.exploration && <div className="ai-topic-picker"><label>当前关联探索<select aria-label="当前关联探索" disabled={locked || selected.loading} value={topicId} onChange={event => { setTopicId(event.target.value); writeSession('paperdesk-ai-topic', event.target.value); }}>
-      <option value="">仅讨论这篇导读</option>
-      {topicId && !topics.records.some(item => item.id === topicId) && <option value={topicId}>{exploration?.title ?? '正在读取已关联探索'}</option>}
-      {topics.records.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-    </select></label>{topics.hasMore && <button type="button" disabled={locked || topics.loading} onClick={() => void topics.loadMore()}>读取更多探索</button>}{topics.error && <p role="alert">{topics.error}</p>}</div>}
-    {topicMissing ? <p role="alert">关联探索当前不可用，请选择另一条探索或仅讨论导读。不会从旧会话恢复你的研究记录。</p> : topicId && !props.exploration && selected.loading ? <p role="status">正在读取探索…</p> : <AiPanelContent key={key} {...props} exploration={exploration} onBusyChange={setLocked} />}
+    {!props.exploration && <div className="ai-topic-picker"><label><span>方向</span><select aria-label="关联方向" title="关联后，提问会带上这个方向的记录；不关联则只讨论这篇导读" disabled={locked || selected.loading} value={topicId} onChange={event => switchTopic(event.target.value)}>
+      <option value="">不关联方向</option>
+      {topicId && !directions.some(item => item.id === topicId) && <option value={topicId}>{exploration?.title ?? '正在读取方向'}</option>}
+      {directions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+    </select></label>{topics.hasMore && <button type="button" disabled={locked || topics.loading} onClick={() => void topics.loadMore()}>更多</button>}{topics.error && <p role="alert">{topics.error}</p>}{pendingTopic && <p role="status">当前回答结束后切换方向。</p>}{shellNotice && <p role="status">{shellNotice}</p>}</div>}
+    {topicMissing ? <p role="alert">关联的方向当前不可用，请选择另一个方向或不关联。不会从旧会话恢复你的研究记录。</p> : topicId && !props.exploration && selected.loading ? <p role="status">正在读取方向…</p> : <AiPanelContent key={key} {...props} suggestedQuestion={props.suggestedQuestion ?? suggestion} exploration={exploration} onBusyChange={setLocked}
+      onDirectionCreated={props.exploration ? undefined : record => switchTopic(record.id, undefined, `已建立并关联方向《${record.title}》，之后的讨论会归入这个方向。`)} />}
   </div>;
 }
 
-function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuestion, onClose, onBusyChange }: PanelProps & { onBusyChange: (busy: boolean) => void }) {
+function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuestion, researchRequest, onClose, onBusyChange, onDirectionCreated }: PanelProps & { onBusyChange: (busy: boolean) => void; onDirectionCreated?: (record: Exploration) => void }) {
   const guideKey = exploration ? `exploration:${exploration.id}` : `${guide?.metadata.id}/${guide?.metadata.revision}`;
-  const [researchEnabled, setResearchEnabled] = useState(() => Boolean(exploration && readSession(`paperdesk-ai-consent:${exploration.id}`) === 'yes'));
   const draftKey = `ai:${guideKey}${exploration ? `:${guide?.metadata.id ?? 'topic'}/${guide?.metadata.revision ?? 0}` : ''}`;
   const [cached] = useState(() => getDraft<SessionDraft>(draftKey));
   const [question, setQuestion] = useState(cached?.question ?? '');
   const [material, setMaterial] = useState<QuestionMaterial | undefined>(cached?.material);
   const [selectedMaterials, setSelectedMaterials] = useState<MaterialSelection>(cached?.selectedMaterials ?? emptyMaterialSelection());
+  const [commandMenu, setCommandMenu] = useState(0), [menuDismissed, setMenuDismissed] = useState<string>();
+  const turnsRef = useRef<AiTurn[]>([]);
+  const [outcomes, setOutcomes] = useState<Record<string, CommandOutcome>>({});
   const [materialsPickerOpen, setMaterialsPickerOpen] = useState(false);
   const [webSearch, setWebSearch] = useState(cached?.webSearch ?? false);
   const [status, setStatus] = useState<AiStatus>();
@@ -102,15 +130,22 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     else if (suggestedQuestion) setNotice('现有问题草稿已保留。请先处理草稿，再带着结果继续讨论。');
   }, []);
   useEffect(() => {
-    const receive = (event: Event) => {
-      const detail = (event as CustomEvent<{ explorationId: string; question: string }>).detail;
-      if (detail?.explorationId !== exploration?.id || typeof detail.question !== 'string' || detail.question.length > 6000) return;
-      if (question || locked) { setNotice('现有问题草稿已保留。请先处理草稿，再带着结果继续讨论。'); return; }
-      editQuestion(detail.question); input.current?.scrollIntoView({ block: 'center' }); input.current?.focus();
-    };
-    window.addEventListener('paperdesk:research-question', receive);
-    return () => window.removeEventListener('paperdesk:research-question', receive);
-  }, [exploration?.id, question, locked]);
+    // The owning page keeps the request, so one prepared while the panel was busy or remounting is not lost.
+    const detail = researchRequest;
+    if (!detail || handledResearchRequests.has(detail.nonce)) return;
+    handledResearchRequests.add(detail.nonce);
+    if (detail.explorationId !== exploration?.id || typeof detail.question !== 'string' || detail.question.length > 6000) return;
+    if (question || locked) { setNotice('现有问题草稿已保留。请先处理草稿，再带着结果继续讨论。'); return; }
+    editQuestion(detail.question);
+    // A document chosen through its own “update” action is an explicit, still revocable selection.
+    const chosen = (exploration?.research?.artifacts ?? []).filter(item => detail.artifactIds?.includes(item.id) && !selectedMaterials.artifacts.some(value => value.id === item.id));
+    if (chosen.length) {
+      const artifacts = [...selectedMaterials.artifacts, ...chosen.map(item => structuredClone(item))].slice(-3);
+      setSelectedMaterials({ ...selectedMaterials, artifacts });
+      setNotice(`已选入《${chosen.map(item => item.title).join('》《')}》作为本轮参考，可在“选择笔记与研究文档”中撤销。`);
+    }
+    input.current?.scrollIntoView({ block: 'center' }); input.current?.focus();
+  }, [researchRequest?.nonce]);
 
   useEffect(() => {
     if (question || selectedMaterials.notes.length || selectedMaterials.artifacts.length) keepDraft(draftKey, { question, conversationId, webSearch, material, selectedMaterials } satisfies SessionDraft);
@@ -153,9 +188,16 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       window.removeEventListener('focus', onReturn); document.removeEventListener('visibilitychange', onReturn);
     };
   }, [settingsOpen, locked, connecting, loginPending]);
+  // Follow new content while the reader is at the end. The panel's own scrolling must not count as
+  // the reader leaving the end: content can grow between setting scrollTop and the scroll event.
+  const autoTop = useRef<number | undefined>(undefined);
+  const stickToBottom = () => { const node = messages.current; if (node) { node.scrollTop = node.scrollHeight; autoTop.current = node.scrollTop; } };
   useEffect(() => {
-    if (nearBottom.current && messages.current) messages.current.scrollTop = messages.current.scrollHeight;
-  }, [turns, phase]);
+    if (!nearBottom.current) return;
+    stickToBottom();
+    const frame = requestAnimationFrame(() => { if (nearBottom.current) stickToBottom(); });
+    return () => cancelAnimationFrame(frame);
+  }, [turns, phase, outcomes]);
 
   async function loadList(currentStatus: AiStatus) {
     const result = exploration ? await aiClient(currentStatus.csrfToken).researchConversations(exploration.id)
@@ -251,35 +293,49 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     finally { if (alive.current) setBusy(false); }
   }
   async function send() {
-    if (!ready || !status || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000 || exploration && !researchEnabled) return;
+    if (!ready || !status || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000) return;
     const text = question.trim();
-    let researchSnapshot, researchMaterials;
-    if (exploration) {
+    // A leading /方向 or /选文 is the reader's explicit request to create or save a result.
+    const parsed = parseCommand(text);
+    let command: ResearchCommand | undefined;
+    if (parsed?.command.name === 'direction') command = { name: 'direction' };
+    else if (parsed) {
+      const purpose = parsed.command.purpose ?? (exploration ? 'research' : 'accumulation');
+      if (purpose === 'research' && !exploration) { setError('推进类选文需要先关联方向：在上方选择方向，或先输入 /方向 建立。问题草稿已保留。'); return; }
+      command = { name: 'reading-brief', purpose };
+    }
+    let researchSnapshot, researchMaterials, progress;
+    if (exploration || command?.name === 'reading-brief') {
       setBusy(true);
       try {
-        const current = await personalStore.get('explorations', exploration.id);
-        if (!current) throw new Error('关联探索已不可用。问题草稿仍保留。');
-        researchSnapshot = await createResearchSnapshot(current);
-        researchMaterials = await prepareSelectedMaterials(exploration.id, selectedMaterials);
+        if (exploration) {
+          const current = await personalStore.get('explorations', exploration.id);
+          if (!current) throw new Error('关联的方向已不可用。问题草稿仍保留。');
+          researchSnapshot = await createResearchSnapshot(current);
+          researchMaterials = await prepareSelectedMaterials(exploration.id, selectedMaterials);
+        }
+        if (command?.name === 'reading-brief') progress = await readingProgress();
       } catch (reason) { setError(errorText(reason)); setBusy(false); return; }
       setBusy(false);
       if (!alive.current) return;
     }
     const base = { conversationId, ...(guide && unit ? { guideId: guide.metadata.id, revision: guide.metadata.revision,
       bodySha256: guide.metadata.bodySha256, unitId: unit.id, ...(questionSelection ? { selection: questionSelection } : {}) } : {}),
-      ...(exploration ? { conversationScope: { kind: 'exploration' as const, explorationId: exploration.id }, researchSnapshot, ...(researchMaterials ? { researchMaterials } : {}) } : {}), question: text,
+      ...(exploration ? { conversationScope: { kind: 'exploration' as const, explorationId: exploration.id }, researchSnapshot, ...(researchMaterials ? { researchMaterials } : {}) } : {}),
+      ...(command ? { command, ...(progress ? { readingProgress: progress } : {}) } : {}), question: text,
       webSearch: Boolean(webSearch && status.searchAvailable) };
     const previous = pendingRequest.current;
     const oldBase = previous ? (({ requestId: _id, ...rest }) => rest)(previous.input) : undefined;
     const request: AskInput = { ...base, requestId: previous && !previous.accepted && JSON.stringify(oldBase) === JSON.stringify(base) ? previous.input.requestId : crypto.randomUUID() };
     pendingRequest.current = { input: request, accepted: false };
     const abort = new AbortController(); controller.current = abort;
-    let localId = `pending-${request.requestId}`, acceptedId: string | undefined, completed = false;
+    let localId = `pending-${request.requestId}`, acceptedId: string | undefined, completed = false, finished: AiTurn | undefined;
     const optimistic: AiTurn = { id: localId, question: text, answer: '', status: 'running', sources: [], context: {
       guideId: request.guideId, revision: request.revision, unitId: request.unitId, selection: request.selection ?? '',
       scope: 'pending', webSearch: request.webSearch,
       researchSnapshot,
       ...(researchMaterials ? { researchMaterials } : {}),
+      ...(command ? { command } : {}),
     }, createdAt: new Date().toISOString() };
     setTurns(current => [...current.filter(turn => turn.id !== optimistic.id), optimistic]); setSending(true); setError(''); setNotice(''); setPhase('正在准备文章上下文'); nearBottom.current = true;
     const update = (change: (turn: AiTurn) => AiTurn) => {
@@ -301,7 +357,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
         }
         else if (event.type === 'delta') { update(turn => ({ ...turn, answer: turn.answer + event.text })); setPhase('正在组织回答'); }
         else if (event.type === 'replace') { update(turn => ({ ...turn, answer: event.text })); setPhase('正在组织回答'); }
-        else if (event.type === 'done') { update(() => event.turn); completed = event.turn.status === 'complete'; }
+        else if (event.type === 'done') { update(() => event.turn); completed = event.turn.status === 'complete'; finished = event.turn; }
         else if (event.type === 'error') {
           if (event.turn) update(() => event.turn!); else update(turn => ({ ...turn, status: 'error' }));
           setError(event.message);
@@ -325,6 +381,8 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
           if (alive.current) {
             if (completed) { setQuestion(''); setMaterial(undefined); clearDraft(draftKey); pendingRequest.current = undefined; }
             setSending(false); setPhase('');
+            // Keep the composer locked until the result is saved; a new direction switches the panel.
+            if (completed && finished?.context?.command) { setBusy(true); try { await runCommand(finished, acceptedId); } finally { if (alive.current) setBusy(false); } }
           }
         }
       }
@@ -335,18 +393,40 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     if (!value) setMaterial(undefined);
     setQuestion(value);
   }
+  turnsRef.current = turns;
+  async function runCommand(turn: AiTurn, owner = connectedId.current) {
+    setOutcomes(current => { const next = { ...current }; delete next[turn.id]; return next; });
+    try {
+      const linked = exploration ? await personalStore.get('explorations', exploration.id) : undefined;
+      const outcome = await applyCommandTurn(turn, { linked, conversation: turnsRef.current, conversationId: owner });
+      if (!alive.current) return;
+      setOutcomes(current => ({ ...current, [turn.id]: outcome }));
+      if (outcome.kind === 'direction-created') onDirectionCreated?.(outcome.record);
+    } catch (reason) {
+      if (!alive.current) return;
+      setOutcomes(current => ({ ...current, [turn.id]: { kind: 'pending' } }));
+      setError(`指令结果未能保存：${errorText(reason)} 可以点这一轮下方的“保存结果”重试。`);
+    }
+  }
+  // History shows what earlier commands produced, read from saved records without writing.
+  useEffect(() => {
+    let live = true;
+    const unknown = turns.filter(turn => turn.context?.command && turn.status === 'complete' && !turn.summaryOnly && !outcomes[turn.id]);
+    if (!unknown.length) return;
+    void Promise.all(unknown.map(async turn => [turn.id, await commandOutcome(turn, exploration).catch((): CommandOutcome => ({ kind: 'pending' }))] as const))
+      .then(entries => { if (live) setOutcomes(current => ({ ...Object.fromEntries(entries), ...current })); });
+    return () => { live = false; };
+  }, [turns, exploration?.recordRevision]);
+  const menuOptions = menuDismissed === question ? [] : matchingOptions(question, exploration);
+  function pickCommand(option: CommandOption) {
+    const value = `${option.token} `; editQuestion(value); setMenuDismissed(value); setCommandMenu(0); input.current?.focus();
+  }
+
   async function copy(answer: string) {
     try {
       if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable');
       await navigator.clipboard.writeText(answer); setNotice('已复制回答。');
     } catch { setCopyText(answer); }
-  }
-  async function saveDocument(turn: AiTurn) {
-    if (!exploration || locked || turn.status !== 'complete') return;
-    setBusy(true); setError('');
-    try { await saveAnswerArtifact(exploration.id, turn); setNotice('已保存为研究文档，可在探索页继续编辑。'); }
-    catch (reason) { setError(errorText(reason)); }
-    finally { if (alive.current) setBusy(false); }
   }
   async function remove() {
     if (!status || !conversationId || locked) return;
@@ -394,12 +474,12 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
   }
 
   return <aside className="ai-panel" aria-labelledby={headingId}>
-    <header className="ai-panel-heading"><h2 id={headingId}>{exploration ? '研究助手' : 'AI解读'}</h2>
+    <header className="ai-panel-heading"><h2 id={headingId}>AI解读</h2>
       <div className="ai-heading-actions"><button type="button" className="ai-icon-button" aria-label="开始新对话" title="新对话" disabled={locked || connecting} onClick={() => void chooseConversation('')}><PanelIcon kind="new" /></button><button type="button" className="ai-icon-button" aria-label="查看历史对话" title="历史对话" disabled={locked} onClick={() => { setHistoryOpen(true); setError(''); setNotice(''); }}><PanelIcon kind="history" /></button>{onClose && <button type="button" className="ai-icon-button" aria-label="收起 AI 解读" title="收起" onClick={onClose}>×</button>}</div>
     </header>
     <div className="ai-context">
-      {exploration && <div className="ai-research-context"><strong>{exploration.title}</strong><label><input type="checkbox" checked={researchEnabled} disabled={locked} onChange={event => { setResearchEnabled(event.target.checked); writeSession(`paperdesk-ai-consent:${exploration.id}`, event.target.checked ? 'yes' : 'no'); }} />随提问发送此探索的研究上下文</label><p>包括问题、解释、未知、约束、决定、证据与下一步。此选择在本次浏览器会话保留，同主题旧讨论会用于接续。其他探索不加入，未选笔记不直接附带；撤销选择不会清除已保存对话。模型切换及备用 API 使用同一份快照。</p><details><summary>预览当前研究上下文 · r{exploration.recordRevision}</summary><ResearchSnapshotView snapshot={researchSnapshotData(exploration)} /></details></div>}
-      {exploration && <button type="button" className="ai-inline-action" disabled={locked} onClick={() => setMaterialsPickerOpen(true)}>选择笔记与研究文档{selectedMaterials.notes.length || selectedMaterials.artifacts.length ? ` · 已选 ${selectedMaterials.notes.length} 条笔记、${selectedMaterials.artifacts.length} 份文档` : ' · 默认不发送'}</button>}
+      {exploration && <div className="ai-research-line">{!guide && <strong>{exploration.title}</strong>}<details className="ai-research-preview"><summary>方向记录 r{exploration.recordRevision}</summary><p>关联方向后，每次提问会带上这个方向的问题、认识、决定、材料和下一步，并参考同方向的旧讨论；其他方向和未选笔记不会发送。</p><ResearchSnapshotView snapshot={researchSnapshotData(exploration)} /></details>
+        <button type="button" className="ai-inline-action" disabled={locked} onClick={() => setMaterialsPickerOpen(true)}>{selectedMaterials.notes.length || selectedMaterials.artifacts.length ? `资料 · 已选 ${selectedMaterials.notes.length} 条笔记、${selectedMaterials.artifacts.length} 份文档` : '资料 · 默认不发送'}</button></div>}
       {unit && <>
       <button type="button" className="ai-material-trigger" onClick={() => setMaterialOpen(true)} aria-label="查看本次提问资料">
         <span><span className="ai-context-label">{sending ? '本次提问位置' : question ? '已固定提问位置' : '围绕这一节提问'}</span><span className="ai-context-current">{questionSelection ? '选文 · ' : ''}{unit.heading ?? '阅读起点'}</span></span><span className="ai-material-info">资料</span>
@@ -407,13 +487,13 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       {materialChanged && !sending && currentUnit && <button type="button" className="ai-material-change" disabled={locked} onClick={() => setMaterial({ unitId: currentUnit.id, selection })}>{selection ? '改用当前选文' : '改用当前阅读章节'} <span aria-hidden="true">↗</span></button>}
       </>}
     </div>
-    <div className="ai-messages" ref={messages} role="region" aria-label="AI 解读对话" tabIndex={0} onScroll={event => { const node = event.currentTarget; nearBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }}>
-      {exploration && !conversationId && conversations.length > 0 && !connecting && !connectionError && <div className="ai-service-state"><p>此主题已有讨论：{conversations[0].title}</p><button type="button" className="ai-inline-action" disabled={locked} onClick={() => void chooseConversation(conversations[0].id)}>继续最近研究对话</button><p>只恢复对话，当前问题草稿与资料选择保持不变。</p></div>}
+    <div className="ai-messages" ref={messages} role="region" aria-label="AI 解读对话" tabIndex={0} onScroll={event => { const node = event.currentTarget; if (autoTop.current !== undefined && Math.abs(node.scrollTop - autoTop.current) < 2) return; autoTop.current = undefined; nearBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }}>
+      {exploration && !conversationId && conversations.length > 0 && !connecting && !connectionError && <div className="ai-service-state"><p>这个方向已有讨论：{conversations[0].title}</p><button type="button" className="ai-inline-action" disabled={locked} onClick={() => void chooseConversation(conversations[0].id)}>继续最近的讨论</button><p>只恢复对话，当前问题草稿与资料选择保持不变。</p></div>}
       {connecting ? <p className="ai-service-state" role="status">正在连接…</p> : connectionError ? <div className="ai-service-state"><p>{connectionError}</p><button type="button" className="ai-inline-action" onClick={() => void connect()}>重试连接</button></div> : status && !status.configured ? <div className="ai-service-state"><p>{status.provider === 'chatgpt' ? '连接 ChatGPT 后即可提问。' : '连接 ChatGPT 订阅，或配置自己的 API。'}</p><button type="button" className="ai-inline-action" onClick={() => setSettingsOpen(true)}>打开 AI 设置</button></div> : null}
-      {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">{exploration ? '沿着同一个问题继续研究' : '从这篇导读继续追问'}</p><div className="ai-suggestions">{(exploration ? ['根据当前目标和约束，比较一至两个值得继续调查的方向。', '当前判断还缺哪些证据？什么观察会改变我们的判断？', '请整理这次研究讨论，提出可保存到探索的修改建议。'] : suggestions).map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => { editQuestion(value); input.current?.focus(); }}>{exploration ? ['比较下一步方向', '检查依据与反例', '整理研究记录'][index] : suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
+      {!turns.length && <div className="ai-empty"><p className="ai-empty-heading">{exploration ? `继续讨论《${exploration.title}》` : '从这篇导读继续追问'}</p><p className="ai-empty-copy">{exploration ? '说出新的疑惑或想法即可。讨论有了变化时输入 /方向 更新这个方向；需要更多论文时输入 /选文。' : '读到想深入的地方，可以输入 /方向 建立研究方向，或输入 /选文 让 Harness 补充综述和论文。'}</p><div className="ai-suggestions">{(exploration ? researchSuggestions : suggestions).map((value, index) => <button key={value} type="button" disabled={locked} onClick={() => { editQuestion(value); input.current?.focus(); }}>{exploration ? researchSuggestionLabels[index] : suggestionLabels[index]}<span aria-hidden="true">↗</span></button>)}</div></div>}
       {turnCursor && <button type="button" className="ai-inline-action" disabled={locked} onClick={() => void loadMore('turns')}>读取更早的问答</button>}
       {turns.map((turn, index) => <section className="ai-turn" key={turn.id} aria-label={`问题 ${index + 1}`}>
-        <div className="ai-question"><span className="ai-speaker">你的问题{turn.summaryOnly ? ' · 历史摘要' : ''}</span><p>{turn.question}</p>{!turn.summaryOnly && <TurnMaterial turn={turn} />}</div>
+        <div className="ai-question"><span className="ai-speaker">{turn.context?.command ? '指令' : '你的问题'}{turn.summaryOnly ? ' · 历史摘要' : ''}</span><p>{turn.question}</p>{!turn.summaryOnly && <TurnMaterial turn={turn} />}</div>
         <div className="ai-response"><div className="ai-response-label"><span>AI 解读</span>{turn.status !== 'complete' && <span className="ai-turn-state">{turn.status === 'running' ? '生成中' : turn.status === 'interrupted' ? '未完成' : '出错'}</span>}</div>
           <AnswerIdentity turn={turn} />
           {turn.context?.fallback?.reason === 'subscription_quota' && <p className="ai-fallback-notice">订阅或应用额度已达上限 · 本轮由 API 回答</p>}
@@ -421,7 +501,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
           {turn.summaryOnly ? <button type="button" className="ai-inline-action" disabled={locked} onClick={() => void readTurn(turn.id)}>读取完整问答与 {turn.sourceCount ?? 0} 条依据</button> : <><PreviousAnswer turn={turn} /><Sources sources={turn.sources} turnId={turn.id} /></>}
           {turn.answer && !turn.summaryOnly && <button type="button" className="ai-inline-action ai-copy" onClick={() => void copy(turn.answer)}>复制{turn.status === 'complete' ? '回答' : '已有内容'}</button>}
           {exploration && !turn.summaryOnly && <ResearchProposals turn={turn} exploration={exploration} disabled={locked} />}
-          {exploration && !turn.summaryOnly && turn.status === 'complete' && turn.answer && <button type="button" className="ai-inline-action" disabled={locked} onClick={() => void saveDocument(turn)}>保存为研究文档</button>}
+          {turn.context?.command && <CommandResult turn={turn} outcome={outcomes[turn.id]} disabled={locked} onRetry={() => void runCommand(turn)} />}
         </div>
       </section>)}
       {sending && <p className="ai-progress" role="status"><span aria-hidden="true" />{phase || '正在生成'}</p>}
@@ -432,10 +512,18 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       {notice && <p className="ai-notice" role="status">{notice}</p>}
       {loginPending && <p className="ai-notice" role="status">正在等待 ChatGPT 授权。完成或取消这次登录后即可发送，问题草稿仍保留。</p>}
       {selectionTooLong && <p className="ai-error" role="alert">选文超过 12,000 字符。请打开“资料”，选择“不附带选文”，或改用较短的当前选文；没有自动截断。</p>}
-      <div className="ai-input-surface"><label className="ai-visually-hidden" htmlFor={questionId}>向 AI 提问</label><textarea id={questionId} ref={input} rows={3} value={question} maxLength={6000} disabled={locked} placeholder={exploration ? '继续讨论研究问题、证据与下一步…' : '关于这篇文章，你想进一步理解什么？'} onChange={event => editQuestion(event.target.value)} onKeyDown={event => {
+      {menuOptions.length > 0 && <CommandMenu options={menuOptions} active={Math.min(commandMenu, menuOptions.length - 1)} onHover={setCommandMenu} onPick={pickCommand} />}
+      {commandHint(question, exploration) && <p className="ai-command-hint">{commandHint(question, exploration)}</p>}
+      <div className="ai-input-surface"><label className="ai-visually-hidden" htmlFor={questionId}>向 AI 提问</label><textarea id={questionId} ref={input} rows={3} value={question} maxLength={6000} disabled={locked} placeholder={exploration ? '继续讨论这个方向；输入 / 使用指令' : '关于这篇文章，你想进一步理解什么？输入 / 使用指令'} onChange={event => editQuestion(event.target.value)} onKeyDown={event => {
+        if (menuOptions.length && !event.nativeEvent.isComposing) {
+          const enabled = menuOptions.filter(option => !option.disabled);
+          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); setCommandMenu(index => (index + (event.key === 'ArrowDown' ? 1 : menuOptions.length - 1)) % menuOptions.length); return; }
+          if ((event.key === 'Enter' || event.key === 'Tab') && !event.shiftKey && enabled.length) { event.preventDefault(); const chosen = menuOptions[Math.min(commandMenu, menuOptions.length - 1)]; pickCommand(chosen.disabled ? enabled[0] : chosen); return; }
+          if (event.key === 'Escape') { event.preventDefault(); setMenuDismissed(question); return; }
+        }
         if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) { event.preventDefault(); void send(); }
       }} />
-      <div className="ai-composer-actions"><button type="button" className="ai-provider-trigger" disabled={locked} aria-label={`AI 设置：${providerLabel(status)}，${webSearch && status?.searchAvailable ? '联网已开启' : '联网关闭'}`} title="设置模型连接与联网查证" onClick={() => setSettingsOpen(true)}><span className={ready ? 'is-connected' : ''} aria-hidden="true" /><span>{providerLabel(status)}<span className="ai-provider-search">{webSearch && status?.searchAvailable ? ' · 联网' : ' · 不联网'}</span></span><span className="ai-provider-chevron" aria-hidden="true">⌄</span></button>{sending ? <button type="button" className="ai-send" onClick={() => controller.current?.abort()}>停止</button> : <button className="ai-send" type="submit" disabled={!ready || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000 || Boolean(exploration && !researchEnabled)}>发送 <span aria-hidden="true">↑</span></button>}</div></div>
+      <div className="ai-composer-actions"><button type="button" className="ai-provider-trigger" disabled={locked} aria-label={`AI 设置：${providerLabel(status)}，${webSearch && status?.searchAvailable ? '联网已开启' : '联网关闭'}`} title="设置模型连接与联网查证" onClick={() => setSettingsOpen(true)}><span className={ready ? 'is-connected' : ''} aria-hidden="true" /><span>{providerLabel(status)}<span className="ai-provider-search">{webSearch && status?.searchAvailable ? ' · 联网' : ' · 不联网'}</span></span><span className="ai-provider-chevron" aria-hidden="true">⌄</span></button>{sending ? <button type="button" className="ai-send" onClick={() => controller.current?.abort()}>停止</button> : <button className="ai-send" type="submit" disabled={!ready || locked || hasRunning || selectionTooLong || !question.trim() || question.length > 6000}>发送 <span aria-hidden="true">↑</span></button>}</div></div>
       {(sending || question.length > 5000) && <p className="ai-composer-hint">{sending ? '关闭会停止回答' : `${question.length} / 6000`}</p>}
     </form>
     {deleteOpen && <Dialog title="删除这段 AI 对话" className="ai-small-dialog" busy={busy} onClose={() => setDeleteOpen(false)}><p>将删除整段对话与引用，无法撤销。笔记与阅读记录会保留。</p><p>可先在“AI 对话备份”中导出。</p>{error && <p role="alert" className="ai-error">{error}</p>}<div className="form-actions"><button className="secondary-action" disabled={busy} onClick={() => setDeleteOpen(false)}>保留对话</button><button className="danger-action" disabled={busy} onClick={() => void remove()}>确认删除这段对话</button></div></Dialog>}

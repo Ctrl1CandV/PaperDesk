@@ -127,7 +127,7 @@ export async function answer({ config, content, prepared, request, turn, signal,
   // calls to this same turn; conservatively reserve one prior round per call.
   let calls = turn.context.toolEvents.length, toolRounds = Math.min(calls, LIMITS.rounds);
   const remainingRounds = LIMITS.rounds - toolRounds;
-  const allowedTools = config.toolsEnabled ? availableTools(request.webSearch && config.searchAvailable, Boolean(turn.context.researchSnapshot)) : [];
+  const allowedTools = config.toolsEnabled ? availableTools(request.webSearch && config.searchAvailable, Boolean(turn.context.researchSnapshot), turn.context.command) : [];
   for (let round = 0; round <= remainingRounds; round++) {
     signal.throwIfAborted();
     const tools = calls >= LIMITS.toolCalls || toolRounds >= LIMITS.rounds ? [] : allowedTools;
@@ -151,7 +151,7 @@ export async function answer({ config, content, prepared, request, turn, signal,
       checkPromptBudget({ messages, tools }, config, turn.context);
       let output; const started = performance.now();
       try {
-        output = name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes'].includes(name) ? prepared.runResearchTool(name,args) : content.runLocal(name, args, turn.sources, turn.context);
+        output = name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes','create_research_direction'].includes(name) ? prepared.runResearchTool(name,args) : content.runLocal(name, args, turn.sources, turn.context);
       } catch (error) {
         signal.throwIfAborted();
         if (name !== 'web_search' || !(error instanceof PublicError) || error.status !== 502) throw error;

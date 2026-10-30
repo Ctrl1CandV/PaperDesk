@@ -355,7 +355,7 @@ export async function answerWithChatGpt({ config, content, prepared, request, tu
   const input = assembleAssistantContext(prepared, request, turn);
   let calls = 0;
   const seenCalls = new Set();
-  const allowedTools = config.toolsEnabled ? availableTools(request.webSearch && config.searchAvailable, Boolean(turn.context.researchSnapshot)) : [];
+  const allowedTools = config.toolsEnabled ? availableTools(request.webSearch && config.searchAvailable, Boolean(turn.context.researchSnapshot), turn.context.command) : [];
   for (let round = 0; round <= LIMITS.rounds; round++) {
     signal?.throwIfAborted();
     const tools = calls >= LIMITS.toolCalls || round >= LIMITS.rounds ? [] : allowedTools;
@@ -386,7 +386,7 @@ export async function answerWithChatGpt({ config, content, prepared, request, tu
       else {
         emit({ type: 'status', text: call.name === 'web_search' ? '正在搜索公开网页' : call.name === 'read_section' ? '正在读取导读章节' : '正在检索本地书库' });
         try {
-          output = call.name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes'].includes(call.name) ? prepared.runResearchTool(call.name,args) : content.runLocal(call.name, args, turn.sources, turn.context);
+          output = call.name === 'web_search' ? await webSearch(args, config, turn.sources, signal, fetchImpl) : ['search_topic_history','read_topic_turn','propose_research_changes','create_research_direction'].includes(call.name) ? prepared.runResearchTool(call.name,args) : content.runLocal(call.name, args, turn.sources, turn.context);
         } catch (error) {
           signal?.throwIfAborted();
           if (call.name !== 'web_search' || !(error instanceof PublicError) || error.status !== 502) throw error;

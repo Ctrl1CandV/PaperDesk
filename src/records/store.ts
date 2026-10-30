@@ -1,7 +1,7 @@
 import type { ArchivePreview, Exploration, ExplorationDraft, GuideState, GuideTarget, ImportChoice, ImportConflict, ImportPreview, Note, NoteDraft, OriginalState, PersonalBackup, Preferences, RecordMap, RecordPage, RecordPageOptions, RecordStats, ResumeRecord, StoreName } from './types';
 import { byteLength, canonical, guideKey, MAX_BACKUP_BYTES, MAX_PERSONAL_BYTES, MAX_PERSONAL_RECORDS, originalKey, recordKey, validateBackup, validateRecord, verifyResearchRecord, ValidationError } from './validation';
 import { exportPersonalArchive, previewPersonalArchive, applyPersonalArchive, discardPersonalArchive, archiveConflicts } from './archive';
-import { createResearchSnapshot, emptyResearchState, validateResearchProposal, type ResearchProposal } from '../../shared/research-contract.mjs';
+import { createResearchSnapshot, emptyResearchState, validateResearchProposal, type ResearchProposal, type ResearchStage } from '../../shared/research-contract.mjs';
 
 export { guideKey, originalKey, validateBackup, ValidationError };
 export const DATABASE_NAME = 'paperdesk-personal-v1';
@@ -256,8 +256,11 @@ export class PersonalRecordStore {
       next.research ??= emptyResearchState();
       for (const change of proposal.changes) {
         if (change.kind === 'set-field') {
-          if (change.field === 'question' || change.field === 'interpretation' || change.field === 'unknowns') next[change.field] = change.value;
+          if (change.field === 'title' || change.field === 'question' || change.field === 'interpretation' || change.field === 'unknowns') next[change.field] = change.value;
+          else if (change.field === 'stage') next.research.stage = change.value as ResearchStage;
           else next.research[change.field] = change.value;
+        } else if (change.kind === 'set-next-action') {
+          next.nextAction = change.action ? structuredClone(change.action) : null;
         } else {
           if (next.research.decisions.some(item => item.id === change.decision.id)) throw new ValidationError('提案包含重复决定标识，未保存。');
           if (change.decision.supersedes && !next.research.decisions.some(item => item.id === change.decision.supersedes)) throw new ValidationError('提案要替代的决定不存在，未保存。');

@@ -7,7 +7,7 @@
 ```text
 npm test
 npm run build -- --logLevel warn
-npm run test:e2e -- tests/e2e/research-records.spec.ts tests/e2e/research-assistant.spec.ts tests/e2e/research-workspace.spec.ts --reporter=line
+npm run test:e2e -- tests/e2e/research-discussion.spec.ts tests/e2e/research-records.spec.ts tests/e2e/research-assistant.spec.ts tests/e2e/research-workspace.spec.ts tests/e2e/exploration.spec.ts --reporter=line
 ```
 
 Node 检查覆盖共享协议、主题隔离、版本冲突、备份与模型请求；构建覆盖内容和类型。浏览器只针对本次研究流程检查，不重复运行无关页面的完整测试集。测试使用明确标记的合成记录和模拟模型，不读取真实私人笔记。
@@ -18,6 +18,8 @@ Node 检查覆盖共享协议、主题隔离、版本冲突、备份与模型请
 | 持续讨论 | 同主题可恢复旧会话、读取相关历史；换论文或模型不串主题，不以旧回答覆盖当前决定。 |
 | 研究记录 | 完整回答可保存，提案经明确采纳后写入；旧版本、重复提交和并发修改不覆盖新状态。 |
 | 实施文件 | 从讨论整理并保存文档，下载包含正文、来源和缺口的文件；生成请求不自动发送、不虚构执行授权。 |
+| 对话指令 | `/方向` 在未关联时建立方向并带入起点节选、之后的讨论归入它，已关联时直接写入更新并保留审计；`/选文` 按目的保存为新文件，推进类必须有方向，信息不足时不保存；阅读标记只随 `/选文` 发送。 |
+| 探索页 | 方向卡片显示阶段、下一步与新入库；方向页给出阶段、现在可以做什么、相关论文、文件与积累；“继续讨论”打开同一对话。 |
 
 检查实际请求和保存内容，而不只检查按钮存在。发生相关失败时修复并复跑对应场景；无需为低影响文案或布局另建测试。检查桌面与模拟窄视口，说明所用视口，不把截图当作真机验收。
 

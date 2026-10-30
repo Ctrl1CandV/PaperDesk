@@ -150,6 +150,8 @@ export function createAiServer(dependencies) {
         if (!isId(guideId) || !isRevision(revision)) reject('请提供有效的文章与修订编号。');
         json(response, 200, store.listPage(guideId, revision, { cursor: url.searchParams.get('cursor'), limit: Number(url.searchParams.get('limit') ?? 50) })); return;
       }
+      const topic = /^\/api\/ai\/topics\/([^/]+)\/summary$/.exec(url.pathname);
+      if (topic && request.method === 'GET') { if (!isUuid(topic[1])) reject('研究主题编号无效。'); json(response, 200, store.topicSummary(topic[1])); return; }
       const match = /^\/api\/ai\/conversations\/([^/]+)$/.exec(url.pathname);
       if (match && ['GET', 'DELETE'].includes(request.method)) {
         const id = match[1];
@@ -301,6 +303,7 @@ export function createAiServer(dependencies) {
           // A proposal from the interrupted provider must not become adoptable
           // merely because the fallback finishes a different answer.
           if (replacement.context.researchProposals) replacement.context.researchProposals = [];
+          delete replacement.context.directionDraft;
           replacement.answer = '';
           store.save(replacement); turn = replacement; Object.defineProperty(prepared, 'runResearchTool', {value:researchToolsForTurn(store, turn),configurable:true}); persistedAt = Date.now();
           send({ type: 'reset', turn });

@@ -6,6 +6,8 @@ import { personalStore, guideKey, originalKey } from '../records/store';
 import type { GuideEvidence, GuideState, OriginalState, ReadingStatus, ResumeRecord } from '../records/types';
 import { NoteEditor } from '../notes/Notes';
 import { AddEvidenceDialog } from '../exploration/AddEvidenceDialog';
+import { rememberReaderTopic } from '../exploration/model';
+import type { TopicRequest } from '../assistant/AiPanel';
 import { PacketDialog, type ReadingContext } from '../handoff/PacketDialog';
 import { Dialog } from '../ui/Dialog';
 import { Markdown } from './Markdown';
@@ -57,6 +59,7 @@ export function Reader({ guide }: { guide: Guide }) {
   const [sidebarTools, setSidebarTools] = useState(() => window.matchMedia('(min-width: 801px) and (max-width: 1099px), (min-width: 1200px)').matches);
   const [assistantWide, setAssistantWide] = useState(() => window.matchMedia('(min-width:1100px)').matches);
   const [assistantOpen, setAssistantOpen] = useState(() => window.matchMedia('(min-width:1100px)').matches);
+  const [topicRequest, setTopicRequest] = useState<TopicRequest>();
   useEffect(() => {
     const media = window.matchMedia('(min-width:1100px)');
     const sidebarMedia = window.matchMedia('(min-width: 801px) and (max-width: 1099px), (min-width: 1200px)');
@@ -144,12 +147,16 @@ export function Reader({ guide }: { guide: Guide }) {
         <article className="prose" style={{ '--reading-size': `${fontSize}px` } as React.CSSProperties}>{guide.units.map(unit => <section id={unit.id} tabIndex={-1} key={unit.id} data-unit={unit.id}><Markdown guide={guide} markdown={unit.markdown} unitId={unit.id} onCitation={openCitation} /></section>)}</article>
         <footer className="reading-footer"><AppLink to="#orientation">回到阅读起点 ↑</AppLink><AppLink to="/explore">研究探索 →</AppLink></footer>
       </main>
-      {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={selection?.text} wide={assistantWide} onClose={() => setAssistantOpen(false)} />}
+      {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={selection?.text} wide={assistantWide} topicRequest={topicRequest} onClose={() => { setAssistantOpen(false); setTopicRequest(undefined); }} />}
     </div>
     {!sidebarTools && readingTools}
     {source && <SourceDialog selection={source} guide={guide} onClose={() => setSource(null)} />}
     {noteContext && <NoteEditor target={{ guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: noteContext.unitId }} quote={noteContext.text} onClose={() => setNoteContext(undefined)} />}
-    {evidence && <AddEvidenceDialog evidence={evidence} onClose={() => setEvidence(undefined)} />}
+    {evidence && <AddEvidenceDialog evidence={evidence} onClose={() => setEvidence(undefined)} onDiscuss={(record, question) => {
+      // Continue beside the article: the panel switches to this topic and waits for Send.
+      rememberReaderTopic(record.id);
+      setTopicRequest({ explorationId: record.id, question, nonce: Date.now() }); setAssistantOpen(true);
+    }} />}
     {packet && <PacketDialog reading={packet} onClose={() => setPacket(undefined)} />}
     {stateOpen && <Dialog title="阅读记录" className="reading-state-dialog" busy={saving} onClose={() => setStateOpen(false)}><p className="quiet-copy">选择后立即保存。</p><label className="field-label">本篇解读（导读修订 {guide.metadata.revision}）<select aria-label="导读阅读状态" value={guideState?.status ?? ''} disabled={saving} onChange={event => mark('guide', event.target.value as ReadingStatus)}><option value="" disabled>未记录</option>{statuses.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><label className="field-label">原论文（{guide.metadata.source.version ?? '版本未指定'}）<select aria-label="原论文阅读状态" value={originalState?.status ?? ''} disabled={saving} onChange={event => mark('original', event.target.value as ReadingStatus)}><option value="" disabled>未记录</option>{statuses.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>{stateMessage && <p role="status">{stateMessage}</p>}<AppLink to="/backup">备份与恢复个人积累 →</AppLink></Dialog>}
   </>;

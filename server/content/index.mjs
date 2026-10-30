@@ -105,6 +105,12 @@ export class ContentIndex {
     this.index.publish(generation, documents, ids);
     this.generation = generation;
   }
+  /** Public catalog of current guides for planning the next reading; no personal reading state. */
+  libraryOverview() {
+    const current = this.catalog?.currentRevisions ? Object.entries(this.catalog.currentRevisions).map(([id, revision]) => this.entries.get(`${id}/${revision}`)) : [...this.entries.values()];
+    return current.filter(Boolean).map(m => ({ guideId: m.id, revision: m.revision, type: m.type, paperTitle: m.paperTitle, guideTitle: m.orientation?.shortTitle ?? m.title,
+      source: m.source?.id ?? m.paperId, version: m.source?.version ?? null, topics: (m.orientation?.topics ?? []).map(topic => topic.label) }));
+  }
   get(id, revision) {
     const key = `${id}/${revision}`, cached = this.cache.get(key);
     if (cached) { this.cache.delete(key); this.cache.set(key, cached); return cached; }

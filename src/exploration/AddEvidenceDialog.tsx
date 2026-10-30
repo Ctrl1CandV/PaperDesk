@@ -1,45 +1,64 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Evidence, Exploration, GuideEvidence, GuideTarget } from '../records/types';
 import { Dialog } from '../ui/Dialog';
 import { clearDraft, getDraft, keepDraft, useUnloadWarning } from '../ui/drafts';
 import { EvidenceCard } from './EvidenceCard';
-import { ExplorationEditor, TargetSelect } from './ExplorationEditor';
-import { createExploration, statusLabels, useExplorations } from './model';
+import { TargetSelect } from './ExplorationEditor';
+import { QuickQuestionForm } from './QuickQuestion';
+import { statusLabels, useExplorations } from './model';
 import { SaveFeedback, useExplorationSave } from './SaveFeedback';
 import './exploration.css';
 
-export function AddEvidenceDialog({ evidence, onClose, onSaved }: {
+export function AddEvidenceDialog({ evidence, onClose, onSaved, onDiscuss }: {
   evidence: GuideEvidence; onClose: () => void; onSaved?: (record: Exploration) => void;
+  /** Continue in the reading assistant with this topic; a new question is prefilled. */
+  onDiscuss?: (record: Exploration, question?: string) => void;
 }) {
   const { records, loading, error, hasMore, loadMore } = useExplorations();
   const draftKey = `exploration:from-reading:${evidence.target.guideId}/${evidence.target.revision}/${evidence.target.unitId}:${evidence.text}`;
   const attachmentKey = `${draftKey}:attachment`;
-  const [selected, setSelected] = useState<Exploration | null>(() => getDraft<{selected: Exploration | null}>(attachmentKey)?.selected ?? null);
-  const [comment, setComment] = useState(() => getDraft<{comment: string}>(attachmentKey)?.comment ?? '');
-  const [initial] = useState(() => ({ ...createExploration(), evidence: [evidence] }));
+  const cached = getDraft<{selected: Exploration | null; comment: string}>(attachmentKey);
+  const [mode, setMode] = useState<'new' | 'existing'>(cached?.selected ? 'existing' : 'new');
+  const [selectedId, setSelectedId] = useState(cached?.selected?.id ?? '');
+  const selected = records.find(record => record.id === selectedId) ?? (cached?.selected?.id === selectedId ? cached.selected : null) ?? records[0] ?? null;
+  const [comment, setComment] = useState(cached?.comment ?? '');
   const [creatingBusy, setCreatingBusy] = useState(false);
+  const discuss = useRef(false);
   useUnloadWarning(Boolean(comment));
-  function completed(record: Exploration) { clearDraft(draftKey); clearDraft(attachmentKey); onSaved?.(record); onClose(); }
-  const state = useExplorationSave(completed);
+  function completed(record: Exploration, start = discuss.current) {
+    clearDraft(draftKey); clearDraft(attachmentKey); onSaved?.(record); onClose();
+    if (start) onDiscuss?.(record);
+  }
+  const state = useExplorationSave(record => completed(record));
   const discard = () => { clearDraft(draftKey); clearDraft(attachmentKey); onClose(); };
   const busy = state.busy || creatingBusy;
   return <Dialog title="加入探索" onClose={onClose} busy={busy} className="exploration-dialog reader-editor">
-    <p className="exploration-small">将选中的导读文字作为材料保留。它仍是导读摘录，不会被当成原文阅读或已验证的结论。</p>
-    <label className="exploration-destination">保存到<select aria-label="保存到哪个探索" value={selected?.id ?? ''} onChange={event => { const next = records.find(record => record.id === event.target.value) ?? null; setSelected(next); keepDraft(attachmentKey, { selected: next, comment }); state.clearError(); }} disabled={loading || busy}>
-      <option value="">创建新探索</option>{records.map(record => <option key={record.id} value={record.id}>{record.title} · {statusLabels[record.status]}</option>)}
-    </select></label>
-    {hasMore && <button className="text-action" disabled={loading || busy} onClick={() => void loadMore()}>载入更多可选探索</button>}
-    {error && <p className="exploration-missing" role="alert">暂时不能读取已有探索。仍可写下问题；保存失败时会保留草稿。</p>}
-    {selected ? <form className="exploration-form" onSubmit={event => { event.preventDefault(); void state.save({ ...selected, evidence: [...selected.evidence, { ...evidence, ...(comment ? { comment } : {}) }] }, selected.recordRevision); }}>
+    <p className="exploration-small">选中的导读文字会作为材料保留。它仍是导读摘录，不代表读过原文或已验证结论。</p>
+    <div className="quick-mode" role="radiogroup" aria-label="加入方式">
+      <label><input type="radio" name="evidence-destination" checked={mode === 'new'} disabled={busy} onChange={() => setMode('new')} />新建方向</label>
+      <label><input type="radio" name="evidence-destination" checked={mode === 'existing'} disabled={busy || !loading && !records.length} onChange={() => setMode('existing')} />加到已有方向{!loading && !records.length ? '（暂无）' : ''}</label>
+    </div>
+    {error && <p className="exploration-missing" role="alert">暂时不能读取已有探索。仍可写下新问题；保存失败时会保留草稿。</p>}
+    {mode === 'new' ? <QuickQuestionForm evidence={evidence} draftKey={draftKey} onCancel={onClose} onBusyChange={setCreatingBusy}
+      onCreated={(record, start) => { clearDraft(attachmentKey); onSaved?.(record); onClose(); if (start) onDiscuss?.(record, record.question); }} />
+    : <form className="exploration-form" onSubmit={event => {
+      event.preventDefault(); if (!selected) return;
+      discuss.current = ((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null)?.value === 'discuss';
+      void state.save({ ...selected, evidence: [...selected.evidence, { ...evidence, ...(comment ? { comment } : {}) }] }, selected.recordRevision);
+    }}>
       <fieldset className="exploration-form-body" disabled={state.busy}>
-      <div className="exploration-attachment-context"><h3>{selected.title}</h3><p>{selected.question}</p><p className="exploration-small">现有 {selected.evidence.length} 条材料会完整保留。</p></div>
       <EvidenceCard evidence={evidence} />
+      <label className="exploration-destination">保存到<select aria-label="保存到哪个探索" value={selected?.id ?? ''} onChange={event => { setSelectedId(event.target.value); keepDraft(attachmentKey, { selected: records.find(record => record.id === event.target.value) ?? null, comment }); state.clearError(); }} disabled={loading || busy}>
+        {records.map(record => <option key={record.id} value={record.id}>{record.title} · {statusLabels[record.status]}</option>)}
+      </select></label>
+      {hasMore && <button type="button" className="text-action" disabled={loading || busy} onClick={() => void loadMore()}>载入更多可选探索</button>}
+      {selected && <div className="exploration-attachment-context"><p>{selected.question}</p><p className="exploration-small">现有 {selected.evidence.length} 条材料会完整保留。</p></div>}
       <label>这条材料的批注（可选）<textarea aria-label="这条材料的批注（可选）" value={comment} onChange={event => { setComment(event.target.value); keepDraft(attachmentKey, { selected, comment: event.target.value }); state.clearError(); }} maxLength={12000} rows={3} /></label>
       <SaveFeedback state={state} />
-      <p className="exploration-small">收起后保留本次会话的选择与批注；尚未写入探索记录。</p>
-      <div className="exploration-form-actions"><button type="submit" className="primary-action" disabled={state.busy}>{state.busy ? '正在保存…' : '保存材料到此探索'}</button><button type="button" onClick={onClose} disabled={state.busy}>收起编辑（保留草稿）</button><button type="button" onClick={discard} disabled={state.busy}>丢弃草稿</button></div>
+      {onDiscuss && <p className="exploration-small">选择“保存并继续讨论”后，旁边的 AI 对话会关联这个方向；它的记录会随你之后发送的提问交给所选模型。</p>}
+      <div className="exploration-form-actions">{onDiscuss && <button type="submit" value="discuss" className="primary-action" disabled={state.busy || !selected}>保存并继续讨论</button>}<button type="submit" value="save" className={onDiscuss ? undefined : 'primary-action'} disabled={state.busy || !selected}>{state.busy ? '正在保存…' : '保存材料到此探索'}</button><button type="button" onClick={onClose} disabled={state.busy}>收起（保留草稿）</button>{comment && <button type="button" onClick={discard} disabled={state.busy}>丢弃草稿</button>}</div>
       </fieldset>
-    </form> : <ExplorationEditor key="new" initial={initial} expectedRevision={null} draftKey={draftKey} creating onSaved={completed} onCancel={onClose} onDiscard={discard} onBusyChange={setCreatingBusy} />}
+    </form>}
   </Dialog>;
 }
 

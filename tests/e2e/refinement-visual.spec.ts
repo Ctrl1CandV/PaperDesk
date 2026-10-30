@@ -30,6 +30,7 @@ test('current reading tools and next-reading panels remain readable at desktop a
   await page.setViewportSize({ width: 1280, height: 900 });
   const record = await page.evaluate(async () => (await import('/src/records/store.ts')).personalStore.saveExploration({ id: crypto.randomUUID(), title: '合成视觉检查：规划与行动', question: '合成测试：Agent 的规划如何与环境反馈连接？', origin: 'reader', status: 'exploring', interpretation: '', unknowns: '', nextAction: null, evidence: [] }, null));
   await page.goto(`/explore/questions/${record.id}`);
+  await page.getByText('更多：本库匹配与文档记录', { exact: true }).click();
   await page.getByRole('button', { name: '寻找下一步阅读', exact: true }).click();
   await page.getByLabel('补充主题词或阅读目标', { exact: true }).fill('Agent 规划');
   await page.getByRole('button', { name: '查找本库阅读', exact: true }).click();

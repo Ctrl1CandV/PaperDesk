@@ -3,9 +3,6 @@
 .ai-research-shell>.ai-panel{height:auto;flex:1;min-height:0}
 .ai-topic-picker{flex:none;padding:10px 22px 4px;background:var(--surface);font-size:12px;color:var(--muted)}
 .ai-topic-picker label{display:flex;align-items:center;gap:10px}.ai-topic-picker select{min-width:0;width:100%;max-width:100%;min-height:34px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:4px}
-.ai-research-context{font-size:12px;line-height:1.7;max-height:260px;overflow:auto;padding:4px 0 8px}
-.ai-research-context>strong{display:block;color:var(--ink);margin-bottom:7px;overflow-wrap:anywhere}
-.ai-research-context label{display:flex;gap:7px;align-items:flex-start}.ai-research-context input{flex:none;margin-top:5px}.ai-research-context p{color:var(--muted);margin:7px 0;white-space:pre-wrap}
 .ai-research-snapshot{overflow-wrap:anywhere;line-height:1.8}.ai-research-snapshot pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;max-height:240px;overflow:auto}.ai-research-snapshot p{white-space:pre-wrap}
 .ai-material-selected,.ai-material-options>div{padding:12px 0;border-top:1px solid var(--line)}.ai-material-options label{display:flex;gap:8px;align-items:flex-start;overflow-wrap:anywhere}.ai-material-options input[type=checkbox]{flex:none;margin-top:6px}.ai-material-options p,.ai-material-selected p,.ai-research-materials p{white-space:pre-wrap;overflow-wrap:anywhere}.ai-material-selected details,.ai-material-options details,.ai-research-materials details{margin:10px 0}.ai-research-materials pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;max-height:240px;overflow:auto}.ai-material-selected summary,.ai-material-options summary,.ai-research-materials summary{cursor:pointer;overflow-wrap:anywhere}
 .ai-research-proposal{border-top:1px solid var(--line);margin:14px 0;padding-top:12px;font-size:13px;line-height:1.8}.ai-research-proposal p{white-space:pre-wrap;overflow-wrap:anywhere}.ai-research-proposal h4{margin:12px 0 6px}.ai-research-proposal summary{cursor:pointer;color:var(--accent)}.ai-research-proposal blockquote{white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0;padding-left:12px;border-left:2px solid var(--line)}
@@ -214,3 +211,25 @@
 @media (width<=600px){.ai-panel{--ai-gap:16px}.ai-panel-heading{padding-top:10px;padding-bottom:6px}.ai-context{padding-bottom:9px}.ai-composer{padding-bottom:max(12px,env(safe-area-inset-bottom))}.ai-composer textarea{min-height:78px;font-size:16px}.ai-answer,.ai-question p{font-size:14px}.ai-context details[open]{max-height:min(440px,calc(100dvh - 340px));scrollbar-gutter:stable;scrollbar-color:var(--control-border) var(--surface-muted)}.ai-empty{padding-top:16px}.workspace-dialog.ai-small-dialog{padding:18px 20px}.ai-small-dialog .workspace-dialog-heading{top:-18px}.ai-field input,.ai-field select{font-size:16px}.ai-model-fields{grid-template-columns:minmax(0,1fr);gap:16px}.ai-fallback-setting{padding:14px}.ai-availability-action{gap:0 12px}.ai-availability-action>span{flex-basis:100%}.ai-settings-status{gap:8px;font-size:12px}.ai-api-heading{display:block}.ai-api-heading>span{display:block;margin-top:5px}}
 @media (height<=700px){.ai-panel-heading{padding-top:10px;padding-bottom:10px}.ai-context{padding-bottom:8px}.ai-composer textarea{min-height:55px;max-height:100px}}
 @media (width<=600px){.ai-provider-tabs button{padding:6px 5px;font-size:13px}.ai-connection-actions>.primary-action,.ai-connection-actions>.secondary-action{width:100%}.ai-availability{padding:14px 16px 8px}.ai-search-permission{padding:15px 16px}.ai-panel .ai-provider-trigger{font-size:11px}.ai-availability-action{gap:0 14px}.ai-fallback-setting{padding:18px 0 0}.ai-settings-dialog .workspace-dialog-heading{top:-18px}}
+.ai-empty-copy{color:var(--muted);font-size:13px;line-height:1.75;margin:0 0 12px}
+/* Direction link and record preview, kept to one line above the conversation. */
+.ai-topic-picker label{gap:8px}.ai-topic-picker label>span{flex:none;color:var(--muted)}
+.ai-research-line{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font-size:12.5px;line-height:1.7;padding:2px 0 6px}
+.ai-research-line>strong{flex-basis:100%;color:var(--ink);overflow-wrap:anywhere}
+.ai-research-preview>summary{cursor:pointer;color:var(--muted)}.ai-research-preview[open]{flex-basis:100%;max-height:260px;overflow:auto}
+.ai-research-preview p{color:var(--muted);margin:6px 0;white-space:pre-wrap}
+/* Commands typed in the composer and their results in the conversation. */
+.ai-command-menu{display:grid;margin:0 0 8px;padding:4px;border:1px solid var(--control-border);border-radius:10px;background:var(--surface);box-shadow:0 6px 20px var(--modal-shadow)}
+.ai-command-menu button{display:flex;align-items:flex-start;gap:12px;width:100%;padding:8px 10px;border:0;border-radius:7px;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
+.ai-command-menu button[aria-selected=true]:not(:disabled){background:var(--surface-selected)}
+.ai-command-menu button:disabled{cursor:default;opacity:.55}
+.ai-command-token{flex:none;min-width:5.5em;color:var(--accent);font:600 13px/1.7 var(--font-data)}
+.ai-command-text{display:grid;gap:1px;font-size:12.5px;line-height:1.6;color:var(--muted)}.ai-command-text strong{color:var(--ink);font-size:13.5px}
+.ai-command-hint{margin:0 0 8px;padding:6px 10px;border-left:3px solid var(--accent);border-radius:0 6px 6px 0;background:var(--surface-selected);color:var(--ink);font-size:12.5px;line-height:1.7}
+.ai-command-result{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;background:var(--surface);font-size:13px;line-height:1.75}
+.ai-command-result p{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
+.ai-command-result.is-quiet{border-left-color:var(--line-strong);color:var(--muted)}
+.ai-command-result.is-pending{border-left-color:var(--warning)}
+.ai-command-label{display:block;color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.3px}
+.ai-command-title{display:block;margin-top:2px;color:var(--heading);font-size:15px;font-weight:600;overflow-wrap:anywhere}
+.ai-command-actions{display:flex;flex-wrap:wrap;gap:4px 16px}

@@ -248,6 +248,18 @@ export class AiStore {
     return this.db.prepare(`SELECT t.summary_json,t.conversation_id,json_extract(t.data,'$.question')!=json_extract(t.summary_json,'$.question') AS question_truncated,json_extract(t.data,'$.answer')!=json_extract(t.summary_json,'$.answer') AS answer_truncated FROM turns t JOIN conversations c ON c.id=t.conversation_id WHERE c.exploration_id=? AND t.status='complete'${exclude} ORDER BY t.rowid DESC LIMIT 8`).all(explorationId,...excludeIds)
       .map(row=>({...JSON.parse(row.summary_json),conversationId:row.conversation_id,questionTruncated:!!row.question_truncated,answerTruncated:!!row.answer_truncated}));
   }
+  /** Counts and the guides read or cited while discussing one topic; no answer text. */
+  topicSummary(explorationId) {
+    if (!isUuid(explorationId)) reject('研究主题编号无效。');
+    const scoped = "FROM turns t JOIN conversations c ON c.id=t.conversation_id WHERE c.exploration_id=? AND t.status='complete'";
+    const totals = this.db.prepare(`SELECT COUNT(DISTINCT t.conversation_id) AS conversations, COUNT(*) AS turns, MAX(t.rowid) AS lastRow ${scoped}`).get(explorationId);
+    const lastTurnAt = totals.lastRow ? JSON.parse(this.db.prepare('SELECT summary_json FROM turns WHERE rowid = ?').get(totals.lastRow).summary_json).createdAt : null;
+    const guides = new Map();
+    const entry = (guideId, revision) => { const key = `${guideId}/${revision}`; if (!guides.has(key)) guides.set(key, { guideId, revision, askedWhileReading: 0, cited: 0 }); return guides.get(key); };
+    for (const row of this.db.prepare(`SELECT json_extract(t.data,'$.context.guideId') AS guideId, json_extract(t.data,'$.context.revision') AS revision, COUNT(*) AS count ${scoped} AND json_extract(t.data,'$.context.guideId') IS NOT NULL GROUP BY 1, 2`).all(explorationId)) entry(row.guideId, row.revision).askedWhileReading = row.count;
+    for (const row of this.db.prepare(`SELECT json_extract(s.value,'$.guideId') AS guideId, json_extract(s.value,'$.revision') AS revision, COUNT(DISTINCT t.id) AS count FROM turns t JOIN conversations c ON c.id=t.conversation_id, json_each(t.data,'$.sources') s WHERE c.exploration_id=? AND t.status='complete' AND json_extract(s.value,'$.kind')='guide' GROUP BY 1, 2`).all(explorationId)) entry(row.guideId, row.revision).cited = row.count;
+    return { conversations: totals.conversations, turns: totals.turns, lastTurnAt, guides: [...guides.values()].filter(item => isId(item.guideId) && isRevision(item.revision)) };
+  }
   readTopicTurn(explorationId, id) {
     const turn = this.turn(id);
     if (!turn || turn.status !== 'complete' || this.conversation(turn.conversationId)?.conversationScope?.explorationId !== explorationId) return null;

@@ -1,5 +1,7 @@
 import type { ResearchSnapshot, ResearchProposal } from '../../shared/research-contract.mjs';
 import type { ResearchMaterials } from '../../shared/research-materials.mjs';
+import type { ResearchCommand } from '../../shared/research-documents.mjs';
+import type { DirectionDraft } from '../../shared/research-contract.mjs';
 export type AiProvider = 'api' | 'chatgpt';
 export type ConversationScope = { kind: 'guide'; guideId: string; revision: number; bodySha256: string } | { kind: 'exploration'; explorationId: string };
 export interface ChatGptAvailability {
@@ -24,6 +26,8 @@ export interface ChatGptModels {
   models: { id: string; name: string; reasoningEfforts?: string[]; defaultReasoningEffort?: string | null }[];
   selectedModelId: string;
 }
+/** Read-only counts for one direction's discussions, with guides read or cited there. */
+export interface TopicSummary { conversations: number; turns: number; lastTurnAt: string | null; guides: { guideId: string; revision: number; askedWhileReading: number; cited: number }[] }
 export interface AiConversation { id: string; title: string; guideId?: string; revision?: number; conversationScope?: ConversationScope; updatedAt: string }
 export interface AiSource {
   id: string; kind: 'guide' | 'web' | 'original'; title: string; url?: string;
@@ -37,6 +41,9 @@ export interface AiContext {
   researchSnapshot?: ResearchSnapshot;
   researchProposals?: ResearchProposal[];
   researchMaterials?: ResearchMaterials;
+  command?: ResearchCommand;
+  directionDraft?: DirectionDraft;
+  readingProgress?: ReadingProgress[];
   topicHistory?: { explorationId: string; turns: { turnId: string; conversationId: string; question: string; answer: string; createdAt: string; questionTruncated: boolean; answerTruncated: boolean }[]; windowCount: number; omittedCount: number; omittedTurnIds: string[] };
   provider?: AiProvider;
   model?: string | null;
@@ -59,7 +66,9 @@ export interface AskInput {
   requestId: string; conversationId?: string; guideId?: string; revision?: number;
   bodySha256?: string; unitId?: string; selection?: string; question: string; webSearch: boolean;
   conversationScope?: ConversationScope; researchSnapshot?: ResearchSnapshot; researchMaterials?: ResearchMaterials;
+  command?: ResearchCommand; readingProgress?: ReadingProgress[];
 }
+export interface ReadingProgress { guideId: string; revision: number; guide: string | null; original: string | null }
 export type AiEvent =
   | { type: 'accepted'; conversationId: string; turnId: string }
   | { type: 'status'; text: string }
@@ -153,6 +162,7 @@ export function aiClient(token: string) {
     disconnectChatGpt: () => request<AiStatus>('/chatgpt/disconnect', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then(statusDefaults),
     provider: (provider: AiProvider) => request<AiStatus>('/provider', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ provider }) }).then(statusDefaults),
     conversations: (guideId: string, revision: number, signal?: AbortSignal, cursor?: string) => request<{ conversations: AiConversation[]; nextCursor?: string | null }>(`/conversations?${new URLSearchParams({ guideId, revision: String(revision), ...(cursor ? { cursor } : {}) })}`, { signal }),
+    topicSummary: (explorationId: string, signal?: AbortSignal) => request<TopicSummary>(`/topics/${explorationId}/summary`, { signal }),
     researchConversations: (explorationId: string, signal?: AbortSignal, cursor?: string) => request<{ conversations: AiConversation[]; nextCursor?: string | null }>(`/conversations?${new URLSearchParams({ explorationId, ...(cursor ? { cursor } : {}) })}`, { signal }),
     conversation: (id: string, signal?: AbortSignal, cursor?: string) => request<AiConversationDetail>(`/conversations/${encodeURIComponent(id)}?summary=1${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`, { signal }),
     turn: (id: string, signal?: AbortSignal) => request<{ turn: AiTurn }>(`/turns/${encodeURIComponent(id)}`, { signal }),

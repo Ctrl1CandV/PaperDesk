@@ -6,6 +6,16 @@
 
 ## 当前状态、快照与提案
 
+### 指令版新增（均为可选字段，旧记录与旧快照摘要不变）
+
+- 提问可带 `command`：`{name:'direction'}` 或 `{name:'reading-brief',purpose:'accumulation'|'research'}`；推进类选文必须关联方向。`/选文` 可同时带 `readingProgress`（当前导读的导读/原文阅读标记）。二者记录在该轮上下文并进入 AI 备份。指令要求、本库公开目录与阅读标记按 `shared/research-documents.mjs` 组装，只在带指令的那一轮发送并计入预算。
+- 未关联方向的 `/方向` 可调用 `create_research_direction`，校验后存为该轮 `context.directionDraft`；浏览器在回答完成后据此建立方向，并以 `research.createdFromTurnId` 防止重复。已关联方向的 `/方向` 使用 `propose_research_changes`，浏览器在回答完成后直接采纳第一份提案（同一审计路径）。
+- `PROPOSAL_FIELDS` = `title`、`stage` + 原七个字段；`stage` ∈ `broaden/narrow/question/validate/write`。提案类型 `set-next-action` 可设置或清除下一步，`read-guide` 的目标须来自本轮读取的导读章节。
+- `research.stage`、`research.purpose`（仅 `accumulation`，表示阅读积累而非研究方向）、`research.createdFromTurnId`、`research.seedDiscussion`（至多 3 轮、4 KiB 的起点讨论节选）。`stage` 与 `seedDiscussion` 存在时才进入快照；节选列出的问答可由 `read_topic_turn` 回看。
+- 文档类型 `reading-brief`（选文实施文件）可带 `purpose` 与 `librarySnapshot`（保存时本库导读 ID），用于显示之后新入库的导读。`research-line` 仍可读取，不再从界面生成。
+- `GET /api/ai/topics/:id/summary` 只读返回该方向的讨论段数、问答轮数、最近时间，以及讨论时在读和被引用的导读计数，不含回答正文。
+- 研究会话的工作说明只在研究主题请求中发送；工具事件 `argumentsJson` 上限为 40000 字符。
+
 `Exploration.research` 是可选扩展：`scope/constraints/candidates/deferred/decisions/appliedProposalIds/appliedProposals/artifacts`。旧探索不填充推断结果。决定包含类型、读者处理状态、理由、来源问答、证据、时间与可选替代关系。决定状态只表示工作选择。
 
 `conversationScope` 区分论文与探索；原 `context.scope` 仍描述实际材料范围。探索请求可以没有论文附件，也可携带原先的固定导读字段。每轮 `researchSnapshot` 有记录版本和 SHA-256，保存当时实际发出的研究字段。快照不含全部文档、回执或未选择笔记。

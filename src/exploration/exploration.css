@@ -153,7 +153,19 @@
   .exploration-form-actions { gap: 10px; }
   .exploration-form-actions .primary-action { flex: 1; }
 }
-.exploration-assistant{margin:32px 0;padding-top:24px;border-top:1px solid var(--line)}
-.exploration-assistant>.ai-research-shell{height:min(800px,90dvh);min-height:500px;margin-top:18px}
 .exploration-research-state{margin:28px 0;line-height:1.85;overflow-wrap:anywhere}
 .exploration-research-state p{white-space:pre-wrap}.exploration-research-state h2{font-size:18px;margin-top:22px}.exploration-research-state details{padding:12px 0;border-bottom:1px solid var(--line)}
+/* Starting from a question: one field, optional title, explicit discussion choice. */
+.quick-mode{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 18px;font-size:14px}
+.quick-mode label{display:flex;align-items:center;gap:8px;min-height:40px}
+.quick-mode input{width:16px;height:16px;accent-color:var(--accent)}
+.quick-question .exploration-evidence{padding:16px 18px}
+.quick-question .exploration-evidence blockquote{font-size:15px;margin:10px 0}
+.quick-seed{padding:12px 16px;border-radius:7px;background:var(--surface-muted);font-size:14px}
+.exploration-form .quick-check{display:flex;align-items:flex-start;gap:8px}
+.exploration-form .quick-check input{width:16px;height:16px;flex:none;margin-top:6px;accent-color:var(--accent)}
+.quick-seed summary{cursor:pointer;color:var(--accent);font-size:13px;min-height:36px}
+.quick-seed ol,.exploration-seed ol{margin:6px 0 0;padding-left:20px;font-size:13px;line-height:1.75}
+.quick-seed li p,.exploration-seed li p{margin:2px 0 10px;color:var(--muted)}
+.exploration-row-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px!important}
+.exploration-row-files span{padding:1px 8px;border-radius:6px;background:var(--surface-selected);color:var(--accent);font-size:12px}

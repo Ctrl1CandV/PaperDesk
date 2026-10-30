@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import type { Exploration, ExplorationDraft, GuideTarget, NextAction } from '../records/types';
 import { contentRepository } from '../content/repository';
 import { clearDraft, getDraft, keepDraft, useUnloadWarning } from '../ui/drafts';
-import { Dialog } from '../ui/Dialog';
 import { EvidenceCard } from './EvidenceCard';
 import { SaveFeedback, useExplorationSave } from './SaveFeedback';
 import { actionLabels, statusLabels, targetLabel } from './model';
 import { emptyResearchState } from '../../shared/research-contract.mjs';
-import type { ResearchDecision } from '../../shared/research-contract.mjs';
+import { RESEARCH_STAGES, type ResearchDecision, type ResearchStage } from '../../shared/research-contract.mjs';
+import { STAGE_LABELS } from '../../shared/research-documents.mjs';
 import { decisionKinds, decisionStatuses } from '../assistant/ResearchProposals';
 
 export interface CachedExplorationDraft { draft: ExplorationDraft; expectedRevision: number | null }
@@ -69,6 +69,10 @@ export function ExplorationEditor({ initial, expectedRevision, draftKey, onSaved
     <label>当前状态<select aria-label="当前状态" value={draft.status} onChange={event => update({ status: event.target.value as Exploration['status'] })}>
       {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
     </select></label>
+    {draft.research?.purpose !== 'accumulation' && <label>研究阶段<select aria-label="研究阶段" value={draft.research?.stage ?? ''} onChange={event => {
+      const { stage: _old, ...research } = draft.research ?? emptyResearchState();
+      update({ research: event.target.value ? { ...research, stage: event.target.value as ResearchStage } : research });
+    }}><option value="">尚未确定</option>{RESEARCH_STAGES.map(stage => <option key={stage} value={stage}>{STAGE_LABELS[stage].label}</option>)}</select></label>}
     {creating ? <details className="exploration-extra"><summary>补充解释与未知（可稍后再写）</summary>{extraFields}</details> : extraFields}
     <details className="exploration-extra"><summary>研究范围、约束与候选方向</summary>
       {([['scope', '研究范围'], ['constraints', '明确约束'], ['candidates', '候选方向'], ['deferred', '暂缓方向及原因']] as const).map(([field, label]) => <label key={field}>{label}<textarea aria-label={label} value={draft.research?.[field] ?? ''} rows={3} maxLength={12000} onChange={event => update({ research: { ...(draft.research ?? emptyResearchState()), [field]: event.target.value } })} /></label>)}
@@ -114,13 +118,4 @@ export function ExplorationEditor({ initial, expectedRevision, draftKey, onSaved
     <p className="exploration-small">只有点击保存才写入个人记录。收起后在本次会话中保留草稿；刷新或关闭浏览器前请保存，或复制草稿以便恢复。</p>
     </fieldset>
   </form>;
-}
-
-export function CreateExplorationDialog({ initial, draftKey, onSaved, onClose }: {
-  initial: ExplorationDraft; draftKey: string; onSaved: (record: Exploration) => void; onClose: () => void;
-}) {
-  const [busy, setBusy] = useState(false);
-  return <Dialog title="创建一个探索问题" onClose={onClose} busy={busy} className="exploration-dialog reader-editor">
-    <ExplorationEditor initial={initial} expectedRevision={null} draftKey={draftKey} onSaved={onSaved} onCancel={onClose} onBusyChange={setBusy} creating />
-  </Dialog>;
 }

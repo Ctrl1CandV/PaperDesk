@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
-import { canonicalResearch, validateResearchSnapshot, validateResearchProposal } from '../../shared/research-contract.mjs';
+import { canonicalResearch, validateResearchSnapshot, validateResearchProposal, validateDirectionDraft } from '../../shared/research-contract.mjs';
 import { validateResearchMaterials } from '../../shared/research-materials.mjs';
+import { validCommand } from '../../shared/research-documents.mjs';
 export class PublicError extends Error {
   constructor(message, status = 400) { super(message); this.status = status; }
 }
@@ -20,7 +21,7 @@ export function safeWebUrl(value) {
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password && value.length < 4096; } catch { return false; }
 }
 export function validateAsk(value) {
-  object(value, ['requestId', 'question', 'webSearch'], ['conversationId', 'selection', 'guideId', 'revision', 'bodySha256', 'unitId', 'conversationScope', 'researchSnapshot', 'researchMaterials']);
+  object(value, ['requestId', 'question', 'webSearch'], ['conversationId', 'selection', 'guideId', 'revision', 'bodySha256', 'unitId', 'conversationScope', 'researchSnapshot', 'researchMaterials', 'command', 'readingProgress']);
   const research = value.conversationScope?.kind === 'exploration';
   if (value.conversationScope !== undefined) validateConversationScope(value.conversationScope);
   if (research) {
@@ -29,6 +30,7 @@ export function validateAsk(value) {
     if (value.researchMaterials !== undefined) validateMaterials(value.researchMaterials, value.conversationScope.explorationId);
   } else if (value.researchSnapshot !== undefined) reject('研究快照需要关联研究主题。');
   if (!research && value.researchMaterials !== undefined) reject('已选研究材料需要关联研究主题。');
+  validateCommandFields(value, research);
   const attachment = value.guideId !== undefined || !research;
   if (value.conversationScope?.kind === 'guide' && ['guideId','revision','bodySha256'].some(key => value.conversationScope[key] !== value[key])) reject('会话与论文版本不一致。');
   if (!attachment && ['revision', 'bodySha256', 'unitId', 'selection'].some(key => value[key] !== undefined)) reject('论文附件身份不完整。');
@@ -37,6 +39,20 @@ export function validateAsk(value) {
     || !isText(value.question, 6000, 1) || !value.question.trim() || typeof value.webSearch !== 'boolean'
     || value.selection !== undefined && !isText(value.selection, 12000)) reject('问题或文章定位无效。问题最多 6000 字，选文最多 12000 字。');
   return value;
+}
+const readingStates = ['unread', 'reading', 'read', 'deferred'];
+// Commands are explicit reader requests; reading marks travel only with a /选文 request.
+function validateCommandFields(value, research) {
+  if (value.command !== undefined) {
+    if (!validCommand(value.command)) reject('指令无效。');
+    if (value.command.name === 'reading-brief' && value.command.purpose === 'research' && !research) reject('推进研究的选文需要先关联一个研究方向。');
+  }
+  if (value.readingProgress === undefined) return;
+  if (value.command?.name !== 'reading-brief' || !Array.isArray(value.readingProgress) || value.readingProgress.length > 300) reject('阅读标记只能随选文指令发送。');
+  for (const item of value.readingProgress) {
+    object(item, ['guideId', 'revision', 'guide', 'original']);
+    if (!isId(item.guideId) || !isRevision(item.revision) || ![item.guide, item.original].every(status => status === null || readingStates.includes(status))) reject('阅读标记无效。');
+  }
 }
 export function validateConversationScope(scope) {
   if (scope?.kind === 'exploration') { object(scope, ['kind', 'explorationId']); if (!isUuid(scope.explorationId)) reject('研究主题编号无效。'); }
@@ -108,7 +124,7 @@ export function validateSource(source) {
 // A snapshot is deliberately data-only. Metadata is preserved as a bounded JSON string,
 // so future content fields survive export without becoming executable configuration.
 export function validateContext(context) {
-  object(context, ['guideId', 'revision', 'bodySha256', 'unitId', 'selection', 'scope', 'metadataJson', 'historyTurnIds', 'webSearch', 'model', 'toolEvents'], ['provider', 'fallback', 'catalogDigest', 'indexGeneration', 'budget', 'conversationScope', 'researchSnapshot', 'researchProposals', 'researchMaterials', 'topicHistory']);
+  object(context, ['guideId', 'revision', 'bodySha256', 'unitId', 'selection', 'scope', 'metadataJson', 'historyTurnIds', 'webSearch', 'model', 'toolEvents'], ['provider', 'fallback', 'catalogDigest', 'indexGeneration', 'budget', 'conversationScope', 'researchSnapshot', 'researchProposals', 'researchMaterials', 'topicHistory', 'command', 'readingProgress', 'directionDraft']);
   if (context.conversationScope !== undefined) validateConversationScope(context.conversationScope);
   if (context.conversationScope?.kind === 'guide' && ['guideId','revision','bodySha256'].some(key=>context.conversationScope[key] !== context[key])) reject('上下文的导读范围不一致。');
   if (context.conversationScope?.kind === 'exploration') {
@@ -117,6 +133,11 @@ export function validateContext(context) {
     if (context.researchMaterials !== undefined) validateMaterials(context.researchMaterials,context.conversationScope.explorationId);
     if (context.topicHistory !== undefined) validateTopicHistory(context.topicHistory,context.conversationScope.explorationId);
   } else if (context.researchSnapshot !== undefined || context.researchProposals !== undefined || context.researchMaterials !== undefined || context.topicHistory !== undefined || context.scope === 'research') reject('研究上下文缺少主题。');
+  validateCommandFields(context, context.conversationScope?.kind === 'exploration');
+  if (context.directionDraft !== undefined) {
+    if (context.command?.name !== 'direction' || context.conversationScope?.kind === 'exploration') reject('只有建立方向的指令可以带方向草稿。');
+    try { validateDirectionDraft(context.directionDraft); } catch { reject('研究方向草稿无效。'); }
+  }
   if (context.researchProposals !== undefined) {
     if (!Array.isArray(context.researchProposals) || context.researchProposals.length > 6) reject('研究提案数量无效。');
     for (const proposal of context.researchProposals) {
@@ -152,7 +173,7 @@ export function validateContext(context) {
   try { const parsed = JSON.parse(context.metadataJson); if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw Error(); } catch { reject('文章元数据快照无效。'); }
   for (const event of context.toolEvents) {
     object(event, ['name', 'argumentsJson', 'resultJson'], ['elapsedMs']);
-    if (!['search_library', 'read_section', 'web_search', 'search_sources', 'read_source_unit', 'resolve_source_locator', 'search_topic_history', 'read_topic_turn', 'propose_research_changes'].includes(event.name) || !isText(event.argumentsJson, 2000) || !isText(event.resultJson, 40000)
+    if (!['search_library', 'read_section', 'web_search', 'search_sources', 'read_source_unit', 'resolve_source_locator', 'search_topic_history', 'read_topic_turn', 'propose_research_changes', 'create_research_direction'].includes(event.name) || !isText(event.argumentsJson, 40000) || !isText(event.resultJson, 40000)
       || event.elapsedMs !== undefined && (typeof event.elapsedMs !== 'number' || !Number.isFinite(event.elapsedMs) || event.elapsedMs < 0)) reject('工具快照无效。');
     try { JSON.parse(event.argumentsJson); JSON.parse(event.resultJson); } catch { reject('工具快照不是有效 JSON。'); }
   }

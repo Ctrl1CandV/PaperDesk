@@ -248,7 +248,7 @@ test('exploration packets include only explicitly chosen personal fields and pre
     }, null);
   });
   await page.goto(`/explore/questions/${seeded.id}`);
-  await page.getByRole('button', { name: '准备探索上下文', exact: true }).click();
+  await page.getByRole('button', { name: '复制上下文', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '复制探索上下文' }), preview = dialog.getByLabel('完整复制预览', { exact: true });
   await expect(preview).not.toHaveValue('');
   const initial = await preview.inputValue();

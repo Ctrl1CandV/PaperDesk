@@ -24,6 +24,8 @@ async function savedRecord(page: Page, id: string) {
   return page.evaluate(async recordId => (await import('/src/records/store.ts')).personalStore.get('explorations', recordId), id);
 }
 async function findFromQuestion(page: Page) {
+  // Local library matching now sits under the direction page's “更多” disclosure.
+  await page.getByText('更多：本库匹配与文档记录', { exact: true }).click();
   await page.getByRole('button', { name: '寻找下一步阅读', exact: true }).click();
   const panel = page.getByRole('region', { name: '寻找下一步阅读' });
   await expect(panel.getByRole('button', { name: '查找本库阅读', exact: true })).toBeDisabled();

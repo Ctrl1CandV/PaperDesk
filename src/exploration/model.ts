@@ -51,3 +51,15 @@ export function useExploration(id: string) {
   }, [id]);
   return { record, loading, error };
 }
+
+/** A short, editable title derived from the reader's own question. */
+export function titleFromQuestion(question: string) {
+  const line = question.trim().split(/\r?\n/, 1)[0].replace(/^[\s#>*-]+/, '').trim();
+  const chars = Array.from(line);
+  return chars.length > 40 ? `${chars.slice(0, 39).join('')}…` : line || '未命名问题';
+}
+// The linked direction is remembered per browser session only.
+function writeSession(key: string, value: string) { try { sessionStorage.setItem(key, value); } catch { /* Session memory remains optional. */ } }
+export function rememberReaderTopic(explorationId: string) { writeSession('paperdesk-ai-topic', explorationId); }
+/** A question waiting for the reader to press Send after navigating to its exploration. */
+export const pendingDiscussions = new Map<string, string>();

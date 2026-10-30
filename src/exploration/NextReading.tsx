@@ -25,6 +25,8 @@ export function NextReading({ record, onSaved }: { record: Exploration; onSaved:
   const [copied, setCopied] = useState(false);
   const [copying, setCopying] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+  // The trigger stays disabled until the save settles; focusing it earlier is silently ignored.
+  const returnFocus = useRef(false);
   const goal = useRef<HTMLTextAreaElement>(null);
   const guides = contentRepository.list().map(entry => entry.guide);
   const topics = [...new Map(guides.flatMap(guide => orientationFor(guide)?.topics ?? []).map(topic => [topic.id, topic])).values()];
@@ -32,9 +34,10 @@ export function NextReading({ record, onSaved }: { record: Exploration; onSaved:
   const candidateKey = candidates.map(item => `${item.target.guideId}/${item.target.revision}`).join('|');
   const state = useExplorationSave(value => {
     clearDraft(draftKey); setOpen(false); setDraft({ base: value, useQuestion: false, useUnknowns: false, goal: '', topicIds: [], brief: '', briefEdited: false });
-    onSaved(value); requestAnimationFrame(() => trigger.current?.focus({ preventScroll: true }));
+    onSaved(value); returnFocus.current = true;
   });
   const busy = state.busy || copying;
+  useEffect(() => { if (returnFocus.current && !busy) { returnFocus.current = false; trigger.current?.focus({ preventScroll: true }); } });
   function change(patch: Partial<ReadingDraft>) {
     const next = { ...draft, ...patch }; setDraft(next); keepDraft(draftKey, next); setCopied(false); setCopyMessage('');
   }
