@@ -44,9 +44,9 @@ test('current guides and local search have honest empty and fresh-home states', 
   await expect(page.locator('.resume-entry')).toHaveCount(0);
   const initial = await backup(page);
   expect(initial.resume).toEqual([]); expect(initial.guideStates).toEqual([]); expect(initial.originalStates).toEqual([]);
-  await expect(page.locator('.guide-entry').nth(0)).toHaveAttribute('id', 'choose-agent-survey');
-  await expect(page.locator('.guide-entry').nth(1)).toHaveAttribute('id', 'choose-instructgpt');
-  await expect(page.locator('.guide-entry').nth(2)).toHaveAttribute('id', 'choose-helm');
+  // The shelf follows the catalog's editorial ranks for current, non-archived guides.
+  const ranked = activeGuideIds.map(id => ({ id, rank: catalog.entries.find(entry => entry.guideId === id && entry.revision === catalog.currentRevisions[id as keyof typeof catalog.currentRevisions])!.recommendation.rank })).sort((a, b) => a.rank - b.rank);
+  for (const [index, { id }] of ranked.slice(0, 3).entries()) await expect(page.locator('.guide-entry').nth(index)).toHaveAttribute('id', `choose-${id}`);
   for (const id of activeGuideIds) await expect(page.locator(`#choose-${id}`)).toBeAttached();
   await page.getByRole('searchbox', { name: '查找文章' }).fill('合成测试不存在的关键词-9bf1');
   await expect(page.getByRole('heading', { name: '没有匹配的文章' })).toBeVisible();

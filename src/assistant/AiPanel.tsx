@@ -318,7 +318,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     let command: ResearchCommand | undefined;
     if (parsed?.command.name === 'direction') command = { name: 'direction' };
     else if (parsed?.command.name === 'notebook') {
-      if (!exploration) { setError('研究记录需要先关联方向：在上方选择方向，或先输入 /方向 建立。问题草稿已保留。'); return; }
+      if (!exploration) { setError('工作稿需要先关联方向：在上方选择方向，或先输入 /方向 建立。问题草稿已保留。'); return; }
       command = { name: 'notebook' };
     }
     else if (parsed) {

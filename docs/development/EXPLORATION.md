@@ -1,6 +1,6 @@
 # Research-direction exploration in v1
 
-The current direction page centers a living Markdown research notebook, editable by the reader and by the explicit `/记录` command. Saved versions preserve the process, questions, tentative ideas and stage results without automatically declaring completion. History restore appends a version; the current saved body accompanies deliberate direction-context requests. See [research notebook](RESEARCH-NOTEBOOK.md).
+The current direction page centers a Markdown working paper (研究工作稿), editable by the reader and by the explicit `/记录` command. It is shaped from the start like the opening file of a paper project (motivation, what is known, judgements and hypotheses, open questions, experiment ideas, stage log) and can be exported as that file. Saved versions preserve the process and stage results without automatically declaring completion; history restore appends a version; the current saved version accompanies deliberate direction-context requests. See [working paper](RESEARCH-NOTEBOOK.md).
 
 Explicit content-delivery batches can also associate pinned guides with a direction on browser startup. Public collection aliases establish an unambiguous initial binding; local receipts keep repeated delivery idempotent and preserve manual removal. This is a declared relationship, not keyword matching or inference from arrival time. See [reading assignments](../content/READING-ASSOCIATIONS.md).
 

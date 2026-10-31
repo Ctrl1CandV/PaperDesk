@@ -6,9 +6,9 @@
 
 ## 持续记录与内容交付增量
 
-`research.notebook` 是可选的 `{versions: NotebookVersion[]}`。每版含连续 `version`、Markdown `body`、`author: reader|assistant`、UTC `createdAt`；AI 版必须含 UUID `sourceTurnId`，读者恢复可含指向较早版本的 `restoredFrom`。最多 24000 字符/版、500 版，仍受 8 MiB 单探索限制。普通保存只可追加，不可改写/移除旧版；恢复是追加保存。当前版可作为 `snapshot.notebook` 进入快照，参与 hash；旧记录缺省时摘要不变。研究记录不是 `researchMaterials.artifacts`，不发送历史或编辑草稿。
+`research.notebook` 是可选的 `{versions: NotebookVersion[]}`。每版含连续 `version`、Markdown `body`、`author: reader|assistant`、UTC `createdAt`；AI 版必须含 UUID `sourceTurnId`，读者恢复可含指向较早版本的 `restoredFrom`，任一版可带可选 `note`（非空，不超过 300 字的改动说明；旧版本缺省）。最多 24000 字符/版、500 版，仍受 8 MiB 单探索限制。普通保存只可追加，不可改写/移除旧版；恢复是追加保存。当前版可作为 `snapshot.notebook` 进入快照，参与 hash；旧记录缺省时摘要不变。研究记录不是 `researchMaterials.artifacts`，不发送历史或编辑草稿。
 
-`command: {name:'notebook'}` 对应 `/记录`，要求已关联方向。工具 `update_research_notebook` 仅在该指令轮次开放，生成 `context.notebookDraft: {body,summary,baseNotebookVersion}`。浏览器在有效完整回答后检查原方向、探索修订、文档基础版本及快照摘要，再追加版本；同一 sourceTurnId 同正文无重复写入。冲突、删除、不同正文或无工具结果不会报告保存成功；草稿保留在回答中。两个 provider 与 AI 导出/导入使用相同契约。
+`command: {name:'notebook'}` 对应 `/记录`，要求已关联方向。工具 `update_research_notebook` 仅在该指令轮次开放，生成 `context.notebookDraft: {body,summary,baseNotebookVersion}`；保存时 `summary` 截为该版的 `note`。指令要求附带工作稿六个小节的约定（`WORKING_PAPER_SECTIONS`）、阶段记录行格式 `- YYYY-MM-DD · 内容` 和服务端当天日期。`/方向` 建立方向时，浏览器用同一 `directionDraft` 生成第一版工作稿，`author: assistant`、`sourceTurnId` 为该指令轮次。浏览器在有效完整回答后检查原方向、探索修订、文档基础版本及快照摘要，再追加版本；同一 sourceTurnId 同正文无重复写入。冲突、删除、不同正文或无工具结果不会报告保存成功；草稿保留在回答中。两个 provider 与 AI 导出/导入使用相同契约。
 
 `research.readingAssignmentReceipts?: {batchId,collectionId}[]` 保存明确内容交付的消费凭据，最多512项、batchId唯一。普通保存不能删除或改写旧凭据；它不进入模型快照。关联与凭据在同一浏览器事务保存，固定文献进入既有 `relatedGuides`。内容端 `catalog.readingAssignments` 版本保留与激活规则见[交付契约](../content/READING-ASSOCIATIONS.md)。
 

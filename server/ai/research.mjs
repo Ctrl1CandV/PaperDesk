@@ -120,6 +120,8 @@ export function prepareAssistantContext(content, request, previous, config, stor
 const statusText={unread:'未读',reading:'阅读中',read:'已读',deferred:'暂缓'};
 function commandRequirements(command, linked, library, readingProgress) {
   let text=commandInstruction(command,{linked});
+  // The stage log is dated; the model has no reliable clock of its own.
+  if (command.name==='notebook') text+=`\n\n今天的日期：${new Date().toISOString().slice(0,10)}。`;
   if (library?.length) text+=`\n\n本库现有导读目录（公开内容，当前修订；不代表读者已读原文或已经掌握）。规划时说明哪些已有材料可直接利用、哪些方面本库尚未覆盖：\n${library.map(item=>`- [${item.type==='survey'?'综述':'论文'}] ${item.paperTitle}（${item.source}${item.version?` ${item.version}`:''}；本库导读 ${item.guideId} r${item.revision}）主题：${item.topics.join('、')||'未标注'}`).join('\n')}`;
   // Reading marks are the reader's own records, sent only because /选文 asked for planning from them.
   const marked=(readingProgress??[]).filter(item=>item.guide||item.original);

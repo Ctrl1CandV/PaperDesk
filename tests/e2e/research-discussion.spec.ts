@@ -115,7 +115,7 @@ test('/选文 without a direction files a learning goal; a declined request save
   expect(await explorations(page)).toHaveLength(1);
   await page.goto('/explore');
   await expect(page.locator('.accumulation-row')).toContainText(goal.title);
-  await expect(page.locator('.direction-tile')).toHaveCount(0);
+  await expect(page.locator('.direction-row')).toHaveCount(0);
   expect(mock.unexpected).toEqual([]);
 });
 
@@ -126,9 +126,14 @@ test('the direction keeps research, related papers and reading files together, a
   await expect(page.getByLabel('关联方向', { exact: true })).not.toHaveValue('');
   await send(page, '/选文 推进');
   const [direction] = await explorations(page);
+  // /方向 also writes the first working paper from the same turn, shaped like a paper project.
+  expect(direction.research.notebook.versions).toHaveLength(1);
+  expect(direction.research.notebook.versions[0]).toMatchObject({ version: 1, author: 'assistant', note: '由 /方向 建立方向时整理' });
+  for (const text of ['## 问题与动机', '## 已知', 'SYNTHETIC 〔推断〕记忆与规划共同影响。', 'SYNTHETIC 评测是否可比', '建立方向：SYNTHETIC 长任务里 Agent 为什么偏离目标？']) expect(direction.research.notebook.versions[0].body).toContain(text);
   await page.goto('/explore');
-  const tile = page.locator('.direction-tile');
+  const tile = page.locator('.direction-row');
   await expect(tile).toContainText('收窄方向'); await expect(tile).toContainText('SYNTHETIC 长任务目标保持');
+  await expect(tile.locator('.row-progress')).toContainText('建立方向');
   await capture(page, 'explore-home-desktop');
   await tile.click();
   await expect(page.locator('.direction-kicker')).toContainText('收窄方向');
@@ -144,7 +149,9 @@ test('the direction keeps research, related papers and reading files together, a
   await page.locator('.direction-files').scrollIntoViewIfNeeded();
   await capture(page, 'direction-files-night');
   await page.getByRole('button', { name: /切换.*白/ }).click();
-  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('.brief-list').getByRole('button', { name: '下载' }).click()]);
+  await page.locator('.brief-row').first().click();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('.brief-dialog').getByRole('button', { name: '下载' }).click()]);
+  await page.keyboard.press('Escape');
   expect(download.suggestedFilename()).toBe(READING_BRIEF.fileName);
   await mkdir('.cache/test-results', { recursive: true });
   const saved = '.cache/test-results/synthetic-reading-brief.md'; await download.saveAs(saved);

@@ -14,7 +14,9 @@ import { actionLabels, pendingDiscussions, statusLabels, targetPath, useExplorat
 import { AiPanel, type ResearchRequest } from '../assistant/AiPanel';
 import { aiClient, getAiStatus, type TopicSummary } from '../assistant/api';
 import { decisionKinds, decisionStatuses } from '../assistant/ResearchProposals';
-import { emptyResearchState, type ResearchDecision } from '../../shared/research-contract.mjs';
+import { emptyResearchState, RESEARCH_STAGES, type ResearchDecision } from '../../shared/research-contract.mjs';
+import { currentNotebook, stageEntries } from '../../shared/research-notebook.mjs';
+import { addStageEntry, projectFileName, renderProjectStartFile } from '../research/notebook-actions';
 import type { ResearchArtifact } from '../../shared/research-artifacts.mjs';
 import { BRIEF_PURPOSES, checkDocumentSections, READING_BRIEF, STAGE_LABELS } from '../../shared/research-documents.mjs';
 import { documentFileName, renderResearchDocument } from '../research/artifact-actions';
@@ -88,6 +90,12 @@ export function ExplorationPage({ explorationId }: { explorationId: string; onHa
     refresh(); const unsubscribe = personalStore.subscribe(changed => { if (!changed || changed === 'notes') refresh(); });
     return () => { live = false; unsubscribe(); };
   }, [record]);
+  const paper = currentNotebook(record?.research?.notebook);
+  const [exportError, setExportError] = useState('');
+  function exportProject(value: Exploration) {
+    setExportError('');
+    try { download(projectFileName(value), renderProjectStartFile(value)); } catch (reason) { setExportError(errorText(reason)); }
+  }
   return <main id="main-content" className="exploration-page direction-page" aria-busy={loading || undefined}>
     <AppLink className="exploration-back" to="/explore">← 探索</AppLink>
     {loading ? <p role="status">正在读取这个方向…</p> : error ? <><h1>暂时无法读取</h1><p role="alert">浏览器本地存储暂不可用。先前的草稿仍留在当前页面会话中，请稍后重试。</p></> : !record ? <>
@@ -97,44 +105,93 @@ export function ExplorationPage({ explorationId }: { explorationId: string; onHa
       <AppLink to="/backup">打开备份与恢复</AppLink>
     </> : <>
       <header className="direction-header">
-        <div className="direction-kicker"><span>{accumulation ? '阅读积累' : '研究方向'}</span>{record.status !== 'exploring' && <span className={`exploration-status status-${record.status}`}>{statusLabels[record.status]}</span>}{record.research?.stage && <span>{STAGE_LABELS[record.research.stage].label}</span>}<span>更新于 {record.updatedAt.slice(0, 10)}</span></div>
-        <h1>{record.title}</h1>
-        <p className="direction-question">{record.question}</p>
+        <div className="direction-title">
+          <p className="direction-kicker"><span>{accumulation ? '阅读积累' : '研究方向'}</span>{record.research?.stage && <span>{STAGE_LABELS[record.research.stage].label}</span>}{record.status !== 'exploring' && <span className={`exploration-status status-${record.status}`}>{statusLabels[record.status]}</span>}{summary?.turns ? <span>{summary.turns} 轮讨论</span> : null}<span>更新于 {record.updatedAt.slice(0, 10)}</span></p>
+          <h1>{record.title}</h1>
+          <p className="direction-question">{record.question}</p>
+        </div>
         {!editing && <div className="direction-actions">
           <button type="button" className="primary-action" onClick={() => discuss()}>继续讨论</button>
-          <button type="button" className="exploration-secondary" onClick={() => { setEditing(true); setSaved(false); }}>编辑方向</button>
+          <button type="button" className="direction-edit" onClick={() => { setEditing(true); setSaved(false); }}>编辑方向</button>
+          <MoreMenu items={[...(paper ? [{ label: '导出项目起始文件', onSelect: () => exportProject(record) }] : []), { label: '添加原文摘录或观察', onSelect: () => setAdding(true) }]} />
         </div>}
         {saved && <p className="exploration-saved" role="status">已保存到这个浏览器。</p>}
+        {exportError && <p className="exploration-missing" role="alert">{exportError}</p>}
       </header>
-      {editing ? <section className="exploration-edit-panel"><h2>编辑方向</h2><p className="exploration-small">修改方向的问题、范围和状态。讨论中形成的变化，也可以在对话里输入 /方向 让 AI 写入。</p><ExplorationEditor initial={record} expectedRevision={record.recordRevision} draftKey={draftKey} onSaved={completed} onCancel={() => setEditing(false)} /></section> : <>
-        <div className="direction-grid">
+      {editing ? <section className="exploration-edit-panel"><h2>编辑方向</h2><p className="exploration-small">修改方向的标题、问题、阶段和状态。工作稿的内容在工作稿里直接编辑。</p><ExplorationEditor initial={record} expectedRevision={record.recordRevision} draftKey={draftKey} onSaved={completed} onCancel={() => setEditing(false)} /></section> : <>
+        <div className="direction-layout">
           <div className="direction-main">
-            <ResearchNotebook key={record.id} record={record} onDiscuss={question => discuss(question)} />
-            {!accumulation && <details className="direction-overview-fold" open={overviewOpen} onToggle={event => { const open = event.currentTarget.open; setOverviewOpen(open); if (open) expandedOverviews.add(explorationId); else expandedOverviews.delete(explorationId); }}><summary>方向概况与决定</summary><Overview record={record} /></details>}
+            {accumulation ? <Files record={record} onDiscuss={discuss} /> : <ResearchNotebook key={record.id} record={record} onDiscuss={question => discuss(question)} />}
+            <Materials record={record} noteIds={noteIds} />
             {record.seedRef && <details className="exploration-origin"><summary>来自编辑起点的改写 · 第 {record.seedRef.revision} 版</summary>
               {lens ? <p>{lens.title}</p> : <p className="exploration-missing">原先的编辑起点当前不可用。已保存的问题和材料仍然保留。</p>}
               <p className="exploration-small">{seed?.evidenceBoundary ?? '编辑起点提供阅读背景，不证明研究空白或个人构想有效。'}</p>
             </details>}
-            <section className="direction-section" aria-labelledby="accumulated-heading">
-              <div className="direction-section-heading"><h2 id="accumulated-heading">研究过程与材料</h2><button type="button" className="text-action" onClick={() => setAdding(true)}>添加原文摘录或观察</button></div>
-              {!accumulation && <DiscussionLine summary={summary} onDiscuss={() => discuss()} />}
-              {record.research?.seedDiscussion && <details className="exploration-seed"><summary>起点讨论 · 来自《{record.research.seedDiscussion.guideTitle}》的 {record.research.seedDiscussion.turns.length} 轮问答节选</summary><p className="exploration-small">建立方向时带入的模型回答节选，不是论文证据。</p><ol>{record.research.seedDiscussion.turns.map(turn => <li key={turn.turnId}><strong>{turn.question}</strong><p>{turn.answer}{turn.answerTruncated ? '…' : ''}</p></li>)}</ol></details>}
-              {(record.research?.artifacts ?? []).filter(item => item.kind !== 'reading-brief').map(item => <details className="direction-saved-document" key={item.id}><summary>{item.title}</summary><div className="brief-preview">{item.body}</div></details>)}
-              {record.evidence.length ? <div className="exploration-evidence-list">{record.evidence.map(evidence => <EvidenceCard key={evidence.id} evidence={evidence} noteExists={evidence.relatedNoteId && noteIds ? noteIds.has(evidence.relatedNoteId) : undefined} />)}</div>
-                : <p className="exploration-small">还没有摘录。阅读时选中文字点“加入探索”，就会作为材料留在这里。</p>}
-            </section>
           </div>
-          <aside className="direction-side">
+          <aside className="direction-panel" aria-label="方向信息">
+            {!accumulation && <StagePanel record={record} />}
+            {!accumulation && <StageLog key={record.id} record={record} />}
             <RelatedPapers record={record} summary={summary} />
+            {!accumulation && <Files record={record} onDiscuss={discuss} compact />}
+            {!accumulation && <details className="direction-overview-fold" open={overviewOpen} onToggle={event => { const open = event.currentTarget.open; setOverviewOpen(open); if (open) expandedOverviews.add(explorationId); else expandedOverviews.delete(explorationId); }}><summary>方向概况与决定</summary><Overview record={record} /></details>}
           </aside>
         </div>
-        <Files record={record} onDiscuss={discuss} />
-        <p className="exploration-record-footer">阶段与状态由你确认；这些材料、整理与文件不代表原文已读、结论已验证或研究空白已成立。</p>
+        <p className="exploration-record-footer">阶段与状态由你确认；工作稿、材料和文件不代表原文已读、结论已验证或研究空白已成立。</p>
       </>}
       {adding && <ManualEvidenceDialog record={record} onClose={() => setAdding(false)} onSaved={completed} />}
       {conversation && <ConversationDrawer record={record} request={conversation.request} suggestedQuestion={handoff} onClose={() => { setConversation(undefined); setHandoff(undefined); }} />}
     </>}
   </main>;
+}
+
+/** Where the direction stands and the one step already decided. */
+function StagePanel({ record }: { record: Exploration }) {
+  const stage = record.research?.stage, at = stage ? RESEARCH_STAGES.indexOf(stage) : -1;
+  return <section className="panel-section" aria-labelledby="stage-heading">
+    <h2 id="stage-heading">阶段</h2>
+    <div className="stage-meter" role="img" aria-label={stage ? `${STAGE_LABELS[stage].label}，第 ${at + 1} / ${RESEARCH_STAGES.length} 步` : '阶段未定'}>{RESEARCH_STAGES.map((item, index) => <i key={item} className={index <= at ? 'is-on' : ''} />)}</div>
+    {stage ? <p className="stage-name"><strong>{STAGE_LABELS[stage].label}</strong>{STAGE_LABELS[stage].doing}</p> : <p className="exploration-small">阶段未定。可以在“编辑方向”里选择，或在讨论中输入 /方向。</p>}
+    {record.nextAction && <div className="direction-next"><span>下一步 · {actionLabels[record.nextAction.kind]}</span><p>{record.nextAction.description}</p>{record.nextAction.target && <AppLink id={`exploration-next-${record.id}`} to={targetPath(record.nextAction.target)}>去阅读 →</AppLink>}</div>}
+  </section>;
+}
+
+/** The working paper's stage log, newest first, with a one-line way to add to it. */
+function StageLog({ record }: { record: Exploration }) {
+  const entries = stageEntries(currentNotebook(record.research?.notebook)?.body);
+  const [text, setText] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState(''), [done, setDone] = useState('');
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (busy || !text.trim()) return;
+    setBusy(true); setError(''); setDone('');
+    try { const result = await addStageEntry(record, text.trim()); setText(''); setDone(`已记入工作稿 · 第 ${result.version.version} 版`); }
+    catch (reason) { setError(`${errorText(reason)} 这句话仍保留在输入框里。`); }
+    finally { setBusy(false); }
+  }
+  return <section className="panel-section stage-log" aria-labelledby="log-heading">
+    <h2 id="log-heading">阶段记录{entries.length > 0 && <span className="direction-count">{entries.length}</span>}</h2>
+    {entries.length ? <ol>{[...entries].reverse().slice(0, 5).map((entry, index) => <li key={`${entry.date}-${index}`}><time dateTime={entry.date}>{entry.date.slice(5)}</time><span>{entry.text}</span></li>)}</ol>
+      : <p className="exploration-small">有了收获或转变，就在这里记一笔，它会写进工作稿的“阶段记录”。</p>}
+    {entries.length > 5 && <p className="exploration-small">更早的 {entries.length - 5} 条在工作稿里。</p>}
+    <form className="stage-log-form" onSubmit={event => void submit(event)}>
+      <label className="visually-hidden" htmlFor={`stage-log-${record.id}`}>记一笔阶段收获</label>
+      <input id={`stage-log-${record.id}`} value={text} maxLength={200} disabled={busy} placeholder="记一笔：今天弄清了…" onChange={event => { setText(event.target.value); setDone(''); }} />
+      {(text.trim() || busy) && <button type="submit" disabled={busy}>{busy ? '正在记下…' : '记下'}</button>}
+    </form>
+    {done && <p className="stage-log-done" role="status">{done}</p>}
+    {error && <p className="exploration-missing" role="alert">{error}</p>}
+  </section>;
+}
+
+/** Excerpts and earlier material: what the working paper can quote and cite. */
+function Materials({ record, noteIds }: { record: Exploration; noteIds?: Set<string> }) {
+  const documents = (record.research?.artifacts ?? []).filter(item => item.kind !== 'reading-brief');
+  return <section className="direction-materials" aria-labelledby="materials-heading">
+    <div className="materials-heading"><h2 id="materials-heading">摘录与材料{record.evidence.length > 0 && <span className="direction-count">{record.evidence.length}</span>}</h2></div>
+    {record.evidence.length ? <div className="exploration-evidence-list">{record.evidence.map(evidence => <EvidenceCard key={evidence.id} evidence={evidence} noteExists={evidence.relatedNoteId && noteIds ? noteIds.has(evidence.relatedNoteId) : undefined} />)}</div>
+      : <p className="exploration-small">还没有摘录。阅读时选中文字点“加入探索”，就会留在这里。</p>}
+    {record.research?.seedDiscussion && <details className="exploration-seed"><summary>起点讨论 · 来自《{record.research.seedDiscussion.guideTitle}》的 {record.research.seedDiscussion.turns.length} 轮问答节选</summary><p className="exploration-small">建立方向时带入的模型回答节选，不是论文证据。</p><ol>{record.research.seedDiscussion.turns.map(turn => <li key={turn.turnId}><strong>{turn.question}</strong><p>{turn.answer}{turn.answerTruncated ? '…' : ''}</p></li>)}</ol></details>}
+    {documents.map(item => <details className="direction-saved-document" key={item.id}><summary>{item.title}</summary><div className="brief-preview">{item.body}</div></details>)}
+  </section>;
 }
 
 const overviewFields = [['interpretation', '目前的认识'], ['candidates', '候选方向'], ['unknowns', '尚不确定'], ['deferred', '暂缓方向及原因'], ['scope', '范围'], ['constraints', '约束']] as const;
@@ -146,22 +203,12 @@ function Overview({ record }: { record: Exploration }) {
   const effective = research?.decisions.filter(item => !superseded.has(item.id)) ?? [];
   const replaced = research?.decisions.filter(item => superseded.has(item.id)) ?? [];
   const decision = (item: ResearchDecision) => <details key={item.id}><summary><span className="decision-kind">{decisionKinds[item.kind]} · {decisionStatuses[item.status]}</span>{item.text}</summary><p>理由：{item.rationale || '尚未填写'}</p><p className="exploration-small">{item.sourceTurnId ? '来自对话' : '手动记录'} · {item.createdAt.slice(0, 10)}{item.supersedes && ' · 替代了一项较早的决定'}</p>{item.evidenceRefs.map((ref, index) => <blockquote key={index}>[{ref.citationId}] {ref.source.text}</blockquote>)}</details>;
-  return <section className="direction-section" aria-labelledby="overview-heading">
-    <h2 id="overview-heading">目前的认识与问题</h2>
+  return <section className="direction-section">
     {filled.length ? <dl className="direction-overview">{filled.map(([field, label]) => <div key={field} className={field === 'interpretation' || field === 'candidates' ? 'is-wide' : ''}><dt>{label}</dt><dd>{value(field)}</dd></div>)}</dl>
-      : <p className="exploration-small">还没有整理的认识。讨论一段后在对话中输入 /方向，AI 会把认识、候选方向和下一步写进来。</p>}
-    {record.nextAction && <div className="direction-next"><span>下一步 · {actionLabels[record.nextAction.kind]}</span><p>{record.nextAction.description}</p>{record.nextAction.target && <AppLink id={`exploration-next-${record.id}`} to={targetPath(record.nextAction.target)}>去阅读 →</AppLink>}</div>}
+      : <p className="exploration-small">方向字段里还没有认识或候选。这些字段由 /方向 维护；详细的内容写在工作稿里。</p>}
     {effective.length > 0 && <div className="direction-decisions"><h3>你确认的决定</h3>{effective.map(decision)}
       {replaced.length > 0 && <details className="exploration-replaced"><summary>已被替代的决定（{replaced.length}）</summary>{replaced.map(decision)}</details>}</div>}
   </section>;
-}
-
-function DiscussionLine({ summary, onDiscuss }: { summary?: TopicSummary | null; onDiscuss: () => void }) {
-  return <div className="discussion-line">
-    {summary === undefined ? <p className="exploration-small">正在读取讨论记录…</p> : summary === null ? <p className="exploration-small">讨论记录暂时读不到（本机 AI 服务未连接）。方向记录不受影响。</p>
-      : summary.turns ? <p><strong>{summary.conversations} 段讨论 · {summary.turns} 轮问答</strong>{summary.lastTurnAt && <span>最近一次 {summary.lastTurnAt.slice(0, 10)}</span>}</p> : <p>还没有讨论。</p>}
-    <button type="button" className="text-action" onClick={onDiscuss}>打开讨论</button>
-  </div>;
 }
 
 type Related = { guide: GuideSummary; reasons: string[]; weight: number };
@@ -193,12 +240,12 @@ function RelatedPapers({ record, summary }: { record: Exploration; summary?: Top
     return () => { live = false; };
   }, [key]);
   const marks = { unread: '未读', reading: '阅读中', read: '已读', deferred: '暂缓' };
-  return <section className="direction-card" aria-labelledby="related-heading">
-    <div className="related-heading"><h2 id="related-heading">相关论文与综述{rows.length > 0 && <span className="direction-count">{rows.length}</span>}</h2><button type="button" className="text-action" onClick={() => setLinking(true)}>关联文献</button></div>
+  return <section className="panel-section" aria-labelledby="related-heading">
+    <div className="panel-heading"><h2 id="related-heading">相关文献{rows.length > 0 && <span className="direction-count">{rows.length}</span>}</h2><button type="button" className="text-action" onClick={() => setLinking(true)}>关联文献</button></div>
     {rows.length ? <ul className="related-papers">{rows.map(({ guide, reasons }) => <li key={guide.metadata.id}>
-      <AppLink to={`/read/${guide.metadata.id}/${guide.metadata.revision}`}><span className="paper-type">{guide.metadata.type === 'survey' ? '综述' : '论文'}</span><strong>{guide.metadata.orientation?.shortTitle ?? guide.metadata.title}</strong><span className="paper-title">{guide.metadata.paperTitle}</span></AppLink>
-      <p>{reasons.join(' · ')}{states[guide.metadata.id] && <span className="paper-mark">导读{marks[states[guide.metadata.id]!.status]}</span>}</p>
-    </li>)}</ul> : <p className="exploration-small">还没有关联的文献。阅读时关联这个方向并讨论，或把相关摘录加入这里，便会留下对应论文与综述。</p>}
+      <AppLink to={`/read/${guide.metadata.id}/${guide.metadata.revision}`} title={guide.metadata.paperTitle}><span className="paper-type">{guide.metadata.type === 'survey' ? '综述' : '论文'}</span><strong>{guide.metadata.orientation?.shortTitle ?? guide.metadata.title}</strong></AppLink>
+      {(reasons.some(reason => reason !== '已关联') || states[guide.metadata.id]) && <p>{reasons.filter(reason => reason !== '已关联').join(' · ')}{states[guide.metadata.id] && <span className="paper-mark">导读{marks[states[guide.metadata.id]!.status]}</span>}</p>}
+    </li>)}</ul> : <p className="exploration-small">还没有关联的文献。可以手动关联，或在阅读时加入摘录、关联这个方向讨论。</p>}
     {summary === null && <p className="exploration-small">讨论中读过和引用的论文暂时读不到（本机 AI 服务未连接）。</p>}
     {linking && <LinkPapers record={record} onClose={() => setLinking(false)} />}
   </section>;
@@ -237,32 +284,44 @@ function LinkPapers({ record, onClose }: { record: Exploration; onClose: () => v
   </Dialog>;
 }
 
-function Files({ record, onDiscuss }: { record: Exploration; onDiscuss: (question?: string, autoSend?: boolean) => void }) {
+function Files({ record, onDiscuss, compact = false }: { record: Exploration; onDiscuss: (question?: string, autoSend?: boolean) => void; compact?: boolean }) {
   const items = briefs(record);
-  const [open, setOpen] = useState<string>();
+  const [open, setOpen] = useState<ResearchArtifact>();
   const [error, setError] = useState('');
   const save = (artifact: ResearchArtifact) => { setError(''); void renderResearchDocument(record, artifact).then(text => download(documentFileName(artifact), text)).catch(reason => setError(errorText(reason))); };
-  return <section className="direction-files" aria-labelledby="files-heading">
-    <div className="direction-files-heading"><div><h2 id="files-heading">{READING_BRIEF.label}{items.length > 0 && <span className="direction-count">{items.length}</span>}</h2><p>把下一轮阅读的方向、筛选条件和添加要求交给 Harness。</p></div>
-      <button type="button" className="primary-action" onClick={() => onDiscuss('/选文 积累 请根据当前方向、已有材料和讨论，生成继续阅读这一方向的综述与代表论文、补充知识积累的选文实施文件。明确筛选条件、避免重复与入库要求；数量和执行权限沿用已明确的约定，尚未约定的保留待确认。', true)}>一键生成积累选文文件</button>
-    </div>
-    <p className="direction-generate-note">点击后使用当前 AI 生成并保存新文件；会附带方向记录、本库目录和阅读标记。</p>
-    <div className="brief-purpose-options">
-      <div><strong>继续积累</strong><p>补全这个方向的知识框架，阅读综述和代表论文。</p><button type="button" className="text-action" onClick={() => onDiscuss('我想继续阅读这个方向的文章、补充积累。请先和我讨论还缺哪些内容、需要怎样的综述与代表论文，确定后再生成选文实施文件。')}>先讨论阅读范围 →</button></div>
-      <div><strong>探索问题</strong><p>围绕尚未解决的问题，寻找方法、证据、比较和反例。</p><button type="button" className="text-action" onClick={() => onDiscuss('我想进一步探索这个方向中面临的问题。请结合当前认识与尚不确定之处，和我确定这轮要推进的子问题及文献筛选条件，确定后再生成选文实施文件。')}>讨论要推进的问题 →</button></div>
-    </div>
-    {items.length ? <ul className="brief-list">{items.map((artifact, index) => {
-      const missing = checkDocumentSections(artifact.body).missing;
-      return <li key={artifact.id}>
-        <div className="brief-meta"><span className={`brief-purpose purpose-${artifact.purpose ?? 'none'}`}>{artifact.purpose ? BRIEF_PURPOSES[artifact.purpose].label : '未标注'}</span><span>{artifact.updatedAt.slice(0, 10)}{index === 0 ? ' · 最新' : ''}</span></div>
-        <strong>{artifact.title.replace(`${READING_BRIEF.label}：`, '')}</strong>
-        {missing.length > 0 && <p className="brief-missing">缺少：{missing.join('、')}</p>}
-        <div className="brief-actions"><button type="button" className="text-action" onClick={() => save(artifact)}>下载</button><button type="button" className="text-action" aria-expanded={open === artifact.id} onClick={() => setOpen(open === artifact.id ? undefined : artifact.id)}>{open === artifact.id ? '收起' : '查看'}</button></div>
-        {open === artifact.id && <div className="brief-preview">{artifact.body}</div>}
-      </li>;
-    })}</ul> : <p className="exploration-small">还没有保存的选文文件。可以直接生成积累文件，也可以先讨论，再按需要生成。</p>}
+  return <section className={`direction-files${compact ? ' panel-section' : ''}`} aria-labelledby="files-heading">
+    <h2 id="files-heading">{READING_BRIEF.label}{items.length > 0 && <span className="direction-count">{items.length}</span>}</h2>
+    {!compact && <p className="exploration-small">把下一轮阅读的方向、筛选条件和入库要求交给 Harness。</p>}
+    {items.length > 0 && <ul className="brief-list">{items.map(artifact => <li key={artifact.id}>
+      <button type="button" className="brief-row" onClick={() => setOpen(artifact)}><strong>{artifact.title.replace(`${READING_BRIEF.label}：`, '')}</strong><span className="brief-meta"><span className={`brief-purpose purpose-${artifact.purpose ?? 'none'}`}>{artifact.purpose ? BRIEF_PURPOSES[artifact.purpose].label : '未标注'}</span>{artifact.updatedAt.slice(0, 10)}</span></button>
+    </li>)}</ul>}
+    <button type="button" className="files-generate" onClick={() => onDiscuss('/选文 积累 请根据当前方向、已有材料和讨论，生成继续阅读这一方向的综述与代表论文、补充知识积累的选文实施文件。明确筛选条件、避免重复与入库要求；数量和执行权限沿用已明确的约定，尚未约定的保留待确认。', true)}><span aria-hidden="true">+ </span>一键生成积累选文文件</button>
     {error && <p role="alert" className="exploration-missing">{error}</p>}
+    {open && <Dialog title={open.title.replace(`${READING_BRIEF.label}：`, '')} onClose={() => setOpen(undefined)} className="brief-dialog">
+      <p className="brief-meta"><span className={`brief-purpose purpose-${open.purpose ?? 'none'}`}>{open.purpose ? BRIEF_PURPOSES[open.purpose].label : '未标注'}</span>{READING_BRIEF.label} · {open.updatedAt.slice(0, 10)}</p>
+      {checkDocumentSections(open.body).missing.length > 0 && <p className="brief-missing">缺少：{checkDocumentSections(open.body).missing.join('、')}</p>}
+      <div className="brief-preview">{open.body}</div>
+      <div className="brief-dialog-actions"><button type="button" className="primary-action" onClick={() => save(open)}>下载</button></div>
+      {error && <p role="alert" className="exploration-missing">{error}</p>}
+    </Dialog>}
   </section>;
+}
+
+/** Rare page actions, kept out of the way until asked for. */
+function MoreMenu({ items }: { items: { label: string; onSelect: () => void }[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const outside = (event: PointerEvent) => { if (!ref.current?.contains(event.target as Node)) setOpen(false); };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setOpen(false); ref.current?.querySelector<HTMLButtonElement>('.more-trigger')?.focus(); } };
+    document.addEventListener('pointerdown', outside); document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+  }, [open]);
+  return <div className="more-menu" ref={ref}>
+    <button type="button" className="more-trigger" aria-label="更多操作" title="更多操作" aria-expanded={open} onClick={() => setOpen(!open)}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor" /><circle cx="12" cy="12" r="1.6" fill="currentColor" /><circle cx="19" cy="12" r="1.6" fill="currentColor" /></svg></button>
+    {open && <div className="more-list">{items.map(item => <button key={item.label} type="button" onClick={() => { setOpen(false); item.onSelect(); }}>{item.label}</button>)}</div>}
+  </div>;
 }
 
 /** The same conversation as in reading, opened over this page for cross-paper discussion. */

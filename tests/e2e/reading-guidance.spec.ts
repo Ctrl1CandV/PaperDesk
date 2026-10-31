@@ -1,9 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 import catalog from '../../content/catalog.json' with { type: 'json' };
-import memory from '../../content/guides/agent-memory-survey.r2.json' with { type: 'json' };
+import memory from '../../content/guides/rag-survey.json' with { type: 'json' };
 
 // SYNTHETIC reading marks only; the AI transport is a local stub and never sends a question.
-const revision = catalog.currentRevisions['agent-memory-survey'];
+const revision = catalog.currentRevisions['rag-survey'];
+const activeCount = Object.keys(catalog.currentRevisions).filter(id => !((catalog as { archivedGuideIds?: string[] }).archivedGuideIds ?? []).includes(id)).length;
 async function stubAi(page: Page) {
   await page.route('**/api/ai/**', route => {
     const path = new URL(route.request().url()).pathname;
@@ -20,7 +21,7 @@ test('the guide card ties reading targets to chapters, shows explicit marks quie
     const { personalStore } = await import('/src/records/store.ts');
     await personalStore.setGuideState({ guideId: 'rag', revision: 2, status: 'reading', updatedAt: new Date().toISOString() });
   });
-  await page.goto(`/library?article=agent-memory-survey`);
+  await page.goto(`/library?article=rag-survey`);
   const outline = page.locator('.orientation-outline');
   const targets = memory.orientation.readingTargets;
   await expect(outline.locator('.outline-aim')).toHaveCount(targets.length);
@@ -37,14 +38,14 @@ test('the guide card ties reading targets to chapters, shows explicit marks quie
   await expect(page.locator('.guide-entry')).toHaveCount(1);
   await expect(page.locator('.library-result-count')).toContainText('阅读中 · 1 篇文章');
   await page.getByRole('combobox', { name: '按导读阅读状态筛选' }).selectOption('unmarked');
-  await expect(page.locator('.guide-entry')).toHaveCount(Object.keys(catalog.currentRevisions).length - 1);
+  await expect(page.locator('.guide-entry')).toHaveCount(activeCount - 1);
 });
 
 test('reading keeps guidance beside the article and closes with one quiet step', async ({ page }) => {
   await stubAi(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   const target = memory.orientation.readingTargets[1];
-  await page.goto(`/read/agent-memory-survey/${revision}#${target.unitId}`);
+  await page.goto(`/read/rag-survey/${revision}#${target.unitId}`);
   const aim = page.locator('.reading-sidebar .toc-aim');
   await expect(aim).toHaveCount(1);
   await expect(aim).toContainText(target.purpose);
@@ -67,6 +68,6 @@ test('reading keeps guidance beside the article and closes with one quiet step',
   await close.getByRole('button', { name: '标为已读' }).click();
   await expect(close).toContainText('这篇导读：已读');
   await expect(close.getByRole('button', { name: '标为已读' })).toHaveCount(0);
-  expect((await marks(page)).map(item => [item.guideId, item.revision, item.status])).toEqual([['agent-memory-survey', revision, 'read']]);
+  expect((await marks(page)).map(item => [item.guideId, item.revision, item.status])).toEqual([['rag-survey', revision, 'read']]);
   await expect(close.getByRole('link', { name: 'RAG' })).toHaveAttribute('href', `/read/rag/${catalog.currentRevisions.rag}`);
 });

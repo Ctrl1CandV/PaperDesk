@@ -80,3 +80,32 @@ test('oversized notebook context is rejected explicitly before provider transmis
   const prepared = prepareAssistantContext({}, request, [], { modelId: 'synthetic', contextTokenLimit: 131072, maxOutputTokens: 1000 });
   assert.equal(prepared.context.researchSnapshot.notebook.body, topic.research.notebook.versions[0].body);
 });
+
+test('the working paper starts from a paper-shaped outline and keeps a dated stage log', async () => {
+  const { WORKING_PAPER_SECTIONS, workingPaperTemplate, stageEntries, appendStageEntry, withoutPlaceholders } = await import('../../shared/research-notebook.mjs');
+  const draft = workingPaperTemplate({ motivation: 'SYNTHETIC 动机' });
+  assert.deepEqual([...draft.matchAll(/^## (.+)$/gm)].map(match => match[1]), WORKING_PAPER_SECTIONS.map(section => section.heading));
+  assert.match(draft, /## 问题与动机\n\nSYNTHETIC 动机/); assert.match(draft, /<!-- 文献已经说明了什么/);
+  // The first entry replaces the untouched hint; later ones append in order; other sections stay put.
+  const first = appendStageEntry(draft, '2026-10-30', 'SYNTHETIC  第一条\n收获');
+  assert.doesNotMatch(first.split('## 阶段记录')[1], /<!--/);
+  const second = appendStageEntry(first, '2026-10-31', 'SYNTHETIC 第二条');
+  assert.deepEqual(stageEntries(second), [{ date: '2026-10-30', text: 'SYNTHETIC 第一条 收获' }, { date: '2026-10-31', text: 'SYNTHETIC 第二条' }]);
+  assert.equal(second.split('## 实验设想')[0], first.split('## 实验设想')[0]);
+  assert.equal(appendStageEntry('', '2026-10-30', 'SYNTHETIC'), '## 阶段记录\n\n- 2026-10-30 · SYNTHETIC\n');
+  assert.equal(appendStageEntry('## 阶段记录\n\n- 2026-10-01 · a\n\n## 其他\n\nb', '2026-10-30', 'SYNTHETIC'), '## 阶段记录\n\n- 2026-10-01 · a\n- 2026-10-30 · SYNTHETIC\n\n## 其他\n\nb\n');
+  assert.deepEqual(stageEntries('## 其他\n\n- 2026-10-01 · 不是阶段记录'), []);
+  assert.doesNotMatch(withoutPlaceholders(second), /<!--/);
+});
+
+test('a version may carry a short note of what changed; older versions without one stay valid and hash the same', async () => {
+  const noted = appendNotebookVersion(undefined, 'SYNTHETIC', { note: `  SYNTHETIC ${'改'.repeat(400)} ` });
+  assert.equal(currentNotebook(noted).note.length, 300);
+  assert.throws(() => validateResearchNotebook({ versions: [{ ...currentNotebook(noted), note: ' ' }] }));
+  const plain = appendNotebookVersion(undefined, 'SYNTHETIC');
+  assert.equal(Object.hasOwn(currentNotebook(plain), 'note'), false);
+  const snapshot = await createResearchSnapshot(record({ ...emptyResearchState(), notebook: noted }));
+  assert.equal(snapshot.notebook.note, currentNotebook(noted).note);
+  assert.match(commandInstruction({ name: 'notebook' }, { linked: true }), /阶段记录/);
+  assert.match(commandInstruction({ name: 'notebook' }, { linked: true }), /相关工作/);
+});

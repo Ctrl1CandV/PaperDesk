@@ -9,15 +9,15 @@ test('library orientation, saved-target labels and related links do not fetch an
   await page.goto('/library?article=rag');
   await expect(page.locator('#orientation-title')).toContainText('RAG');
   expect(downloaded).toEqual([]);
-  await page.locator('#choose-streamingllm').click();
-  await expect(page.locator('#orientation-title')).toContainText('StreamingLLM');
+  await page.locator('#choose-agentbench').click();
+  await expect(page.locator('#orientation-title')).toContainText('AgentBench');
   expect(downloaded).toEqual([]);
-  await page.locator('#start-streamingllm').click();
-  await expect(page.locator('.prose')).toContainText('StreamingLLM');
+  await page.locator('#start-agentbench').click();
+  await expect(page.locator('.prose')).toContainText('AgentBench');
   expect(downloaded.filter(url => url.endsWith('.md'))).toHaveLength(1);
   expect(downloaded.filter(url => url.endsWith('.json'))).toHaveLength(1);
   // Markdown relationship rendering must not indirectly load other articles.
-  expect(downloaded.every(url => url.includes('streamingllm'))).toBe(true);
+  expect(downloaded.every(url => url.includes('agentbench'))).toBe(true);
 });
 
 test('a late body cannot replace the newly selected article and retained anchors still resolve', async ({ page }) => {

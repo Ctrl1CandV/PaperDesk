@@ -1,3 +1,4 @@
+import { WORKING_PAPER_SECTIONS } from './research-notebook.mjs';
 // Commands typed in the single AI conversation, and the reading file they can
 // produce. Shared by the backend (per-turn requirements) and the browser
 // (command parsing, section check, export header). Data only.
@@ -55,10 +56,11 @@ const fileRules = `- 依据当前研究快照（如有）、本轮选入的资�
 
 /** Requirements the backend appends before the reader's message when a command is used. */
 export function commandInstruction(command, { linked }) {
-  if (command.name === 'notebook') return `应用附加的指令要求（不是读者原话）：读者输入 /记录，明确要求更新当前方向的研究记录。researchSnapshot.notebook 是当前完整正文和版本；没有它表示尚未开始记录。结合读者本轮要求、当前记录和讨论，调用一次 update_research_notebook，body 是完整更新后的 Markdown 正文，summary 简述变化。
-- 保留读者的原意、疑问、失败经历和个人判断，未要求删除的旧内容应保留；不要把整份记录概括为短摘要。只有读者明确授权的整理、改写或新增才写入。
-- 区分〔读者〕、〔文献〕、〔推断〕和〔待验证〕；没有结果就写尚未验证。学习/实践达到目的、暂时结束或转向论文写作，由读者的真实想法决定，不能替读者宣布完成，不改阶段状态。
-- 有文献依据的主张保留可回查来源；旧正文引用与定位原样保留，不把历史编号冒充本轮来源；新增引用使用本轮实际来源的 Markdown URL，文献、版本和位置写清楚，不只写 [L1] 等临时编号。不编造成功、论文创新性或原文阅读。
+  if (command.name === 'notebook') return `应用附加的指令要求（不是读者原话）：读者输入 /记录，明确要求更新这个方向的研究工作稿。researchSnapshot.notebook 是当前完整正文和版本；没有它表示还没有工作稿。工作稿会逐步成为论文项目的起始文件，默认按这些二级标题组织：${WORKING_PAPER_SECTIONS.map(section => `「${section.heading}」（${section.hint}将来用作${section.becomes}）`).join('、')}。结合读者本轮要求、当前正文和讨论，调用一次 update_research_notebook：body 是完整更新后的 Markdown 正文，summary 用一句话写这次改了什么（会显示在版本记录里）。
+- 把新内容放进对应的标题下；读者改过的标题、增删的小节和自己的写法照样保留，不强行改回模板。<!-- … --> 是空小节的提示，写入内容时删掉它，没有内容的小节保留提示。
+- 保留读者的原意、疑问、失败经历和个人判断，未要求删除的旧内容应保留；不要把整份正文概括为短摘要。
+- 「已知」只写有出处的内容，新增引用用本轮实际来源的 Markdown 链接（本库导读写成 /read/导读ID/修订#章节 的相对链接），旧正文引用原样保留，不只写 [L1] 等临时编号。「判断与假设」「实验设想」中没有依据的内容标为〔假设〕或〔待验证〕；没有执行过的实验不写结果。
+- 「阶段记录」每条一行：“- YYYY-MM-DD · 收获或转变”，只记读者明确表达或讨论中确实达成的进展，日期用今天；不替读者宣布完成、成功、创新或转向写论文，不改方向阶段。
 - body 最多 24000 字，不截断旧文来满足限制，超长或意图不明时不调用工具，说明需要怎样缩小修改。无实质变化时不调用。
 - 工具接收的是草稿；回答中简短说明本次变化和仍待确认之处即可，不再重复整份正文。界面保留工具提交的完整草稿供查看或下载，成功写入后才显示已保存。`;
   if (command.name === 'direction') return linked

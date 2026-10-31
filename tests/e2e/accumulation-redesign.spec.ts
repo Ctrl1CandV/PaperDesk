@@ -60,7 +60,7 @@ test('existing exploration appears before editorial choices and its next action 
   const personal = await page.locator('.explore-directions').boundingBox();
   const editorial = await page.locator('.exploration-editorial').boundingBox();
   expect(personal!.y).toBeLessThan(editorial!.y);
-  await expect(page.locator('.exploration-record-row')).toContainText('1 条材料');
+  await expect(page.locator('.exploration-record-row')).toContainText('摘录 1');
   await expect(page.locator('.exploration-row-next')).toContainText('合成测试行动');
   await capture(page, 'explore-saved-desktop');
   await page.locator('.exploration-record-row').click();

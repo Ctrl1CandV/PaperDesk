@@ -24,7 +24,7 @@ export function availableTools(webSearch, research = false, command = undefined)
       nextAction:{type:'object',properties:{kind:{enum:['read-guide','check-concept','compare-evidence','search-literature']},description:{type:'string',maxLength:2000},target:{type:'object',properties:{guideId:{type:'string'},revision:{type:'integer'},unitId:{type:'string'}},required:['guideId','revision','unitId'],additionalProperties:false}},required:['kind','description'],additionalProperties:false},
       rationale:field('为什么现在可以建立这个方向') }, ['title','question','interpretation','candidates','unknowns','stage','rationale']));
   }
-  if (research && command?.name === 'notebook') tools.push(functionTool('update_research_notebook', '仅在读者输入 /记录 时，提交当前方向研究记录的完整 Markdown 新正文。保留读者原意及未要求删除的旧内容，不把假设写成结果，不宣布研究完成。正文需要可回查的真实引用，旧引用保留；新引用用真实 URL 和版本/位置，不仅使用临时编号。界面稍后按基础版本保存。', {body:{type:'string',maxLength:24000},summary:{type:'string',maxLength:2000}}, ['body','summary']));
+  if (research && command?.name === 'notebook') tools.push(functionTool('update_research_notebook', '仅在读者输入 /记录 时，提交当前方向研究工作稿的完整 Markdown 新正文，按工作稿的二级标题放置内容。保留读者原意、改过的结构及未要求删除的旧内容，不把假设写成结果，不宣布研究完成。正文需要可回查的真实引用，旧引用保留；新引用用真实 URL 和版本/位置，不仅使用临时编号。summary 用一句话说明改了什么。界面稍后按基础版本保存。', {body:{type:'string',maxLength:24000},summary:{type:'string',maxLength:2000}}, ['body','summary']));
   return tools;
 }
 

@@ -3,14 +3,13 @@
 .notebook-heading h2 { margin: 0 0 4px !important; font-size: 21px !important; }
 .notebook-meta { color: var(--muted); font-size: 12.5px; line-height: 1.7; margin: 0 !important; }
 .notebook-tools { display: flex; align-items: center; gap: 4px 13px; flex-wrap: wrap; }
-.notebook-tools button, .notebook-editor-bar button, .notebook-history-controls button, .notebook-plain, .notebook-empty button { border: 0; background: none; color: var(--accent); padding: 6px 0; min-height: 32px; font-size: 13px; cursor: pointer; }
-.notebook-tools .notebook-write { background: var(--surface-selected); border: 1px solid var(--line); border-radius: 5px; padding: 5px 12px; font-weight: 600; }
+.notebook-tools button, .notebook-editor-bar button, .notebook-history-controls button, .notebook-plain, .notebook-empty > button { border: 0; background: none; color: var(--accent); padding: 6px 0; min-height: 32px; font-size: 13px; cursor: pointer; }
 .notebook-page, .notebook-empty, .notebook-editor { padding: 24px 28px 30px; }
 .notebook-page { min-height: 260px; }
 .notebook-empty { max-width: 44em; }
 .notebook-empty p { line-height: 1.9; font-size: 15px; color: var(--muted); margin: 0 0 12px !important; }
 .notebook-empty p:first-child { color: var(--ink); }
-.notebook-empty button { margin-top: 4px; font-size: 14px; }
+.notebook-empty > button { margin-top: 4px; font-size: 14px; }
 .notebook-prose { font-size: 16px; line-height: 1.85; overflow-wrap: anywhere; color: var(--ink); }
 .notebook-prose > :first-child { margin-top: 0 !important; }
 .notebook-prose > :last-child { margin-bottom: 0 !important; }
@@ -36,3 +35,53 @@
 .notebook-history-dialog { width: min(900px, calc(100vw - 24px)); }.notebook-history-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px 22px; }.notebook-history-controls label { display: grid; gap: 6px; flex: 1; min-width: 0; font-size: 13px; color: var(--muted); }.notebook-history-controls select { width: 100%; padding: 8px; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--surface); color: var(--ink); }
 .notebook-history-body { padding: 24px 4px; margin: 18px 0; border-block: 1px solid var(--line); max-height: 55dvh; overflow: auto; }.notebook-history-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }.notebook-history-footer p { font-size: 13px; color: var(--muted); margin: 0; }
 @media (max-width: 800px) { .notebook-heading { padding: 18px; }.notebook-page, .notebook-empty, .notebook-editor { padding: 20px 18px; }.notebook-tools { gap: 4px 16px; }.notebook-prose { font-size: 16px; }.notebook-editor textarea { min-height: 380px; padding: 12px; }.notebook-notice { padding: 0 18px 18px; }.notebook-editor-actions .notebook-plain { margin-left: 0; } }
+/* Working paper: the main surface of a direction. */
+.notebook-heading h2 { font-size: 19px !important; }
+.notebook-note { display: inline-block; max-width: 100%; margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--line); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+@media (min-width: 801px) { .notebook-note { max-width: 32em; } }
+.notebook-page { padding: 26px 40px 36px; }
+.notebook-page .notebook-prose { max-width: 44em; }
+.notebook-prose h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding-top: 1.1em; border-top: 1px solid var(--line); }
+.notebook-prose > h2:first-child { padding-top: 0; border-top: 0; }
+.section-becomes { color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: .02em; }
+.section-becomes::before { content: '→ 论文·'; }
+.notebook-placeholder { color: var(--muted); font-size: 14px; font-style: italic; }
+.notebook-placeholder::before { content: '待补充：'; font-style: normal; }
+.notebook-empty { max-width: none; }
+.notebook-outline { display: grid; gap: 0; margin: 4px 0 20px; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.notebook-outline li { display: grid; grid-template-columns: 7em minmax(0, 1fr) auto; gap: 4px 16px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.7; }
+.notebook-outline strong { color: var(--heading); font-weight: 600; }
+.notebook-outline span { color: var(--muted); }
+.notebook-outline em { color: var(--muted); font-size: 12.5px; font-style: normal; }
+.notebook-outline em::before { content: '→ '; }
+.notebook-empty-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.notebook-empty-actions button { min-height: 42px; }
+.notebook-empty .notebook-empty-actions .exploration-secondary { color: var(--ink); padding: 9px 15px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); }
+.notebook-compare { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.notebook-history-note { margin: 12px 0 0 !important; color: var(--muted); font-size: 13px; }
+.notebook-diff { font: 13px/1.75 var(--font-data); white-space: pre-wrap; overflow-wrap: anywhere; }
+.notebook-diff p { margin: 0 !important; padding: 0 8px; }
+.notebook-diff p > span[aria-hidden] { display: inline-block; width: 1.4em; color: var(--muted); }
+.notebook-diff .diff-added { background: var(--success-bg); }
+.notebook-diff .diff-removed { background: var(--danger-bg); text-decoration: line-through; text-decoration-color: var(--muted); }
+.notebook-diff .diff-same { color: var(--muted); }
+.notebook-diff .diff-gap { margin: 4px 0 !important; color: var(--muted); font-family: var(--font-body); font-size: 12px; }
+@media (max-width: 800px) {
+  .notebook-page { padding: 20px 18px 26px; }
+  .notebook-outline li { grid-template-columns: 1fr; gap: 0; }
+}
+.notebook-heading > div:first-child { flex: 1 1 320px; min-width: 0; }
+.notebook-heading .notebook-meta { display: flex; flex-wrap: wrap; gap: 0 8px; }
+.notebook-heading .notebook-note { flex: 1 1 12em; min-width: 0; max-width: none; margin-left: 0; }
+.notebook-tools { flex: none; }
+.notebook-history-controls label.notebook-compare { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; min-height: 38px; }
+.notebook-history-controls label.notebook-compare input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+/* Fewer controls: two quiet text actions; the version line opens history. */
+.notebook-tools { gap: 0; }
+.notebook-tools button { padding: 6px 10px; color: var(--muted); }
+.notebook-tools button + button { border-left: 1px solid var(--line); }
+.notebook-tools button:hover { color: var(--accent); }
+.notebook-version { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.notebook-version:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.section-becomes { opacity: .75; }
+.section-becomes::before { content: '论文·'; }

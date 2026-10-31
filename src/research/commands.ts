@@ -1,5 +1,5 @@
-import { type NotebookVersion } from '../../shared/research-notebook.mjs';
-import { saveNotebookTurn } from './notebook-actions';
+import { appendNotebookVersion, appendStageEntry, type NotebookVersion } from '../../shared/research-notebook.mjs';
+import { saveNotebookTurn, templateFromRecord } from './notebook-actions';
 import { createSeedDiscussion, emptyResearchState, validateResearchProposal, type ResearchProposal } from '../../shared/research-contract.mjs';
 import { checkDocumentSections, readingBriefTitle, READING_BRIEF, STAGE_LABELS } from '../../shared/research-documents.mjs';
 import type { ResearchArtifact } from '../../shared/research-artifacts.mjs';
@@ -65,7 +65,7 @@ export async function applyCommandTurn(turn: AiTurn, { linked, conversation, con
   if (!command || turn.status !== 'complete' || turn.summaryOnly) return { kind: 'declined' };
   if (command.name === 'notebook') {
     if (!turn.context?.notebookDraft) return { kind: 'declined' };
-    if (linked && linked.id !== turn.context.researchSnapshot?.explorationId) throw Error('这份研究记录属于另一个方向，未保存。');
+    if (linked && linked.id !== turn.context.researchSnapshot?.explorationId) throw Error('这份工作稿属于另一个方向，未保存。');
     return { kind: 'notebook-saved', ...await saveNotebookTurn(turn) };
   }
   if (command.name === 'direction') {
@@ -79,8 +79,12 @@ export async function applyCommandTurn(turn: AiTurn, { linked, conversation, con
       const earlier = conversation.filter(item => item.id !== turn.id && item.status === 'complete' && item.answer && !item.context?.command);
       const seedDiscussion = guide && conversationId && earlier.length ? createSeedDiscussion({ conversationId, guideId: guide.metadata.id, revision: guide.metadata.revision, guideTitle: guide.metadata.title, turns: earlier }) : undefined;
       const base = createExploration();
-      const record = await personalStore.saveExploration({ ...base, title: draft.title.trim(), question: draft.question.trim(), status: 'exploring', interpretation: draft.interpretation, unknowns: draft.unknowns, nextAction: draft.nextAction,
-        research: { ...emptyResearchState(), scope: draft.scope, constraints: draft.constraints, candidates: draft.candidates, deferred: draft.deferred, stage: draft.stage, createdFromTurnId: turn.id, ...(seedDiscussion ? { seedDiscussion } : {}) } }, null);
+      const fields = { ...base, title: draft.title.trim(), question: draft.question.trim(), status: 'exploring' as const, interpretation: draft.interpretation, unknowns: draft.unknowns, nextAction: draft.nextAction,
+        research: { ...emptyResearchState(), scope: draft.scope, constraints: draft.constraints, candidates: draft.candidates, deferred: draft.deferred, stage: draft.stage, createdFromTurnId: turn.id, ...(seedDiscussion ? { seedDiscussion } : {}) } };
+      // The working paper starts from what the discussion established, written by the same turn.
+      const body = appendStageEntry(templateFromRecord(fields), new Date().toLocaleDateString('sv-SE'), `建立方向：${fields.question}`);
+      const notebook = appendNotebookVersion(undefined, body, { author: 'assistant', sourceTurnId: turn.id, note: '由 /方向 建立方向时整理' });
+      const record = await personalStore.saveExploration({ ...fields, research: { ...fields.research, notebook } }, null);
       return { kind: 'direction-created', record };
     }
     const candidate = turn.context?.researchProposals?.[0];
@@ -113,7 +117,7 @@ export async function applyCommandTurn(turn: AiTurn, { linked, conversation, con
 }
 
 export function outcomeSummary(outcome: CommandOutcome) {
-  if (outcome.kind === 'notebook-saved') return `已更新《${outcome.record.title}》的研究记录 · 第 ${outcome.version.version} 版`;
+  if (outcome.kind === 'notebook-saved') return `已更新《${outcome.record.title}》的研究工作稿 · 第 ${outcome.version.version} 版`;
   if (outcome.kind === 'direction-created') return `已建立研究方向《${outcome.record.title}》${outcome.record.research?.stage ? ` · ${STAGE_LABELS[outcome.record.research.stage].label}` : ''}`;
   if (outcome.kind === 'direction-updated') return `已更新《${outcome.record.title}》：${outcome.proposal.changes.length} 项变化`;
   if (outcome.kind === 'brief-saved') return `已生成《${READING_BRIEF.label}》，保存在《${outcome.record.title}》`;

@@ -127,14 +127,14 @@ test('two exact guide excerpts accumulate with question, interpretation, deferra
 
 test('independent manual original excerpt and reader observation need no unrelated guide', async ({ page }) => {
   await createSynthetic(page);
-  await page.getByRole('button', { name: '添加原文摘录或观察' }).click();
+  await page.getByRole('button', { name: '更多操作' }).click(); await page.getByRole('button', { name: '添加原文摘录或观察' }).click();
   let dialog = page.getByRole('dialog', { name: '添加材料', exact: true });
   await dialog.getByLabel('原文来源 URL 或学术标识').fill('synthetic:source-for-ui-test');
   await dialog.getByLabel('原文位置', { exact: true }).fill('合成测试材料 第 2 页');
   await dialog.getByLabel('原文摘录', { exact: true }).fill('合成原文摘录，仅用于测试，不是学术事实。');
   await dialog.getByRole('button', { name: '保存这条材料' }).click();
   await expect(dialog).not.toBeVisible();
-  await page.getByRole('button', { name: '添加原文摘录或观察' }).click();
+  await page.getByRole('button', { name: '更多操作' }).click(); await page.getByRole('button', { name: '添加原文摘录或观察' }).click();
   dialog = page.getByRole('dialog', { name: '添加材料', exact: true });
   await dialog.getByLabel('材料类型', { exact: true }).selectOption('reader-observation');
   await expect(dialog.getByLabel('原文来源 URL 或学术标识')).toHaveCount(0);

@@ -7,8 +7,6 @@ test('venue references prefer CCF A/B and use a dated CAS major category where a
     ['instructgpt', 'CCF-A', '2026目录'],
     ['transformer', 'CCF-A', '2026目录'],
     ['react', 'CCF-A', '2026目录'],
-    ['streamingllm', 'CCF-A', '2026目录'],
-    ['concept-drift-survey', 'CAS-1', '2025大类'],
   ];
   for (const [id, label, edition] of cases) {
     await page.goto(`/library?article=${id}`);
@@ -20,15 +18,22 @@ test('venue references prefer CCF A/B and use a dated CAS major category where a
     await expect(reference).toHaveAttribute('rel', 'noopener noreferrer');
     await expect(page.locator('.orientation-prose p')).toHaveCount(3);
   }
+  // Guides taken off the shelf keep their ranking for exact routes and saved references.
+  const archived = await page.evaluate(async () => {
+    const { venueRanking } = await import('/src/library/venueRankings.ts');
+    const { contentRepository } = await import('/src/content/repository.ts');
+    return ['streamingllm', 'concept-drift-survey'].map(id => { const ranking = venueRanking(contentRepository.getSummary(id, contentRepository.currentRevision(id)!)!.metadata); return [id, ranking?.label, ranking?.edition, ranking?.description]; });
+  });
+  expect(archived.map(item => item.slice(0, 3))).toEqual([['streamingllm', 'CCF-A', '2026目录'], ['concept-drift-survey', 'CAS-1', '2025大类']]);
+  expect(archived[1][3]).toMatch(/中科院期刊分区 1 区/);
   await page.setViewportSize({ width: 320, height: 844 });
-  await page.goto('/library?article=concept-drift-survey');
-  await expect(page.locator('.orientation-ranking')).toContainText('CAS-1');
-  await expect(page.locator('.orientation-ranking a')).toHaveAttribute('aria-label', /中科院期刊分区 1 区/);
+  await page.goto('/library?article=agent-survey');
+  await expect(page.locator('.orientation-ranking')).toContainText('CCF-B');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 });
 
 test('unknown venues and preprints stay blank rather than inheriting a ranking from a title mention', async ({ page }) => {
-  for (const id of ['helm', 'agent-memory-survey']) {
+  for (const id of ['helm', 'multi-agent-communication-survey']) {
     await page.goto(`/library?article=${id}`);
     await expect(page.locator('#orientation-title')).toBeVisible();
     await expect(page.locator('.orientation-ranking')).toHaveCount(0);
