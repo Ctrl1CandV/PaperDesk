@@ -1,5 +1,7 @@
 # Research-direction exploration in v1
 
+Explorations now also persist in the private repository's `research-workspace/` through the local workspace API. Browser startup migrates existing records and reconciles pulled revisions; immutable per-direction snapshots retain conflict branches and deletion records. IndexedDB remains the live editing store with optimistic revision checks. This explicit cross-computer extension supersedes the browser-only persistence boundary below; other personal stores remain separate. See [Git workflow](EXPLORATION-GIT.md).
+
 The current direction page centers a Markdown working paper (研究工作稿), editable by the reader and by the explicit `/记录` command. It is shaped from the start like the opening file of a paper project (motivation, what is known, judgements and hypotheses, open questions, experiment ideas, stage log) and can be exported as that file. Saved versions preserve the process and stage results without automatically declaring completion; history restore appends a version; the current saved version accompanies deliberate direction-context requests. See [working paper](RESEARCH-NOTEBOOK.md).
 
 Explicit content-delivery batches can also associate pinned guides with a direction on browser startup. Public collection aliases establish an unambiguous initial binding; local receipts keep repeated delivery idempotent and preserve manual removal. This is a declared relationship, not keyword matching or inference from arrival time. See [reading assignments](../content/READING-ASSOCIATIONS.md).

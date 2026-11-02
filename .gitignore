@@ -18,6 +18,8 @@
 paperdesk-ai-backup-*.json
 /personal-data/
 /backups/
+/research-workspace/**/*.tmp
+/research-workspace/**/*.tmp-*
 paperdesk-backup-*.json
 
 # Authoring packages and recovery receipts never form part of the app source

@@ -8,6 +8,8 @@ import { LIMITS } from '../ai/instructions.mjs';
 import { answer } from '../ai/providers/api.mjs';
 import { requestHash, validateBackup } from '../storage/ai-store.mjs';
 import { exportBackupStream, importBackupStream } from '../storage/ai-backup.mjs';
+import { fileURLToPath } from 'node:url';
+import { createExplorationSyncHandler } from './exploration-sync.mjs';
 
 const HOSTS = new Set(['127.0.0.1:4176', '127.0.0.1:4173', '127.0.0.1:4174']);
 const ORIGINS = new Set(['http://127.0.0.1:4173', 'http://127.0.0.1:4174']);
@@ -48,6 +50,7 @@ function stream(response) {
 export function createAiServer(dependencies) {
   const { config, content, fetchImpl = fetch } = dependencies;
   const token = randomBytes(32).toString('hex'), active = new Map();
+  const workspace = createExplorationSyncHandler({ directory: dependencies.workspaceDirectory ?? fileURLToPath(new URL('../../research-workspace/explorations/', import.meta.url)) });
   const activeConversations = new Set();
   let mutatingConnection = false, checkingController = null, importing = false;
   const status = () => ({ ...(dependencies.runtime?.status() ?? {
@@ -58,10 +61,19 @@ export function createAiServer(dependencies) {
   }), csrfToken: token, storage: dependencies.store?.usage() });
   const server = createServer(async (request, response) => {
     try {
-      const store = dependencies.store;
-      if (!store) reject('本地 AI 数据库正在启动，请稍后重试。', 503);
       checkBrowserRequest(request, token, false);
       const url = new URL(request.url, 'http://127.0.0.1:4176');
+      if (url.pathname.startsWith('/api/workspace/')) {
+        if (request.headers.host === '127.0.0.1:4174' || request.headers.origin === 'http://127.0.0.1:4174') reject('隔离测试来源未连接项目工作区。', 403);
+        if (url.pathname === '/api/workspace/status' && request.method === 'GET') {
+          json(response, 200, { csrfToken: token }); return;
+        }
+        checkBrowserRequest(request, token);
+        if (await workspace(request, response, { readJson, json })) return;
+        reject('项目工作区接口不存在。', 404);
+      }
+      const store = dependencies.store;
+      if (!store) reject('本地 AI 数据库正在启动，请稍后重试。', 503);
       if (request.method === 'GET' && url.pathname === '/api/ai/status') {
         json(response, 200, status()); return;
       }

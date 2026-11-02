@@ -1,5 +1,9 @@
 # Minimal implementation context
 
+## Explicit Git exploration workspace extension
+
+The complete exploration is now deliberately persisted under `research-workspace/` for transfer through a private Git repository. This is the explicit exception to the earlier browser-only/private-records-outside-Git rule below. The original browser migrates its saved directions through the local workspace API; source code, synthetic fixtures, reports and screenshots must still contain no real personal records. Working-paper histories, embedded excerpts and document artifacts belong to the transferred exploration. Other notes, reading marks, AI conversations, credentials and original-material storage are not added to Git. The local service does not commit or push on its own. See [workspace boundary and workflow](EXPLORATION-GIT.md).
+
 ## Research assistant extension
 
 The working paper (research notebook) is part of the direction's current state: deliberate requests with that direction attached include only its latest saved text, version, authorship and change-note metadata. Its full history and unsaved editor buffer are excluded. `/记录` is an explicit instruction to write a new version, subject to the original record revision and snapshot hash; ordinary discussion does not update the notebook. Personal backups preserve history; downloaded notebooks, exported project start files (which include saved excerpts) and task appendices are private handoff documents. Public content-delivery manifests contain only public collection aliases and fixed guide references; local direction IDs, questions and consumption receipts are not published.

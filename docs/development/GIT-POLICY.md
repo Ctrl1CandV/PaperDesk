@@ -19,6 +19,8 @@ Only the integrating writer changes the index, branches or commits. Review exact
 
 `.content-update/` is ignored but **is not disposable cache**: its previous catalog and receipt support intentional selection rollback. Inspect interrupted transactions with the importer; do not delete recovery records during routine cleanup. Ignoring files does not remove tracked copies or their history.
 
+The explicitly authorized private-repository research workspace is tracked under `research-workspace/`. It holds complete explorations and immutable revisions, separately from public content and source code. Include its new JSON revisions when transferring research between computers; do not include the other ignored personal stores or credentials. See [exploration Git workflow](EXPLORATION-GIT.md). Generated temporary workspace files remain ignored.
+
 Content hashes cover exact bytes. `.gitattributes` disables text normalization for `content/**`; never blanket-format or convert reviewed content. Other source text uses LF for portable checkouts.
 
 ## Local artifacts and cleanup

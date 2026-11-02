@@ -17,11 +17,11 @@ function protectBackendFiles(request: IncomingMessage, response: ServerResponse,
   path = path.replaceAll('\\', '/');
   // Browser acceptance uses this origin with synthetic IndexedDB records.
   // Never let that isolated frontend read the normal AI service's conversations.
-  if (request.headers.host === '127.0.0.1:4174' && /^\/api\/ai(?:\/|$)/.test(path)) {
+  if (request.headers.host === '127.0.0.1:4174' && /^\/api\/(?:ai|workspace)(?:\/|$)/.test(path)) {
     response.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
     response.end(JSON.stringify({ message: '隔离测试来源未连接 AI 服务。' })); return;
   }
-  if (/(^|\/)(server|private|personal-data|backups|\.git|\.cache|\.content-update|\.source-review|incoming)(\/|$)/i.test(path)) {
+  if (/(^|\/)(server|private|personal-data|backups|research-workspace|\.git|\.cache|\.content-update|\.source-review|incoming)(\/|$)/i.test(path)) {
     response.writeHead(403, { 'Cache-Control': 'no-store' }); response.end('Forbidden'); return;
   }
   next();
@@ -40,9 +40,9 @@ export default defineConfig(({ command }) => {
   }],
   html: { cspNonce: nonce },
   server: { host: '127.0.0.1', port: 4173, strictPort: true,
-    fs: { deny: ['**/.env', '**/.env.*', '**/*.{crt,pem,key}', '**/.git/**', '**/.cache/**', '**/server/**', '**/private/**', '**/personal-data/**', '**/backups/**', '**/.content-update/**', '**/.source-review/**', '**/incoming/**'] },
-    proxy: { '/api/ai': { target: 'http://127.0.0.1:4176', changeOrigin: false } },
-    watch: { ignored: ['**/.cache/**', '**/private/**', '**/server/**', '**/incoming/**', '**/.content-update/**', '**/.source-review/**', '**/docs/evidence/**'] } },
+    fs: { deny: ['**/.env', '**/.env.*', '**/*.{crt,pem,key}', '**/.git/**', '**/.cache/**', '**/server/**', '**/private/**', '**/personal-data/**', '**/backups/**', '**/research-workspace/**', '**/.content-update/**', '**/.source-review/**', '**/incoming/**'] },
+    proxy: { '/api/ai': { target: 'http://127.0.0.1:4176', changeOrigin: false }, '/api/workspace': { target: 'http://127.0.0.1:4176', changeOrigin: false } },
+    watch: { ignored: ['**/.cache/**', '**/private/**', '**/server/**', '**/research-workspace/**', '**/incoming/**', '**/.content-update/**', '**/.source-review/**', '**/docs/evidence/**'] } },
   preview: { host: '127.0.0.1', port: 4173, strictPort: true,
-    proxy: { '/api/ai': { target: 'http://127.0.0.1:4176', changeOrigin: false } } },
+    proxy: { '/api/ai': { target: 'http://127.0.0.1:4176', changeOrigin: false }, '/api/workspace': { target: 'http://127.0.0.1:4176', changeOrigin: false } } },
 }; });

@@ -11,6 +11,7 @@ import { ExplorePage, LensPage, ExplorationPage } from '../exploration';
 import { PacketDialog } from '../handoff/PacketDialog';
 import type { Exploration } from '../records/types';
 import type { Guide } from '../content/types';
+import { ExplorationSync } from '../records/ExplorationSync';
 import { personalStore } from '../records/store';
 import { reconcileReadingAssignments, readingAssignmentIssueText } from '../research/reading-assignments';
 
@@ -98,5 +99,5 @@ export function App() {
   else if (question) page = <ExplorationPage key={question[1]} explorationId={question[1]} onHandoff={setPacket} />;
   else if (import.meta.env.DEV && pathname === '/__fixtures/reader') page = <GuidePage key="fixture" id="agent-survey" revision={1} synthetic />;
   else page = <Missing id={match?.[1]} />;
-  return <><a href="#main-content" className="skip-link">跳至正文</a><Header pathname={pathname} /><ReadingAssignments />{page}{packet && <PacketDialog exploration={packet} onClose={() => setPacket(undefined)} />}</>;
+  return <><a href="#main-content" className="skip-link">跳至正文</a><Header pathname={pathname} /><ReadingAssignments /><ExplorationSync />{page}{packet && <PacketDialog exploration={packet} onClose={() => setPacket(undefined)} />}</>;
 }

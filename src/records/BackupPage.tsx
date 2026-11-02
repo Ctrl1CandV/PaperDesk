@@ -143,9 +143,10 @@ export function BackupPage() {
       <p className="records-muted">笔记和探索的冲突默认保留两份；阅读位置、阅读标记和设置默认保留本地。</p>
       <div className="form-actions"><button className="primary-action" disabled={busy} onClick={() => void applyImport()}>确认按以上选择导入</button><button className="secondary-action" disabled={busy} onClick={() => { void discardPreview().then(() => { source.current = ''; setError(''); setNotice('已取消，本地记录未改变。'); }).catch(reason => setError(message(reason))); }}>取消导入</button><button className="secondary-action" disabled={busy} onClick={() => void makePreview(source.current)}>重新预览</button></div>
     </section>}
-    <section className="records-section records-removal" aria-labelledby="remove-records-title"><div><h2 id="remove-records-title">清除本地记录</h2><p>清除当前来源的笔记、探索、位置、主动标记和阅读设置。导读正文不受影响。</p></div><button className="records-danger secondary-action" disabled={busy} onClick={() => { setRemoveOpen(true); setConfirmRemoval(false); }}>清除前确认</button></section>
+    <section className="records-section records-removal" aria-labelledby="remove-records-title"><div><h2 id="remove-records-title">清除本地记录</h2><p>清除当前来源的笔记、探索缓存、位置、主动标记和阅读设置，并暂停项目同步。项目文件中的探索仍保留；要删除跨电脑共享的方向，请在探索页删除该方向。</p></div><button className="records-danger secondary-action" disabled={busy} onClick={() => { setRemoveOpen(true); setConfirmRemoval(false); }}>清除前确认</button></section>
     {removeOpen && <Dialog title="确认清除本地记录" onClose={() => { if (!busy) setRemoveOpen(false); }}>
       <p>这会删除当前浏览器来源的全部个人记录。此操作无法撤销；已有备份可重新导入。</p>
+      <p>项目文件中的探索与版本历史会保留，同步将暂停。点击“恢复项目同步”后才会重新载入；此操作不会删除其他电脑上的探索。</p>
       <button className="secondary-action" disabled={busy} onClick={() => void exportFile()}>先导出完整备份</button>
       {error && <p role="alert" className="records-error">{error}</p>}{notice && <p role="status">{notice}</p>}
       <label className="records-confirm"><input type="checkbox" checked={confirmRemoval} onChange={event => setConfirmRemoval(event.target.checked)} />我确认清除全部个人记录和阅读设置</label>

@@ -9,6 +9,8 @@ const storeNames: StoreName[] = ['notes', 'explorations', 'resume', 'guideStates
 const allStores = [...storeNames, 'preferences'];
 const metaStore = '_metadata', stageStore = '_backupStage', migrationStore = '_migrationV1', researchMigrationStore = '_migrationV2';
 type ChangeStore = StoreName | 'preferences';
+export interface ExplorationSyncBaseline { heads: string[]; localFingerprint: string }
+const syncPrefix = 'exploration-sync:';
 export const emptyStats = (): RecordStats => ({ bytes: 0, counts: { notes: 0, explorations: 0, resume: 0, guideStates: 0, originalStates: 0 }, revision: 0, limitBytes: MAX_PERSONAL_BYTES, migrationBackupAvailable: false });
 export class ConflictError extends Error {
   constructor(public current: Note | Exploration | null) { super('记录已在另一处修改或删除。当前草稿仍保留，请比较后选择保存副本或重新载入。'); this.name = 'ConflictError'; }
@@ -184,6 +186,50 @@ export class PersonalRecordStore {
   }
   async get<K extends StoreName>(name: K, key: string): Promise<RecordMap[K] | undefined> {
     return this.run([name], 'readonly', transaction => request(transaction.objectStore(name).get(key)));
+  }
+  /** A consistent local snapshot for three-way file reconciliation. No other personal stores are read. */
+  async explorationSyncState(): Promise<{ records: Exploration[]; baselines: Record<string, ExplorationSyncBaseline>; paused: boolean }> {
+    return this.run(['explorations', metaStore], 'readonly', async transaction => {
+      const metadata = transaction.objectStore(metaStore);
+      const records = await request<Exploration[]>(transaction.objectStore('explorations').getAll());
+      const keys = await request<IDBValidKey[]>(metadata.getAllKeys());
+      const baselines: Record<string, ExplorationSyncBaseline> = {};
+      for (const key of keys) if (typeof key === 'string' && key.startsWith(syncPrefix)) baselines[key.slice(syncPrefix.length)] = await request(metadata.get(key));
+      return { records, baselines, paused: (await request(metadata.get('exploration-sync-paused'))) === true };
+    });
+  }
+  /** Import/acknowledge a project revision atomically; the baseline also protects competing tabs. */
+  async applyExplorationSync(input: { id: string; baseline: ExplorationSyncBaseline; expectedBaseline: ExplorationSyncBaseline | null; expected?: Exploration | null; record?: Exploration | null }) {
+    const { id, baseline, expectedBaseline } = input;
+    if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f]{64}$/.test(baseline.localFingerprint) || !Array.isArray(baseline.heads) || baseline.heads.some(hash => !/^[0-9a-f]{64}$/.test(hash))) throw new ValidationError('探索项目同步元数据无效。');
+    let next = input.record === undefined ? undefined : input.record === null ? null : structuredClone(input.record);
+    if (next) {
+      if (next.id !== id) throw new ValidationError('探索项目版本身份不一致。');
+      // A previously opened editor must not be able to overwrite imported text with the same revision.
+      next.recordRevision = Math.max(next.recordRevision, (input.expected?.recordRevision ?? 0) + 1);
+      validateRecord('explorations', next); await verifyResearchRecord(next);
+    }
+    await this.run(['explorations', metaStore], 'readwrite', async transaction => {
+      const metadata = transaction.objectStore(metaStore), store = transaction.objectStore('explorations');
+      if ((await request(metadata.get('exploration-sync-paused'))) === true) throw new StorageError('项目同步已暂停，浏览器记录未改变。');
+      const currentBaseline = await request<ExplorationSyncBaseline | undefined>(metadata.get(`${syncPrefix}${id}`));
+      if (canonical(currentBaseline ?? null) !== canonical(expectedBaseline)) throw new ConflictError(null);
+      if (next !== undefined) {
+        const current = await request<Exploration | undefined>(store.get(id));
+        if (canonical(current ?? null) !== canonical(input.expected ?? null)) throw new ConflictError(current ?? null);
+        if (canonical(current ?? null) !== canonical(next)) {
+          await this.accountChange(transaction, 'explorations', current, next ?? undefined);
+          if (next) await request(store.put(next, id)); else await request(store.delete(id));
+        }
+      }
+      await request(metadata.put(structuredClone(baseline), `${syncPrefix}${id}`));
+    });
+    // Metadata-only acknowledgement is intentionally silent: no feedback loop.
+    if (next !== undefined) this.notifyChange('explorations');
+  }
+  async resumeExplorationSync() {
+    await this.run([metaStore], 'readwrite', transaction => request(transaction.objectStore(metaStore).delete('exploration-sync-paused')));
+    this.notifyChange();
   }
   private async saveVersioned<T extends Note | Exploration>(name: 'notes' | 'explorations', draft: NoteDraft | ExplorationDraft, expectedRevision: number | null): Promise<T> {
     draft = structuredClone(draft);
@@ -464,6 +510,7 @@ export class PersonalRecordStore {
       const stats = await request<RecordStats>(transaction.objectStore(metaStore).get('stats'));
       for (const name of [...allStores, stageStore, migrationStore, researchMigrationStore]) transaction.objectStore(name).clear();
       transaction.objectStore(metaStore).clear(); transaction.objectStore(metaStore).put({ ...emptyStats(), revision: stats.revision + 1 }, 'stats');
+      transaction.objectStore(metaStore).put(true, 'exploration-sync-paused');
     });
     const backup = await this.exportBackup();
     if (storeNames.some(name => backup[name].length) || Object.keys(backup.preferences).length) throw new StorageError('清除后记录发生变化，请重新查看。');

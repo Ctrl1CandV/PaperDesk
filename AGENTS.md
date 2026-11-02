@@ -20,6 +20,8 @@ The subsequent AI reading extension explicitly adds a reader-triggered model ser
 
 These are project instructions, not a filesystem security boundary. The operator must separately restrict the execution environment.
 
+The subsequent Git research-workspace extension explicitly authorizes persisting complete explorations in `research-workspace/` for transfer through a private repository. This is the scoped exception to the earlier exclusion of private records from Git and synchronization from the local product. Preserve record IDs, provenance, notebook history, conflict branches and deletions; do not put real records into source, tests, reports or screenshots. Notes, reading marks, AI history, credentials and source-material stores retain their separate privacy boundaries. See docs/development/EXPLORATION-GIT.md.
+
 Implementation is assigned to Codex in this standalone workspace. The product specification remains 1.1; the implementation handoff revision is codex-2026-10-21. Do not inherit role/model settings, branch policies or implementation status from another project. Use available agents honestly, give each an explicit read/write scope and acceptance criteria, and never claim an unavailable named model was used.
 
 Use a Windows-compatible local workflow. Quote paths containing spaces, use project-local tooling and document portable npm commands. Do not assume a shell profile, a Linux installation or a previous development server exists. Create the dependency lockfile in W0; creating a lockfile does not authorize a Git commit.
