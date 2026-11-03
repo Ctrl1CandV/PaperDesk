@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import catalog from '../../content/catalog.json' with { type: 'json' };
-import memory from '../../content/guides/rag-survey.json' with { type: 'json' };
+import memory from '../../content/guides/rag-survey.r2.json' with { type: 'json' };
 
 // SYNTHETIC reading marks only; the AI transport is a local stub and never sends a question.
 const revision = catalog.currentRevisions['rag-survey'];

@@ -164,3 +164,14 @@ IndexedDB/SQLite layout 均升级至 3，保留升级前恢复副本；个人新
 本次 `npm test` 383/383 通过，`npm run build -- --logLevel warn` 和 `git diff --check` 通过；构建提示部分压缩产物超过 500 kB。在隔离来源 4174 的应用内浏览器实际查看了书架、Toolformer 选中卡与导学、阅读正文/目录/AI 面板、空笔记弹窗和教学图，截图位于忽略的 `.cache/palette-review/`。本地 Playwright 浏览器缺失，`npx playwright install chromium` 因 `ECONNRESET` 失败，本次未运行自动化浏览器套件，也未做窄视口或真机检查；隔离来源未连接 AI 服务，未调用模型或读取正常来源的个人记录。
 
 先通过[学习导览](../learning/README.md)定位负责模块，再进行必要改动。增加阅读内容遵循[内容工作流](../content/workflows/CONTENT-WORKFLOW.md)和[来源与图示规范](../content/workflows/SOURCES-AND-VISUALS.md)。部署、同步和云服务仍需另行确定范围。
+
+## 导读加深试点 · 2026-11-03
+
+读者反馈导读过度压缩、缩写难懂、缺少原图、语言机械。本轮新增：
+
+- 共享术语表与正文术语卡片（`content/glossary.json`，128 条，对全部导读生效）；
+- 原论文图组件（图注、出处、许可、放大）；
+- 信息卡多段文字；
+- 试点修订 transformer r2 与 rag-survey r2。
+
+读者第一轮验收认为方向正确，但仍需修改：卡片不放图、三段文字写得更充分；抓住核心并讲长讲细，例如 Transformer 的架构和多头注意力；RAG 综述的解析进一步放宽篇幅。具体交接待办、核验记录与原图许可依据，见[导读加深试点](../research/reading-depth-pilot.md)。正式内容工作流将在验收后更新。

@@ -16,7 +16,7 @@ test('venue references prefer CCF A/B and use a dated CAS major category where a
     await expect(reference).toContainText(edition);
     await expect(reference).toHaveAttribute('href', /^https:\/\//);
     await expect(reference).toHaveAttribute('rel', 'noopener noreferrer');
-    await expect(page.locator('.orientation-prose p')).toHaveCount(3);
+    await expect(page.locator('.orientation-prose h3')).toHaveCount(3);
   }
   // Guides taken off the shelf keep their ranking for exact routes and saved references.
   const archived = await page.evaluate(async () => {

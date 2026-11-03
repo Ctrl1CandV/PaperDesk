@@ -8,11 +8,13 @@ type LibraryBrief = {
   value: string;
   advice: string;
   chapterLabels: Record<string, string | undefined>;
+  /** Optional key figure: a declared asset path of the same revision. */
+  figure?: string;
   sourceUpdatedAt: string | null;
   sourceRecordUrl: string | null;
 };
 
-const briefs: LibraryBrief[] = data.entries;
+const briefs = data.entries as LibraryBrief[];
 
 // A brief describes one approved revision; a newly imported guide must never
 // inherit prose, chapter labels or dates from a different revision.

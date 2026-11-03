@@ -1,0 +1,1665 @@
+{
+ "schemaVersion": 1,
+ "entries": [
+  {
+   "id": "llm",
+   "term": "LLM",
+   "aliases": [
+    "LLM",
+    "LLMs",
+    "大语言模型"
+   ],
+   "full": "Large Language Model",
+   "zh": "大语言模型",
+   "field": "自然语言处理 · 模型类别",
+   "explain": "参数规模很大、在海量文本上以“预测下一个词元”为目标预训练出来的语言模型，如 GPT-3、GPT-4、LLaMA。规模足够大后，它们能根据提示完成许多没有专门训练过的任务。",
+   "builds": "建立在 Transformer 架构和自回归预训练之上；ChatGPT 等对话助手是在其上再做指令微调和人类反馈对齐的结果。",
+   "guide": "/read/llm-survey/1#u02"
+  },
+  {
+   "id": "ptm",
+   "term": "PTM",
+   "aliases": [
+    "PTM",
+    "PTMs",
+    "预训练模型"
+   ],
+   "full": "Pre-trained Model",
+   "zh": "预训练模型",
+   "field": "自然语言处理 · 模型类别",
+   "explain": "先在大规模无标注数据上用通用目标训练，再迁移到具体任务的模型，如 BERT、GPT。大语言模型可以看作规模很大的预训练模型。"
+  },
+  {
+   "id": "token",
+   "term": "词元",
+   "aliases": [
+    "词元"
+   ],
+   "full": "Token",
+   "field": "自然语言处理 · 基本概念",
+   "explain": "模型处理文本的基本单位，可以是一个词、一个子词或一个字符。例如英文 unbelievable 可能被切成 un、believ、able 三个词元。模型的输入长度、计算量和调用费用通常都按词元计算。"
+  },
+  {
+   "id": "autoregressive",
+   "term": "自回归",
+   "aliases": [
+    "自回归"
+   ],
+   "full": "Autoregressive",
+   "field": "自然语言处理 · 生成方式",
+   "explain": "生成时每次只预测下一个元素，再把它接到已有输出后面继续预测。GPT 等语言模型都是这样一个词元一个词元地生成文本，所以生成过程无法完全并行。"
+  },
+  {
+   "id": "hallucination",
+   "term": "幻觉",
+   "aliases": [
+    "幻觉"
+   ],
+   "full": "Hallucination",
+   "field": "大模型 · 可靠性问题",
+   "explain": "模型生成看似合理、实际与事实或给定材料不符的内容，例如编造不存在的论文或数字。减少幻觉是 RAG 的主要出发点之一。"
+  },
+  {
+   "id": "icl",
+   "term": "ICL",
+   "aliases": [
+    "ICL",
+    "上下文学习"
+   ],
+   "full": "In-Context Learning",
+   "zh": "上下文学习",
+   "field": "大模型使用 · 提示方法",
+   "explain": "不更新模型参数，只在提示里给出任务说明和几个示例，模型就能完成新任务。GPT-3 论文系统展示了这种能力；RAG 能“把资料放进提示就起作用”，也依赖于它。",
+   "guide": "/read/gpt3/1#u03",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2005.14165"
+   }
+  },
+  {
+   "id": "zero-shot",
+   "term": "零样本",
+   "aliases": [
+    "零样本",
+    "zero-shot"
+   ],
+   "full": "Zero-shot",
+   "field": "机器学习 · 使用设定",
+   "explain": "不提供任何示例，只给任务说明就让模型完成任务。与之相对，少样本是在提示中给几个示例。"
+  },
+  {
+   "id": "few-shot",
+   "term": "少样本",
+   "aliases": [
+    "少样本",
+    "few-shot"
+   ],
+   "full": "Few-shot",
+   "field": "机器学习 · 使用设定",
+   "explain": "只提供少量示例（通常几个到几十个）让模型完成任务。对大语言模型而言，这些示例往往直接写在提示里，而不是用来更新参数。"
+  },
+  {
+   "id": "cot",
+   "term": "CoT",
+   "aliases": [
+    "CoT",
+    "思维链"
+   ],
+   "full": "Chain-of-Thought",
+   "zh": "思维链",
+   "field": "大模型使用 · 提示方法",
+   "explain": "在提示中示范“先写出推理步骤，再给答案”，引导模型逐步推理。Wei 等 2022 年发现，它能让足够大的模型在算术、常识和符号推理上明显变好。",
+   "builds": "从少样本提示发展而来：示例里不只给答案，还给解题过程。后来的 IRCoT 等方法把它和检索交替使用。",
+   "guide": "/read/chain-of-thought/1#u01",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2201.11903"
+   }
+  },
+  {
+   "id": "fine-tuning",
+   "term": "微调",
+   "aliases": [
+    "微调",
+    "FT",
+    "Fine-tuning",
+    "fine-tuning"
+   ],
+   "full": "Fine-Tuning",
+   "zh": "微调",
+   "field": "机器学习 · 训练方法",
+   "explain": "在已经预训练好的模型上，用特定任务或领域的数据继续训练、调整参数。与 RAG 相比，知识被写进参数里，更新要重新训练，但能更深地改变模型的行为和风格。"
+  },
+  {
+   "id": "sft",
+   "term": "SFT",
+   "aliases": [
+    "SFT",
+    "监督微调"
+   ],
+   "full": "Supervised Fine-Tuning",
+   "zh": "监督微调",
+   "field": "大模型训练 · 微调",
+   "explain": "用人工写好的“输入—理想输出”样例，以监督学习的方式继续训练预训练模型，让它学会按指令回答。它通常是训练对话模型的第一步。",
+   "builds": "是微调的一种；InstructGPT 的流程是先做 SFT，再训练奖励模型，最后用强化学习（RLHF）进一步对齐。",
+   "guide": "/read/instructgpt/2#u03",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2203.02155"
+   }
+  },
+  {
+   "id": "rlhf",
+   "term": "RLHF",
+   "aliases": [
+    "RLHF",
+    "人类反馈强化学习"
+   ],
+   "full": "Reinforcement Learning from Human Feedback",
+   "zh": "人类反馈强化学习",
+   "field": "大模型训练 · 对齐方法",
+   "explain": "先让人给模型的多个回答排序，训练一个预测人类偏好的奖励模型，再用强化学习让模型生成更符合偏好的回答。ChatGPT 类模型用它让输出更有帮助、更少有害内容。",
+   "builds": "通常接在监督微调之后；InstructGPT 是把它系统用于大语言模型的代表工作。RAG 中也有人借鉴这一思路，用语言模型的反馈训练检索器。",
+   "guide": "/read/instructgpt/2#u03",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2203.02155"
+   }
+  },
+  {
+   "id": "rl",
+   "term": "强化学习",
+   "aliases": [
+    "强化学习",
+    "RL"
+   ],
+   "full": "Reinforcement Learning",
+   "zh": "强化学习",
+   "field": "机器学习 · 学习范式",
+   "explain": "让模型通过试错学习：根据行动得到的奖励信号调整策略，以获得更高的累计奖励。在语言模型中，“奖励”常来自人类偏好或另一个模型的评分。"
+  },
+  {
+   "id": "contrastive",
+   "term": "对比学习",
+   "aliases": [
+    "对比学习"
+   ],
+   "full": "Contrastive Learning",
+   "field": "机器学习 · 训练方法",
+   "explain": "拉近相关样本（正样本）的表示、推远无关样本（负样本）的表示的训练方法。检索器常用它学习让问题和对应文档的向量彼此靠近。"
+  },
+  {
+   "id": "distillation",
+   "term": "蒸馏",
+   "aliases": [
+    "知识蒸馏",
+    "蒸馏"
+   ],
+   "full": "Knowledge Distillation",
+   "zh": "知识蒸馏",
+   "field": "机器学习 · 训练方法",
+   "explain": "用一个大而强的模型（教师）的输出去训练一个小模型（学生），让小模型以更低成本获得相近的能力。"
+  },
+  {
+   "id": "kl",
+   "term": "KL 散度",
+   "aliases": [
+    "KL 散度",
+    "KL散度",
+    "KL divergence"
+   ],
+   "full": "Kullback–Leibler Divergence",
+   "field": "机器学习 · 数学工具",
+   "explain": "衡量两个概率分布差异的量。训练时最小化 KL 散度，可以让一个模型的输出分布向另一个靠拢，例如让检索器的打分贴近大模型的偏好。"
+  },
+  {
+   "id": "scaling-law",
+   "term": "规模规律",
+   "aliases": [
+    "规模规律",
+    "scaling laws",
+    "Scaling laws"
+   ],
+   "full": "Scaling Laws",
+   "field": "大模型 · 经验规律",
+   "explain": "模型性能随参数量、数据量和计算量增长，大致按幂律稳定提升的经验规律。它是大模型不断做大的重要依据。"
+  },
+  {
+   "id": "agent",
+   "term": "Agent",
+   "aliases": [
+    "Agent",
+    "Agents",
+    "智能体"
+   ],
+   "zh": "智能体",
+   "field": "人工智能 · 系统类型",
+   "explain": "能感知环境、制定计划、调用工具并采取行动来完成目标的系统。以大模型为核心的 Agent，把语言模型放进“观察—思考—行动”的循环里。",
+   "guide": "/read/agent-survey/2"
+  },
+  {
+   "id": "gpt3",
+   "term": "GPT-3",
+   "aliases": [
+    "GPT-3"
+   ],
+   "field": "大模型 · 代表模型",
+   "explain": "OpenAI 2020 年发布的 1750 亿参数自回归语言模型。它展示了只靠在提示中给示例就能完成多种任务的上下文学习能力。",
+   "guide": "/read/gpt3/1#u01",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2005.14165"
+   }
+  },
+  {
+   "id": "chatgpt",
+   "term": "ChatGPT",
+   "aliases": [
+    "ChatGPT"
+   ],
+   "field": "大模型 · 代表产品",
+   "explain": "OpenAI 2022 年底发布的对话产品，在 GPT-3.5 系列模型上用指令微调和人类反馈强化学习对齐。它的普及推动了大模型和 RAG 研究的快速增长。"
+  },
+  {
+   "id": "toolformer",
+   "term": "Toolformer",
+   "aliases": [
+    "Toolformer"
+   ],
+   "field": "大模型 · 工具使用",
+   "explain": "让语言模型自己学会何时调用计算器、搜索等外部工具：先在文本中尝试插入工具调用，只保留确实帮助预测后文的调用作为训练数据，再用它微调模型。",
+   "guide": "/read/toolformer/1#u01",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2302.04761"
+   }
+  },
+  {
+   "id": "autogpt",
+   "term": "AutoGPT",
+   "aliases": [
+    "AutoGPT"
+   ],
+   "field": "大模型 · Agent 项目",
+   "explain": "2023 年流行的开源项目，让 GPT-4 自主地把目标拆成子任务、调用工具并循环执行，是早期“自主智能体”的代表之一。"
+  },
+  {
+   "id": "webgpt",
+   "term": "WebGPT",
+   "aliases": [
+    "WebGPT"
+   ],
+   "field": "检索增强 · 自适应检索",
+   "explain": "OpenAI 2021 年的工作：在文本浏览环境中微调 GPT-3，让它会搜索、浏览网页并收集引用来回答长问题，先模仿人类示范，再用人类反馈优化。",
+   "builds": "是让模型自己决定何时搜索的早期代表，与后来的 Toolformer、FLARE 思路相通。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2112.09332"
+   }
+  },
+  {
+   "id": "transformer",
+   "term": "Transformer",
+   "aliases": [
+    "Transformer"
+   ],
+   "field": "深度学习 · 模型架构",
+   "explain": "2017 年提出的神经网络架构，完全依靠注意力在序列各位置之间传递信息，不再使用循环和卷积。它训练时可以高度并行，后来成为几乎所有大语言模型的基础。",
+   "builds": "沿用编码器—解码器框架，用自注意力取代 RNN；后来的 GPT 系列只保留解码器部分。",
+   "guide": "/read/transformer/2#architecture",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1706.03762"
+   }
+  },
+  {
+   "id": "rnn",
+   "term": "RNN",
+   "aliases": [
+    "RNN",
+    "RNNs",
+    "循环神经网络",
+    "循环网络"
+   ],
+   "full": "Recurrent Neural Network",
+   "zh": "循环神经网络",
+   "field": "深度学习 · 序列模型",
+   "explain": "按顺序逐个读入序列元素，每一步把当前输入和上一步的隐状态合成新的隐状态，以此“记住”前文。由于必须一步接一步地算，同一个序列内部很难并行。",
+   "builds": "LSTM 和 GRU 是它的改良版；Transformer 用注意力取代了它在位置之间传递信息的作用。"
+  },
+  {
+   "id": "lstm",
+   "term": "LSTM",
+   "aliases": [
+    "LSTM"
+   ],
+   "full": "Long Short-Term Memory",
+   "zh": "长短期记忆网络",
+   "field": "深度学习 · 序列模型",
+   "explain": "一种改良的 RNN，用输入门、遗忘门和输出门控制信息的写入、保留和读出，缓解普通 RNN 在长序列上记不住远处信息的问题。",
+   "builds": "由 Hochreiter 与 Schmidhuber 于 1997 年提出，在 Transformer 出现前是序列建模的主流方案。",
+   "source": {
+    "label": "Hochreiter & Schmidhuber, Neural Computation 1997",
+    "url": "https://doi.org/10.1162/neco.1997.9.8.1735"
+   }
+  },
+  {
+   "id": "gru",
+   "term": "GRU",
+   "aliases": [
+    "GRU"
+   ],
+   "full": "Gated Recurrent Unit",
+   "zh": "门控循环单元",
+   "field": "深度学习 · 序列模型",
+   "explain": "另一种带门控的 RNN，只有更新门和重置门，结构比 LSTM 简单，效果通常相近。",
+   "builds": "由 Cho 等在 2014 年提出，可看作 LSTM 的简化版。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1406.1078"
+   }
+  },
+  {
+   "id": "cnn",
+   "term": "CNN",
+   "aliases": [
+    "CNN",
+    "CNNs",
+    "卷积神经网络"
+   ],
+   "full": "Convolutional Neural Network",
+   "zh": "卷积神经网络",
+   "field": "深度学习 · 模型架构",
+   "explain": "用一个小窗口（卷积核）在输入上滑动、提取局部特征的网络。所有位置可以同时计算，但每层只看局部，远距离的两个位置要叠很多层才能联系起来。",
+   "builds": "最初用于图像；ConvS2S、ByteNet 把它用于机器翻译，是 Transformer 论文比较的对象。"
+  },
+  {
+   "id": "convs2s",
+   "term": "ConvS2S",
+   "aliases": [
+    "ConvS2S"
+   ],
+   "full": "Convolutional Sequence to Sequence",
+   "field": "机器翻译 · 模型",
+   "explain": "Facebook 2017 年提出的完全基于卷积的序列到序列翻译模型，各位置并行计算，并在编码器和解码器之间使用注意力。",
+   "builds": "用 CNN 替代 RNN 来提高并行度；Transformer 论文指出，它连接两个位置所需的操作数随距离线性增长。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1705.03122"
+   }
+  },
+  {
+   "id": "bytenet",
+   "term": "ByteNet",
+   "aliases": [
+    "ByteNet"
+   ],
+   "field": "机器翻译 · 模型",
+   "explain": "DeepMind 提出的卷积翻译模型，用空洞卷积扩大感受野，使远距离位置之间的路径长度按对数增长。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1610.10099"
+   }
+  },
+  {
+   "id": "seq2seq",
+   "term": "Seq2Seq",
+   "aliases": [
+    "Seq2Seq",
+    "seq2seq",
+    "序列到序列",
+    "编码器—解码器"
+   ],
+   "full": "Sequence to Sequence",
+   "zh": "序列到序列",
+   "field": "深度学习 · 模型结构",
+   "explain": "把输入序列映射成输出序列的模型结构：编码器把输入编码成向量表示，解码器据此逐个生成输出。机器翻译、文本摘要都是典型任务。",
+   "builds": "Sutskever 等 2014 年用 LSTM 实现了这一结构，Bahdanau 等随后加入注意力；Transformer 沿用了编码器—解码器的整体框架。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1409.3215"
+   }
+  },
+  {
+   "id": "attention",
+   "term": "注意力机制",
+   "aliases": [
+    "注意力机制",
+    "attention mechanism"
+   ],
+   "full": "Attention Mechanism",
+   "field": "深度学习 · 核心机制",
+   "explain": "让模型在处理某个位置时，按相关程度给其他位置分配权重，再把它们的信息加权汇总。两个位置无论相隔多远，都能直接建立联系。",
+   "builds": "Bahdanau 等 2014 年首先用于神经机器翻译，让解码器生成每个词时回看原句的不同部分；Transformer 把它变成整个模型的核心。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1409.0473"
+   }
+  },
+  {
+   "id": "self-attention",
+   "term": "自注意力",
+   "aliases": [
+    "自注意力",
+    "self-attention",
+    "Self-Attention"
+   ],
+   "full": "Self-Attention",
+   "field": "深度学习 · 注意力机制",
+   "explain": "注意力的一种：查询、键、值都来自同一个序列，让序列中每个位置都能直接与所有位置交换信息。",
+   "builds": "早先用于阅读理解、句子表示等任务；Transformer 第一次只用它（不用 RNN 和卷积）构建完整的翻译模型。",
+   "guide": "/read/transformer/2#u02"
+  },
+  {
+   "id": "qkv",
+   "term": "Q、K、V",
+   "aliases": [
+    "Q、K、V",
+    "Q/K/V",
+    "QKV"
+   ],
+   "full": "Query, Key, Value",
+   "zh": "查询、键、值",
+   "field": "深度学习 · 注意力机制",
+   "explain": "注意力计算中的三组向量。查询（Q）表示“当前位置想找什么”，键（K）是每个位置供匹配的“标签”，值（V）是真正被取走的内容。Q 与 K 的匹配分数经 softmax 变成权重，再对 V 加权求和。",
+   "guide": "/read/transformer/2#u02"
+  },
+  {
+   "id": "multi-head",
+   "term": "多头注意力",
+   "aliases": [
+    "多头注意力",
+    "Multi-Head Attention"
+   ],
+   "full": "Multi-Head Attention",
+   "field": "深度学习 · 注意力机制",
+   "explain": "用多组不同的投影分别计算注意力，再把结果拼接起来。每个“头”的维度更小，总计算量与单头相近，但能同时关注不同类型的关系。",
+   "guide": "/read/transformer/2#u03"
+  },
+  {
+   "id": "softmax",
+   "term": "softmax",
+   "aliases": [
+    "softmax",
+    "Softmax",
+    "SoftMax"
+   ],
+   "field": "机器学习 · 基础函数",
+   "explain": "把一组任意实数变成加起来等于 1 的正数（概率分布），原来越大的数分到的比例越高。注意力用它把匹配分数变成权重，模型输出层用它把分数变成每个词的概率。"
+  },
+  {
+   "id": "layernorm",
+   "term": "LayerNorm",
+   "aliases": [
+    "LayerNorm",
+    "层归一化"
+   ],
+   "full": "Layer Normalization",
+   "zh": "层归一化",
+   "field": "深度学习 · 训练技巧",
+   "explain": "对单个样本在特征维度上做标准化（减均值、除以标准差，再乘可学习的缩放、加偏移），让每层输入的数值分布保持稳定，帮助深层网络训练。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1607.06450"
+   }
+  },
+  {
+   "id": "residual",
+   "term": "残差连接",
+   "aliases": [
+    "残差连接"
+   ],
+   "full": "Residual Connection",
+   "field": "深度学习 · 网络结构",
+   "explain": "把一层的输入直接加到它的输出上，即 x + F(x)。信号和梯度可以沿这条“捷径”穿过很多层，让很深的网络也能训练。",
+   "builds": "来自 He 等 2015 年的 ResNet；Transformer 在每个子层外都使用它。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1512.03385"
+   }
+  },
+  {
+   "id": "ffn",
+   "term": "FFN",
+   "aliases": [
+    "FFN",
+    "前馈网络"
+   ],
+   "full": "Feed-Forward Network",
+   "zh": "前馈网络",
+   "field": "深度学习 · 网络结构",
+   "explain": "Transformer 每层的第二个子层：两次线性变换中间夹一个激活函数，对每个位置分别独立计算。注意力负责位置之间交换信息，前馈网络负责加工每个位置自己的表示。",
+   "guide": "/read/transformer/2#u03"
+  },
+  {
+   "id": "relu",
+   "term": "ReLU",
+   "aliases": [
+    "ReLU"
+   ],
+   "full": "Rectified Linear Unit",
+   "zh": "修正线性单元",
+   "field": "深度学习 · 激活函数",
+   "explain": "最常用的激活函数之一：输入为正时原样输出，为负时输出 0，即 max(0, x)。计算简单，能缓解深层网络的梯度消失。"
+  },
+  {
+   "id": "positional-encoding",
+   "term": "位置编码",
+   "aliases": [
+    "位置编码",
+    "Positional Encoding"
+   ],
+   "full": "Positional Encoding",
+   "field": "深度学习 · Transformer 组件",
+   "explain": "注意力本身不区分顺序，因此要把表示位置的向量加到词向量上。原版 Transformer 用不同频率的正弦、余弦函数生成，也可以作为参数直接学出来。",
+   "guide": "/read/transformer/2#u04"
+  },
+  {
+   "id": "teacher-forcing",
+   "term": "teacher forcing",
+   "aliases": [
+    "teacher forcing"
+   ],
+   "field": "深度学习 · 训练方法",
+   "explain": "训练序列生成模型时，每一步都把正确答案的前文（而不是模型自己生成的前文）作为输入。这让训练可以并行，但训练和推理时看到的前文并不一样。"
+  },
+  {
+   "id": "bpe",
+   "term": "BPE",
+   "aliases": [
+    "BPE"
+   ],
+   "full": "Byte-Pair Encoding",
+   "zh": "字节对编码",
+   "field": "自然语言处理 · 分词方法",
+   "explain": "一种子词切分方法：从单个字符出发，反复把语料中最常相邻出现的两个片段合并成新单位，直到词表达到预定大小。生僻词可以拆成常见片段表示。",
+   "builds": "原是一种数据压缩算法，Sennrich 等 2015 年把它引入神经机器翻译；GPT 系列使用它的字节级变体。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1508.07909"
+   }
+  },
+  {
+   "id": "wordpiece",
+   "term": "word-piece",
+   "aliases": [
+    "word-piece",
+    "WordPiece"
+   ],
+   "field": "自然语言处理 · 分词方法",
+   "explain": "与 BPE 类似的子词切分方法，Google 的神经机器翻译系统用它把词切成更小的片段，以兼顾词表大小和对生僻词的覆盖。",
+   "builds": "由 Google 在语音和翻译系统中使用，GNMT 论文对其做了说明。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1609.08144"
+   }
+  },
+  {
+   "id": "bleu",
+   "term": "BLEU",
+   "aliases": [
+    "BLEU"
+   ],
+   "full": "Bilingual Evaluation Understudy",
+   "field": "机器翻译 · 评价指标",
+   "explain": "最常用的机器翻译自动评价指标：统计机器译文和人工参考译文在 1 到 4 个词的片段上重合多少，并惩罚过短的译文。分数越高越接近参考译文，但它不直接衡量意思是否正确。",
+   "source": {
+    "label": "Papineni 等，ACL 2002",
+    "url": "https://aclanthology.org/P02-1040/"
+   }
+  },
+  {
+   "id": "wmt",
+   "term": "WMT",
+   "aliases": [
+    "WMT"
+   ],
+   "full": "Conference on Machine Translation（原 Workshop on Statistical Machine Translation）",
+   "field": "机器翻译 · 评测活动",
+   "explain": "机器翻译领域的年度评测活动，每年发布标准训练数据和测试集（如 newstest2014），是比较翻译模型的通用基准。"
+  },
+  {
+   "id": "beam-search",
+   "term": "束搜索",
+   "aliases": [
+    "束搜索",
+    "beam search"
+   ],
+   "full": "Beam Search",
+   "field": "自然语言处理 · 解码方法",
+   "explain": "生成时每一步只保留得分最高的 k 个候选序列（k 称为束宽），继续扩展，最后选总分最高的一个。比每步只取最优词更全面，又比穷举省计算。"
+  },
+  {
+   "id": "label-smoothing",
+   "term": "标签平滑",
+   "aliases": [
+    "标签平滑",
+    "label smoothing"
+   ],
+   "full": "Label Smoothing",
+   "field": "深度学习 · 正则化",
+   "explain": "训练时不让正确答案的目标概率等于 1，而是留出一小部分（如 0.1）平均分给其他类别，防止模型过度自信，常能提高泛化。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1512.00567"
+   }
+  },
+  {
+   "id": "dropout",
+   "term": "dropout",
+   "aliases": [
+    "dropout",
+    "Dropout"
+   ],
+   "field": "深度学习 · 正则化",
+   "explain": "训练时随机把一部分神经元的输出置为 0（如丢弃率 0.1），迫使网络不依赖个别神经元，从而减少过拟合；推理时不丢弃。"
+  },
+  {
+   "id": "adam",
+   "term": "Adam",
+   "aliases": [
+    "Adam"
+   ],
+   "full": "Adaptive Moment Estimation",
+   "field": "深度学习 · 优化器",
+   "explain": "最常用的神经网络优化器之一：为每个参数维护梯度的一阶和二阶滑动平均，据此自适应地调整每个参数的更新步长。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1412.6980"
+   }
+  },
+  {
+   "id": "flops",
+   "term": "FLOPs",
+   "aliases": [
+    "FLOPs"
+   ],
+   "full": "Floating Point Operations",
+   "zh": "浮点运算次数",
+   "field": "计算 · 成本度量",
+   "explain": "浮点运算次数，这里指训练一个模型总共做了多少次浮点运算。Transformer 论文用“训练时长 × GPU 数 × 单卡估计算力”粗略换算，用来比较训练成本。"
+  },
+  {
+   "id": "perplexity",
+   "term": "困惑度",
+   "aliases": [
+    "困惑度",
+    "perplexity",
+    "PPL"
+   ],
+   "full": "Perplexity",
+   "field": "自然语言处理 · 评价指标",
+   "explain": "评价语言模型的指标，可以理解为模型在每个位置上平均“在多少个候选之间犹豫”。数值越低，说明模型对真实文本预测得越准。"
+  },
+  {
+   "id": "moe",
+   "term": "MoE",
+   "aliases": [
+    "MoE"
+   ],
+   "full": "Mixture of Experts",
+   "zh": "混合专家",
+   "field": "深度学习 · 模型架构",
+   "explain": "模型包含许多“专家”子网络，每个输入只交给路由器选中的少数几个专家处理。参数总量可以很大，单次计算量却不随之增长。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1701.06538"
+   }
+  },
+  {
+   "id": "gnmt",
+   "term": "GNMT",
+   "aliases": [
+    "GNMT"
+   ],
+   "full": "Google's Neural Machine Translation",
+   "field": "机器翻译 · 系统",
+   "explain": "Google 2016 年发布的神经机器翻译系统，基于深层 LSTM 编码器—解码器和注意力，当时代表工业界的最高水平。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/1609.08144"
+   }
+  },
+  {
+   "id": "rag",
+   "term": "RAG",
+   "aliases": [
+    "RAG",
+    "检索增强生成"
+   ],
+   "full": "Retrieval-Augmented Generation",
+   "zh": "检索增强生成",
+   "field": "自然语言处理 · 知识增强方法",
+   "explain": "生成回答之前，先从外部资料库检索相关内容，把检索结果和问题一起交给模型。模型参数可以不变，更新资料库就能更新知识，也便于指出答案的出处。",
+   "builds": "名称来自 Lewis 等 2020 年的论文，当时检索器和生成器一起微调；大模型时代多指推理时把检索结果放进提示的做法。",
+   "guide": "/read/rag/2#u01",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2005.11401"
+   }
+  },
+  {
+   "id": "naive-rag",
+   "term": "Naive RAG",
+   "aliases": [
+    "Naive RAG"
+   ],
+   "zh": "朴素 RAG",
+   "field": "检索增强 · 范式",
+   "explain": "最基础的 RAG 流程：把资料切块、编码、建索引；用问题检索最相似的若干块；把它们和问题拼成提示交给大模型。也叫 Retrieve-Read（先检索、再阅读）。",
+   "guide": "/read/rag-survey/2#u02"
+  },
+  {
+   "id": "advanced-rag",
+   "term": "Advanced RAG",
+   "aliases": [
+    "Advanced RAG"
+   ],
+   "zh": "进阶 RAG",
+   "field": "检索增强 · 范式",
+   "explain": "在朴素 RAG 的直线流程上，检索前优化索引和查询（改写、扩展、加元数据），检索后整理材料（重排、压缩），流程仍是一条链。",
+   "builds": "针对朴素 RAG 检索不准、材料冗余的问题而提出。",
+   "guide": "/read/rag-survey/2#u02"
+  },
+  {
+   "id": "modular-rag",
+   "term": "Modular RAG",
+   "aliases": [
+    "Modular RAG"
+   ],
+   "zh": "模块化 RAG",
+   "field": "检索增强 · 范式",
+   "explain": "把 RAG 拆成搜索、记忆、路由、预测等可替换的模块，可以增加、替换模块或调整它们的交互顺序，支持迭代、自适应等非线性流程。",
+   "builds": "继承并扩展了前两种范式，前两者可以看作它的特例。",
+   "guide": "/read/rag-survey/2#u02"
+  },
+  {
+   "id": "vector-db",
+   "term": "向量数据库",
+   "aliases": [
+    "向量数据库"
+   ],
+   "full": "Vector Database",
+   "field": "检索增强 · 基础设施",
+   "explain": "专门存储大量向量、并能快速找出与给定向量最相似者的数据库。RAG 用它保存文档块的嵌入向量。"
+  },
+  {
+   "id": "chunk",
+   "term": "chunk",
+   "aliases": [
+    "chunk",
+    "chunks"
+   ],
+   "zh": "文本块",
+   "field": "检索增强 · 基本概念",
+   "explain": "切分文档得到的片段，是 RAG 建索引和检索的基本单位。切得大，上下文完整但噪声多；切得小，检索精准但可能缺少必要的上下文。"
+  },
+  {
+   "id": "embedding-model",
+   "term": "嵌入模型",
+   "aliases": [
+    "嵌入模型",
+    "嵌入向量"
+   ],
+   "full": "Embedding Model",
+   "field": "信息检索 · 表示方法",
+   "explain": "把文本转换成固定长度向量的模型。语义相近的文本，向量也相近；检索就是计算问题向量和文档向量之间的相似度。"
+  },
+  {
+   "id": "dense-retrieval",
+   "term": "稠密检索",
+   "aliases": [
+    "稠密检索",
+    "dense retrieval"
+   ],
+   "full": "Dense Retrieval",
+   "field": "信息检索 · 检索方法",
+   "explain": "把问题和文档都编码成稠密向量，按向量相似度检索。能匹配用词不同但意思相近的内容，需要训练好的编码器。",
+   "builds": "与基于词面匹配的稀疏检索相对；DPR 是代表工作。"
+  },
+  {
+   "id": "sparse-retrieval",
+   "term": "稀疏检索",
+   "aliases": [
+    "稀疏检索"
+   ],
+   "full": "Sparse Retrieval",
+   "field": "信息检索 · 检索方法",
+   "explain": "以词为单位的检索：文档向量中只有出现过的词对应的维度非零，如 TF-IDF、BM25。擅长精确的词面匹配，对生僻实体名尤其可靠。"
+  },
+  {
+   "id": "bm25",
+   "term": "BM25",
+   "aliases": [
+    "BM25"
+   ],
+   "full": "Okapi Best Matching 25",
+   "field": "信息检索 · 打分函数",
+   "explain": "经典的稀疏检索打分方法：根据查询词在文档中出现的次数、在整个语料中有多罕见以及文档长度来计算相关度。只看词面，不理解同义词，但简单、快速。"
+  },
+  {
+   "id": "dpr",
+   "term": "DPR",
+   "aliases": [
+    "DPR"
+   ],
+   "full": "Dense Passage Retrieval",
+   "zh": "稠密段落检索",
+   "field": "信息检索 · 稠密检索",
+   "explain": "用两个编码器分别把问题和段落编码成向量，以内积衡量相关度的检索方法。在开放域问答上，前 20 个结果的准确率比 BM25 高 9 到 19 个百分点，是稠密检索的代表工作。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2004.04906"
+   }
+  },
+  {
+   "id": "mteb",
+   "term": "MTEB",
+   "aliases": [
+    "MTEB",
+    "C-MTEB"
+   ],
+   "full": "Massive Text Embedding Benchmark",
+   "field": "信息检索 · 评测基准",
+   "explain": "评测文本嵌入模型的大规模基准与排行榜，涵盖检索、聚类、分类等多类任务；C-MTEB 是面向中文的版本。"
+  },
+  {
+   "id": "bge",
+   "term": "BGE",
+   "aliases": [
+    "BGE"
+   ],
+   "full": "BAAI General Embedding",
+   "field": "信息检索 · 嵌入模型",
+   "explain": "北京智源人工智能研究院发布的通用嵌入模型系列，在中英文检索中常用，同系列也有专门的重排模型。"
+  },
+  {
+   "id": "odqa",
+   "term": "ODQA",
+   "aliases": [
+    "ODQA",
+    "开放域问答"
+   ],
+   "full": "Open-Domain Question Answering",
+   "zh": "开放域问答",
+   "field": "自然语言处理 · 任务",
+   "explain": "不给定参考文章，系统需要自己从维基百科等大型资料库中找依据来回答任意领域问题的任务，是检索增强方法最常用的测试场景。"
+  },
+  {
+   "id": "qa",
+   "term": "QA",
+   "aliases": [
+    "QA"
+   ],
+   "full": "Question Answering",
+   "zh": "问答",
+   "field": "自然语言处理 · 任务",
+   "explain": "问答任务：给定问题（有时还有资料），输出答案。RAG 最核心的下游任务。"
+  },
+  {
+   "id": "multi-hop",
+   "term": "多跳问答",
+   "aliases": [
+    "多跳问答",
+    "多跳检索",
+    "multi-hop"
+   ],
+   "full": "Multi-hop QA",
+   "zh": "多跳问答",
+   "field": "自然语言处理 · 任务类型",
+   "explain": "需要把多份资料中的信息串起来才能回答的问题，例如先查到某人的出生城市，再查这个城市属于哪个国家。一次检索往往不够。"
+  },
+  {
+   "id": "ie",
+   "term": "IE",
+   "aliases": [
+    "IE"
+   ],
+   "full": "Information Extraction",
+   "zh": "信息抽取",
+   "field": "自然语言处理 · 任务",
+   "explain": "从非结构化文本中抽取实体、关系、事件等结构化信息的任务。"
+  },
+  {
+   "id": "kg",
+   "term": "KG",
+   "aliases": [
+    "KG",
+    "KGs",
+    "知识图谱"
+   ],
+   "full": "Knowledge Graph",
+   "zh": "知识图谱",
+   "field": "知识表示 · 数据结构",
+   "explain": "用“实体—关系—实体”三元组表示知识的图结构数据，例如（巴黎，首都，法国）。信息经过整理和验证，比较精确，但构建和维护成本高。"
+  },
+  {
+   "id": "gnn",
+   "term": "GNN",
+   "aliases": [
+    "GNN",
+    "GNNs",
+    "图神经网络"
+   ],
+   "full": "Graph Neural Network",
+   "zh": "图神经网络",
+   "field": "深度学习 · 模型架构",
+   "explain": "直接在图结构数据上计算的神经网络，通过在相邻节点之间传递和聚合信息，学习节点或整张图的表示。"
+  },
+  {
+   "id": "nli",
+   "term": "NLI",
+   "aliases": [
+    "NLI"
+   ],
+   "full": "Natural Language Inference",
+   "zh": "自然语言推理",
+   "field": "自然语言处理 · 任务",
+   "explain": "判断两段文字之间的关系：前提能否推出假设（蕴含）、与之矛盾，还是无关。常用来检查生成内容是否得到材料支持。"
+  },
+  {
+   "id": "hyde",
+   "term": "HyDE",
+   "aliases": [
+    "HyDE",
+    "Reverse HyDE"
+   ],
+   "full": "Hypothetical Document Embeddings",
+   "zh": "假设文档嵌入",
+   "field": "信息检索 · 查询转换",
+   "explain": "先让大模型针对问题写一段“假设的答案文档”，再用它的向量去检索真实文档。假设文档可能有错误细节，但它“长得像”答案，比原问题更容易找到相似的真实文档。",
+   "builds": "针对缺少标注数据时稠密检索效果差的问题（Gao 等，2022）。在索引一侧反过来做，为每段资料生成它能回答的问题，被称为 Reverse HyDE。",
+   "guide": "/read/rag-survey/2#query",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2212.10496"
+   }
+  },
+  {
+   "id": "rrr",
+   "term": "RRR",
+   "aliases": [
+    "RRR",
+    "Rewrite-Retrieve-Read"
+   ],
+   "full": "Rewrite-Retrieve-Read",
+   "field": "检索增强 · 查询改写",
+   "explain": "在“检索—阅读”之前加一步改写：用一个可训练的小模型把问题改写成更适合搜索的查询，再检索并交给大模型作答。改写器根据大模型回答的好坏，用强化学习训练。",
+   "builds": "改进自直接用原问题检索的 Retrieve-Read 流程（Ma 等，2023）。",
+   "guide": "/read/rag-survey/2#u02",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.14283"
+   }
+  },
+  {
+   "id": "step-back",
+   "term": "Step-back",
+   "aliases": [
+    "Step-back Prompting",
+    "Step-Back Prompting",
+    "Step-back"
+   ],
+   "zh": "退一步提示",
+   "field": "大模型使用 · 提示方法",
+   "explain": "先让模型把具体问题抽象成一个更上位的问题，比如背后的概念或原理，再用它引导推理。在 RAG 中，原问题和上位问题都拿去检索。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.06117"
+   }
+  },
+  {
+   "id": "cove",
+   "term": "CoVe",
+   "aliases": [
+    "CoVe",
+    "Chain-of-Verification"
+   ],
+   "full": "Chain-of-Verification",
+   "zh": "验证链",
+   "field": "大模型使用 · 减少幻觉",
+   "explain": "模型先起草回答，再针对草稿列出需要核实的问题，独立回答这些问题，最后据此修正回答，以减少编造。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2309.11495"
+   }
+  },
+  {
+   "id": "beque",
+   "term": "BEQUE",
+   "aliases": [
+    "BEQUE"
+   ],
+   "field": "信息检索 · 查询改写",
+   "explain": "淘宝搜索中的长尾查询改写方法：用大模型把少见、表述不规范的搜索词改写成更容易检索的形式，提升了长尾查询的召回。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2311.03758"
+   }
+  },
+  {
+   "id": "genread",
+   "term": "GenRead",
+   "aliases": [
+    "GenRead",
+    "Generate-Read",
+    "generate-then-read"
+   ],
+   "full": "Generate-then-Read",
+   "field": "检索增强 · 上下文来源",
+   "explain": "不从外部资料检索，而是先让大模型根据问题生成几段背景文档，再读这些文档作答。作者发现生成的上下文常常比检索结果更贴合问题。",
+   "builds": "把 Retrieve-Read 中的检索器换成生成器（Yu 等，2022），说明“上下文”也可以来自模型自身。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2209.10063"
+   }
+  },
+  {
+   "id": "recite",
+   "term": "RECITE",
+   "aliases": [
+    "RECITE",
+    "Recite-Read"
+   ],
+   "full": "Recitation-Augmented Generation",
+   "zh": "背诵增强生成",
+   "field": "检索增强 · 上下文来源",
+   "explain": "让模型先从自己的参数记忆中“背诵”出一段或几段相关内容，再根据背诵内容作答，用于不连外部资料的闭卷问答。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2210.01296"
+   }
+  },
+  {
+   "id": "dsp",
+   "term": "DSP",
+   "aliases": [
+    "DSP",
+    "Demonstrate-Search-Predict"
+   ],
+   "full": "Demonstrate-Search-Predict",
+   "field": "检索增强 · 流程框架",
+   "explain": "把“构造示范—检索—预测”写成可编排的程序，让冻结的大模型和检索器之间多次传递文本，把复杂问题拆成多个它们能可靠处理的小步骤。",
+   "builds": "改进自一次性的 retrieve-then-read 流程（Khattab 等，2022）。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2212.14024"
+   }
+  },
+  {
+   "id": "rag-fusion",
+   "term": "RAG-Fusion",
+   "aliases": [
+    "RAG-Fusion"
+   ],
+   "field": "检索增强 · 查询扩展",
+   "explain": "把用户问题扩展成多个不同角度的查询，并行检索，再把各路结果合并重排，以找到单一查询容易漏掉的信息。"
+  },
+  {
+   "id": "iter-retgen",
+   "term": "ITER-RETGEN",
+   "aliases": [
+    "ITER-RETGEN",
+    "Iter-RetGen"
+   ],
+   "field": "检索增强 · 迭代检索",
+   "explain": "用模型当前生成的回答作为查询去检索，再用新检索结果生成更好的回答，如此循环，即“生成增强检索、检索增强生成”。",
+   "builds": "改进自只检索一次的流程（Shao 等，2023），与在生成过程中频繁插入检索的方法相比，每轮把检索结果作为整体使用。",
+   "guide": "/read/rag-survey/2#u05",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.15294"
+   }
+  },
+  {
+   "id": "ircot",
+   "term": "IRCoT",
+   "aliases": [
+    "IRCoT"
+   ],
+   "full": "Interleaving Retrieval with Chain-of-Thought",
+   "field": "检索增强 · 递归检索",
+   "explain": "多步问答中把检索和思维链交替进行：每推出一步，就用这一步的内容去检索，检索结果再帮助下一步推理。出发点是“该检索什么”取决于“已经推出了什么”。",
+   "builds": "结合了思维链（CoT）和检索，改进自“先检索一次、再推理”的做法（Trivedi 等，2022）。",
+   "guide": "/read/rag-survey/2#u05",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2212.10509"
+   }
+  },
+  {
+   "id": "toc",
+   "term": "ToC",
+   "aliases": [
+    "ToC"
+   ],
+   "full": "Tree of Clarifications",
+   "zh": "澄清树",
+   "field": "检索增强 · 递归检索",
+   "explain": "面对有歧义的问题，递归地列出它的各种可能理解，形成一棵“澄清树”，分别检索后综合成一个覆盖各种理解的长答案。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.14696"
+   }
+  },
+  {
+   "id": "flare",
+   "term": "FLARE",
+   "aliases": [
+    "FLARE",
+    "Flare"
+   ],
+   "full": "Forward-Looking Active REtrieval augmented generation",
+   "zh": "前瞻式主动检索增强生成",
+   "field": "检索增强 · 自适应检索",
+   "explain": "生成长文时先试着预测下一句；如果其中有概率很低、模型没把握的词，就用这句预测去检索，再重新生成这一句。检索时机由模型的置信度决定。",
+   "builds": "改进自只在开头检索一次的做法（Jiang 等，2023），属于自适应检索。",
+   "guide": "/read/rag-survey/2#u05",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.06983"
+   }
+  },
+  {
+   "id": "self-rag",
+   "term": "Self-RAG",
+   "aliases": [
+    "Self-RAG"
+   ],
+   "full": "Self-Reflective Retrieval-Augmented Generation",
+   "field": "检索增强 · 自适应检索",
+   "explain": "训练模型在生成过程中输出特殊的“反思词元”：判断此刻是否需要检索、检索到的段落是否相关、自己的输出是否有依据。模型由此按需检索并自我评价。",
+   "builds": "针对“不管是否需要都检索固定数量段落”的问题（Asai 等，2023）；需要专门训练模型。",
+   "guide": "/read/rag-survey/2#u05",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.11511"
+   }
+  },
+  {
+   "id": "skr",
+   "term": "SKR",
+   "aliases": [
+    "SKR"
+   ],
+   "full": "Self-Knowledge guided Retrieval augmentation",
+   "field": "检索增强 · 自适应检索",
+   "explain": "先判断模型对一个问题是“已知”还是“未知”，只在未知时才调用检索，以避免检索结果反而干扰模型本来能答对的问题。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.05002"
+   }
+  },
+  {
+   "id": "crag",
+   "term": "CRAG",
+   "aliases": [
+    "CRAG"
+   ],
+   "full": "Corrective Retrieval Augmented Generation",
+   "zh": "纠正式检索增强生成",
+   "field": "检索增强 · 鲁棒性",
+   "explain": "训练一个轻量的检索评估器判断检索结果的整体质量，按置信度决定直接使用、改用网络搜索或两者结合，并对文档“先分解再重组”以过滤无关信息。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2401.15884"
+   }
+  },
+  {
+   "id": "densex",
+   "term": "DenseX",
+   "aliases": [
+    "DenseX",
+    "Dense X"
+   ],
+   "field": "信息检索 · 检索粒度",
+   "explain": "研究“检索单位该多大”的工作，提出以命题为检索单位：每个命题是一句自成一体、只陈述一个事实的短句。实验中按命题建索引的检索效果好于按段落。",
+   "builds": "改进自按段落或固定长度切块的做法（Chen 等，2023）。",
+   "guide": "/read/rag-survey/2#u03",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2312.06648"
+   }
+  },
+  {
+   "id": "small2big",
+   "term": "Small2Big",
+   "aliases": [
+    "Small2Big"
+   ],
+   "field": "检索增强 · 切块策略",
+   "explain": "检索时用小单位（如单句）提高匹配精度，交给模型时再把前后文一起带上，兼顾“找得准”和“上下文完整”。"
+  },
+  {
+   "id": "kgp",
+   "term": "KGP",
+   "aliases": [
+    "KGP"
+   ],
+   "full": "Knowledge Graph Prompting",
+   "field": "检索增强 · 索引结构",
+   "explain": "多文档问答方法：先在多篇文档之上建一张图（节点是段落、页面或表格，边表示相似或结构关系），再由大模型驱动的智能体沿图游走，收集回答所需的段落。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.11730"
+   }
+  },
+  {
+   "id": "knowledgpt",
+   "term": "KnowledGPT",
+   "aliases": [
+    "KnowledGPT"
+   ],
+   "field": "检索增强 · 结构化知识",
+   "explain": "让大模型生成知识库查询，从知识库中检索结构化知识，并把知识保存在个性化的知识库中供后续使用。"
+  },
+  {
+   "id": "g-retriever",
+   "term": "G-Retriever",
+   "aliases": [
+    "G-Retriever"
+   ],
+   "field": "检索增强 · 图检索",
+   "explain": "面向图结构数据问答的方法，把图神经网络、大模型和检索结合起来，并把检索相关子图的过程建模为一个优化问题。"
+  },
+  {
+   "id": "selfmem",
+   "term": "Selfmem",
+   "aliases": [
+    "Selfmem",
+    "Self-Mem"
+   ],
+   "field": "检索增强 · 上下文来源",
+   "explain": "用检索增强的生成器反复生成输出，构成一个不断扩充的“自我记忆池”，再由选择器从中挑出好的输出用于下一轮生成。"
+  },
+  {
+   "id": "tablegpt",
+   "term": "TableGPT",
+   "aliases": [
+    "TableGPT"
+   ],
+   "field": "检索增强 · 半结构化数据",
+   "explain": "利用大模型的代码能力处理表格，例如生成 SQL 语句在数据库表上查询，用来回答涉及表格数据的问题。"
+  },
+  {
+   "id": "promptagator",
+   "term": "PROMPTAGATOR",
+   "aliases": [
+    "PROMPTAGATOR",
+    "Promptagator"
+   ],
+   "field": "信息检索 · 检索器训练",
+   "explain": "用大模型根据少量（如 8 个）示例生成大量合成查询，再用这些数据训练特定任务的检索器，缓解专业领域缺少标注数据的问题。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2209.11755"
+   }
+  },
+  {
+   "id": "llm-embedder",
+   "term": "LLM-Embedder",
+   "aliases": [
+    "LLM-Embedder"
+   ],
+   "field": "信息检索 · 检索器训练",
+   "explain": "同时用数据集的标准标签和大模型给出的奖励信号训练嵌入模型，使它适应多种下游任务。"
+  },
+  {
+   "id": "replug",
+   "term": "REPLUG",
+   "aliases": [
+    "REPLUG"
+   ],
+   "field": "检索增强 · 检索器训练",
+   "explain": "把大模型当作黑箱，只在输入前拼接检索文档；再用大模型对文档的偏好训练检索器，让检索器的打分分布向大模型靠拢（以 KL 散度衡量）。",
+   "builds": "不需要像早期方法那样修改大模型、加交叉注意力（Shi 等，2023）。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2301.12652"
+   }
+  },
+  {
+   "id": "uprise",
+   "term": "UPRISE",
+   "aliases": [
+    "UPRISE"
+   ],
+   "field": "检索增强 · 适配器",
+   "explain": "训练一个轻量的提示检索器，自动从预先构建的提示池中为新任务的输入挑选合适的提示，提升零样本表现。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2303.08518"
+   }
+  },
+  {
+   "id": "aar",
+   "term": "AAR",
+   "aliases": [
+    "AAR"
+   ],
+   "full": "Augmentation-Adapted Retriever",
+   "field": "检索增强 · 适配器",
+   "explain": "一种通用的检索适配器，目标是让同一个检索器作为插件，适配多种下游任务和语言模型。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.17331"
+   }
+  },
+  {
+   "id": "prca",
+   "term": "PRCA",
+   "aliases": [
+    "PRCA"
+   ],
+   "full": "Pluggable Reward-driven Contextual Adapter",
+   "field": "检索增强 · 适配器",
+   "explain": "在检索器和黑箱大模型之间加一个可插拔的上下文适配器，从检索结果中提取有用信息；适配器以大模型回答的好坏为奖励来训练。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.18347"
+   }
+  },
+  {
+   "id": "bgm",
+   "term": "BGM",
+   "aliases": [
+    "BGM"
+   ],
+   "field": "检索增强 · 适配器",
+   "explain": "保持检索器和大模型都不变，在两者之间训练一个序列到序列的“桥接”模型，把检索结果重排、筛选，转换成大模型更好用的形式。",
+   "builds": "针对检索器与大模型“偏好不一致”的问题（Ke 等，2024）。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2401.06954"
+   }
+  },
+  {
+   "id": "santa",
+   "term": "SANTA",
+   "aliases": [
+    "SANTA"
+   ],
+   "field": "检索增强 · 结构化数据",
+   "explain": "面向结构化数据检索的训练框架，用对比学习等多阶段训练，让检索器同时把握数据的结构信息和语义信息。"
+  },
+  {
+   "id": "ra-dit",
+   "term": "RA-DIT",
+   "aliases": [
+    "RA-DIT"
+   ],
+   "full": "Retrieval-Augmented Dual Instruction Tuning",
+   "field": "检索增强 · 协同微调",
+   "explain": "两步微调：先微调大模型，让它更会利用检索到的材料；再微调检索器，让它返回大模型更需要的内容。两步各有提升，合用效果更好。",
+   "builds": "介于“改造预训练”和“推理时简单拼接”之间的第三种做法（Lin 等，2023）。",
+   "guide": "/read/rag-survey/2#u04",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.01352"
+   }
+  },
+  {
+   "id": "retro",
+   "term": "RETRO",
+   "aliases": [
+    "RETRO",
+    "RETRO++",
+    "Retro++"
+   ],
+   "full": "Retrieval-Enhanced Transformer",
+   "field": "检索增强 · 预训练",
+   "explain": "DeepMind 2021 年的模型，在预训练时就从 2 万亿词元的数据库中检索文本块，并通过分块交叉注意力使用它们；在 Pile 数据集上用约 1/25 的参数达到与 GPT-3 相当的效果。RETRO++ 是后续改进版本。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2112.04426"
+   }
+  },
+  {
+   "id": "rerank",
+   "term": "重排",
+   "aliases": [
+    "重排",
+    "Reranking",
+    "Rerank",
+    "rerank"
+   ],
+   "full": "Reranking",
+   "field": "信息检索 · 后处理",
+   "explain": "对检索得到的候选重新打分排序，把最相关的放到前面，并可以过滤不相关的。通常用比初次检索更精细、但更慢的模型。"
+  },
+  {
+   "id": "lost-in-the-middle",
+   "term": "Lost in the Middle",
+   "aliases": [
+    "Lost in the Middle",
+    "迷失在中间"
+   ],
+   "zh": "迷失在中间",
+   "field": "大模型 · 长上下文现象",
+   "explain": "Liu 等 2023 年发现：关键信息位于长上下文的开头或结尾时，模型表现最好；位于中间时表现明显下降，专门的长上下文模型也不例外。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.03172"
+   }
+  },
+  {
+   "id": "llmlingua",
+   "term": "LLMLingua",
+   "aliases": [
+    "LLMLingua"
+   ],
+   "field": "大模型 · 提示压缩",
+   "explain": "提示压缩方法：用小语言模型判断哪些词元不重要并删除，配合预算控制保留关键语义，最高约 20 倍压缩而性能损失很小。压缩后人难以读懂，大模型仍能理解。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.05736"
+   }
+  },
+  {
+   "id": "recomp",
+   "term": "RECOMP",
+   "aliases": [
+    "RECOMP",
+    "Recomp"
+   ],
+   "field": "检索增强 · 上下文压缩",
+   "explain": "训练两种压缩器把检索文档压成简短摘要：抽取式挑选有用句子，生成式综合多篇写摘要。文档无用时可以返回空，实现“选择性增强”。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.04408"
+   }
+  },
+  {
+   "id": "ragas",
+   "term": "RAGAS",
+   "aliases": [
+    "RAGAS",
+    "Ragas"
+   ],
+   "full": "Retrieval Augmented Generation Assessment",
+   "field": "检索增强 · 评价工具",
+   "explain": "RAG 自动评价框架，用大模型从上下文相关性、答案忠实性、答案相关性等维度打分，不依赖人工标注的标准答案。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2309.15217"
+   }
+  },
+  {
+   "id": "ares",
+   "term": "ARES",
+   "aliases": [
+    "ARES"
+   ],
+   "full": "Automated RAG Evaluation System",
+   "field": "检索增强 · 评价工具",
+   "explain": "RAG 自动评价系统：自动生成训练数据，微调轻量的评判模型来打分，再用少量人工标注做统计校准。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2311.09476"
+   }
+  },
+  {
+   "id": "rgb",
+   "term": "RGB",
+   "aliases": [
+    "RGB"
+   ],
+   "full": "Retrieval-Augmented Generation Benchmark",
+   "field": "检索增强 · 评测基准",
+   "explain": "中英文 RAG 评测基准，分别测试噪声鲁棒性、拒答、信息整合和反事实鲁棒性四种能力。原文的评测发现，大模型在后三项上仍有明显困难。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2309.01431"
+   }
+  },
+  {
+   "id": "recall-bench",
+   "term": "RECALL",
+   "aliases": [
+    "RECALL"
+   ],
+   "field": "检索增强 · 评测基准",
+   "explain": "测试大模型面对外部材料中的反事实（错误）知识时是否稳健的基准。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2311.08147"
+   }
+  },
+  {
+   "id": "crud",
+   "term": "CRUD",
+   "aliases": [
+    "CRUD",
+    "CRUD-RAG"
+   ],
+   "field": "检索增强 · 评测基准",
+   "explain": "中文 RAG 评测基准，按创作、知识问答、纠错、摘要等场景评价检索和生成。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2401.17043"
+   }
+  },
+  {
+   "id": "trulens",
+   "term": "TruLens",
+   "aliases": [
+    "TruLens"
+   ],
+   "field": "检索增强 · 评价工具",
+   "explain": "开源的大模型应用评价工具，提出从上下文相关性、忠实性和答案相关性三方面评价 RAG。"
+  },
+  {
+   "id": "em",
+   "term": "EM",
+   "aliases": [
+    "EM"
+   ],
+   "full": "Exact Match",
+   "zh": "精确匹配",
+   "field": "问答 · 评价指标",
+   "explain": "精确匹配：预测答案和标准答案在规范化（如去掉标点、大小写）后完全相同才算对。"
+  },
+  {
+   "id": "f1",
+   "term": "F1",
+   "aliases": [
+    "F1"
+   ],
+   "full": "F1 Score",
+   "field": "机器学习 · 评价指标",
+   "explain": "精确率和召回率的调和平均。在问答中，把预测答案和标准答案看成词的集合计算，允许部分重合得分。"
+  },
+  {
+   "id": "mrr",
+   "term": "MRR",
+   "aliases": [
+    "MRR"
+   ],
+   "full": "Mean Reciprocal Rank",
+   "zh": "平均倒数排名",
+   "field": "信息检索 · 评价指标",
+   "explain": "看第一个正确结果排在第几位，取它的倒数（第 1 位得 1，第 2 位得 1/2……），再对所有查询求平均。"
+  },
+  {
+   "id": "ndcg",
+   "term": "NDCG",
+   "aliases": [
+    "NDCG"
+   ],
+   "full": "Normalized Discounted Cumulative Gain",
+   "zh": "归一化折损累计增益",
+   "field": "信息检索 · 评价指标",
+   "explain": "同时考虑结果的相关程度和排序位置的检索指标：越相关的结果排得越靠前，得分越高，并按理想排序归一化。"
+  },
+  {
+   "id": "hit-rate",
+   "term": "Hit Rate",
+   "aliases": [
+    "Hit Rate",
+    "命中率"
+   ],
+   "zh": "命中率",
+   "field": "信息检索 · 评价指标",
+   "explain": "前 K 个检索结果中至少包含一个正确结果的查询所占的比例。"
+  },
+  {
+   "id": "rouge",
+   "term": "ROUGE",
+   "aliases": [
+    "ROUGE",
+    "ROUGE-L"
+   ],
+   "full": "Recall-Oriented Understudy for Gisting Evaluation",
+   "field": "自然语言处理 · 评价指标",
+   "explain": "常用于摘要的自动评价指标，统计生成文本和参考文本之间重合的词片段，偏重召回；ROUGE-L 基于最长公共子序列。"
+  },
+  {
+   "id": "langchain",
+   "term": "LangChain",
+   "aliases": [
+    "LangChain"
+   ],
+   "field": "工程工具 · 应用框架",
+   "explain": "常用的开源大模型应用开发框架，提供文档加载、切块、向量检索、提示组装、调用工具等组件，搭建 RAG 系统时被广泛使用。"
+  },
+  {
+   "id": "llamaindex",
+   "term": "LlamaIndex",
+   "aliases": [
+    "LlamaIndex",
+    "LLamaIndex"
+   ],
+   "field": "工程工具 · 应用框架",
+   "explain": "专注于把私有数据接入大模型的开源框架，提供多种索引结构、检索和查询引擎。"
+  },
+  {
+   "id": "nq",
+   "term": "NQ",
+   "aliases": [
+    "NQ",
+    "Natural Questions"
+   ],
+   "full": "Natural Questions",
+   "field": "问答 · 数据集",
+   "explain": "Google 发布的开放域问答数据集，问题来自真实的搜索查询，答案标注在维基百科页面中。"
+  },
+  {
+   "id": "hotpotqa",
+   "term": "HotpotQA",
+   "aliases": [
+    "HotpotQA"
+   ],
+   "field": "问答 · 数据集",
+   "explain": "多跳问答数据集，回答每个问题都需要综合两篇维基百科文章中的信息。"
+  },
+  {
+   "id": "triviaqa",
+   "term": "TriviaQA",
+   "aliases": [
+    "TriviaQA"
+   ],
+   "field": "问答 · 数据集",
+   "explain": "由知识竞赛题及其证据文档组成的问答数据集，常用于测试模型的事实知识。"
+  }
+ ]
+}

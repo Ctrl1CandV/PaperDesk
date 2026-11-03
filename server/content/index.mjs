@@ -11,6 +11,7 @@ import { RetrievalIndex, digest, RETRIEVAL_VERSION } from './retrieval-index.mjs
 import { ReadingMaterials } from './materials.mjs';
 import { utf8Prefix, localResultBudget } from '../ai/prompt-budget.mjs';
 import { guidePromptMetadata } from './prompt-metadata.mjs';
+import { termMatcher, termsIn } from '../../shared/glossary.mjs';
 import { object, reject, isId, isRevision, isText } from '../http/validation.mjs';
 
 const sectionUrl = (guide, unit) => `/read/${guide.metadata.id}/${guide.metadata.revision}#${unit.id}`;
@@ -142,6 +143,25 @@ export class ContentIndex {
       url, guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: unit.id, text, version: guide.metadata.source.version };
     sources.push(source); return source;
   }
+  // Reviewed glossary names for terms mentioned in the sent units; about 1 KB at most.
+  termsFor(units) {
+    if (!this.rootDir) return [];
+    let bytes;
+    try { bytes = this.read('content/glossary.json', 1024 * 1024); } catch { return []; }
+    const hash = digest(bytes);
+    if (hash !== this.glossaryDigest) {
+      const entries = JSON.parse(bytes).entries ?? [];
+      this.glossary = { entries: new Map(entries.map(entry => [entry.id, entry])), matcher: termMatcher(entries) }; this.glossaryDigest = hash;
+    }
+    const terms = [];
+    for (const id of termsIn(units.map(unit => unit.renderedText ?? unit.text).join('\n'), this.glossary.matcher)) {
+      const { term, full, zh, field } = this.glossary.entries.get(id);
+      const item = { term, ...(full ? { full } : {}), ...(zh ? { zh } : {}), field };
+      if (Buffer.byteLength(JSON.stringify([...terms, item])) > 1024) break;
+      terms.push(item);
+    }
+    return terms;
+  }
   prepare(request, previous, config) {
     this.refresh();
     const guide = this.get(request.guideId, request.revision);
@@ -154,7 +174,7 @@ export class ContentIndex {
     const sectionUnits = [...new Set([guide.units[0], active])];
     const guideBytes = Buffer.byteLength(guide.body);
     let units = guide.body.length <= LIMITS.contextChars && guideBytes <= 5000 ? guide.units : sectionUnits;
-    let metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence));
+    let metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence, this.termsFor(units)));
     // Reserve room before selecting the guide scope, including metadata, question,
     // history and subsequent evidence. Final provider preflight remains authoritative.
     const tools = config.toolsEnabled === false ? [] : availableTools(Boolean(request.webSearch && config.searchAvailable));
@@ -165,7 +185,7 @@ export class ContentIndex {
     let contextBytes = textBudget();
     const scope = guide.body.length <= LIMITS.contextChars && guideBytes <= contextBytes ? 'full-guide' : 'section';
     if (scope === 'section' && units !== sectionUnits) {
-      units = sectionUnits; metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence)); contextBytes = textBudget();
+      units = sectionUnits; metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence, this.termsFor(units))); contextBytes = textBudget();
     }
     if (contextBytes < 512) reject('问题和必要资料超过本机的上下文预算，请缩短输入或调整本机模型上下文预算。', 413);
     if (units.length > 64) reject('导读章节数量超过本轮来源预算，请选择章节模式。', 413);

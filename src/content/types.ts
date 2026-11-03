@@ -33,9 +33,12 @@ export interface GuideSummary {
     coverage: Pick<GuideMetadata['coverage'], 'limitations'>;
   };
   units: GuideMetadata['units'];
+  /** Declared figure assets with intrinsic sizes, derived by build-index. */
+  figures: FigureInfo[];
   bodyPath: string;
   packageDirectory: string;
 }
+export interface FigureInfo { path: string; alt: string; origin: string; rights: string; width?: number; height?: number }
 export interface EditorialTarget { guideId: string; revision: number; unitId: string; purpose: string }
 export interface EditorialLens {
   id: string; rank: number; title: string; whyNow: string; orientation: string;

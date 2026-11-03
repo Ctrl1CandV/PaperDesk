@@ -8,6 +8,9 @@ import type { Citation, Guide } from '../content/types';
 import { contentRepository } from '../content/repository';
 import { AppLink } from '../app/navigation';
 import { Diagram } from './Diagram';
+import { PaperFigure } from './PaperFigure';
+import { TermHint } from './TermHint';
+import { remarkTerms } from './remark-terms';
 import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
 
 function textOf(children: ReactNode): string {
@@ -32,10 +35,19 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
 }) {
   let citationIndex = 0;
   let paragraphIndex = 0;
-  return <ReactMarkdown skipHtml remarkPlugins={[remarkGfm, remarkMath]}
+  return <ReactMarkdown skipHtml remarkPlugins={[remarkGfm, remarkMath, [remarkTerms, { title: guide.metadata.title }]]}
     urlTransform={url => isSafeExternalUrl(url) || contentRepository.resolveRelated(guide, url) || contentRepository.resolveAsset(guide, url) ? url : ''}
     components={{
-      p: ({ children }) => <p data-paragraph={`${unitId}-p${++paragraphIndex}`}>{children}</p>,
+      p: ({ node, children }) => {
+        // A paragraph holding only an image becomes a figure, which cannot sit inside <p>.
+        const content = node?.children.filter(child => child.type !== 'text' || child.value.trim()) ?? [];
+        if (content.length === 1 && content[0].type === 'element' && content[0].tagName === 'img') return <>{children}</>;
+        return <p data-paragraph={`${unitId}-p${++paragraphIndex}`}>{children}</p>;
+      },
+      abbr: ({ children, ...props }) => {
+        const id = (props as Record<string, unknown>)['data-term'];
+        return typeof id === 'string' ? <TermHint id={id}>{children}</TermHint> : <>{children}</>;
+      },
       h1: ({ children }) => <h1>{children}</h1>,
       a: ({ href, children }) => {
         if (!href) return <span>{children}</span>;
@@ -45,9 +57,9 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
         if (related) return <AppLink id={`${unitId}-related-${href.replace('.md', '')}`} to={related}>{children}<span aria-hidden="true"> →</span></AppLink>;
         return <span>{children}</span>;
       },
-      img: ({ src, alt }) => {
-        const asset = src && contentRepository.resolveAsset(guide, src);
-        return asset ? <img src={asset} alt={alt} loading="lazy" /> : <span className="content-fallback">{alt ? `图片：${alt}` : '未提供可显示的本地图片'}</span>;
+      img: ({ src, alt, title }) => {
+        const figure = typeof src === 'string' ? contentRepository.figure(guide.metadata.id, guide.metadata.revision, src) : undefined;
+        return figure ? <PaperFigure figure={figure} caption={title ?? undefined} /> : <span className="content-fallback">{alt ? `图片：${alt}` : '未提供可显示的本地图片'}</span>;
       },
       pre: ({ children }) => <div className="code-block">{children}</div>,
       code: ({ className, children }) => {

@@ -20,11 +20,12 @@ test('the LLM survey learning path reaches the reviewed papers and browser back 
     const revision = (catalog.currentRevisions as Record<string, number>)[id];
     await expect(page.locator(`.prose a[href="/read/${id}/${revision}"]`).first()).toBeAttached();
   }
-  const transformer = page.locator('.prose a[href="/read/transformer/1"]').first();
+  const transformerRevision = catalog.currentRevisions.transformer;
+  const transformer = page.locator(`.prose a[href="/read/transformer/${transformerRevision}"]`).first();
   await transformer.scrollIntoViewIfNeeded(); await transformer.focus();
   const scroll = await page.evaluate(() => scrollY);
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/\/read\/transformer\/1$/);
+  await expect(page).toHaveURL(new RegExp(`/read/transformer/${transformerRevision}$`));
   await expect(page.locator('.prose h1')).toContainText('Transformer');
   await page.goBack();
   await expect(transformer).toBeFocused();
@@ -71,7 +72,9 @@ for (const id of Object.keys(catalog.currentRevisions)) {
       await expect(source).toHaveAttribute('target', '_blank');
       await expect(source).toHaveAttribute('rel', 'noopener noreferrer');
       await expect(page.locator('.orientation-prose').getByRole('heading')).toHaveText([metadata.type === 'survey' ? '综述概述' : '论文概述', '为什么值得读', '阅读建议']);
-      await expect(page.locator('.orientation-prose p')).toHaveCount(3);
+      // Briefs may run to several paragraphs separated by one blank line.
+      const paragraphs = brief ? [brief.overview, brief.value, brief.advice].reduce((sum, text) => sum + text.split(/\n\n+/).length, 0) : 3;
+      await expect(page.locator('.orientation-prose p')).toHaveCount(paragraphs);
       await expect(page.locator('.article-orientation details, .article-orientation [role="tab"]')).toHaveCount(0);
       const chapters = metadata.units.filter((unit: { heading?: string }) => unit.heading);
       await expect(page.locator('.orientation-outline a')).toHaveCount(chapters.length);

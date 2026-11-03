@@ -7,6 +7,7 @@ import type { Exploration, ReadingStatus, ResumeRecord } from '../records/types'
 import { marksText, useReadingMarks, type ReadingMarks } from '../records/reading-marks';
 import { libraryBrief, publicationName, sourceVersionLabel } from './briefs';
 import { venueRanking } from './venueRankings';
+import { PaperFigure } from '../reader/PaperFigure';
 import './library.css';
 
 type Category = 'all' | 'survey' | 'paper';
@@ -34,11 +35,15 @@ export function matchesTitleOrTopic(guide: GuideSummary, query: string) {
   return terms.every(term => fields.some(field => /^[a-z0-9-]+$/i.test(term) ? field.split(/[^a-z0-9-]+/i).some(word => word === term) : field.includes(term)));
 }
 
+// Briefs may run to several paragraphs, separated by one blank line.
+const paragraphs = (text: string) => text.split(/\n\n+/).map((paragraph, index) => <p key={index}>{paragraph}</p>);
+
 function Orientation({ guide, resumes, marks, returnToList, openRelated }: { guide: GuideSummary; resumes: ResumeRecord[]; marks: ReadingMarks; returnToList: () => void; openRelated: (id: string) => void }) {
   const { metadata } = guide, orientation = metadata.orientation;
   const bibliography = orientation?.bibliography;
   const title = titleParts(orientation?.shortTitle ?? metadata.title);
   const brief = libraryBrief(metadata);
+  const figure = brief.figure ? contentRepository.figure(metadata.id, metadata.revision, brief.figure) : undefined;
   const chapters = guide.units.filter(unit => unit.heading);
   const resume = resumes.filter(item => item.guideId === metadata.id).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
   const resumeGuide = resume && contentRepository.getSummary(resume.guideId, resume.revision);
@@ -66,9 +71,9 @@ function Orientation({ guide, resumes, marks, returnToList, openRelated }: { gui
     </header>
     <div className="orientation-body">
       <div className="orientation-prose">
-        <section><h3>{metadata.type === 'survey' ? '综述概述' : '论文概述'}</h3><p>{brief.overview}</p></section>
-        {brief.value && <section><h3>为什么值得读</h3><p>{brief.value}</p></section>}
-        {brief.advice && <section><h3>阅读建议</h3><p>{brief.advice}</p></section>}
+        <section><h3>{metadata.type === 'survey' ? '综述概述' : '论文概述'}</h3>{paragraphs(brief.overview)}{figure && <PaperFigure figure={figure} compact />}</section>
+        {brief.value && <section><h3>为什么值得读</h3>{paragraphs(brief.value)}</section>}
+        {brief.advice && <section><h3>阅读建议</h3>{paragraphs(brief.advice)}</section>}
       </div>
       <nav className="orientation-outline" aria-label="阅读章节"><div className="orientation-section-heading"><h3>阅读章节</h3><span>{chapters.length} 节</span></div><ol>{chapters.map((unit, index) =>
         <li key={unit.id}><AppLink to={`/read/${metadata.id}/${metadata.revision}#${unit.id}`} title={unit.heading ?? undefined} aria-current={currentResume && resume.unitId === unit.id ? 'location' : undefined}><span className="outline-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span>{brief.chapterLabels[unit.id] ?? unit.heading}</span></AppLink>{aims.get(unit.id) && <p className="outline-aim">{aims.get(unit.id)!.purpose}</p>}</li>

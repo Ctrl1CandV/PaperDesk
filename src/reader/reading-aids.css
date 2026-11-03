@@ -1,0 +1,62 @@
+/* Term hints: a quiet underline that only explains when asked. */
+.term-hint {
+  display:inline; padding:0; margin:0; border:0; background:none; font:inherit; color:inherit; line-height:inherit;
+  text-decoration:underline dotted; text-decoration-color:color-mix(in srgb, var(--muted) 70%, transparent);
+  text-decoration-thickness:1px; text-underline-offset:.28em; cursor:help; border-radius:2px;
+}
+.term-hint:hover, .term-hint[aria-expanded="true"] { text-decoration-color:var(--accent); color:var(--heading); }
+.term-hint:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+.term-card {
+  position:fixed; z-index:60; width:min(21rem, calc(100vw - 24px)); max-height:min(60vh, 26rem); overflow:auto;
+  padding:14px 16px 12px; background:var(--surface); color:var(--ink); border:1px solid var(--line);
+  border-radius:8px; box-shadow:0 10px 30px var(--modal-shadow); font-size:14px; line-height:1.7; text-align:left;
+}
+.term-card:focus { outline:none; }
+.term-card p { margin:0; }
+.term-card-name { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 10px; }
+.term-card-name strong { font-size:16px; color:var(--heading); }
+.term-card-name span { color:var(--ink); }
+.term-card-field { margin-top:2px!important; font-size:12px; color:var(--muted); }
+.term-card-explain { margin-top:10px!important; }
+.term-card-builds { margin-top:8px!important; font-size:13px; color:var(--ink); }
+.term-card-builds span { display:block; font-size:12px; color:var(--muted); }
+.term-card-links { display:flex; flex-wrap:wrap; gap:4px 16px; margin-top:10px!important; padding-top:8px; border-top:1px solid var(--line); font-size:13px; }
+.term-card-links a { color:var(--accent); text-decoration:none; }
+.term-card-links a:hover { text-decoration:underline; }
+
+/* Sidebar term list, folded by default like the reading lens. */
+.reading-terms { margin:8px 0 0; padding:12px 12px 0; border-top:1px solid var(--line); font-size:12px; line-height:1.75; color:var(--muted); }
+.reading-terms summary { min-height:32px; display:flex; align-items:center; gap:6px; cursor:pointer; list-style-position:inside; }
+.reading-terms summary:hover { color:var(--accent); }
+.reading-terms summary span { font-variant-numeric:tabular-nums; }
+.reading-terms ul { margin:4px 0 8px; padding:0; list-style:none; max-height:40vh; overflow:auto; }
+.reading-terms li { display:flex; gap:8px; align-items:baseline; padding:2px 0; }
+.reading-terms li .term-hint { color:var(--ink); white-space:nowrap; }
+.reading-terms li span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Original figures: shown on a paper-white mat in both themes, with their source. */
+.paper-figure { margin:28px 0 32px; }
+.paper-figure-frame {
+  display:block; width:100%; padding:16px; margin:0; border:1px solid var(--line); border-radius:6px;
+  background:#fff; cursor:zoom-in;
+}
+.paper-figure-frame:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+.paper-figure-frame img, .prose .paper-figure-frame img { display:block; max-width:100%; max-height:70vh; width:auto; height:auto; margin:0 auto; object-fit:contain; }
+.paper-figure figcaption { margin-top:10px; font-size:14px; line-height:1.7; color:var(--muted); }
+.paper-figure-caption { display:block; color:var(--ink); }
+.paper-figure-source { display:block; font-size:12px; color:var(--muted); }
+.paper-figure-source a { color:var(--accent); text-decoration:none; white-space:nowrap; }
+.paper-figure.compact { margin:20px 0 0; }
+.paper-figure.compact .paper-figure-frame { padding:10px; }
+.paper-figure.compact .paper-figure-frame img { max-height:320px; }
+.figure-dialog { width:min(1100px, calc(100vw - 32px)); max-width:none; }
+.figure-dialog-image { background:#fff; border-radius:6px; padding:16px; overflow:auto; }
+.figure-dialog-image img { display:block; max-width:100%; max-height:calc(100vh - 220px); width:auto; height:auto; margin:0 auto; object-fit:contain; }
+.figure-dialog .paper-figure-source { margin-top:10px; }
+:root[data-theme="dark"] .paper-figure-frame, :root[data-theme="dark"] .figure-dialog-image { background:#f4f1ee; border-color:transparent; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .paper-figure-frame, :root:not([data-theme="light"]) .figure-dialog-image { background:#f4f1ee; border-color:transparent; }
+}
+@media (max-width: 600px) {
+  .paper-figure-frame { padding:8px; }
+}

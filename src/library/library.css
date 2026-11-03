@@ -66,6 +66,7 @@
 .orientation-body { padding:24px 28px 0; }
 .orientation-body h3 { margin:0 0 10px; font-size:19px; font-weight:700; line-height:1.55; color:var(--heading); }
 .orientation-prose section+section { margin-top:24px; }
+.orientation-prose p + p { margin-top:12px; }
 .orientation-prose p { margin:0; font-size:16px; line-height:1.75; color:var(--ink); }
 .orientation-outline { margin-top:26px; padding:22px 0; border-top:1px solid var(--line); }
 .orientation-section-heading { display:flex; align-items:baseline; justify-content:space-between; gap:20px; }

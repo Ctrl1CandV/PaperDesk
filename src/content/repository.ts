@@ -129,6 +129,13 @@ export const contentRepository = {
     const target = id && byKey.get(`${id}/${current[id]}`)?.guide;
     return target && (!fragment || target.units.some(unit => unit.id === fragment)) ? `/read/${id}/${current[id!]}${fragment ? '#' + fragment : ''}` : undefined;
   },
+  /** A declared figure of a revision with its bundled URL and intrinsic size. */
+  figure(guideId: string, revision: number, path: string) {
+    const summary = byKey.get(`${guideId}/${revision}`)?.guide;
+    const info = summary?.figures?.find(item => item.path === path);
+    const url = summary && assets[`../../content/${summary.packageDirectory}${path}`];
+    return info && url ? { ...info, url } : undefined;
+  },
   resolveAsset(guide: Guide, link: string) {
     return guide.metadata.assets.some(asset => asset.path === link) ? assets[`../../content/${guide.packageDirectory}${link}`] : undefined;
   },

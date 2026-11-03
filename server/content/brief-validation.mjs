@@ -11,6 +11,11 @@ export function validateLibraryBriefs(data, guides) {
     for (const field of ['overview', 'value', 'advice']) {
       if (typeof entry[field] !== 'string' || !entry[field].trim()) fail(`${field} must contain prose`);
     }
+    // An optional card figure must be one of this revision's declared assets.
+    if (entry.figure !== undefined && (typeof entry.figure !== 'string' || !metadata.assets.some(asset => asset.path === entry.figure))) fail('figure must be a declared asset of the pinned revision');
+    for (const field of ['overview', 'value', 'advice']) {
+      if (/\n{3,}/.test(entry[field]) || entry[field] !== entry[field].trim()) fail(`${field} paragraphs are separated by one blank line`);
+    }
     const chapters = metadata.units.filter(unit => unit.heading).map(unit => unit.id);
     const labels = entry.chapterLabels;
     if (!labels || typeof labels !== 'object' || Array.isArray(labels)

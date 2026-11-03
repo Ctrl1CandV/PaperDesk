@@ -2,7 +2,7 @@
  * Keep provenance and coverage whole; unrelated teaching targets and references
  * stay in the reviewed guide rather than crowding out its actual text.
  */
-export function guidePromptMetadata(metadata, units, evidence) {
+export function guidePromptMetadata(metadata, units, evidence, terms = []) {
   const { title, paperId, paperTitle, source, orientation, coverage, citations } = metadata;
   const selected = new Set(units.map(unit => unit.id));
   const targets = orientation?.readingTargets.filter(target => selected.has(target.unitId)) ?? [];
@@ -10,6 +10,7 @@ export function guidePromptMetadata(metadata, units, evidence) {
   return { title, paperId, paperTitle, source, coverage, evidence,
     orientation: orientation ? { shortTitle: orientation.shortTitle, bibliography: orientation.bibliography, readingTargets: targets } : null,
     citations: references,
+    ...(terms.length ? { terms, termsNote: '术语名称来自平台审核术语表，只帮助识别缩写和方法名，不是原文证据。' } : {}),
     metadataProjection: { scope: 'bibliography-and-selected-guide-units', unitIds: [...selected],
       omittedReadingTargets: (orientation?.readingTargets.length ?? 0) - targets.length,
       omittedCitations: citations.length - references.length,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Citation, Guide } from '../content/types';
 import { coverageHint, coverageLabel } from '../content/labels';
 import { contentRepository } from '../content/repository';
@@ -17,6 +17,8 @@ import { Markdown } from './Markdown';
 import { SourceDialog, type SourceSelection } from './SourceDialog';
 import { sectionContext } from './readingContext';
 import { ReaderAssistant } from './ReaderAssistant';
+import { TermHint } from './TermHint';
+import { glossaryTermsIn } from '../content/glossary';
 
 type ReadingTarget = NonNullable<Guide['metadata']['orientation']>['readingTargets'][number];
 function Contents({ guide, active, aim, onChoose }: { guide: Guide; active: string; aim?: ReadingTarget; onChoose?: () => void }) {
@@ -135,6 +137,8 @@ export function Reader({ guide }: { guide: Guide }) {
   // Authored reading targets for this section, shown quietly beside the article.
   const aim = guide.metadata.orientation?.readingTargets.find(target => target.unitId === active);
   const lens = readingLens(guide.metadata.type);
+  // Link targets are not prose; only words the reader sees count as mentions.
+  const terms = useMemo(() => glossaryTermsIn(guide.body.replace(/\]\([^)]*\)/g, ']')), [guide]);
   const related = guide.metadata.related.map(item => contentRepository.list().find(entry => entry.guide.metadata.id === item.guideId)?.guide).filter(item => item !== undefined);
   function adjustFont(delta: number) { const next = fontSize + delta; setFontSize(next); personalStore.savePreferences({ fontSize: next }).catch(() => setStorageError('本次字号已调整，但偏好未能保存。')); }
   async function mark(kind: 'guide' | 'original', status: ReadingStatus) {
@@ -150,7 +154,7 @@ export function Reader({ guide }: { guide: Guide }) {
   const readingTools = <div className="reader-action-bar reading-tools" role="group" aria-label="阅读积累"><div className="reading-tool-context"><span>{selection ? '选中文本' : '当前章节'}</span><strong title={contextHeading}>{contextHeading}</strong></div>{selection && <button className="text-action clear-selection" onClick={() => { setSelection(undefined); window.getSelection()?.removeAllRanges(); }}>清除选择</button>}<button id="reader-note-action" className="tool-primary" aria-haspopup="dialog" onClick={() => setNoteContext(context())}><ReadingActionIcon kind="note" /><span>记笔记</span></button><button id="reader-explore-action" className="tool-primary" aria-haspopup="dialog" onClick={() => { const selected = context(); setEvidence({ id: crypto.randomUUID(), provenance: 'guide-excerpt', text: selected.text, target: { guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: selected.unitId }, sources: selected.sources }); }}><ReadingActionIcon kind="explore" /><span>加入探索</span></button><button id="reader-packet-action" className="tool-secondary" aria-haspopup="dialog" onClick={() => setPacket(context())}><ReadingActionIcon kind="copy" /><span>复制上下文</span></button></div>;
   return <>
     <div className={`mobile-tools${assistantWide ? ' assistant-mobile-tools' : ''}`}><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
-    <div className={`reader-layout${assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>{guide.units.length - 1} 节</span></div><Contents guide={guide} active={active} aim={aim} /><details className="reading-lens"><summary>读{lens.name}时可以留意</summary><ul>{lens.questions.map(question => <li key={question}>{question}</li>)}</ul></details><div className="sidebar-footer"><AppLink to="/explore">探索 →</AppLink></div>{sidebarTools && readingTools}</aside>
+    <div className={`reader-layout${assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>{guide.units.length - 1} 节</span></div><Contents guide={guide} active={active} aim={aim} /><details className="reading-lens"><summary>读{lens.name}时可以留意</summary><ul>{lens.questions.map(question => <li key={question}>{question}</li>)}</ul></details>{terms.length > 0 && <details className="reading-terms"><summary>本文术语 <span>{terms.length}</span></summary><ul>{terms.map(entry => <li key={entry.id}><TermHint id={entry.id}>{entry.term}</TermHint><span>{entry.zh ?? entry.full}</span></li>)}</ul></details>}<div className="sidebar-footer"><AppLink to="/explore">探索 →</AppLink></div>{sidebarTools && readingTools}</aside>
       <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述解读' : '论文解读'}</span><span>导读修订 {guide.metadata.revision}</span><span title={coverageHint(guide.metadata.coverage.scope) || undefined}>{coverageLabel(guide.metadata.coverage.scope)}</span></div></div>
         <div className="reading-identity"><a className="reading-original" href={guide.metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 · {guide.metadata.source.version ?? '版本未指定'} ↗</a><div className="reader-heading-actions"><div className="desktop-font">{controls}</div><button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)} title={`本篇解读 · ${statusLabel(guideState?.status)}；原论文 · ${statusLabel(originalState?.status)}`}><strong>阅读记录</strong><span aria-hidden="true">⌄</span></button></div></div>
         {storageError && <p className="status-warning" role="status">{storageError}</p>}
