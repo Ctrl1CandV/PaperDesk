@@ -1,0 +1,874 @@
+{
+  "schemaVersion": 2,
+  "id": "rag-survey",
+  "paperId": "arxiv:2312.10997",
+  "revision": 3,
+  "title": "RAG 综述：检索增强生成的方法地图",
+  "paperTitle": "Retrieval-Augmented Generation for Large Language Models: A Survey",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "把综述的三种范式、检索—生成—增强三个环节与评价体系整理成一张方法地图，让读者能定位任意一篇 RAG 论文改变了哪一环、改进自什么。",
+  "source": {
+    "id": "arxiv:2312.10997",
+    "version": "v5",
+    "url": "https://arxiv.org/html/2312.10997v5"
+  },
+  "bodyFile": "rag-survey.r3.md",
+  "bodySha256": "4da64a162cf6ff4e5ebb52a50a35147bade1d770fe94ee908e143e1516889061",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从一个例子看 RAG 怎样工作"
+    },
+    {
+      "id": "history",
+      "heading": "RAG 的来路：技术树与三个阶段"
+    },
+    {
+      "id": "u02",
+      "heading": "三种范式：从流水线到可组合的模块"
+    },
+    {
+      "id": "versus",
+      "heading": "RAG、微调与提示工程怎样选"
+    },
+    {
+      "id": "u03",
+      "heading": "检索之一：从哪里找、切多细、怎样建索引"
+    },
+    {
+      "id": "query",
+      "heading": "检索之二：问题怎样问、检索器怎样配"
+    },
+    {
+      "id": "u04",
+      "heading": "生成：材料怎样整理，模型怎样调整"
+    },
+    {
+      "id": "u05",
+      "heading": "增强过程：一次检索不够时怎么办"
+    },
+    {
+      "id": "u06",
+      "heading": "怎样评价一个 RAG 系统"
+    },
+    {
+      "id": "future",
+      "heading": "挑战与未来方向"
+    },
+    {
+      "id": "u07",
+      "heading": "把方法放回地图：一张速查表"
+    },
+    {
+      "id": "u08",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/html/2312.10997v5#S1",
+      "labels": [
+        "摘要与 §I",
+        "§I 与图 1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/abs/2312.10997v5",
+      "labels": [
+        "论文身份与版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/html/2312.10997v5#S2",
+      "labels": [
+        "§II 与图 2",
+        "§II 与图 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.SS1",
+      "labels": [
+        "Naive RAG 的三个步骤"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.SS2",
+      "labels": [
+        "Advanced RAG"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.SS3",
+      "labels": [
+        "Modular RAG"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.SS3.SSS1",
+      "labels": [
+        "新模块"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.SS3.SSS2",
+      "labels": [
+        "新模式"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.SS4",
+      "labels": [
+        "§II-D 与图 4"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/abs/2312.05934",
+      "labels": [
+        "Ovadia 等的比较研究"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用文献 [28]）"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/html/2312.10997v5#S3",
+      "labels": [
+        "§III 检索"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS1.SSS1",
+      "labels": [
+        "数据结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS1.SSS2",
+      "labels": [
+        "检索粒度"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS2",
+      "labels": [
+        "索引优化"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS3",
+      "labels": [
+        "查询优化"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS4",
+      "labels": [
+        "嵌入"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS5",
+      "labels": [
+        "适配器"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/html/2312.10997v5#S4",
+      "labels": [
+        "§IV 生成"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/html/2312.10997v5#S4.SS1",
+      "labels": [
+        "上下文整理"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/html/2312.10997v5#S4.SS2",
+      "labels": [
+        "大模型微调"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/html/2312.10997v5#S5",
+      "labels": [
+        "§V 增强过程与图 5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/html/2312.10997v5#S5.SS1",
+      "labels": [
+        "迭代检索"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/html/2312.10997v5#S5.SS2",
+      "labels": [
+        "递归检索"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/html/2312.10997v5#S5.SS3",
+      "labels": [
+        "自适应检索"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c25",
+      "url": "https://arxiv.org/html/2312.10997v5#S6",
+      "labels": [
+        "§VI 任务与评价"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c26",
+      "url": "https://arxiv.org/html/2312.10997v5#S6.SS1",
+      "labels": [
+        "下游任务"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c27",
+      "url": "https://arxiv.org/html/2312.10997v5#S6.SS2",
+      "labels": [
+        "评价目标"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c28",
+      "url": "https://arxiv.org/html/2312.10997v5#S6.SS3",
+      "labels": [
+        "评价维度"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c29",
+      "url": "https://arxiv.org/html/2312.10997v5#S6.SS4",
+      "labels": [
+        "基准与工具"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c30",
+      "url": "https://arxiv.org/html/2312.10997v5#S7",
+      "labels": [
+        "§VII 讨论与展望"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c31",
+      "url": "https://arxiv.org/html/2312.10997v5#S7.SS1",
+      "labels": [
+        "RAG 与长上下文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c32",
+      "url": "https://arxiv.org/html/2312.10997v5#S7.SS2",
+      "labels": [
+        "鲁棒性"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c33",
+      "url": "https://arxiv.org/abs/2401.14887",
+      "labels": [
+        "Cuconasu 等原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用文献 [54]）"
+    },
+    {
+      "id": "c34",
+      "url": "https://arxiv.org/html/2312.10997v5#S7.SS3",
+      "labels": [
+        "混合方法"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c35",
+      "url": "https://arxiv.org/html/2312.10997v5#S7.SS4",
+      "labels": [
+        "规模规律"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c36",
+      "url": "https://arxiv.org/html/2312.10997v5#S7.SS5",
+      "labels": [
+        "生产落地"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c37",
+      "url": "https://arxiv.org/html/2312.10997v5#S7.SS6",
+      "labels": [
+        "多模态"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c38",
+      "url": "https://arxiv.org/html/2312.10997v5",
+      "labels": [
+        "固定 HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c39",
+      "url": "https://arxiv.org/pdf/2312.10997v5",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c40",
+      "url": "https://arxiv.org/html/2312.10997v5#S2.T1",
+      "labels": [
+        "表 I 方法汇总"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c41",
+      "url": "https://arxiv.org/abs/2310.05736",
+      "labels": [
+        "LLMLingua 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（LLMLingua 原文）"
+    },
+    {
+      "id": "c42",
+      "url": "https://arxiv.org/abs/2305.14283v3",
+      "labels": [
+        "Ma 等，RRR"
+      ],
+      "role": "background",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c43",
+      "url": "https://arxiv.org/abs/2212.10496v1",
+      "labels": [
+        "Gao 等，HyDE"
+      ],
+      "role": "background",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c44",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS3.SSS2",
+      "labels": [
+        "查询转换与 Step-back"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c45",
+      "url": "https://arxiv.org/html/2312.10997v5#S3.SS3.SSS3",
+      "labels": [
+        "查询路由"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c46",
+      "url": "https://arxiv.org/abs/2307.03172",
+      "labels": [
+        "Liu 等，Lost in the Middle"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c47",
+      "url": "https://arxiv.org/html/2312.10997v5#S4.SS1.SSS1",
+      "labels": [
+        "§IV-A.1 重排"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c48",
+      "url": "https://aclanthology.org/2023.emnlp-main.825/",
+      "labels": [
+        "Jiang 等，LLMLingua"
+      ],
+      "role": "background",
+      "sourceVersion": "EMNLP 2023, main.825"
+    },
+    {
+      "id": "c49",
+      "url": "https://arxiv.org/abs/2310.04408v1",
+      "labels": [
+        "Xu 等，RECOMP"
+      ],
+      "role": "background",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c50",
+      "url": "https://arxiv.org/html/2312.10997v5#S4.SS1.SSS2",
+      "labels": [
+        "§IV-A.2 选择与压缩"
+      ],
+      "role": "primary",
+      "sourceVersion": "v5"
+    },
+    {
+      "id": "c51",
+      "url": "https://arxiv.org/abs/2305.15294",
+      "labels": [
+        "Shao 等，ITER-RETGEN"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c52",
+      "url": "https://arxiv.org/abs/2212.10509",
+      "labels": [
+        "Trivedi 等，IRCoT"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c53",
+      "url": "https://arxiv.org/abs/2305.06983v2",
+      "labels": [
+        "Jiang 等，FLARE"
+      ],
+      "role": "background",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c54",
+      "url": "https://arxiv.org/abs/2310.11511",
+      "labels": [
+        "Asai 等，Self-RAG"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c55",
+      "url": "https://arxiv.org/abs/2309.01431",
+      "labels": [
+        "Chen 等，RGB"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c56",
+      "url": "https://arxiv.org/abs/2309.15217v1",
+      "labels": [
+        "Es 等，RAGAS"
+      ],
+      "role": "background",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c57",
+      "url": "https://arxiv.org/abs/2311.09476",
+      "labels": [
+        "Saad-Falcon 等，ARES"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c58",
+      "url": "https://arxiv.org/abs/2209.11755",
+      "labels": [
+        "Dai 等，Promptagator"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c59",
+      "url": "https://arxiv.org/abs/2301.12652",
+      "labels": [
+        "Shi 等，REPLUG"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c60",
+      "url": "https://arxiv.org/abs/2310.01352",
+      "labels": [
+        "Lin 等，RA-DIT"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 原论文摘要"
+    },
+    {
+      "id": "c61",
+      "url": "https://arxiv.org/html/2401.14887v4#S5.SS4",
+      "labels": [
+        "实验条件与表 3"
+      ],
+      "role": "background",
+      "sourceVersion": "v4"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "rag",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "llm-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/rag-survey/figure-2-rag-process.webp",
+      "sha256": "33c8e7f6fc33723846fef32372d7540f6be288d976e9cd57b5e04a25ce45302f",
+      "mime": "image/webp",
+      "alt": "RAG 处理问答的示例流程：用户提问，系统从文档库检索相关片段，与问题拼成提示交给大模型生成回答",
+      "origin": "https://arxiv.org/pdf/2312.10997v5#page=3",
+      "rights": "Gao 等，arXiv:2312.10997v5，图 2。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/rag-survey/figure-1-technology-tree.webp",
+      "sha256": "aeb92f6e8a2c43e93410d00226cb80decaf9ea7eb603128cd23d99eac1dd3187",
+      "mime": "image/webp",
+      "alt": "RAG 研究技术树：以 2020、2023、2024 年为时间轴，按预训练、微调、推理三个增强阶段分成三根枝干，标注了代表方法",
+      "origin": "https://arxiv.org/pdf/2312.10997v5#page=2",
+      "rights": "Gao 等，arXiv:2312.10997v5，图 1。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/rag-survey/figure-3-paradigms.webp",
+      "sha256": "481a8b17baf6867db0e310df227f66240e155c56f0d58b436bc0ec803b30fc4c",
+      "mime": "image/webp",
+      "alt": "三种 RAG 范式对比：左为 Naive RAG 的线性流程，中为加入检索前后优化的 Advanced RAG，右为由多个模块灵活组合的 Modular RAG",
+      "origin": "https://arxiv.org/pdf/2312.10997v5#page=4",
+      "rights": "Gao 等，arXiv:2312.10997v5，图 3。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/rag-survey/figure-4-rag-vs-finetuning.webp",
+      "sha256": "f017fd0c47d406a0193880b6d45aae44635ffbdace79223fd00e5d0e15805f4e",
+      "mime": "image/webp",
+      "alt": "象限图：横轴为模型改动需求，纵轴为外部知识需求；提示工程位于左下，微调位于右下，RAG 从 Naive 到 Modular 向上发展，并与微调在右上结合",
+      "origin": "https://arxiv.org/pdf/2312.10997v5#page=7",
+      "rights": "Gao 等，arXiv:2312.10997v5，图 4。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/rag-survey/figure-5-retrieval-processes.webp",
+      "sha256": "e8138b2b165e9a551e1001ad943721762702b82b2730bb5328a865245d462469",
+      "mime": "image/webp",
+      "alt": "三种检索增强流程：迭代检索在检索和生成之间循环；递归检索逐步改写或分解问题；自适应检索由模型判断是否需要检索、何时停止",
+      "origin": "https://arxiv.org/pdf/2312.10997v5#page=11",
+      "rights": "Gao 等，arXiv:2312.10997v5，图 5。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§I–II: technology tree, Naive/Advanced/Modular paradigms, RAG vs fine-tuning",
+      "§III: retrieval source, granularity, indexing, query optimization, embedding and adapters",
+      "§IV: context curation and LLM fine-tuning",
+      "§V: iterative, recursive and adaptive retrieval",
+      "§VI: downstream tasks, evaluation targets, aspects, metrics, benchmarks and tools",
+      "§VII: long context, robustness, hybrid approaches, scaling, production and multimodal (overview)"
+    ],
+    "figuresViewed": [
+      "Figure 1 — PDF p2 (reproduced)",
+      "Figure 2 — PDF p3 (reproduced)",
+      "Figure 3 — PDF p4 (reproduced)",
+      "Figure 4 — PDF p7 (reproduced)",
+      "Figure 5 — PDF p11 (reproduced)",
+      "Table I — PDF p6 (text)",
+      "Tables II–IV — PDF pp13–15 (text)"
+    ],
+    "limitations": [
+      "方法简介依据综述描述并对照各方法 arXiv 摘要，没有逐篇精读被引论文，也没有复现性能结果。",
+      "第七章生态与多模态部分只做概述；表 I、表 II 只作为索引引用，没有逐行讲解。",
+      "综述覆盖到 2024 年初，不代表此后的 RAG 方法与产品现状；参考文献 [100] 与 LLMLingua 不符，相关介绍以其原文摘要为准。"
+    ],
+    "reviewBasis": "The fixed v5 survey and primary method records were checked for the revision 3 comparisons, including RRR, HyDE, Lost in the Middle, LLMLingua, RECOMP, ITER-RETGEN, IRCoT, FLARE, Self-RAG, RGB, RAGAS and ARES. Figures 1–5 are the unchanged PDF extracts from revision 2. The archive example, ranking arithmetic and diagnostic contrasts are original teaching material. Reader acceptance pending."
+  },
+  "orientation": {
+    "shortTitle": "RAG综述：检索增强生成的方法地图",
+    "topics": [
+      {
+        "id": "rag",
+        "label": "检索增强生成",
+        "aliases": [
+          "RAG",
+          "retrieval augmented generation"
+        ]
+      },
+      {
+        "id": "retrieval-design",
+        "label": "检索与上下文",
+        "aliases": [
+          "查询改写",
+          "重排",
+          "上下文压缩"
+        ]
+      },
+      {
+        "id": "rag-evaluation",
+        "label": "RAG评价",
+        "aliases": [
+          "忠实性",
+          "相关性",
+          "依据"
+        ]
+      }
+    ],
+    "summary": "沿一则双跳档案问题比较三种范式、查询优化、上下文整理、增强流程及评价：哪些证据缺失，怎样检回，在生成与评分时又可能如何丢失。",
+    "value": "可以从候选列表、最终提示与答案分别找出故障位置，并判断论文报告的分数能否支持对某个部件的改进归因。",
+    "prerequisites": [
+      "知道大语言模型能根据提示生成文本即可；向量检索、嵌入、微调等概念会在正文中解释。",
+      "可先读本库 Transformer 和 RAG 原始论文导读，但不是必须。"
+    ],
+    "boundaries": [
+      "固定 arXiv v5（2024-03-27），综述范围到 2024 年初，不是此后技术与产品的完整清单。",
+      "重点细读三种范式、查询优化、上下文整理、增强与评价；图 1–5 使用原论文图，第七章生态和多模态只作概述。",
+      "青榆站档案与指标手算均为教学例子；代表方法另附一手来源，未复现性能。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Yunfan Gao",
+        "Yun Xiong",
+        "Xinyu Gao",
+        "Kangxiang Jia",
+        "Jinliu Pan",
+        "Yuxi Bi",
+        "Yi Dai",
+        "Jiawei Sun",
+        "Meng Wang",
+        "Haofen Wang"
+      ],
+      "year": 2023,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2312.10997v5",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "能沿图 2 说出索引、检索、生成三步各做什么，以及朴素流程在检索、生成、衔接上各有什么毛病。",
+        "concepts": [
+          "RAG",
+          "索引",
+          "检索",
+          "生成",
+          "向量数据库"
+        ],
+        "limit": "图 2 是综述的示意例子，不是对某个具体系统的评测。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "能沿同一道双跳问题比较 Naive、Advanced、Modular 三种组织方式，并指出漏检、选错版本各自发生在哪里。",
+        "concepts": [
+          "Naive RAG",
+          "Advanced RAG",
+          "Modular RAG",
+          "范式",
+          "模块"
+        ],
+        "limit": "三种范式是演进中的组织思路，不是性能阶梯，模块更多不等于效果更好。"
+      },
+      {
+        "unitId": "versus",
+        "purpose": "能用“外部知识需求”和“模型改动需求”两个维度比较 RAG、微调和提示工程。",
+        "concepts": [
+          "微调",
+          "提示工程",
+          "知识注入"
+        ],
+        "limit": "两者并不互斥；所引比较研究针对无监督微调。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "理解检索来源、检索粒度和索引结构如何决定“能找到什么”。",
+        "concepts": [
+          "检索粒度",
+          "切块",
+          "元数据",
+          "知识图谱",
+          "命题"
+        ],
+        "limit": "粒度没有通用最优值，取决于任务和预算。"
+      },
+      {
+        "unitId": "query",
+        "purpose": "区分改写检索指令、编码假想文档和拆成子问题，检查查询优化能否兼顾时间、版本与真实证据。",
+        "concepts": [
+          "HyDE",
+          "查询改写",
+          "BM25",
+          "稠密检索",
+          "嵌入"
+        ],
+        "limit": "嵌入模型没有放之四海而皆准的选择。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "比较重排、截取、词元压缩和句子抽取，判断证据在哪一步丢掉了适用条件。",
+        "concepts": [
+          "重排",
+          "上下文压缩",
+          "证据完整性"
+        ],
+        "limit": "位置敏感和压缩收益受任务、模型及预算影响。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "能分清迭代、递归、自适应三种检索流程，并说出 ITER-RETGEN、IRCoT、FLARE、Self-RAG 各属于哪一种。",
+        "concepts": [
+          "迭代检索",
+          "递归检索",
+          "自适应检索",
+          "Self-RAG",
+          "FLARE"
+        ],
+        "limit": "多轮检索也可能让错误自我强化。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "能手算同一组排名的精确率与召回率，并用对照样例区分材料相关性、答案忠实性、相关性与事实正确性。",
+        "concepts": [
+          "忠实性",
+          "上下文相关性",
+          "拒答",
+          "噪声鲁棒性",
+          "RAGAS"
+        ],
+        "limit": "现有指标多借用自相关领域，尚未形成统一标准。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "能用速查表定位一篇 RAG 论文改变了哪一环，并判断实验能否把收益归给该改变。",
+        "concepts": [
+          "方法地图",
+          "归因",
+          "端到端提升"
+        ],
+        "limit": "速查表是导读整理，不是综述原表。"
+      }
+    ]
+  }
+}

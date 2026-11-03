@@ -1,9 +1,12 @@
 import { test, expect, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import catalog from '../../content/catalog.json' with { type: 'json' };
-import memory from '../../content/guides/rag-survey.r2.json' with { type: 'json' };
+import type { GuideMetadata } from '../../src/content/types';
 
 // SYNTHETIC reading marks only; the AI transport is a local stub and never sends a question.
 const revision = catalog.currentRevisions['rag-survey'];
+const selected = catalog.entries.find(entry => entry.guideId === 'rag-survey' && entry.revision === revision)!;
+const memory: GuideMetadata = JSON.parse(readFileSync(new URL(`../../content/${selected.metadataFile}`, import.meta.url), 'utf8'));
 const activeCount = Object.keys(catalog.currentRevisions).filter(id => !((catalog as { archivedGuideIds?: string[] }).archivedGuideIds ?? []).includes(id)).length;
 async function stubAi(page: Page) {
   await page.route('**/api/ai/**', route => {
@@ -23,7 +26,7 @@ test('the guide card ties reading targets to chapters, shows explicit marks quie
   });
   await page.goto(`/library?article=rag-survey`);
   const outline = page.locator('.orientation-outline');
-  const targets = memory.orientation.readingTargets;
+  const targets = memory.orientation!.readingTargets;
   await expect(outline.locator('.outline-aim')).toHaveCount(targets.length);
   await expect(outline.locator('li', { has: page.locator(`a[href$="#${targets[0].unitId}"]`) }).locator('.outline-aim')).toHaveText(targets[0].purpose);
   const related = page.getByRole('navigation', { name: '相关导读' });
@@ -44,7 +47,7 @@ test('the guide card ties reading targets to chapters, shows explicit marks quie
 test('reading keeps guidance beside the article and closes with one quiet step', async ({ page }) => {
   await stubAi(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
-  const target = memory.orientation.readingTargets[1];
+  const target = memory.orientation!.readingTargets[1];
   await page.goto(`/read/rag-survey/${revision}#${target.unitId}`);
   const aim = page.locator('.reading-sidebar .toc-aim');
   await expect(aim).toHaveCount(1);

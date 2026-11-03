@@ -19,14 +19,16 @@ import { sectionContext } from './readingContext';
 import { ReaderAssistant } from './ReaderAssistant';
 import { TermHint } from './TermHint';
 import { glossaryTermsIn } from '../content/glossary';
+import { libraryBrief } from '../library/briefs';
 
 type ReadingTarget = NonNullable<Guide['metadata']['orientation']>['readingTargets'][number];
 function Contents({ guide, active, aim, onChoose }: { guide: Guide; active: string; aim?: ReadingTarget; onChoose?: () => void }) {
+  const labels = libraryBrief(guide.metadata).chapterLabels;
   return <nav aria-label="章节目录"><ol>{guide.units.map((unit, index) => <li key={unit.id}>
     <a href={`#${unit.id}`} aria-label={unit.heading ?? '阅读起点'} title={unit.heading ?? '阅读起点'} aria-current={active === unit.id ? 'location' : undefined} onClick={event => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); onChoose?.(); navigate(`#${unit.id}`);
-    }}><span className="toc-number" aria-hidden="true">{String(index).padStart(2, '0')}</span><span>{navigationLabels[unit.heading ?? ''] ?? unit.heading ?? '阅读起点'}</span></a>
+    }}><span className="toc-number" aria-hidden="true">{String(index).padStart(2, '0')}</span><span className="toc-label">{labels[unit.id] ?? navigationLabels[unit.heading ?? ''] ?? unit.heading ?? '阅读起点'}</span></a>
     {aim && aim.unitId === unit.id && active === unit.id && <div className="toc-aim"><p><span>本节要弄清</span>{aim.purpose}</p>{aim.limit && <p className="toc-aim-limit">留意：{aim.limit}</p>}</div>}
   </li>)}</ol></nav>;
 }

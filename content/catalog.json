@@ -8,14 +8,14 @@
     "toolformer": 1,
     "reflexion": 1,
     "llm-survey": 1,
-    "transformer": 2,
+    "transformer": 4,
     "gpt3": 1,
     "chain-of-thought": 1,
     "rag": 2,
     "agent-memory-survey": 2,
     "streamingllm": 2,
     "concept-drift-survey": 2,
-    "rag-survey": 2,
+    "rag-survey": 4,
     "multi-agent-communication-survey": 1,
     "multi-agent-collaboration-survey": 1,
     "autogen": 1,
@@ -148,6 +148,26 @@
       }
     },
     {
+      "guideId": "transformer",
+      "revision": 3,
+      "metadataFile": "guides/transformer.r3.json",
+      "recommendation": {
+        "rank": 2,
+        "relation": "editorial-reading-order",
+        "reason": "理解注意力与序列建模基础。"
+      }
+    },
+    {
+      "guideId": "transformer",
+      "revision": 4,
+      "metadataFile": "guides/transformer.r4.json",
+      "recommendation": {
+        "rank": 2,
+        "relation": "editorial-reading-order",
+        "reason": "理解注意力与序列建模基础。"
+      }
+    },
+    {
       "guideId": "gpt3",
       "revision": 1,
       "metadataFile": "guides/gpt3.json",
@@ -261,6 +281,26 @@
       "guideId": "rag-survey",
       "revision": 2,
       "metadataFile": "guides/rag-survey.r2.json",
+      "recommendation": {
+        "rank": 5,
+        "relation": "editorial-reading-order",
+        "reason": "建立外部知识接入、控制和评价的全局地图。"
+      }
+    },
+    {
+      "guideId": "rag-survey",
+      "revision": 3,
+      "metadataFile": "guides/rag-survey.r3.json",
+      "recommendation": {
+        "rank": 5,
+        "relation": "editorial-reading-order",
+        "reason": "建立外部知识接入、控制和评价的全局地图。"
+      }
+    },
+    {
+      "guideId": "rag-survey",
+      "revision": 4,
+      "metadataFile": "guides/rag-survey.r4.json",
       "recommendation": {
         "rank": 5,
         "relation": "editorial-reading-order",

@@ -65,7 +65,7 @@ function Orientation({ guide, resumes, marks, returnToList, openRelated }: { gui
       <div className={`orientation-actions${canResume ? ' has-resume' : ''}`}>
         {canResume && <p className="orientation-resume" title={resumeUnit?.heading ?? undefined}>上次读到：{resumeLabel ?? '阅读起点'}{!currentResume && <span> · 导读修订 {resume.revision}</span>}</p>}
         <AppLink id={`start-${metadata.id}`} className="primary-action" to={canResume ? `/read/${resume.guideId}/${resume.revision}` : `/read/${metadata.id}/${metadata.revision}`}>{canResume ? '继续阅读' : '开始导读'} <span aria-hidden="true">→</span></AppLink>
-        {canResume && <AppLink className="text-action" to={`/read/${metadata.id}/${metadata.revision}#orientation`}>从头阅读</AppLink>}
+        {canResume && <AppLink className="text-action" to={`/read/${metadata.id}/${metadata.revision}#${guide.units[0].id}`}>{currentResume ? '从头阅读' : `从头阅读第 ${metadata.revision} 版`}</AppLink>}
         {recorded && <p className="orientation-marks">{recorded}</p>}
       </div>
     </header>
