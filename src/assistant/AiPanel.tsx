@@ -95,7 +95,9 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
   const [status, setStatus] = useState<AiStatus>();
   const [connecting, setConnecting] = useState(true);
   const [connectionError, setConnectionError] = useState('');
-  const [error, setError] = useState('');
+  const [error, setErrorValue] = useState('');
+  const [preflightFailure, setPreflightFailure] = useState<{ status: number; quick: boolean }>();
+  function setError(value: string) { setPreflightFailure(undefined); setErrorValue(value); }
   const [notice, setNotice] = useState('');
   const [quickRetry, setQuickRetry] = useState<{ question: string; turn?: AiTurn }>();
   const quickCommandTurn = useRef<string | undefined>(undefined);
@@ -352,7 +354,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     const request: AskInput = { ...base, requestId: previous && !previous.accepted && JSON.stringify(oldBase) === JSON.stringify(base) ? previous.input.requestId : crypto.randomUUID() };
     pendingRequest.current = { input: request, accepted: false };
     const abort = new AbortController(); controller.current = abort;
-    let localId = `pending-${request.requestId}`, acceptedId: string | undefined, completed = false, finished: AiTurn | undefined;
+    let localId = `pending-${request.requestId}`, acceptedId: string | undefined, completed = false, finished: AiTurn | undefined, requestRejected = false;
     const optimistic: AiTurn = { id: localId, question: text, answer: '', status: 'running', sources: [], context: {
       guideId: request.guideId, revision: request.revision, unitId: request.unitId, selection: request.selection ?? '',
       scope: 'pending', webSearch: request.webSearch,
@@ -389,15 +391,24 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
 
     } catch (reason) {
       if (alive.current) {
-        update(turn => ({ ...turn, status: 'interrupted' }));
-        setError(abort.signal.aborted ? '已停止接收回答。问题仍保留；刷新对话可确认服务端最终保存的内容。' : errorText(reason));
+        requestRejected = !acceptedId && !abort.signal.aborted && reason instanceof AiApiError && reason.status >= 400 && reason.status < 600;
+        if (requestRejected) {
+          // This attempt was rejected before an accepted event. Keep the
+          // composer instead of presenting a fabricated interrupted answer.
+          setTurns(current => current.filter(turn => turn.id !== localId));
+          setError(errorText(reason));
+          setPreflightFailure({ status: (reason as AiApiError).status, quick: Boolean(quickQuestion) });
+        } else {
+          update(turn => ({ ...turn, status: 'interrupted' }));
+          setError(abort.signal.aborted ? '已停止接收回答。问题仍保留；刷新对话可确认服务端最终保存的内容。' : errorText(reason));
+        }
       }
     } finally {
       submitting.current = false;
       if (alive.current) {
         setPhase('正在确认对话已保存'); controller.current = undefined;
         // A reload also resolves ambiguous failures and preserves a partial response already saved by the service.
-        try { await loadList(status); if (acceptedId) await loadConversation(acceptedId, status, true, completed ? undefined : localId); }
+        try { if (!requestRejected) { await loadList(status); if (acceptedId) await loadConversation(acceptedId, status, true, completed ? undefined : localId); } }
         catch { if (alive.current) setNotice('本页回答仍保留，尚未确认服务端状态。请刷新对话核对。'); }
         finally {
           // A provider may have reported an expired login or refreshed model choice.
@@ -557,7 +568,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       {hasRunning && !sending && <div className="ai-service-state"><p>这段对话仍标记为处理中，可能来自另一个页面或中断的连接。刷新后可恢复已保存内容。</p><button type="button" disabled={busy} className="ai-inline-action" onClick={() => void refresh()}>刷新对话</button></div>}
     </div>
     <form className="ai-composer" onSubmit={event => { event.preventDefault(); void send(); }}>
-      {error && <div className="ai-error" role="alert"><p>{error}</p>{conversationId && <button type="button" disabled={locked} onClick={() => void refresh()}>刷新对话</button>}<button type="button" disabled={locked} onClick={() => void connect()}>重试连接</button><button type="button" disabled={locked} onClick={() => setSettingsOpen(true)}>AI 设置</button></div>}
+      {error && <div className="ai-error" role="alert">{preflightFailure && <><strong>提问准备失败</strong><p>{preflightFailure.status === 413 ? '本轮请求未发送给模型。' : preflightFailure.status >= 500 ? '本次提问未能正常开始，服务返回了错误。' : '本次提问请求未被接收。'}{preflightFailure.quick ? '原有问题草稿仍保留。' : '问题保留在输入框中，可调整后重新发送。'}</p></>}<p>{error}</p>{preflightFailure && !preflightFailure.quick && <button type="button" disabled={locked || !ready || hasRunning || selectionTooLong || !question.trim() || question.length > 6000} onClick={() => void send()}>重新发送</button>}{conversationId && <button type="button" disabled={locked} onClick={() => void refresh()}>刷新对话</button>}{preflightFailure?.status !== 413 && <button type="button" disabled={locked} onClick={() => void connect()}>重试连接</button>}<button type="button" disabled={locked} onClick={() => setSettingsOpen(true)}>AI 设置</button></div>}
       {notice && <p className="ai-notice" role="status">{notice}</p>}
       {loginPending && <p className="ai-notice" role="status">正在等待 ChatGPT 授权。完成或取消这次登录后即可发送，问题草稿仍保留。</p>}
       {selectionTooLong && <p className="ai-error" role="alert">选文超过 12,000 字符。请打开“资料”，选择“不附带选文”，或改用较短的当前选文；没有自动截断。</p>}

@@ -10,6 +10,7 @@ import { normalizedRelativePath } from '../../shared/package-path.mjs';
 import { RetrievalIndex, digest, RETRIEVAL_VERSION } from './retrieval-index.mjs';
 import { ReadingMaterials } from './materials.mjs';
 import { utf8Prefix, localResultBudget } from '../ai/prompt-budget.mjs';
+import { guidePromptMetadata } from './prompt-metadata.mjs';
 import { object, reject, isId, isRevision, isText } from '../http/validation.mjs';
 
 const sectionUrl = (guide, unit) => `/read/${guide.metadata.id}/${guide.metadata.revision}#${unit.id}`;
@@ -149,16 +150,24 @@ export class ContentIndex {
     const active = guide.units.find(unit => unit.id === request.unitId);
     if (!active) reject('当前章节不存在，请重新选择章节。');
     if (request.selection && !normalizeText(active.text).includes(normalizeText(request.selection)) && !active.renderedText.includes(normalizeText(request.selection))) reject('选文与当前章节不一致，请重新选择；公式或跨章节文字可直接写入问题。');
-    const { title, paperId, paperTitle, source, orientation, coverage, citations } = guide.metadata;
     const evidence = this.evidenceFor(`guide:${request.guideId}/${request.revision}:${request.unitId}`);
-    let metadataJson = JSON.stringify({ title, paperId, paperTitle, source, orientation: orientation ?? null, coverage, citations, evidence });
+    const sectionUnits = [...new Set([guide.units[0], active])];
+    const guideBytes = Buffer.byteLength(guide.body);
+    let units = guide.body.length <= LIMITS.contextChars && guideBytes <= 5000 ? guide.units : sectionUnits;
+    let metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence));
     // Reserve room before selecting the guide scope, including metadata, question,
     // history and subsequent evidence. Final provider preflight remains authoritative.
-    const fixedBytes = Buffer.byteLength(metadataJson + SYSTEM_PROMPT + JSON.stringify(availableTools(request.webSearch)) + request.question + (request.selection ?? '')) + 2000;
-    const contextBytes = Math.min(5000, Math.max(0, (config.contextTokenLimit ?? 32768) - (config.maxOutputTokens ?? 3000) - fixedBytes - 10000));
-    if (contextBytes < 512) reject('本轮元数据与问题已占满保守预算，请缩小问题或调整已确认的模型上下文容量。', 413);
-    const scope = guide.body.length <= LIMITS.contextChars && Buffer.byteLength(guide.body) <= contextBytes ? 'full-guide' : 'section';
-    const units = scope === 'full-guide' ? guide.units : [...new Set([guide.units[0], active])];
+    const tools = config.toolsEnabled === false ? [] : availableTools(Boolean(request.webSearch && config.searchAvailable));
+    const textBudget = () => {
+      const fixedBytes = Buffer.byteLength(metadataJson + SYSTEM_PROMPT + JSON.stringify(tools) + request.question + (request.selection ?? '')) + 2000;
+      return Math.min(5000, Math.max(0, (config.contextTokenLimit ?? 32768) - (config.maxOutputTokens ?? 3000) - fixedBytes - 10000));
+    };
+    let contextBytes = textBudget();
+    const scope = guide.body.length <= LIMITS.contextChars && guideBytes <= contextBytes ? 'full-guide' : 'section';
+    if (scope === 'section' && units !== sectionUnits) {
+      units = sectionUnits; metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence)); contextBytes = textBudget();
+    }
+    if (contextBytes < 512) reject('问题和必要资料超过本机的上下文预算，请缩短输入或调整本机模型上下文预算。', 413);
     if (units.length > 64) reject('导读章节数量超过本轮来源预算，请选择章节模式。', 413);
     if (units.reduce((sum, unit) => sum + unit.text.length, 0) > LIMITS.contextChars) reject('当前章节超过上下文预算，请选择较短章节。', 413);
     const guideRanges = [];

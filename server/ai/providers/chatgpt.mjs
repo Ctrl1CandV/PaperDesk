@@ -1,5 +1,5 @@
 import { assembleAssistantContext } from '../research.mjs';
-import { LIMITS, SYSTEM_PROMPT, availableTools } from '../instructions.mjs';
+import { LIMITS, SYSTEM_PROMPT, availableTools, toolArgumentLimit } from '../instructions.mjs';
 import { checkPromptBudget } from '../prompt-budget.mjs';
 import { PublicError, isText } from '../../http/validation.mjs';
 import { webSearch } from './api.mjs';
@@ -166,10 +166,15 @@ async function checkResponse(response, signal) {
 
 // Read on demand so a changed account never inherits a cached account's catalog.
 export async function listChatGptModels(auth, { signal, fetchImpl = fetch } = {}) {
-  const timeout = AbortSignal.timeout(15000);
-  const requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
+  // A cold first request may need an OAuth refresh before a large model
+  // catalog can be read. Give these two bounded stages separate deadlines;
+  // refreshing must not consume the catalog's entire network allowance.
+  let stage = 'authorization', timeout = AbortSignal.timeout(30000);
+  let requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
   try {
     const token = await accessToken(auth, requestSignal);
+    stage = 'catalog'; timeout = AbortSignal.timeout(30000);
+    requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
     let catalog;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -204,7 +209,9 @@ export async function listChatGptModels(auth, { signal, fetchImpl = fetch } = {}
     return models;
   } catch (error) {
     signal?.throwIfAborted();
-    if (timeout.aborted) throw new PublicError('读取 ChatGPT 可用模型超时，请稍后重试。', 504);
+    if (timeout.aborted) throw new PublicError(stage === 'authorization'
+      ? '准备 ChatGPT 登录授权超时，请检查本机网络后重试。登录信息仍保留。'
+      : '读取 ChatGPT 可用模型超时，请检查本机网络后重试。登录信息仍保留。', 504);
     throw error;
   }
 }
@@ -218,7 +225,11 @@ export async function resolveChatGptModel(auth, { modelId, signal, fetchImpl = f
 
 function namespaceTools(tools) {
   return tools.length ? [{ type: 'namespace', name: NAMESPACE, description: '只读检索已审核的论文导读与明确启用的公开网页摘录。',
-    tools: tools.map(({ function: fn }) => ({ type: 'function', name: fn.name, description: fn.description, parameters: fn.parameters, strict: true })) }] : [];
+    // These shared schemas intentionally contain optional fields (ranges,
+    // filters and research changes). Responses strict mode requires every
+    // property to be required, recursively; enabling it rejects the request
+    // before inference. Preserve optional semantics and validate calls locally.
+    tools: tools.map(({ function: fn }) => ({ type: 'function', name: fn.name, description: fn.description, parameters: fn.parameters, strict: false })) }] : [];
 }
 
 function inspectOutput(output) {
@@ -235,7 +246,7 @@ function inspectOutput(output) {
       }
     } else if (item?.type === 'function_call') {
       if (item.namespace !== NAMESPACE || !isText(item.call_id, 200, 1) || !isText(item.name, 60, 1)
-        || !isText(item.arguments, 2000, 1) || item.status && item.status !== 'completed'
+        || !isText(item.arguments, toolArgumentLimit(item.name), 1) || item.status && item.status !== 'completed'
         || item.async || item.caller && item.caller.type !== 'direct') throw new PublicError('ChatGPT 工具调用格式无效或超出允许范围。', 502);
       calls.push(item);
     } else throw new PublicError('ChatGPT 请求了本轮未支持的输出或工具类型。', 502);

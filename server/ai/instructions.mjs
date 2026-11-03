@@ -1,5 +1,10 @@
 export const LIMITS = Object.freeze({ contextChars: 40000, historyChars: 12000, messageChars: 130000, toolCalls: 6, rounds: 4, answerChars: 40000, upstreamBytes: 2 * 1024 * 1024 });
 
+// Writing a complete research record has a larger, already versioned storage
+// contract than a bounded search query or a source locator.
+const researchWriteTools = new Set(['create_research_direction', 'propose_research_changes', 'update_research_notebook']);
+export const toolArgumentLimit = name => researchWriteTools.has(name) ? 40000 : 2000;
+
 const functionTool = (name, description, properties, required) => ({ type: 'function', function: { name, description, parameters: { type: 'object', properties, required, additionalProperties: false } } });
 export function availableTools(webSearch, research = false, command = undefined) {
   const tools = [functionTool('search_library', '按关键词搜索本地已审核的压缩导读。返回有固定版本的章节节选，非原论文全文。', { query: { type: 'string', maxLength: 300 } }, ['query']),

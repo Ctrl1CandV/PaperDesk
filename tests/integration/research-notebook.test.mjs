@@ -7,6 +7,7 @@ import { AiStore } from '../../server/storage/ai-store.mjs';
 import { prepareAssistantContext, researchToolsForTurn } from '../../server/ai/research.mjs';
 import { answer } from '../../server/ai/providers/api.mjs';
 import { answerWithChatGpt } from '../../server/ai/providers/chatgpt.mjs';
+import { toolArgumentLimit } from '../../server/ai/instructions.mjs';
 
 // Synthetic records, mocked provider streams, no model or network requests.
 const config = { modelId:'synthetic-model', baseURL:'https://example.test/v1', apiKey:'synthetic-key', toolsEnabled:true, searchAvailable:false, search:{apiKey:''}, maxOutputTokens:1000, contextTokenLimit:32768 };
@@ -18,15 +19,20 @@ for (const provider of ['api', 'chatgpt']) test(`synthetic ${provider} notebook 
   const prepared = prepareAssistantContext({}, request, [], config, store);
   const {turn} = store.begin(request, prepared.context, prepared.sources);
   prepared.runResearchTool = researchToolsForTurn(store, turn);
-  const args = {body:'SYNTHETIC reader question\n\n〔待验证〕SYNTHETIC new idea', summary:'SYNTHETIC add uncertainty'};
+  const args = {body:'SYNTHETIC reader question\n\n〔待验证〕SYNTHETIC new idea\n' + 'SYNTHETIC unverified observation. '.repeat(100), summary:'SYNTHETIC add uncertainty'};
+  const argumentsJson = JSON.stringify(args);
+  assert.ok(argumentsJson.length > 2000 && argumentsJson.length < 40000, 'A normal working paper exceeds the read-only tool argument allowance.');
   let calls = 0;
   const seen = [];
   const fetchImpl = async (_url, options) => {
     seen.push(JSON.parse(options.body));
     let events;
-    if (provider === 'api') events = [{choices:[calls++ ? {delta:{content:args.body},finish_reason:'stop'} : {delta:{tool_calls:[{index:0,id:'synthetic-call',type:'function',function:{name:'update_research_notebook',arguments:JSON.stringify(args)}}]},finish_reason:'tool_calls'}]}];
+    if (provider === 'api') events = calls++ ? [{choices:[{delta:{content:'SYNTHETIC saved draft summary.'},finish_reason:'stop'}]}] : [
+      {choices:[{delta:{tool_calls:[{index:0,id:'synthetic-call',type:'function',function:{name:'update_research_notebook',arguments:argumentsJson.slice(0,1800)}}]}}]},
+      {choices:[{delta:{tool_calls:[{index:0,function:{arguments:argumentsJson.slice(1800)}}]},finish_reason:'tool_calls'}]},
+    ];
     else {
-      const output = calls++ ? [{type:'message',id:'synthetic-message',role:'assistant',status:'completed',content:[{type:'output_text',text:args.body,annotations:[]}]}] : [{type:'function_call',id:'synthetic-item',call_id:'synthetic-call',namespace:'paperdesk',name:'update_research_notebook',arguments:JSON.stringify(args),status:'completed'}];
+      const output = calls++ ? [{type:'message',id:'synthetic-message',role:'assistant',status:'completed',content:[{type:'output_text',text:'SYNTHETIC saved draft summary.',annotations:[]}]}] : [{type:'function_call',id:'synthetic-item',call_id:'synthetic-call',namespace:'paperdesk',name:'update_research_notebook',arguments:argumentsJson,status:'completed'}];
       events = [{type:'response.completed',response:{id:'synthetic-response',status:'completed',output}}];
     }
     return new Response(events.map(event => `data: ${JSON.stringify(event)}\n\n`).join(''), {headers:{'content-type':'text/event-stream'}});
@@ -36,6 +42,7 @@ for (const provider of ['api', 'chatgpt']) test(`synthetic ${provider} notebook 
   turn.status = 'complete'; store.save(turn);
   assert.equal(calls, 2);
   assert.deepEqual(turn.context.notebookDraft, {...args,baseNotebookVersion:1});
+  assert.equal(turn.context.toolEvents[0].argumentsJson, argumentsJson);
   assert.equal(turn.context.researchSnapshot.notebook.body, 'SYNTHETIC reader question');
   assert.equal(turn.context.researchSnapshot.recordRevision, 3);
   assert.ok(JSON.stringify(seen[0]).includes('update_research_notebook'));
@@ -43,4 +50,33 @@ for (const provider of ['api', 'chatgpt']) test(`synthetic ${provider} notebook 
   const restored = new AiStore(':memory:'); t.after(() => restored.close());
   restored.import(store.export());
   assert.deepEqual(restored.turn(turn.id).context.notebookDraft, turn.context.notebookDraft);
+});
+
+for (const provider of ['api', 'chatgpt']) test(`synthetic ${provider} retains read-only and research-write transport limits`, async t => {
+  const store = new AiStore(':memory:'); t.after(() => store.close());
+  const record = {id:randomUUID(), title:'SYNTHETIC limit topic', question:'SYNTHETIC limit question', interpretation:'', unknowns:'', recordRevision:1, evidence:[], nextAction:null, research:emptyResearchState()};
+  for (const [name, args, limit] of [
+    ['search_library', {query:'SYNTHETIC ' + 'x'.repeat(2100)}, 2000],
+    ['update_research_notebook', {body:'SYNTHETIC ' + 'x'.repeat(40000),summary:'SYNTHETIC too large'}, 40000],
+  ]) {
+    assert.equal(toolArgumentLimit(name), limit);
+    const request = {requestId:randomUUID(), question:'/记录 SYNTHETIC check transport limit', webSearch:false, command:{name:'notebook'}, conversationScope:{kind:'exploration',explorationId:record.id}, researchSnapshot:await createResearchSnapshot(record)};
+    const prepared = prepareAssistantContext({}, request, [], config, store);
+    const {turn} = store.begin(request, prepared.context, prepared.sources);
+    let calls = 0, executions = 0;
+    prepared.runResearchTool = () => { executions++; return {error:'SYNTHETIC must not execute'}; };
+    const fetchImpl = async () => {
+      calls++;
+      const events = provider === 'api'
+        ? [{choices:[{delta:{tool_calls:[{index:0,id:'synthetic-limit-call',type:'function',function:{name,arguments:JSON.stringify(args)}}]},finish_reason:'tool_calls'}]}]
+        : [{type:'response.completed',response:{id:'synthetic-limit-response',status:'completed',output:[{type:'function_call',id:'synthetic-limit-item',call_id:'synthetic-limit-call',namespace:'paperdesk',name,arguments:JSON.stringify(args),status:'completed'}]}}];
+      return new Response(events.map(event => `data: ${JSON.stringify(event)}\n\n`).join(''), {headers:{'content-type':'text/event-stream'}});
+    };
+    await assert.rejects(() => (provider === 'api' ? answer : answerWithChatGpt)({config, content:{runLocal(){executions++;return {}; }}, request, turn, prepared,
+      signal:new AbortController().signal, emit:()=>{}, persist:()=>store.save(turn), fetchImpl, auth:{getAccessToken:async()=>'synthetic-token'}}), /工具/);
+    assert.equal(calls, 1); assert.equal(executions, 0, 'The transport rejects excess arguments before any local tool runs.');
+  }
+  assert.equal(toolArgumentLimit('create_research_direction'), 40000);
+  assert.equal(toolArgumentLimit('propose_research_changes'), 40000);
+  assert.equal(toolArgumentLimit('unrecognized_synthetic_tool'), 2000);
 });

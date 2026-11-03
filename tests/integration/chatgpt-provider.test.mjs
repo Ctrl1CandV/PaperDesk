@@ -115,7 +115,7 @@ test('explicit model selection cannot use a hidden catalog entry and an empty li
 
 test('catalog timeout bounds token acquisition and returns a safe timeout without a service request', async t => {
   const timeout = new AbortController();
-  t.mock.method(AbortSignal, 'timeout', milliseconds => { assert.equal(milliseconds, 15000); return timeout.signal; });
+  t.mock.method(AbortSignal, 'timeout', milliseconds => { assert.equal(milliseconds, 30000); return timeout.signal; });
   const delayedAuth = { getAccessToken: async () => {
     timeout.abort(new DOMException('Synthetic timeout', 'TimeoutError'));
     return new Promise(() => {});
@@ -124,10 +124,33 @@ test('catalog timeout bounds token acquisition and returns a safe timeout withou
   await assert.rejects(listChatGptModels(delayedAuth, { fetchImpl: async () => { calls++; throw new Error('Synthetic unexpected request'); } }), error => {
     assert.ok(error instanceof PublicError);
     assert.equal(error.status, 504);
-    assert.match(error.message, /读取 ChatGPT 可用模型超时/);
+    assert.match(error.message, /准备 ChatGPT 登录授权超时/);
     return true;
   });
   assert.equal(calls, 0);
+});
+
+test('cold authorization does not consume the catalog deadline', async t => {
+  const authorization = new AbortController(), catalog = new AbortController();
+  const phases = [authorization, catalog];
+  t.mock.method(AbortSignal, 'timeout', milliseconds => { assert.equal(milliseconds, 30000); return phases.shift().signal; });
+  const models = await listChatGptModels({ async getAccessToken() { return 'SYNTHETIC_ONLY'; } }, { fetchImpl: async (_url, { signal }) => {
+    // The old aggregate deadline would already be expired at this point.
+    authorization.abort(new DOMException('Synthetic prior-stage deadline', 'TimeoutError'));
+    assert.equal(signal.aborted, false);
+    return Response.json({ models: [{ slug: 'synthetic-delayed-model', visibility: 'list' }] });
+  } });
+  assert.equal(models[0].id, 'synthetic-delayed-model');
+});
+
+test('catalog stage timeout is distinct from authorization and never counts as quota exhaustion', async t => {
+  const phases = [new AbortController(), new AbortController()];
+  const catalog = phases[1];
+  t.mock.method(AbortSignal, 'timeout', () => phases.shift().signal);
+  await assert.rejects(listChatGptModels(auth, { fetchImpl: async () => {
+    catalog.abort(new DOMException('Synthetic catalog deadline', 'TimeoutError'));
+    return Response.json({ models: [] });
+  } }), error => error instanceof PublicError && error.status === 504 && /读取 ChatGPT 可用模型超时/.test(error.message) && !isChatGptQuotaError(error));
 });
 
 test('large synthetic catalog metadata above the old budget yields only ordered picker fields', async () => {
@@ -211,7 +234,10 @@ test('Responses uses supported stateless fields, instructions, namespaced tools 
   assert.equal(request.body.tools[0].type, 'namespace');
   assert.equal(request.body.tools[0].name, 'paperdesk');
   assert.deepEqual(request.body.tools[0].tools.map(item => item.name), ['search_library', 'read_section', 'search_sources', 'read_source_unit', 'resolve_source_locator']);
-  assert.ok(request.body.tools[0].tools.every(tool => tool.type === 'function' && tool.strict === true && !('function' in tool)));
+  assert.ok(request.body.tools[0].tools.every(tool => tool.type === 'function' && tool.strict === false && !('function' in tool)));
+  const optionalFilter = request.body.tools[0].tools.find(tool => tool.name === 'search_sources');
+  assert.ok(optionalFilter.parameters.properties.paperId);
+  assert.equal(optionalFilter.parameters.required.includes('paperId'), false);
   assert.equal(state.turn.answer, '合成回答 [L1]。');
   assert.equal(JSON.stringify(emitted).includes('Synthetic hidden'), false);
 });

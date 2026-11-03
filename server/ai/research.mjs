@@ -164,7 +164,7 @@ export function researchToolsForTurn(store, turn) {
         const draft=validateNotebookDraft({...args,baseNotebookVersion:snapshot.notebook?.version ?? 0});
         if (draft.body === snapshot.notebook?.body) return {status:'unchanged',message:'正文没有变化，无需保存新版本。'};
         turn.context.notebookDraft=structuredClone(draft);
-        return {status:'notebook-drafted',message:'研究记录草稿已接收；请在回答中展示完整正文。回答完成后界面会检查版本并保存；不要提前声称已保存。'};
+        return {status:'notebook-drafted',message:'研究工作稿草稿已接收，界面保留了完整正文。回答中简述变化与待确认之处即可，无需重复全文；回答完成后界面会检查版本并保存，不要提前声称已保存。'};
       } catch(error) { return {error:`研究记录草稿无效：${error instanceof Error?error.message:'格式无效'}`}; }
     }
     if (name === 'search_topic_history') {

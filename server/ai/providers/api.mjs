@@ -1,5 +1,5 @@
 import { assembleAssistantContext } from '../research.mjs';
-import { LIMITS, SYSTEM_PROMPT, availableTools } from '../instructions.mjs';
+import { LIMITS, SYSTEM_PROMPT, availableTools, toolArgumentLimit } from '../instructions.mjs';
 import { PublicError, object, reject, isText, safeWebUrl } from '../../http/validation.mjs';
 import { checkPromptBudget } from '../prompt-budget.mjs';
 
@@ -65,7 +65,7 @@ async function completion(config, messages, tools, signal, emit, fetchImpl) {
       if (part.id !== undefined) { if (typeof part.id !== 'string') reject('模型工具编号无效。', 502); call.id += part.id; }
       if (part.function?.name !== undefined) { if (typeof part.function.name !== 'string') reject('模型工具名称无效。', 502); call.function.name += part.function.name; }
       if (part.function?.arguments !== undefined) { if (typeof part.function.arguments !== 'string') reject('模型工具参数无效。', 502); call.function.arguments += part.function.arguments; }
-      if (call.id.length > 200 || call.function.name.length > 60 || call.function.arguments.length > 2000) reject('模型工具请求超过限制。', 502);
+      if (call.id.length > 200 || call.function.name.length > 60 || call.function.arguments.length > toolArgumentLimit(call.function.name)) reject('模型工具请求超过限制。', 502);
       calls.set(part.index, call);
     }
   }

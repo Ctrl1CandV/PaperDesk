@@ -147,11 +147,11 @@ test('synthetic catalog cancellation during backoff prevents a second request', 
 
 test('synthetic shared catalog deadline also stops retry backoff', async t => {
   const timeout = new AbortController(); let calls = 0, deadlines = 0;
-  t.mock.method(AbortSignal, 'timeout', milliseconds => { deadlines++; assert.equal(milliseconds, 15000); return timeout.signal; });
+  t.mock.method(AbortSignal, 'timeout', milliseconds => { deadlines++; assert.equal(milliseconds, 30000); return deadlines === 1 ? new AbortController().signal : timeout.signal; });
   await assert.rejects(listChatGptModels(auth, { fetchImpl: async () => {
     calls++; setTimeout(() => timeout.abort(), 20); return Response.json({}, { status: 503 });
   } }), error => error.status === 504);
-  assert.equal(calls, 1); assert.equal(deadlines, 1);
+  assert.equal(calls, 1); assert.equal(deadlines, 2);
 });
 
 test('synthetic response POST failures never use the catalog retry policy', async () => {
