@@ -1,0 +1,610 @@
+{
+  "schemaVersion": 2,
+  "id": "multi-agent-collaboration-survey",
+  "paperId": "arxiv:2501.06322",
+  "revision": 2,
+  "title": "多智能体协作综述：沿协作通道比较分工方式",
+  "paperTitle": "Multi-Agent Collaboration Mechanisms: A Survey of LLMs",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "沿图 2 的协作通道框架，讲清参与者、类型、结构、策略四个属性与编排层分别回答什么问题，并用代表方法说明每一栏怎样填。",
+  "source": {
+    "id": "arxiv:2501.06322",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2501.06322v1"
+  },
+  "bodyFile": "multi-agent-collaboration-survey.r2.md",
+  "bodySha256": "d038ce2ac0aa3a3ebd01ffe9cab123d6bb6825b0f7a03a85e9354e8fdd11a280",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "作者为什么从单个模型走向组合"
+    },
+    {
+      "id": "definition",
+      "heading": "定义：一个 Agent、一个系统、一条协作通道"
+    },
+    {
+      "id": "framework",
+      "heading": "图 2：四个属性加一层编排"
+    },
+    {
+      "id": "types",
+      "heading": "协作类型：合作、竞争与竞合怎样区分"
+    },
+    {
+      "id": "strategies",
+      "heading": "策略：规则、角色与模型分别靠什么做决定"
+    },
+    {
+      "id": "structures",
+      "heading": "结构：信息汇聚到哪里，责任落在谁身上"
+    },
+    {
+      "id": "orchestration",
+      "heading": "编排：通道由谁创建、何时改变"
+    },
+    {
+      "id": "lessons",
+      "heading": "作者自己总结的六条经验"
+    },
+    {
+      "id": "applications",
+      "heading": "应用章节：同一套维度在三个领域里"
+    },
+    {
+      "id": "evaluation",
+      "heading": "开放问题：评价、治理与安全"
+    },
+    {
+      "id": "method-map",
+      "heading": "方法地图：把代表方法放回五个维度"
+    },
+    {
+      "id": "source",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/abs/2501.06322v1",
+      "labels": [
+        "论文身份与版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/html/2501.06322v1#S1",
+      "labels": [
+        "§1 动机与贡献"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/html/2501.06322v1#S2",
+      "labels": [
+        "§1.1 与 §2",
+        "§2.1",
+        "§2.2",
+        "§2.3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/html/2501.06322v1#S1.SS2",
+      "labels": [
+        "§1.2 与表 1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/html/2501.06322v1#S3",
+      "labels": [
+        "§3 概念与定义",
+        "§3 与图 2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/html/2501.06322v1#S3.E1",
+      "labels": [
+        "式 1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/html/2501.06322v1#S1.F1",
+      "labels": [
+        "图 1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS6",
+      "labels": [
+        "§4.6 与 §7",
+        "§4.6 小结"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS2",
+      "labels": [
+        "§4.2 协作类型"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.F3",
+      "labels": [
+        "图 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/abs/2305.14325",
+      "labels": [
+        "Du 等人的多实例辩论"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/abs/2402.16499",
+      "labels": [
+        "LLMArena"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/abs/2310.17512",
+      "labels": [
+        "CompeteAI"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.T2",
+      "labels": [
+        "表 2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS3",
+      "labels": [
+        "§4.3 策略"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/abs/2308.00352",
+      "labels": [
+        "MetaGPT"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/abs/2308.10848",
+      "labels": [
+        "AgentVerse"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.T3",
+      "labels": [
+        "表 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS4",
+      "labels": [
+        "§4.4 结构",
+        "§4.4.2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.F5",
+      "labels": [
+        "图 5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/abs/2306.02561",
+      "labels": [
+        "LLM-Blender"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/abs/2310.02170",
+      "labels": [
+        "DyLAN"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/abs/2312.01823",
+      "labels": [
+        "交换之思"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/html/2501.06322v1#S4.SS5",
+      "labels": [
+        "§4.5 编排",
+        "§4.5.2",
+        "表 5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c25",
+      "url": "https://arxiv.org/abs/2404.17729",
+      "labels": [
+        "CoMM"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c26",
+      "url": "https://arxiv.org/abs/2405.11403",
+      "labels": [
+        "MapCoder"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c27",
+      "url": "https://arxiv.org/abs/2402.15235",
+      "labels": [
+        "MACRec"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c28",
+      "url": "https://arxiv.org/abs/2307.05300",
+      "labels": [
+        "SPP"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表方法）"
+    },
+    {
+      "id": "c29",
+      "url": "https://arxiv.org/html/2501.06322v1#S5",
+      "labels": [
+        "§5 应用",
+        "图 6 与 §5.1",
+        "§5.2",
+        "§5.3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c30",
+      "url": "https://arxiv.org/html/2501.06322v1#S6",
+      "labels": [
+        "§6 开放问题",
+        "§6.3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c31",
+      "url": "https://arxiv.org/html/2501.06322v1#S6.SS2",
+      "labels": [
+        "§6.2 评价"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c32",
+      "url": "https://arxiv.org/pdf/2501.06322v1",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c33",
+      "url": "https://arxiv.org/html/2501.06322v1",
+      "labels": [
+        "固定 HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "multi-agent-communication-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/multi-agent-collaboration-survey/figure-1-two-channels.webp",
+      "sha256": "c39cd54e562d865575853ea7a0e1d37c3d8795c22dd13689b865a00d9fb224ab",
+      "mime": "image/webp",
+      "alt": "一个问答多智能体系统的两条协作通道：用户提问后，支持方给出主张并反问；反对方表示不同意、需要更多信息，并向两名研究助理分别发出环境影响与稳定性的查询；最终回答由反对方送回用户。橙色箭头标注竞争、规则、去中心式通道，绿色箭头标注合作、角色式、中心式通道",
+      "origin": "https://arxiv.org/pdf/2501.06322v1#page=3",
+      "rights": "Tran 等，arXiv:2501.06322v1，图 1。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/multi-agent-collaboration-survey/figure-2-framework.webp",
+      "sha256": "0e345e865b96b06d7a3343af564a0d7739f66c0d8b87303a50fc2eb3f0dcb3ca",
+      "mime": "image/webp",
+      "alt": "多智能体协作框架总图：左侧是三个 Agent 各自的感知、模型、适配器、目标与行动；中间是协作通道的三个属性组，分别是类型、结构和策略；右侧按早期、中期、晚期列出交换的内容；一条标注协调与编排层的绿色箭头指向整片通道区域",
+      "origin": "https://arxiv.org/pdf/2501.06322v1#page=9",
+      "rights": "Tran 等，arXiv:2501.06322v1，图 2。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/multi-agent-collaboration-survey/figure-3-collaboration-types.webp",
+      "sha256": "439e39fcf8ed65c711d3060a654df813619191fed75f1504e15dc7d7f48fee81",
+      "mime": "image/webp",
+      "alt": "三类协作的示例：左侧为学术写作支持系统，编辑、译者、研究者、校验者四个角色分工合作；中间为法庭模拟，被告方与公诉方各自争取有利结果；右侧为政策制定，支持方与反对方在部分议题上妥协、在另一些议题上竞争",
+      "origin": "https://arxiv.org/pdf/2501.06322v1#page=11",
+      "rights": "Tran 等，arXiv:2501.06322v1，图 3。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/multi-agent-collaboration-survey/figure-5-communication-structures.webp",
+      "sha256": "dd77c351c2a2e79da9a922f79dc416d4fa442469599b5f98807b2ca1f0493c88",
+      "mime": "image/webp",
+      "alt": "三类通信结构：上方为中心式，左侧是联邦学习式的分布式训练，中间是只有一个聚合器的星形结构，右侧是带语言模型的聚合器；下方左侧为去中心化，用户与物品 Agent 互相反馈；下方右侧为层级式，CAMEL 的起始、选项与批评者选择流程",
+      "origin": "https://arxiv.org/pdf/2501.06322v1#page=17",
+      "rights": "Tran 等，arXiv:2501.06322v1，图 5。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1: motivation, related surveys (Table 1) and contributions",
+      "§2: multi-agent systems, LLMs as agent brains, collaborative AI",
+      "§3: agent and system notation, Equation 1, collaboration channels, exchange stages",
+      "§4.2: cooperation, competition, coopetition and hybrid channels (Table 2, Figure 3)",
+      "§4.3: rule-based, role-based and model-based strategies (Table 3)",
+      "§4.4: centralized, decentralized and hierarchical structures (Table 4, Figure 5)",
+      "§4.5: static and dynamic coordination and orchestration (Table 5)",
+      "§4.6: lessons learned",
+      "§5: applications in 5G/6G and Industry 5.0, QA/NLG, social and cultural domains",
+      "§6: collective intelligence, evaluation and benchmarking, ethics and safety"
+    ],
+    "figuresViewed": [
+      "Figure 1 — main PDF p3 (reproduced)",
+      "Figure 2 — main PDF p9 (reproduced)",
+      "Figure 3 — main PDF p11 (reproduced)",
+      "Figure 5 — main PDF p17 (reproduced)",
+      "Figure 6 — main PDF p23 (viewed)",
+      "Figure 8 — main PDF p27 (viewed)",
+      "Table 1 — main PDF p4",
+      "Table 2 — main PDF p11",
+      "Table 3 — main PDF p14",
+      "Table 4 — main PDF p16",
+      "Table 5 — main PDF p19",
+      "Table 6 — main PDF p22"
+    ],
+    "limitations": [
+      "覆盖综述主线与四个属性，未逐项展开表 2–表 6 的每一行和被引工作。",
+      "图 1、图 2、图 3、图 5 已裁切并亲眼查看；表 2–表 5 只摘录与论证相关的部分。",
+      "代表方法的做法以综述描述为准，并对照了各方法 arXiv 摘要；没有逐篇精读被引论文，也没有复现任何结果。",
+      "图 1 的问答系统是论文自己的例子；按三种策略改写该系统、静态与动态编排的对照均为导读推演，已在原位标明。",
+      "固定阅读 arXiv v1（2025-01-10）；开放问题与应用清单反映该版本，不能直接视为今天的研究现状。"
+    ],
+    "reviewBasis": "Revision 2 rewrites the guide around Figure 2 and the four channel attributes plus the orchestration layer, following the survey's own chapter order; notation, definitions, table contents and application claims were re-checked against arXiv v1 pp1–29, and Figures 1–3 and 5 were cropped and visually inspected. Representative method descriptions were checked against their arXiv abstracts. Authoring review by AI; reader acceptance pending."
+  },
+  "orientation": {
+    "shortTitle": "协作综述：角色、规则与编排",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "协作通道"
+        ]
+      },
+      {
+        "id": "multi-agent-collaboration",
+        "label": "多智能体协作",
+        "aliases": [
+          "角色分工",
+          "合作",
+          "竞争",
+          "竞合"
+        ]
+      },
+      {
+        "id": "multi-agent-orchestration",
+        "label": "多智能体编排",
+        "aliases": [
+          "静态编排",
+          "动态编排",
+          "协调"
+        ]
+      }
+    ],
+    "summary": "从单个大模型的幻觉、自回归生成与规模成本讲起，说明作者为什么主张横向扩展。综述用一组符号把 Agent 写成 {模型、目标、环境、输入、输出}，把系统写成通道集合，再以图 2 把一条协作通道拆成参与者、类型、结构、策略四个属性，并单列编排层决定通道何时创建、如何排序。",
+    "value": "读完能对任何一篇多智能体论文做一次定位：成员之间的目标是什么关系，交互靠规则、角色还是推断来约束，控制集中在哪里，流程在运行前还是运行中确定。这套提问顺序也能解释为什么很多“多 Agent 更好”的结论互相矛盾：比较常常同时改动了参与者、预算与编排。",
+    "prerequisites": [
+      "了解语言模型、输入上下文与工具调用的基本区别。",
+      "知道Agent会根据输入或环境反馈采取行动；无需先实现多智能体系统。"
+    ],
+    "boundaries": [
+      "主线讲解，不逐篇展开表 2–表 6 的全部行。",
+      "协作类型的归类边界、MoE 作为竞合的类比均有说明。",
+      "导读中的策略改写与编排对照是教学推演，不是论文实验。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Khanh-Tung Tran",
+        "Dung Dao",
+        "Minh-Duong Nguyen",
+        "Quoc-Viet Pham",
+        "Barry O’Sullivan",
+        "Hoang D. Nguyen"
+      ],
+      "year": 2025,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2501.06322v1",
+      "preprintYear": 2025
+    },
+    "readingTargets": [
+      {
+        "unitId": "definition",
+        "purpose": "说明一个 Agent、一个系统与一条通道各由什么组成，并能读懂式 1 的三层嵌套。",
+        "concepts": [
+          "Agent 符号",
+          "通道集合",
+          "共同基础假设",
+          "交换阶段"
+        ],
+        "limit": "式 1 是描述性定义，不是有效性定理。"
+      },
+      {
+        "unitId": "framework",
+        "purpose": "对着图 2 说清三栏属性与编排层各管什么，并把它填进一个具体系统。",
+        "concepts": [
+          "图 2",
+          "类型",
+          "结构",
+          "策略",
+          "编排层"
+        ],
+        "limit": "框架描述形式，不预测哪一栏填什么效果更好。"
+      },
+      {
+        "unitId": "types",
+        "purpose": "区分合作、竞争与竞合，并判断目标写在哪一层。",
+        "concepts": [
+          "合作",
+          "竞争",
+          "竞合",
+          "混合通道"
+        ],
+        "limit": "通道层级的竞争可以服务于系统层级的合作。"
+      },
+      {
+        "unitId": "strategies",
+        "purpose": "分辨规则、角色与模型三种策略各靠什么决定下一步，以及各自的代价。",
+        "concepts": [
+          "规则策略",
+          "角色策略",
+          "模型策略",
+          "标准作业程序"
+        ],
+        "limit": "三种策略常叠加，角色名称不能证明能力差异。"
+      },
+      {
+        "unitId": "structures",
+        "purpose": "按信息与控制分布区分三类结构，并检查一条边究竟承载什么。",
+        "concepts": [
+          "中心式",
+          "去中心化",
+          "层级式",
+          "网络拓扑"
+        ],
+        "limit": "边数不是可比较的通信量。"
+      },
+      {
+        "unitId": "orchestration",
+        "purpose": "解释静态与动态编排分别把决定权放在运行前还是运行时。",
+        "concepts": [
+          "静态编排",
+          "动态编排",
+          "任务依赖"
+        ],
+        "limit": "动态编排的收益取决于底座模型能否稳定扮演角色。"
+      },
+      {
+        "unitId": "method-map",
+        "purpose": "用两张表把代表方法按维度归档，并从现象反查要检查的维度。",
+        "concepts": [
+          "方法地图",
+          "反查表"
+        ],
+        "limit": "表是导读整理，方法做法以综述与原文摘要为准。"
+      },
+      {
+        "unitId": "source",
+        "purpose": "找到值得精读的页面，并说明本次覆盖与推演的性质。",
+        "concepts": [
+          "原文定位",
+          "覆盖边界"
+        ],
+        "limit": "不是对全部被引工作的复核。"
+      }
+    ]
+  }
+}

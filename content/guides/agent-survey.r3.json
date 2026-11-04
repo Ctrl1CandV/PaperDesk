@@ -1,0 +1,780 @@
+{
+  "schemaVersion": 2,
+  "id": "agent-survey",
+  "paperId": "arxiv:2308.11432",
+  "revision": 3,
+  "title": "Agent 综述：大模型怎样进入环境并持续行动",
+  "paperTitle": "A Survey on Large Language Model based Autonomous Agents",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "以原论文图 2 的统一框架为主线，讲清角色设定、记忆、规划和行动怎样组成 Agent，再把能力获取、应用与评价放回同一张地图。",
+  "source": {
+    "id": "arxiv:2308.11432",
+    "version": "v7",
+    "url": "https://arxiv.org/html/2308.11432v7"
+  },
+  "bodyFile": "agent-survey.r3.md",
+  "bodySha256": "24c8b0311b5d25fe8a524f408246916771f67939e8fe94e7f6b0ad94d4d4c9d3",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "从孤立环境中的智能体到语言模型控制中心"
+    },
+    {
+      "id": "architecture",
+      "heading": "统一框架：四个模块怎样连起来"
+    },
+    {
+      "id": "profile",
+      "heading": "角色设定：给系统一个具体位置"
+    },
+    {
+      "id": "memory",
+      "heading": "记忆：保存什么、怎样取回、何时反思"
+    },
+    {
+      "id": "planning",
+      "heading": "规划：从单路推理到带反馈的修正"
+    },
+    {
+      "id": "action",
+      "heading": "行动：目标、产生方式、空间与后果"
+    },
+    {
+      "id": "capability",
+      "heading": "能力从哪里来：微调、提示与机制工程"
+    },
+    {
+      "id": "applications",
+      "heading": "应用地图：社会科学、自然科学与工程"
+    },
+    {
+      "id": "evaluation",
+      "heading": "评价：主观判断与客观指标"
+    },
+    {
+      "id": "challenges",
+      "heading": "开放问题：六个尚未解决的矛盾"
+    },
+    {
+      "id": "method-map",
+      "heading": "把方法放回地图：怎样读一篇新的 Agent 论文"
+    },
+    {
+      "id": "source",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/html/2308.11432v7#S1",
+      "labels": [
+        "摘要与 §1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/abs/2308.11432v7",
+      "labels": [
+        "论文身份与版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=1",
+      "labels": [
+        "§1，PDF 第1–2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=2",
+      "labels": [
+        "图 1 与 §1，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=31",
+      "labels": [
+        "§5，PDF 第31页",
+        "§6，PDF 第31–33页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=4",
+      "labels": [
+        "图 2 与 §2，PDF 第4页",
+        "§2.1.1，PDF 第4–5页",
+        "图 2 与 §2.1，PDF 第4–16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/abs/2304.03442",
+      "labels": [
+        "Generative Agents 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/abs/2307.07924",
+      "labels": [
+        "ChatDev 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=6",
+      "labels": [
+        "§2.1.2，PDF 第6–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/abs/2305.10250",
+      "labels": [
+        "MemoryBank 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/abs/2306.03901",
+      "labels": [
+        "ChatDB 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/abs/2305.14322",
+      "labels": [
+        "RET-LLM 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=8",
+      "labels": [
+        "式 1 与 §2.1.2，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=9",
+      "labels": [
+        "§2.1.2 的反思部分，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=10",
+      "labels": [
+        "§2.1.3，PDF 第10–13页",
+        "图 3 与 §2.1.3，PDF 第10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/abs/2201.11903",
+      "labels": [
+        "CoT 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/abs/2305.18323",
+      "labels": [
+        "ReWOO 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/abs/2303.17580",
+      "labels": [
+        "HuggingGPT 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/abs/2203.11171",
+      "labels": [
+        "CoT-SC 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/abs/2305.10601",
+      "labels": [
+        "ToT 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/abs/2305.14992",
+      "labels": [
+        "RAP 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/abs/2304.11477",
+      "labels": [
+        "LLM+P 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "labels": [
+        "ReAct 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/abs/2305.16291",
+      "labels": [
+        "Voyager 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c25",
+      "url": "https://arxiv.org/abs/2302.01560",
+      "labels": [
+        "DEPS 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c26",
+      "url": "https://arxiv.org/abs/2207.05608",
+      "labels": [
+        "Inner Monologue 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c27",
+      "url": "https://arxiv.org/abs/2303.17651",
+      "labels": [
+        "Self-Refine 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c28",
+      "url": "https://arxiv.org/abs/2303.11366",
+      "labels": [
+        "Reflexion 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c29",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=13",
+      "labels": [
+        "§2.1.4，PDF 第13–16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c30",
+      "url": "https://arxiv.org/abs/2305.17144",
+      "labels": [
+        "GITM 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c31",
+      "url": "https://arxiv.org/abs/2302.04761",
+      "labels": [
+        "ToolFormer 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c32",
+      "url": "https://arxiv.org/abs/2307.16789",
+      "labels": [
+        "ToolLLM 原论文摘要",
+        "ToolBench 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c33",
+      "url": "https://arxiv.org/abs/2304.05376",
+      "labels": [
+        "ChemCrow 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c34",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=16",
+      "labels": [
+        "§2.2，PDF 第16–21页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c35",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=19",
+      "labels": [
+        "图 4 与 §2.2，PDF 第19页",
+        "图 4 与 §2.2，PDF 第19–21页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c36",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=17",
+      "labels": [
+        "§2.2，PDF 第17–18页",
+        "表 1，PDF 第17页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c37",
+      "url": "https://arxiv.org/abs/2306.06070",
+      "labels": [
+        "Mind2Web 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c38",
+      "url": "https://arxiv.org/abs/2307.04738",
+      "labels": [
+        "RoCo 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c39",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=21",
+      "labels": [
+        "§3 与图 5，PDF 第21–27页",
+        "图 5 与 §3–4，PDF 第21–31页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c40",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=22",
+      "labels": [
+        "§3.1，PDF 第22页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c41",
+      "url": "https://arxiv.org/abs/2208.04024",
+      "labels": [
+        "Social Simulacra 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c42",
+      "url": "https://arxiv.org/abs/2307.14984",
+      "labels": [
+        "S3 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c43",
+      "url": "https://arxiv.org/abs/2308.01423",
+      "labels": [
+        "ChatMOF 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c44",
+      "url": "https://arxiv.org/abs/2308.00352",
+      "labels": [
+        "MetaGPT 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c45",
+      "url": "https://arxiv.org/abs/2204.01691",
+      "labels": [
+        "SayCan 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c46",
+      "url": "https://arxiv.org/abs/2307.06135",
+      "labels": [
+        "SayPlan 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c47",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=27",
+      "labels": [
+        "§4 与图 5，PDF 第27–31页",
+        "§4.1，PDF 第27页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c48",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=30",
+      "labels": [
+        "§4.2，PDF 第30页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c49",
+      "url": "https://arxiv.org/abs/2308.03688",
+      "labels": [
+        "AgentBench 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c50",
+      "url": "https://arxiv.org/abs/2207.01206",
+      "labels": [
+        "WebShop 原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c51",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=29",
+      "labels": [
+        "表 3，PDF 第29页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c52",
+      "url": "https://arxiv.org/pdf/2308.11432v7#page=25",
+      "labels": [
+        "表 2，PDF 第25页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c53",
+      "url": "https://arxiv.org/html/2308.11432v7",
+      "labels": [
+        "固定 HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    },
+    {
+      "id": "c54",
+      "url": "https://arxiv.org/pdf/2308.11432v7",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v7"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/agent-survey/figure-2-architecture.webp",
+      "sha256": "93ab7fb2c5b6cf2e411485e7da1a443b73a75fae18e98621ae1e785a5370e854",
+      "mime": "image/webp",
+      "alt": "Agent 架构的统一框架：四列分别为角色设定、记忆、规划与行动，顶部是作为中心控制器的大语言模型，箭头表示前三个模块对行动的影响",
+      "origin": "https://arxiv.org/pdf/2308.11432v7#page=4",
+      "rights": "Wang 等，arXiv:2308.11432v7，图 2。arXiv v7 页面标注 CC BY 4.0；导读保留图号与署名，仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/agent-survey/figure-3-planning-paths.webp",
+      "sha256": "eb3b5616345d90a7cfb4ea2c3531e9e8c3048fedb2527f2009cd2a9da5064c5f",
+      "mime": "image/webp",
+      "alt": "单路推理与多路推理的对比：左侧 CoT 和 Zero-shot CoT 沿着一条链前进，右侧 CoT-SC 展开多条完整路径，ToT 把中间步骤组织成可扩展、可回退的树",
+      "origin": "https://arxiv.org/pdf/2308.11432v7#page=10",
+      "rights": "Wang 等，arXiv:2308.11432v7，图 3。arXiv v7 页面标注 CC BY 4.0；导读保留图号与署名，仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/agent-survey/figure-4-capability-eras.webp",
+      "sha256": "6fea3a457e7ee8fde9d58c0a2ad4cb8634d3100a881ac45d9c88ae45005e9afa",
+      "mime": "image/webp",
+      "alt": "能力获取方式的三个时代：机器学习时代以参数学习为主；大模型时代加入提示工程；Agent 时代再加入机制工程，前两种方式仍然保留",
+      "origin": "https://arxiv.org/pdf/2308.11432v7#page=19",
+      "rights": "Wang 等，arXiv:2308.11432v7，图 4。arXiv v7 页面标注 CC BY 4.0；导读保留图号与署名，仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/agent-survey/figure-5-applications-evaluation.webp",
+      "sha256": "cb010620dd8ec82f4cd6511f30f0b4bd542abcbea3caf95508faa8f08aa16f4a",
+      "mime": "image/webp",
+      "alt": "应用与评价的分类图：左侧把应用分成社会科学、自然科学和工程三类，右侧把评价分成主观评价与客观评价",
+      "origin": "https://arxiv.org/pdf/2308.11432v7#page=22",
+      "rights": "Wang 等，arXiv:2308.11432v7，图 5。arXiv v7 页面标注 CC BY 4.0；导读保留图号与署名，仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1: problem background and the survey's three-part organization",
+      "§2.1: profile, memory, planning and action modules",
+      "§2.2: capability acquisition with and without fine-tuning",
+      "§3: applications in social science, natural science and engineering",
+      "§4: subjective and objective evaluation, metrics, protocols and benchmarks",
+      "§5–7: related surveys, six challenges and conclusion"
+    ],
+    "figuresViewed": [
+      "Figure 2 — main PDF p4 (reproduced)",
+      "Figure 3 — main PDF p10 (reproduced)",
+      "Figure 4 — main PDF p19 (reproduced)",
+      "Figure 5 — main PDF p22 (reproduced)",
+      "Table 1 — main PDF p17",
+      "Table 2 — main PDF p25",
+      "Table 3 — main PDF p29"
+    ],
+    "limitations": [
+      "覆盖综述主线与代表方法，未逐项展开所有子分类、表格行和被引工作。",
+      "图 2–5 已裁切并亲眼查看；表 1–3 只摘录与论证相关的部分，没有逐行抄录。",
+      "代表方法的做法以综述描述为准，并对照了各方法 arXiv 摘要；没有逐篇精读被引论文，也没有复现实验。",
+      "文献助手、三条记忆分数和评价场景都是导读自编的教学例子，不是论文实验或真实系统。",
+      "固定阅读 arXiv v7；综述中的挑战、应用清单和数字反映该版本，不能直接视为今天的研究现状。"
+    ],
+    "reviewBasis": "Revision 3 rewrites the guide around Figure 2 and the four modules, following the survey's own chapter order; all key numbers, module descriptions, application claims and evaluation categories were re-checked against arXiv v7 pp1–33, and Figures 2–5 were cropped and visually inspected. Representative method descriptions were checked against their arXiv abstracts. Authoring review by AI; reader acceptance pending."
+  },
+  "orientation": {
+    "shortTitle": "Agent 综述：系统、环境与持续行动",
+    "topics": [
+      {
+        "id": "llm-agents",
+        "label": "LLM Agent",
+        "aliases": [
+          "Agent",
+          "Agents",
+          "自主智能体",
+          "智能体"
+        ]
+      },
+      {
+        "id": "agent-architecture",
+        "label": "Agent 系统架构",
+        "aliases": [
+          "记忆",
+          "规划",
+          "工具调用"
+        ]
+      },
+      {
+        "id": "agent-applications",
+        "label": "Agent 应用与评价",
+        "aliases": [
+          "多智能体",
+          "Agent 评估"
+        ]
+      }
+    ],
+    "summary": "从“孤立环境中的智能体”讲到以 LLM 为中心控制器的系统，用图 2 把角色设定、记忆、规划和行动拆成四个设计维度，再连接能力获取、三类应用、主客观评价与六个开放问题。",
+    "value": "读完能判断一篇新 Agent 工作改的是哪个模块，分清它改的是模型参数、提示还是运行机制，并把效果放回任务、环境和评价条件中理解。",
+    "prerequisites": [
+      "了解语言模型按输入生成文本的基本方式。",
+      "不必预先熟悉 Agent 分类；正文先解释主体、环境与行动的关系。"
+    ],
+    "boundaries": [
+      "覆盖研究主线，未逐项展开所有子分类、表格与被引工作。",
+      "固定阅读 arXiv v7；综述中的挑战不能直接证明今天仍存在同样的研究空白。",
+      "教学示例和编者阅读联系不等于论文实测结果。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Lei Wang",
+        "Chen Ma",
+        "Xueyang Feng",
+        "Zeyu Zhang",
+        "Hao Yang",
+        "Jingsen Zhang",
+        "Zhiyuan Chen",
+        "Jiakai Tang",
+        "Xu Chen",
+        "Yankai Lin",
+        "Wayne Xin Zhao",
+        "Zhewei Wei",
+        "Jirong Wen"
+      ],
+      "year": 2024,
+      "venue": "Frontiers of Computer Science",
+      "publicationKind": "journal",
+      "url": "https://link.springer.com/article/10.1007/s11704-024-40231-1",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "architecture",
+        "purpose": "说清四个模块各自回答什么问题、怎样相互影响，并能对照图 2 指出每个模块的位置。",
+        "concepts": [
+          "统一框架",
+          "角色设定",
+          "记忆",
+          "规划",
+          "行动"
+        ],
+        "limit": "这是作者用来整理已有工作的分析框架，不要求每个系统都显式实现四个模块。"
+      },
+      {
+        "unitId": "memory",
+        "purpose": "区分记忆的结构、格式与操作，能解释读取打分式怎样随权重改变结果。",
+        "concepts": [
+          "短期记忆",
+          "长期记忆",
+          "嵌入",
+          "读取",
+          "写入",
+          "反思"
+        ],
+        "limit": "覆盖记忆模块的主要分类，不比较各代表系统的实验效果。"
+      },
+      {
+        "unitId": "planning",
+        "purpose": "区分无反馈与有反馈规划，能说出 CoT、ToT、ReAct、Reflexion 各改了什么。",
+        "concepts": [
+          "CoT",
+          "CoT-SC",
+          "ToT",
+          "ReAct",
+          "Reflexion"
+        ],
+        "limit": "帮助辨认规划结构，不证明某一种规划方式在所有任务上更好。"
+      },
+      {
+        "unitId": "action",
+        "purpose": "从目标、产生方式、空间与影响四个角度分析一个 Agent 的行动模块。",
+        "concepts": [
+          "行动目标",
+          "行动空间",
+          "工具调用",
+          "环境影响"
+        ],
+        "limit": "覆盖行动模块的分类，不展开具体 API 或机器人的控制细节。"
+      },
+      {
+        "unitId": "capability",
+        "purpose": "判断一种改进是在改参数、改提示还是改机制，并说明各自代价。",
+        "concepts": [
+          "微调",
+          "提示工程",
+          "机制工程",
+          "经验积累"
+        ],
+        "limit": "提供能力获取的分类，不评估某一模型或数据集的绝对效果。"
+      },
+      {
+        "unitId": "evaluation",
+        "purpose": "为具体 Agent 任务选择指标、协议和基准，区分任务成功与行为可信。",
+        "concepts": [
+          "主观评价",
+          "客观评价",
+          "评价协议",
+          "基准"
+        ],
+        "limit": "提供评价框架，不替代具体任务中的实验设计和统计检验。"
+      }
+    ]
+  }
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## Guide depth batch — 2026-11-04
+
+- Applied the new guide-writing workflow to 17 current revisions, with `react` and `helm` completing at r3; kept all previous revisions and merged the brief/glossary/catalog updates.
+- Build, content validation and 529 Node tests pass (1 skipped); added the batch summary and separate independent spot-check reports for `react` and `helm`.
+- Browser E2E and visual review remain unverified because the local loopback server was unreachable in this environment; no Git commit, push or deployment. See `docs/research/guide-depth-batch-2026-11-04.md` for exact evidence and remaining content limits.
+
 ## Project organization and learning entry — 2026-10-27
 
 - Grouped backend HTTP, AI, content and storage modules; separated reusable rules from command entry points and organized checks by type.

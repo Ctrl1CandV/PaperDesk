@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
   "currentRevisions": {
-    "agent-survey": 2,
-    "instructgpt": 2,
-    "helm": 2,
-    "react": 1,
+    "agent-survey": 3,
+    "instructgpt": 3,
+    "helm": 3,
+    "react": 3,
     "toolformer": 1,
     "reflexion": 1,
-    "llm-survey": 1,
-    "transformer": 4,
-    "gpt3": 1,
+    "llm-survey": 2,
+    "transformer": 5,
+    "gpt3": 2,
     "chain-of-thought": 1,
-    "rag": 2,
+    "rag": 3,
     "agent-memory-survey": 2,
     "streamingllm": 2,
     "concept-drift-survey": 2,
-    "rag-survey": 4,
-    "multi-agent-communication-survey": 1,
-    "multi-agent-collaboration-survey": 1,
-    "autogen": 1,
-    "camel": 1,
-    "agentprune": 1,
-    "llm-evaluation-survey": 1,
+    "rag-survey": 5,
+    "multi-agent-communication-survey": 2,
+    "multi-agent-collaboration-survey": 2,
+    "autogen": 2,
+    "camel": 2,
+    "agentprune": 2,
+    "llm-evaluation-survey": 2,
     "agent-evaluation-survey": 1,
-    "agentbench": 1,
-    "tau-bench": 1
+    "agentbench": 2,
+    "tau-bench": 2
   },
   "entries": [
     {
@@ -68,9 +68,29 @@
       }
     },
     {
+      "guideId": "agent-survey",
+      "revision": 3,
+      "metadataFile": "guides/agent-survey.r3.json",
+      "recommendation": {
+        "rank": 7,
+        "relation": "editorial-reading-order",
+        "reason": "从模型能力转向环境中的持续行动。"
+      }
+    },
+    {
       "guideId": "instructgpt",
       "revision": 2,
       "metadataFile": "guides/instructgpt.r2.json",
+      "recommendation": {
+        "rank": 4,
+        "relation": "editorial-reading-order",
+        "reason": "理解指令跟随与偏好对齐的训练链路。"
+      }
+    },
+    {
+      "guideId": "instructgpt",
+      "revision": 3,
+      "metadataFile": "guides/instructgpt.r3.json",
       "recommendation": {
         "rank": 4,
         "relation": "editorial-reading-order",
@@ -88,9 +108,39 @@
       }
     },
     {
+      "guideId": "helm",
+      "revision": 3,
+      "metadataFile": "guides/helm.r3.json",
+      "recommendation": {
+        "rank": 16,
+        "relation": "editorial-reading-order",
+        "reason": "具体理解场景、适配和多指标的评价协议。"
+      }
+    },
+    {
       "guideId": "react",
       "revision": 1,
       "metadataFile": "guides/react.json",
+      "recommendation": {
+        "rank": 8,
+        "relation": "editorial-reading-order",
+        "reason": "串起推理、行动与观察的最小循环。"
+      }
+    },
+    {
+      "guideId": "react",
+      "revision": 2,
+      "metadataFile": "guides/react.r2.json",
+      "recommendation": {
+        "rank": 8,
+        "relation": "editorial-reading-order",
+        "reason": "串起推理、行动与观察的最小循环。"
+      }
+    },
+    {
+      "guideId": "react",
+      "revision": 3,
+      "metadataFile": "guides/react.r3.json",
       "recommendation": {
         "rank": 8,
         "relation": "editorial-reading-order",
@@ -121,6 +171,16 @@
       "guideId": "llm-survey",
       "revision": 1,
       "metadataFile": "guides/llm-survey.json",
+      "recommendation": {
+        "rank": 1,
+        "relation": "editorial-reading-order",
+        "reason": "先建立语言模型的能力、训练与使用地图。"
+      }
+    },
+    {
+      "guideId": "llm-survey",
+      "revision": 2,
+      "metadataFile": "guides/llm-survey.r2.json",
       "recommendation": {
         "rank": 1,
         "relation": "editorial-reading-order",
@@ -168,9 +228,29 @@
       }
     },
     {
+      "guideId": "transformer",
+      "revision": 5,
+      "metadataFile": "guides/transformer.r5.json",
+      "recommendation": {
+        "rank": 2,
+        "relation": "editorial-reading-order",
+        "reason": "理解注意力与序列建模基础。"
+      }
+    },
+    {
       "guideId": "gpt3",
       "revision": 1,
       "metadataFile": "guides/gpt3.json",
+      "recommendation": {
+        "rank": 3,
+        "relation": "editorial-reading-order",
+        "reason": "理解预训练模型怎样利用上下文中的任务示例。"
+      }
+    },
+    {
+      "guideId": "gpt3",
+      "revision": 2,
+      "metadataFile": "guides/gpt3.r2.json",
       "recommendation": {
         "rank": 3,
         "relation": "editorial-reading-order",
@@ -268,6 +348,16 @@
       }
     },
     {
+      "guideId": "rag",
+      "revision": 3,
+      "metadataFile": "guides/rag.r3.json",
+      "recommendation": {
+        "rank": 6,
+        "relation": "editorial-reading-order",
+        "reason": "具体理解检索结果如何进入生成过程。"
+      }
+    },
+    {
       "guideId": "rag-survey",
       "revision": 1,
       "metadataFile": "guides/rag-survey.json",
@@ -308,9 +398,29 @@
       }
     },
     {
+      "guideId": "rag-survey",
+      "revision": 5,
+      "metadataFile": "guides/rag-survey.r5.json",
+      "recommendation": {
+        "rank": 5,
+        "relation": "editorial-reading-order",
+        "reason": "建立外部知识接入、控制和评价的全局地图。"
+      }
+    },
+    {
       "guideId": "multi-agent-communication-survey",
       "revision": 1,
       "metadataFile": "guides/multi-agent-communication-survey.json",
+      "recommendation": {
+        "rank": 9,
+        "relation": "editorial-reading-order",
+        "reason": "先沿通信架构、策略和范式认识设计空间。"
+      }
+    },
+    {
+      "guideId": "multi-agent-communication-survey",
+      "revision": 2,
+      "metadataFile": "guides/multi-agent-communication-survey.r2.json",
       "recommendation": {
         "rank": 9,
         "relation": "editorial-reading-order",
@@ -328,9 +438,29 @@
       }
     },
     {
+      "guideId": "multi-agent-collaboration-survey",
+      "revision": 2,
+      "metadataFile": "guides/multi-agent-collaboration-survey.r2.json",
+      "recommendation": {
+        "rank": 10,
+        "relation": "editorial-reading-order",
+        "reason": "补齐角色关系、结构与编排的比较轴。"
+      }
+    },
+    {
       "guideId": "autogen",
       "revision": 1,
       "metadataFile": "guides/autogen.json",
+      "recommendation": {
+        "rank": 12,
+        "relation": "editorial-reading-order",
+        "reason": "把消息、工具反馈和控制流程放入可执行系统。"
+      }
+    },
+    {
+      "guideId": "autogen",
+      "revision": 2,
+      "metadataFile": "guides/autogen.r2.json",
       "recommendation": {
         "rank": 12,
         "relation": "editorial-reading-order",
@@ -348,6 +478,16 @@
       }
     },
     {
+      "guideId": "camel",
+      "revision": 2,
+      "metadataFile": "guides/camel.r2.json",
+      "recommendation": {
+        "rank": 11,
+        "relation": "editorial-reading-order",
+        "reason": "用双角色协议观察交流如何推进或偏离任务。"
+      }
+    },
+    {
       "guideId": "agentprune",
       "revision": 1,
       "metadataFile": "guides/agentprune.json",
@@ -358,9 +498,29 @@
       }
     },
     {
+      "guideId": "agentprune",
+      "revision": 2,
+      "metadataFile": "guides/agentprune.r2.json",
+      "recommendation": {
+        "rank": 13,
+        "relation": "editorial-reading-order",
+        "reason": "检查通信连接是否必要及减少交流的成本条件。"
+      }
+    },
+    {
       "guideId": "llm-evaluation-survey",
       "revision": 1,
       "metadataFile": "guides/llm-evaluation-survey.json",
+      "recommendation": {
+        "rank": 14,
+        "relation": "editorial-reading-order",
+        "reason": "先确定测什么、在哪里测和怎样解释分数。"
+      }
+    },
+    {
+      "guideId": "llm-evaluation-survey",
+      "revision": 2,
+      "metadataFile": "guides/llm-evaluation-survey.r2.json",
       "recommendation": {
         "rank": 14,
         "relation": "editorial-reading-order",
@@ -388,9 +548,29 @@
       }
     },
     {
+      "guideId": "agentbench",
+      "revision": 2,
+      "metadataFile": "guides/agentbench.r2.json",
+      "recommendation": {
+        "rank": 17,
+        "relation": "editorial-reading-order",
+        "reason": "比较交互环境中的表现、汇总指标与失败类型。"
+      }
+    },
+    {
       "guideId": "tau-bench",
       "revision": 1,
       "metadataFile": "guides/tau-bench.json",
+      "recommendation": {
+        "rank": 18,
+        "relation": "editorial-reading-order",
+        "reason": "检查最终状态、过程要求与多次运行可靠性的差别。"
+      }
+    },
+    {
+      "guideId": "tau-bench",
+      "revision": 2,
+      "metadataFile": "guides/tau-bench.r2.json",
       "recommendation": {
         "rank": 18,
         "relation": "editorial-reading-order",

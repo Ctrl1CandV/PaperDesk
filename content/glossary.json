@@ -1660,6 +1660,3669 @@
    ],
    "field": "问答 · 数据集",
    "explain": "由知识竞赛题及其证据文档组成的问答数据集，常用于测试模型的事实知识。"
+  },
+  {
+   "id": "react",
+   "term": "ReAct",
+   "aliases": [
+    "ReAct"
+   ],
+   "full": "Reasoning and Acting",
+   "zh": "推理与行动结合",
+   "field": "智能体 · 交互方法",
+   "explain": "让语言模型交错生成思考和环境动作，再把动作的外部观察放入上下文，以支持下一步推理和行动。思考由模型生成，观察则来自执行环境。",
+   "guide": "/read/react/2#u02"
+  },
+  {
+   "id": "fever",
+   "term": "FEVER",
+   "aliases": [
+    "FEVER"
+   ],
+   "full": "Fact Extraction and VERification",
+   "zh": "事实抽取与核验",
+   "field": "自然语言处理 · 基准",
+   "explain": "一个事实核验数据集，要求根据证据判断陈述得到支持、被反驳，还是信息不足。具体实验可能采用不同的证据提供方式。"
+  },
+  {
+   "id": "alfworld",
+   "term": "ALFWorld",
+   "aliases": [
+    "ALFWorld"
+   ],
+   "full": "ALFWorld",
+   "zh": "文本家庭交互环境",
+   "field": "智能体 · 基准",
+   "explain": "一种模拟家庭任务的文本交互环境。智能体通过移动、取物和使用物品等动作完成目标，并从环境接收反馈。"
+  },
+  {
+   "id": "webshop",
+   "term": "WebShop",
+   "aliases": [
+    "WebShop"
+   ],
+   "full": "WebShop",
+   "zh": "网页购物研究环境",
+   "field": "智能体 · 基准",
+   "explain": "用于研究网页交互的购物任务环境。智能体根据文字要求搜索和选择商品，评价可以区分属性满足程度与完整任务成功。"
+  },
+  {
+   "id": "cot-sc",
+   "term": "CoT-SC",
+   "aliases": [
+    "CoT-SC"
+   ],
+   "full": "Chain-of-Thought Self-Consistency",
+   "zh": "思维链自一致性",
+   "field": "语言模型 · 推理",
+   "explain": "对同一问题采样多条推理轨迹，再将出现最多的答案作为结果。多次采样增加了计算开销，多数答案也可能是错的。"
+  },
+  {
+   "id": "palm",
+   "term": "PaLM",
+   "aliases": [
+    "PaLM",
+    "PaLM-540B",
+    "PaLM-8B",
+    "PaLM-62B"
+   ],
+   "full": "Pathways Language Model",
+   "zh": "Pathways 语言模型",
+   "field": "语言模型 · 模型系列",
+   "explain": "Google 提出的语言模型系列，使用不同规模的参数训练。ReAct 论文主要用其中的 540B 模型做少样本提示实验。"
+  },
+  {
+   "id": "agentbench",
+   "term": "AgentBench",
+   "aliases": [
+    "AgentBench"
+   ],
+   "full": "AgentBench: Evaluating LLMs as Agents",
+   "zh": "AgentBench",
+   "field": "Agent 评测 · 交互基准",
+   "explain": "把语言模型放进八种纯文本交互环境，用统一的观察、动作和评分流程考察它能否连续完成任务的多环境基准。环境覆盖操作系统、数据库、知识图谱、卡牌游戏、海龟汤、家务、购物和网页浏览。",
+   "builds": "由清华大学等机构的研究者提出，论文 arXiv v2 于 2023 年发布，后发表于 ICLR 2024。",
+   "guide": "/read/agentbench/2",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2308.03688v2"
+   }
+  },
+  {
+   "id": "pomdp",
+   "term": "POMDP",
+   "aliases": [
+    "POMDP",
+    "部分可观察马尔可夫决策过程"
+   ],
+   "full": "Partially Observable Markov Decision Process",
+   "zh": "部分可观察马尔可夫决策过程",
+   "field": "强化学习 · 任务形式化",
+   "explain": "一种描述智能体在看不到完整环境状态时如何行动的数学框架。它包含状态、动作、转移、奖励、任务指令和观察；智能体只能根据观察选择动作，动作再改变环境状态。AgentBench 用它来定义交互评测。",
+   "builds": "马尔可夫决策过程的扩展，区别在于智能体不能直接观测完整状态。"
+  },
+  {
+   "id": "mind2web",
+   "term": "Mind2Web",
+   "aliases": [
+    "Mind2Web"
+   ],
+   "full": "Mind2Web: Towards a Generalist Agent for the Web",
+   "zh": "Mind2Web",
+   "field": "Agent 评测 · 网页操作基准",
+   "explain": "一个跨网站、跨领域的网页操作基准，任务要求智能体根据高层指令在真实网页结构中选择元素并执行点击、输入或选择。AgentBench 采用它的跨域测试集，把元素选择转成多选问答来评测纯文本模型。",
+   "builds": "由 Deng 等人提出，强调跨网站泛化；AgentBench 调整了候选元素数量和提示方式以适配通用语言模型。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2306.06070"
+   }
+  },
+  {
+   "id": "freebase",
+   "term": "Freebase",
+   "aliases": [
+    "Freebase"
+   ],
+   "full": "Freebase",
+   "zh": "Freebase",
+   "field": "知识图谱 · 开放知识库",
+   "explain": "一个大型开放知识图谱，用实体和关系组织事实。AgentBench 的知识图谱环境把 Freebase 包装成有限的查询工具，要求模型在看不到完整图的情况下，通过多步关系查询找到答案。",
+   "builds": "早期的协作式开放知识库，后被 Wikidata 等后继项目取代；论文使用它作为知识图谱后端的固定版本。"
+  },
+  {
+   "id": "aquawar",
+   "term": "Aquawar",
+   "aliases": [
+    "Aquawar"
+   ],
+   "full": "Aquawar",
+   "zh": "Aquawar",
+   "field": "Agent 评测 · 卡牌游戏环境",
+   "explain": "一个双人回合制卡牌对战环境，双方各控制四条有不同技能的鱼。AgentBench 采用简化版本，让模型选择鱼、技能和目标，并用胜率与伤害率合成奖励。",
+   "builds": "来自 2021 年清华大学智能体竞赛的简化卡牌系统，论文将其改造成纯文本接口。"
+  },
+  {
+   "id": "oa",
+   "term": "OA",
+   "aliases": [
+    "OA",
+    "Overall Score"
+   ],
+   "full": "Overall Score",
+   "zh": "综合分数",
+   "field": "Agent 评测 · 汇总指标",
+   "explain": "AgentBench 用来汇总八种环境的分数：先把每个环境的原始分数除以该环境在参评模型上的平均分，再对所有环境取平均。它可以大于 1，表示相对参考尺度的综合表现，不是任务成功概率。",
+   "guide": "/read/agentbench/2#overall-score"
+  },
+  {
+   "id": "mmlu",
+   "term": "MMLU",
+   "aliases": [
+    "MMLU"
+   ],
+   "full": "Massive Multitask Language Understanding",
+   "zh": "大规模多任务语言理解",
+   "field": "语言模型评测 · 静态基准",
+   "explain": "一个用多项选择题覆盖数十个学科的语言模型知识基准。它通常一次给题、一次作答，用准确率评分，不涉及多轮环境交互；AgentBench 用它作为“静态答题”评测的对照。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2009.03300"
+   }
+  },
+  {
+   "id": "sparql",
+   "term": "SPARQL",
+   "aliases": [
+    "SPARQL"
+   ],
+   "full": "SPARQL Protocol and RDF Query Language",
+   "zh": "SPARQL 查询语言",
+   "field": "知识图谱 · 查询语言",
+   "explain": "用于查询 RDF 知识图谱的标准语言，写法接近图模式匹配。AgentBench 的知识图谱环境不让模型直接写 SPARQL，而是提供关系、邻居、交集等有限工具，以降低接口难度并突出规划。",
+   "source": {
+    "label": "W3C 规范",
+    "url": "https://www.w3.org/TR/sparql11-overview/"
+   }
+  },
+  {
+   "id": "one-shot",
+   "term": "单样本",
+   "aliases": [
+    "单样本",
+    "one-shot"
+   ],
+   "full": "One-Shot Learning",
+   "field": "语言模型 · 任务适配",
+   "explain": "在 GPT-3 的评测设定里，指当前提示中给一组完整的输入与答案，再让模型完成新输入。示范通过上下文起作用，推理时不更新参数；它不是模型全部训练只用过一个样本。",
+   "guide": "/read/gpt3/2#u03"
+  },
+  {
+   "id": "gpt2",
+   "term": "GPT-2",
+   "aliases": [
+    "GPT-2"
+   ],
+   "full": "Generative Pre-trained Transformer 2",
+   "field": "自然语言处理 · 模型",
+   "explain": "GPT-3 之前的自回归 Transformer 语言模型，通过大量文本的下一词元预测进行预训练。GPT-3 沿用了它的多项架构与分词设计，再扩大模型和训练规模。",
+   "guide": "/read/gpt3/2#u02"
+  },
+  {
+   "id": "causal-mask",
+   "term": "因果遮罩",
+   "aliases": [
+    "因果遮罩"
+   ],
+   "full": "Causal Attention Mask",
+   "field": "Transformer · 信息通路",
+   "explain": "限制一个位置只能读取自身及前面输入位置的注意力遮罩。训练时虽然已经拥有完整文本，遮罩仍会阻止模型偷看后面要预测的答案，从而与从左到右生成的条件保持一致。",
+   "guide": "/read/transformer/5#u04"
+  },
+  {
+   "id": "pre-normalization",
+   "term": "预归一化",
+   "aliases": [
+    "预归一化"
+   ],
+   "full": "Pre-Normalization",
+   "field": "Transformer · 架构",
+   "explain": "在注意力或前馈子层之前先做归一化的架构安排，常简称 Pre-LN。它与原始 Transformer 在子层计算、残差相加之后再归一化的位置不同，比较架构时需要辨认这一顺序。",
+   "guide": "/read/gpt3/2#u02"
+  },
+  {
+   "id": "meta-learning",
+   "term": "元学习",
+   "aliases": [
+    "元学习"
+   ],
+   "full": "Meta-Learning",
+   "field": "机器学习 · 学习方式",
+   "explain": "研究如何通过跨任务的长期学习，使模型遇到少量新任务信息时快速适应。GPT-3 作者用慢速预训练与快速上下文适配来解释这种现象，但行为曲线本身没有证明模型内部运行某一种确定的元学习算法。",
+   "guide": "/read/gpt3/2#u04"
+  },
+  {
+   "id": "data-contamination",
+   "term": "数据污染",
+   "aliases": [
+    "数据污染",
+    "data contamination"
+   ],
+   "full": "Data Contamination",
+   "field": "模型评价 · 数据边界",
+   "explain": "评测样本或与答案有关的信息进入训练材料，使测试可能混入记忆收益。文字重合只是检测线索，还要区分背景文章、完整问答泄露和筛选后样本难度变化。",
+   "guide": "/read/gpt3/2#u06"
+  },
+  {
+   "id": "n-gram",
+   "term": "N-gram",
+   "aliases": [
+    "N-gram",
+    "13-gram"
+   ],
+   "field": "自然语言处理 · 文本表示",
+   "explain": "文本中连续 N 个单位组成的片段，单位可按任务定义为词或字符。GPT-3 的污染审计主要检查连续词片段是否出现在候选训练材料中；13-gram 就是连续 13 个词。",
+   "guide": "/read/gpt3/2#u06"
+  },
+  {
+   "id": "common-crawl",
+   "term": "Common Crawl",
+   "aliases": [
+    "Common Crawl"
+   ],
+   "field": "预训练 · 数据来源",
+   "explain": "大规模网页抓取资料，是许多语言模型预训练语料的重要来源。GPT-3 使用经过质量筛选和模糊去重的版本，并非把所有原始网页直接等权加入训练。",
+   "guide": "/read/gpt3/2#u02"
+  },
+  {
+   "id": "webtext2",
+   "term": "WebText2",
+   "aliases": [
+    "WebText2"
+   ],
+   "field": "预训练 · 数据来源",
+   "explain": "GPT-3 使用的网页文本语料，是原 WebText 的扩展版本。它在训练混合中的抽样比例高于其在候选语料总量中的占比，因此相同材料可能被重复使用。",
+   "guide": "/read/gpt3/2#u02"
+  },
+  {
+   "id": "superglue",
+   "term": "SuperGLUE",
+   "aliases": [
+    "SuperGLUE"
+   ],
+   "field": "语言模型评价 · 综合基准",
+   "explain": "汇集八项语言理解任务的基准，包含句间关系、词义、指代和阅读理解等测量。综合分按基准规则聚合，不是单独一种能力；GPT-3 的图 1.1 用开发集，表 3.5 用测试集。",
+   "guide": "/read/gpt3/2#superglue"
+  },
+  {
+   "id": "bert",
+   "term": "BERT",
+   "aliases": [
+    "BERT",
+    "BERT-Large"
+   ],
+   "full": "Bidirectional Encoder Representations from Transformers",
+   "field": "自然语言处理 · 预训练模型",
+   "explain": "通过读取左右两侧上下文来学习表示的 Transformer 编码器模型，预训练后常在标注任务上继续微调。BERT-Large 是其中较大的配置，在 GPT-3 论文中作为经过任务微调的比较基线。"
+  },
+  {
+   "id": "t5",
+   "term": "T5",
+   "aliases": [
+    "T5",
+    "T5-11B"
+   ],
+   "full": "Text-to-Text Transfer Transformer",
+   "field": "自然语言处理 · 预训练模型",
+   "explain": "把多种语言任务统一写成文本输入与文本输出的编码器—解码器模型。GPT-3 论文用经过微调的 T5 系统作比较；11B 表示约 110 亿参数，不是示范数量。"
+  },
+  {
+   "id": "salient-span-masking",
+   "term": "SSM",
+   "aliases": [
+    "SSM"
+   ],
+   "full": "Salient Span Masking",
+   "zh": "显著片段遮蔽",
+   "field": "语言模型 · 预训练目标",
+   "explain": "选择实体等显著文本片段遮住，让模型根据上下文恢复，以强化与知识问答相关的预测。GPT-3 表中的 T5-11B+SSM 是加入这种预训练方式的闭卷问答比较系统，不能只按 T5 的参数量理解。",
+   "guide": "/read/gpt3/2#u05"
+  },
+  {
+   "id": "lambada",
+   "term": "LAMBADA",
+   "aliases": [
+    "LAMBADA"
+   ],
+   "field": "语言模型评价 · 篇章补全",
+   "explain": "给出一段文字，要求预测最后一个词的基准，许多题目需要利用较长语境。GPT-3 用填空格式组织少样本示范，单样本成绩下降而多样本上升；作者也报告了训练重合风险。",
+   "guide": "/read/gpt3/2#u05"
+  },
+  {
+   "id": "webquestions",
+   "term": "WebQuestions",
+   "aliases": [
+    "WebQuestions"
+   ],
+   "field": "语言模型评价 · 事实问答",
+   "explain": "由自然语言问题与参考答案组成的事实问答数据集。GPT-3 在不给额外检索文章的闭卷条件下评测它，并分别报告零、单、少样本成绩。",
+   "guide": "/read/gpt3/2#u05"
+  },
+  {
+   "id": "storycloze",
+   "term": "StoryCloze",
+   "aliases": [
+    "StoryCloze"
+   ],
+   "field": "语言模型评价 · 故事补全",
+   "explain": "要求根据故事前文选择合理结尾的基准。GPT-3 在没有监督训练集可抽样时，从开发集取上下文示范，再在测试集评价，需与通常从训练集抽示范的设定区分。"
+  },
+  {
+   "id": "coqa",
+   "term": "CoQA",
+   "aliases": [
+    "CoQA"
+   ],
+   "full": "Conversational Question Answering",
+   "field": "语言模型评价 · 对话式阅读理解",
+   "explain": "给出一篇材料和围绕它的连续问答，要求结合文章与前面的对话回答新问题。它测量在给定材料中理解和组织答案的能力，与不给检索文章的闭卷事实问答不同。",
+   "guide": "/read/gpt3/2#translation"
+  },
+  {
+   "id": "drop-benchmark",
+   "term": "DROP",
+   "aliases": [
+    "DROP"
+   ],
+   "full": "Discrete Reasoning Over Paragraphs",
+   "field": "语言模型评价 · 离散推理",
+   "explain": "根据段落回答问题的基准，常涉及计数、比较或其他数值操作。GPT-3 的少样本结果远低于原表中的专门系统，展示了流畅文本预测与可靠离散推理之间的差距。",
+   "guide": "/read/gpt3/2#translation"
+  },
+  {
+   "id": "race",
+   "term": "RACE",
+   "aliases": [
+    "RACE"
+   ],
+   "full": "ReAding Comprehension from Examinations",
+   "field": "语言模型评价 · 阅读选择题",
+   "explain": "由考试阅读理解材料和选择题组成的基准。GPT-3 补充材料用它展示任务前缀与候选答案，并说明对答案无条件概率进行归一化的评分安排。",
+   "guide": "/read/gpt3/2#answer-scoring"
+  },
+  {
+   "id": "arc",
+   "term": "ARC",
+   "aliases": [
+    "ARC"
+   ],
+   "full": "AI2 Reasoning Challenge",
+   "field": "语言模型评价 · 科学问答",
+   "explain": "源自学校科学考试的多项选择题数据集，划分为 Easy 与 Challenge 等部分。这里指 GPT-3 使用的 AI2 科学问答基准，不是其他同缩写的抽象推理数据集。"
+  },
+  {
+   "id": "copa",
+   "term": "COPA",
+   "aliases": [
+    "COPA"
+   ],
+   "full": "Choice of Plausible Alternatives",
+   "field": "语言模型评价 · 常识因果选择",
+   "explain": "给出一句前提，从候选中选更合理的原因或结果，是 SuperGLUE 的子任务。它通过选择题测量特定常识判断，较高分数不自动证明普遍的因果理解。",
+   "guide": "/read/gpt3/2#superglue"
+  },
+  {
+   "id": "wic",
+   "term": "WiC",
+   "aliases": [
+    "WiC"
+   ],
+   "full": "Word-in-Context",
+   "field": "语言模型评价 · 词义判断",
+   "explain": "给出同一个词出现的两句话，判断两处是否使用同一种含义，是 SuperGLUE 的子任务。GPT-3 尝试多种问法后仍接近随机水平，是论文明确讨论的弱项。",
+   "guide": "/read/gpt3/2#superglue"
+  },
+  {
+   "id": "wsc",
+   "term": "WSC",
+   "aliases": [
+    "WSC"
+   ],
+   "full": "Winograd Schema Challenge",
+   "field": "语言模型评价 · 指代消解",
+   "explain": "要求根据句子语境判断代词指向哪个实体的一类测试。SuperGLUE 的 WSC 成绩与论文污染审计中的 Winograd 结果应分别按其数据与协议理解。",
+   "guide": "/read/gpt3/2#superglue"
+  },
+  {
+   "id": "winograd",
+   "term": "Winograd",
+   "aliases": [
+    "Winograd"
+   ],
+   "field": "语言模型评价 · 指代推理",
+   "explain": "常指用具有歧义的代词与实体关系考察语境推理的 Winograd 图式测试。GPT-3 污染审计在训练材料中找到部分真实题目，并保留了相应污染标记。",
+   "guide": "/read/gpt3/2#u06"
+  },
+  {
+   "id": "piqa",
+   "term": "PIQA",
+   "aliases": [
+    "PIQA"
+   ],
+   "full": "Physical Interaction Question Answering",
+   "field": "语言模型评价 · 物理常识",
+   "explain": "通过日常物体使用和行动问题比较候选方案，测量特定物理常识。GPT-3 审计发现其干净子集分数下降，作者讨论了选择偏差的可能性但没有排除污染。",
+   "guide": "/read/gpt3/2#u06"
+  },
+  {
+   "id": "quac",
+   "term": "QuAC",
+   "aliases": [
+    "QuAC"
+   ],
+   "full": "Question Answering in Context",
+   "field": "语言模型评价 · 对话式问答",
+   "explain": "围绕一篇材料进行多轮问答的数据集。污染检查中，文章本身与训练材料重合，并不自动意味着模型看过后来附加的完整问答对。",
+   "guide": "/read/gpt3/2#u06"
+  },
+  {
+   "id": "squad2",
+   "term": "SQuAD2",
+   "aliases": [
+    "SQuAD2"
+   ],
+   "full": "Stanford Question Answering Dataset 2.0",
+   "field": "语言模型评价 · 阅读理解",
+   "explain": "根据文章回答问题的数据集版本，也包含文章不能回答的问题。GPT-3 对其训练重合进行检查时，需要区分来源文章重复与问题答案泄露。",
+   "guide": "/read/gpt3/2#u06"
+  },
+  {
+   "id": "xlm",
+   "term": "XLM",
+   "aliases": [
+    "XLM"
+   ],
+   "full": "Cross-lingual Language Model",
+   "field": "自然语言处理 · 跨语言预训练",
+   "explain": "利用多语言文本学习跨语言表示的模型路线，也用于机器翻译比较。GPT-3 主文翻译表采用 XLM 的分词口径计算 BLEU，目的是尽量与相应既有结果对齐。",
+   "guide": "/read/gpt3/2#translation"
+  },
+  {
+   "id": "instructgpt",
+   "term": "InstructGPT",
+   "aliases": [
+    "InstructGPT"
+   ],
+   "field": "语言模型 · 指令与偏好对齐",
+   "explain": "在预训练语言模型之上引入人类示范与偏好反馈，使输出更符合人的意图的一项工作。与只在当前上下文放示范不同，其监督微调和偏好优化阶段会更新模型参数。",
+   "guide": "/read/instructgpt/2#u01"
+  },
+  {
+   "id": "multirc",
+   "term": "MultiRC",
+   "aliases": [
+    "MultiRC"
+   ],
+   "full": "Multi-Sentence Reading Comprehension",
+   "field": "语言模型评价 · 阅读理解",
+   "explain": "需要结合文章中多句信息判断候选答案的阅读理解数据集，也是 SuperGLUE 的子任务。GPT-3 在该任务中给不同待测问题使用同一组抽出的上下文示范，而不是每题重新抽样。",
+   "guide": "/read/gpt3/2#training"
+  },
+  {
+   "id": "gpu",
+   "term": "GPU",
+   "aliases": [
+    "GPU"
+   ],
+   "full": "Graphics Processing Unit",
+   "zh": "图形处理器",
+   "field": "计算基础 · 硬件",
+   "explain": "能并行执行大量数值计算的处理器，常用于神经网络的矩阵运算。模型规模过大时，可以把参数与计算分配给多块 GPU，但还需要考虑显存容量和处理器之间的数据传输。"
+  },
+  {
+   "id": "locally-banded-sparse-attention",
+   "term": "局部带状稀疏注意力",
+   "aliases": [
+    "局部带状稀疏注意力"
+   ],
+   "full": "Locally Banded Sparse Attention",
+   "field": "Transformer · 注意力范围",
+   "explain": "限制每个位置只与附近一段位置计算注意力，而不是连接所有允许的前文位置。GPT-3 在层间交替采用局部带状稀疏注意力与稠密注意力，在保留部分全局连接的同时限制部分层的连接范围。",
+   "guide": "/read/gpt3/2#u02"
+  },
+  {
+   "id": "closed-book-qa",
+   "term": "闭卷问答",
+   "aliases": [
+    "闭卷问答"
+   ],
+   "full": "Closed-Book Question Answering",
+   "field": "语言模型评价 · 信息条件",
+   "explain": "回答问题时不额外提供可检索文章，主要依靠模型参数中的知识与当前允许的提示。它仍可以在少样本设定下使用带答案的示范，与零样本不是同一个区分维度。",
+   "guide": "/read/gpt3/2#u05"
+  },
+  {
+   "id": "reward-model",
+   "term": "RM",
+   "aliases": [
+    "RM",
+    "奖励模型"
+   ],
+   "full": "Reward Model",
+   "zh": "奖励模型",
+   "field": "大模型训练 · 偏好学习",
+   "explain": "读取提示和候选回答，输出一个用于优化的分数。在 InstructGPT 中，它从人类排序学习，让较受偏好的回答分数更高；评分是对人类判断的预测，不是独立的事实验证或绝对质量刻度。",
+   "guide": "/read/instructgpt/3#reward-model",
+   "source": {
+    "label": "InstructGPT 的奖励模型",
+    "url": "https://arxiv.org/abs/2203.02155v1"
+   }
+  },
+  {
+   "id": "ppo",
+   "term": "PPO",
+   "aliases": [
+    "PPO",
+    "近端策略优化"
+   ],
+   "full": "Proximal Policy Optimization",
+   "zh": "近端策略优化",
+   "field": "强化学习 · 策略优化",
+   "explain": "一类交替采样和优化策略的强化学习方法。它利用奖励与优势估计调整行动概率，并通过受限的代理目标抑制过大的策略变化；InstructGPT 用它更新生成回答的模型。",
+   "builds": "Schulman 等于2017年提出，属于策略梯度方法。",
+   "guide": "/read/instructgpt/3#ppo",
+   "source": {
+    "label": "Proximal Policy Optimization Algorithms",
+    "url": "https://arxiv.org/abs/1707.06347"
+   }
+  },
+  {
+   "id": "ppo-ptx",
+   "term": "PPO-ptx",
+   "aliases": [
+    "PPO-ptx"
+   ],
+   "zh": "混入预训练更新的 PPO",
+   "field": "大模型训练 · 能力保持",
+   "explain": "InstructGPT 中的训练变体：计算 PPO 更新的同时，继续在预训练文本上计算语言建模梯度，再合并更新。它用另一种训练分布缓解部分公开任务的性能退化，不是在每次回答时检索预训练文本。",
+   "guide": "/read/instructgpt/3#objective",
+   "source": {
+    "label": "InstructGPT 式2及附录C.4",
+    "url": "https://arxiv.org/abs/2203.02155v1"
+   }
+  },
+  {
+   "id": "nlp",
+   "term": "NLP",
+   "aliases": [
+    "NLP",
+    "自然语言处理"
+   ],
+   "full": "Natural Language Processing",
+   "zh": "自然语言处理",
+   "field": "人工智能 · 研究领域",
+   "explain": "研究计算机如何分析、理解和生成人类语言，包括问答、翻译、摘要、分类等任务。论文中的公开 NLP 基准是若干具体任务的测量，不是对全部语言能力或使用风险的完整评价。"
+  },
+  {
+   "id": "api",
+   "term": "API",
+   "aliases": [
+    "API"
+   ],
+   "full": "Application Programming Interface",
+   "zh": "应用程序接口",
+   "field": "软件工程 · 接口",
+   "explain": "程序向另一项服务提交请求并接收结果的约定接口。语言模型 API 通常接收提示、返回生成文本；论文所说的 API 提示分布，还需要结合它实际采集的是哪种产品入口来理解。"
+  },
+  {
+   "id": "epoch",
+   "term": "epoch",
+   "aliases": [
+    "epoch",
+    "epochs"
+   ],
+   "zh": "训练轮次",
+   "field": "机器学习 · 训练计数",
+   "explain": "将指定训练数据完整遍历一次称为一个 epoch。它与一次参数更新、一次生成交互或一条独立提示都不是同一个计数单位。"
+  },
+  {
+   "id": "sigmoid",
+   "term": "sigmoid",
+   "aliases": [
+    "sigmoid"
+   ],
+   "zh": "逻辑函数",
+   "field": "数学基础 · 概率映射",
+   "explain": "将任意实数映射到0与1之间的函数，常用形式是1/(1+exp(-z))。输入为0时输出0.5，输入越大输出越接近1；偏好模型用它把两个回答的分数差变成选择概率。",
+   "guide": "/read/instructgpt/3#reward-model"
+  },
+  {
+   "id": "negative-log-likelihood",
+   "term": "负对数似然",
+   "aliases": [
+    "负对数似然"
+   ],
+   "full": "Negative Log-Likelihood",
+   "field": "机器学习 · 训练目标",
+   "explain": "对模型赋给实际观测数据的概率取对数并取负。模型给正确样本的概率越低，损失越大；最小化它会提高这些样本在模型中的概率。",
+   "guide": "/read/instructgpt/3#sft"
+  },
+  {
+   "id": "policy-gradient",
+   "term": "策略梯度",
+   "aliases": [
+    "策略梯度"
+   ],
+   "full": "Policy Gradient",
+   "field": "强化学习 · 优化方法",
+   "explain": "根据采样行动及其回报，调整策略选择行动的概率。在语言生成中，行动可以是下一个词元；奖励提供评价方向，而不是逐词标准答案。",
+   "guide": "/read/instructgpt/3#ppo"
+  },
+  {
+   "id": "advantage",
+   "term": "优势估计",
+   "aliases": [
+    "优势估计",
+    "advantage"
+   ],
+   "full": "Advantage Estimation",
+   "field": "强化学习 · 回报估计",
+   "explain": "估计某个行动相对于当前状态下通常预期的回报好多少。正优势倾向于提高相应行动的概率，负优势倾向于降低；它帮助把任务难度与本次行动的相对好坏分开。",
+   "guide": "/read/instructgpt/3#ppo"
+  },
+  {
+   "id": "value-function",
+   "term": "价值函数",
+   "aliases": [
+    "价值函数"
+   ],
+   "full": "Value Function",
+   "field": "强化学习 · 回报预测",
+   "explain": "预测从某个状态继续按策略行动时的预期回报。语言模型训练中的状态可以是提示加上已生成的前缀；价值函数帮助估计优势，不等同于给完整回答打分的奖励模型。",
+   "guide": "/read/instructgpt/3#ppo"
+  },
+  {
+   "id": "bandit",
+   "term": "bandit",
+   "aliases": [
+    "bandit"
+   ],
+   "zh": "单步反馈环境",
+   "field": "强化学习 · 问题设定",
+   "explain": "一种选择行动、获得反馈后本轮结束的学习设定，没有跨多步外部状态的长期任务。InstructGPT 把提示到完整回答看作这样的一轮交互，而回答内部仍按词元逐步生成。",
+   "guide": "/read/instructgpt/3#ppo"
+  },
+  {
+   "id": "alignment-tax",
+   "term": "对齐税",
+   "aliases": [
+    "对齐税",
+    "alignment tax"
+   ],
+   "full": "Alignment Tax",
+   "field": "大模型训练 · 性能取舍",
+   "explain": "为改善模型行为而付出的某些能力或任务性能代价。InstructGPT 用它描述偏好优化后部分公开语言任务的退化，并测试预训练混合能否缓解；这不是对齐必然损害能力的定理。",
+   "guide": "/read/instructgpt/3#alignment-tax",
+   "source": {
+    "label": "InstructGPT 的性能退化讨论",
+    "url": "https://arxiv.org/abs/2203.02155v1"
+   }
+  },
+  {
+   "id": "flan",
+   "term": "FLAN",
+   "aliases": [
+    "FLAN"
+   ],
+   "full": "Finetuned Language Net",
+   "field": "大模型训练 · 指令微调",
+   "explain": "将多种已有语言任务写成自然语言指令，对预训练语言模型进行微调，以促进未见任务上的零样本泛化。InstructGPT 中的 FLAN 基线是作者使用相应数据训练的 GPT-3，不是原研究发布模型的直接比较。",
+   "source": {
+    "label": "Finetuned Language Models Are Zero-Shot Learners",
+    "url": "https://arxiv.org/abs/2109.01652"
+   }
+  },
+  {
+   "id": "t0",
+   "term": "T0",
+   "aliases": [
+    "T0",
+    "T0++"
+   ],
+   "field": "大模型训练 · 多任务提示训练",
+   "explain": "将多种有监督语言任务及不同措辞的提示结合起来训练，以增强对未见任务的泛化。T0++ 是扩展的数据与训练变体；InstructGPT 使用其任务数据微调 GPT-3 作为基线，架构和训练规模与原 T0 模型不同。",
+   "source": {
+    "label": "Multitask Prompted Training Enables Zero-Shot Task Generalization",
+    "url": "https://arxiv.org/abs/2110.08207"
+   }
+  },
+  {
+   "id": "truthfulqa",
+   "term": "TruthfulQA",
+   "aliases": [
+    "TruthfulQA"
+   ],
+   "field": "模型评价 · 事实性基准",
+   "explain": "用容易诱发常见误解的问答题，检验模型是否会模仿人类文本中的错误说法。评价时要分清回答真实与回答真实且有信息量，因为回避实质回答也可能不说错话。",
+   "source": {
+    "label": "TruthfulQA: Measuring How Models Mimic Human Falsehoods",
+    "url": "https://arxiv.org/abs/2109.07958"
+   }
+  },
+  {
+   "id": "realtoxicityprompts",
+   "term": "RealToxicityPrompts",
+   "aliases": [
+    "RealToxicityPrompts"
+   ],
+   "field": "模型评价 · 毒性基准",
+   "explain": "从真实网页文本中抽取的续写开头及毒性标注，用于检查语言模型接下来的输出是否出现冒犯或有毒内容。输入采样方式和额外续写指令会改变结果，需要随分数一起报告。",
+   "source": {
+    "label": "RealToxicityPrompts: Evaluating Neural Toxic Degeneration in Language Models",
+    "url": "https://arxiv.org/abs/2009.11462"
+   }
+  },
+  {
+   "id": "perspective-api",
+   "term": "Perspective API",
+   "aliases": [
+    "Perspective API"
+   ],
+   "field": "模型评价 · 自动评分工具",
+   "explain": "对文本中的毒性等特征提供自动评分的工具。InstructGPT 将其结果与人工判断并列，自动分数是风险特征的代理，不是对所有现实伤害的测量。"
+  },
+  {
+   "id": "winogender",
+   "term": "Winogender",
+   "aliases": [
+    "Winogender"
+   ],
+   "field": "模型评价 · 性别偏见",
+   "explain": "通过主要在代词性别上变化的最小句子对，探查指代系统中的性别偏见。应用到语言模型时可以改成候选句概率测试，但这种适配指标与原始指代任务需要区分。",
+   "source": {
+    "label": "Gender Bias in Coreference Resolution",
+    "url": "https://arxiv.org/abs/1804.09301"
+   }
+  },
+  {
+   "id": "crows-pairs",
+   "term": "CrowS-Pairs",
+   "aliases": [
+    "CrowS-Pairs"
+   ],
+   "full": "Crowdsourced Stereotype Pairs",
+   "field": "模型评价 · 社会偏见",
+   "explain": "通过更体现刻板印象与较少体现刻板印象的句子对，检查语言模型的偏好差异。原论文针对掩码语言模型；其他研究如何计算句子概率和汇总偏见，需要按其实际协议理解。",
+   "source": {
+    "label": "CrowS-Pairs: A Challenge Dataset for Measuring Social Biases in Masked Language Models",
+    "url": "https://arxiv.org/abs/2010.00133"
+   }
+  },
+  {
+   "id": "squad-v2",
+   "term": "SQuADv2",
+   "aliases": [
+    "SQuADv2",
+    "SQuAD v2",
+    "SQuAD 2.0"
+   ],
+   "full": "Stanford Question Answering Dataset 2.0",
+   "field": "模型评价 · 阅读理解",
+   "explain": "在段落问答中同时包含有答案和无答案问题的数据集。模型既要从段落中找答案，也要判断何时材料不足以支持回答，避免看到相似词语就猜一个答案。",
+   "source": {
+    "label": "Know What You Don't Know: Unanswerable Questions for SQuAD",
+    "url": "https://arxiv.org/abs/1806.03822"
+   }
+  },
+  {
+   "id": "hellaswag",
+   "term": "HellaSwag",
+   "aliases": [
+    "HellaSwag"
+   ],
+   "field": "模型评价 · 常识推断",
+   "explain": "给定一个情境或事件描述，从多个后续文本中选择合理延续的基准。错误选项经过对抗式筛选，目的是让仅凭表面语言模式的模型更难选对。",
+   "source": {
+    "label": "HellaSwag: Can a Machine Really Finish Your Sentence?",
+    "url": "https://arxiv.org/abs/1905.07830"
+   }
+  },
+  {
+   "id": "episode",
+   "term": "episode",
+   "aliases": [
+    "episode",
+    "episodes"
+   ],
+   "zh": "一轮交互",
+   "field": "强化学习 · 训练计数",
+   "explain": "从环境给出初始条件，到达到结束条件的一轮交互。InstructGPT 中，一条提示触发一次回答并获得奖励就结束一轮；同一提示可被采样多次，所以交互轮数多于独立提示数。"
+  },
+  {
+   "id": "binary-entropy",
+   "term": "二元分布的熵",
+   "aliases": [
+    "二元分布的熵"
+   ],
+   "zh": "二元选择的不确定性",
+   "field": "信息论 · 不确定性度量",
+   "explain": "用来描述两个可能结果的概率分布有多不确定。两者各占一半时最大，完全确定一个结果时为零；用它作偏见代理，只是在测量候选间的确定程度，不是完整的公平性判断。"
+  },
+  {
+   "id": "confidence-interval",
+   "term": "置信区间",
+   "aliases": [
+    "置信区间"
+   ],
+   "full": "Confidence Interval",
+   "field": "统计学 · 估计不确定性",
+   "explain": "根据有限样本，用既定方法为总体参数构造的区间。95%置信水平指该方法在重复采样中约有95%的区间覆盖真实参数，不是说模型有95%的回答正确，也不表达它跨所有任务的稳定性。"
+  },
+  {
+   "id": "ppo-clipping",
+   "term": "PPO 剪裁",
+   "aliases": [
+    "PPO 剪裁",
+    "clip ratio"
+   ],
+   "zh": "策略概率比的剪裁",
+   "field": "强化学习 · 更新控制",
+   "explain": "PPO 在代理优化目标中对新旧行动概率比进行剪裁，抑制继续朝有利方向过度更新的激励。剪裁系数不是参数最多改变多少的比例，也不是对最终策略距离的硬性保证。",
+   "guide": "/read/instructgpt/3#ppo",
+   "source": {
+    "label": "Proximal Policy Optimization Algorithms",
+    "url": "https://arxiv.org/abs/1707.06347"
+   }
+  },
+  {
+   "id": "function-calling",
+   "term": "Function Calling",
+   "aliases": [
+    "Function Calling",
+    "function calling",
+    "函数调用"
+   ],
+   "full": "Function Calling",
+   "zh": "函数调用",
+   "field": "Agent · 工具使用",
+   "explain": "一种让语言模型按接口定义直接生成结构化工具调用的方式。模型从给定的函数列表里选择函数并填参数，运行时执行后把结果返回给模型，模型再决定下一步。与让模型输出文本动作再解析相比，参数模式由接口约束，调用更稳定。"
+  },
+  {
+   "id": "pass-k",
+   "term": "pass^k",
+   "aliases": [
+    "pass^k"
+   ],
+   "full": "pass hat k",
+   "zh": "k 次全成功率",
+   "field": "Agent 评测 · 可靠性指标",
+   "explain": "同一任务独立运行 k 次、k 次全部成功的比例，再对任务平均。它衡量重复服务中的一致性，与“k 次中至少一次成功”的 pass@k 相反；k 越大，要求越严，曲线通常随 k 下降。"
+  },
+  {
+   "id": "pass-at-k",
+   "term": "pass@k",
+   "aliases": [
+    "pass@k"
+   ],
+   "full": "pass at k",
+   "zh": "k 次至少一次成功率",
+   "field": "代码生成 · 评测指标",
+   "explain": "同一任务独立尝试 k 次、至少一次成功的比例。它适合“多试几次总能找到解”的场景，例如代码生成；在服务场景里，它会把偶然成功算成能力，因此需要与 pass^k 一起看。"
+  },
+  {
+   "id": "user-simulation",
+   "term": "用户模拟",
+   "aliases": [
+    "用户模拟",
+    "用户模拟器",
+    "user simulation"
+   ],
+   "full": "User Simulation",
+   "zh": "用户模拟",
+   "field": "对话系统 · 评测方法",
+   "explain": "用程序或语言模型扮演用户，按任务说明和对话历史生成回复，使多轮交互可以重复运行。模拟用户通常只看到对话，不看到工具调用，因此它的知识、记忆和推理能力会成为评测环境的一部分。"
+  },
+  {
+   "id": "bfcl",
+   "term": "BFCL",
+   "aliases": [
+    "BFCL",
+    "Berkeley Function Calling Leaderboard"
+   ],
+   "full": "Berkeley Function Calling Leaderboard",
+   "zh": "伯克利函数调用排行榜",
+   "field": "Agent 评测 · 工具调用基准",
+   "explain": "一个评测语言模型函数调用能力的公开排行榜，覆盖多种编程语言和调用场景，主要看模型能否选对函数并填对参数。它通常以单步调用为单位，不包含多轮用户交互。",
+   "source": {
+    "label": "Berkeley Function Calling Leaderboard",
+    "url": "https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html"
+   }
+  },
+  {
+   "id": "tau-bench",
+   "term": "τ-bench",
+   "aliases": [
+    "τ-bench"
+   ],
+   "full": "Tool-Agent-User Interaction Benchmark",
+   "zh": "工具—Agent—用户交互基准",
+   "field": "Agent 评测 · 交互基准",
+   "explain": "把模拟用户、隐藏数据库、接口和领域政策放进同一段对话的 Agent 基准。它用最终数据库状态与必要输出判定任务，并用 pass^k 测量重复运行的稳定性。",
+   "source": {
+    "label": "arXiv 原文 v1",
+    "url": "https://arxiv.org/abs/2406.12045v1"
+   }
+  },
+  {
+   "id": "tau2-bench",
+   "term": "τ²-bench",
+   "aliases": [
+    "τ²-bench"
+   ],
+   "full": "τ²-Bench: Evaluating Conversational Agents in a Dual-Control Environment",
+   "zh": "双边控制 Agent 基准",
+   "field": "Agent 评测 · 交互基准",
+   "explain": "τ-bench 的后续工作，把用户也变成能调用工具的行动者，双方共同修改共享环境。任务写成去中心化部分可观察马尔可夫决策过程，并加入电信客服领域和可组合的任务生成器。",
+   "source": {
+    "label": "arXiv 摘要页",
+    "url": "https://arxiv.org/abs/2506.07982"
+   }
+  },
+  {
+   "id": "multiwoz",
+   "term": "MultiWOZ",
+   "aliases": [
+    "MultiWOZ"
+   ],
+   "full": "MultiWOZ: A Large-Scale Multi-Domain Wizard-of-Oz Dataset for Task-Oriented Dialogue Modelling",
+   "zh": "多领域任务型对话数据集",
+   "field": "对话系统 · 数据集",
+   "explain": "一个多领域任务型对话数据集，覆盖预订、信息查询等场景，常用来训练和评测对话状态跟踪与回复生成。对话是预先收集的，模型通常在给定上下文里生成下一句。",
+   "source": {
+    "label": "arXiv 原文 v3",
+    "url": "https://arxiv.org/abs/1810.00278v3"
+   }
+  },
+  {
+   "id": "generative-agents",
+   "term": "Generative Agents",
+   "aliases": [
+    "Generative Agents",
+    "Generative Agent"
+   ],
+   "full": "Generative Agents: Interactive Simulacra of Human Behavior",
+   "zh": "生成式智能体",
+   "field": "智能体 · 社会模拟",
+   "explain": "让多个由大语言模型驱动的角色在虚拟小镇中生活：它们用自然语言保存经历，把经历概括成更高层的反思，再按新近、相关和重要程度取回记忆来安排行为。原论文用 25 个角色模拟日常互动，并用消融实验说明观察、规划和反思各自影响行为的可信度。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2304.03442"
+   }
+  },
+  {
+   "id": "reflexion",
+   "term": "Reflexion",
+   "aliases": [
+    "Reflexion"
+   ],
+   "zh": "语言化反思",
+   "field": "智能体 · 反馈与反思",
+   "explain": "不更新模型参数，而是让 Agent 在每次尝试后把任务反馈写成自然语言反思，存进情节记忆，供下一次尝试使用。反馈可以来自环境，也可以来自模型自评；它改变的是下一次的输入，不是模型权重。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2303.11366"
+   }
+  },
+  {
+   "id": "voyager",
+   "term": "Voyager",
+   "aliases": [
+    "Voyager"
+   ],
+   "zh": "开放世界终身学习智能体",
+   "field": "智能体 · 具身学习",
+   "explain": "在 Minecraft 中持续探索的 Agent，由自动课程、可执行代码构成的技能库，以及带环境反馈的迭代提示三部分组成。它把验证过的技能保存为代码，之后遇到新任务时检索复用，而不是重新训练模型。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.16291"
+   }
+  },
+  {
+   "id": "hugginggpt",
+   "term": "HuggingGPT",
+   "aliases": [
+    "HuggingGPT"
+   ],
+   "zh": "模型编排智能体",
+   "field": "智能体 · 工具编排",
+   "explain": "让 ChatGPT 充当控制器：先把用户请求拆成子任务，再根据 Hugging Face 上的模型描述选择模型，执行后汇总结果。它不训练新模型，而是把已有模型当作可调用的行动空间。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2303.17580"
+   }
+  },
+  {
+   "id": "chatdev",
+   "term": "ChatDev",
+   "aliases": [
+    "ChatDev"
+   ],
+   "zh": "对话式软件开发框架",
+   "field": "智能体 · 多智能体协作",
+   "explain": "把软件开发的设计、编码、测试等阶段交给多个由 LLM 驱动的角色，通过多轮对话协作完成任务。它用“对话链”规定角色之间说什么，并用“交流式去幻觉”减少对话中的错误。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.07924"
+   }
+  },
+  {
+   "id": "metagpt",
+   "term": "MetaGPT",
+   "aliases": [
+    "MetaGPT"
+   ],
+   "zh": "元编程多智能体框架",
+   "field": "智能体 · 多智能体协作",
+   "explain": "把人类工作流中的标准作业程序（SOP）编码进提示序列，给不同 Agent 分配产品经理、架构师、工程师等角色，让它们按流水线协作完成软件开发。它的目标是减少简单串联多个 LLM 造成的逻辑不一致和级联幻觉。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.00352"
+   }
+  },
+  {
+   "id": "tot",
+   "term": "ToT",
+   "aliases": [
+    "ToT",
+    "Tree of Thoughts"
+   ],
+   "full": "Tree of Thoughts",
+   "zh": "思维树",
+   "field": "大模型 · 推理与搜索",
+   "explain": "把推理过程组织成树：每个节点是一个中间“想法”，模型评估节点后决定扩展哪一支，必要时回退。它适合需要探索、前瞻或早期决策很关键的任务，代价是要多次调用模型，而且评估本身可能出错。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.10601"
+   }
+  },
+  {
+   "id": "rewoo",
+   "term": "ReWOO",
+   "aliases": [
+    "ReWOO"
+   ],
+   "full": "Reasoning WithOut Observation",
+   "zh": "无观察推理",
+   "field": "智能体 · 规划",
+   "explain": "先把完整计划写出来，计划里标明每一步调用什么工具、用什么参数，再依次执行工具并把结果填回计划，最后统一生成答案。它把推理和观察分开，减少重复送入模型的上下文；代价是计划在执行前已经确定，遇到意外观察时不够灵活。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.18323"
+   }
+  },
+  {
+   "id": "self-refine",
+   "term": "Self-Refine",
+   "aliases": [
+    "Self-Refine"
+   ],
+   "zh": "自我修订",
+   "field": "智能体 · 反馈与修订",
+   "explain": "让同一个大语言模型先给出初稿，再对自己的初稿提出反馈，并根据反馈修改，循环到满足条件。它不需要额外训练数据或强化学习，但反馈质量受同一个模型的能力限制。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2303.17651"
+   }
+  },
+  {
+   "id": "llm-p",
+   "term": "LLM+P",
+   "aliases": [
+    "LLM+P"
+   ],
+   "zh": "大模型加经典规划器",
+   "field": "智能体 · 规划",
+   "explain": "先把自然语言描述的规划问题转成 PDDL，再交给经典规划器求解，最后把计划翻译回自然语言。它把形式化搜索交给经典规划器，适合需要正确或最优计划的场景；前提是自然语言到 PDDL 的翻译准确。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2304.11477"
+   }
+  },
+  {
+   "id": "saycan",
+   "term": "SayCan",
+   "aliases": [
+    "SayCan"
+   ],
+   "zh": "语言与机器人技能结合",
+   "field": "机器人 · 语言落地",
+   "explain": "把语言模型给出的高层任务知识与预训练机器人技能的价值函数结合：语言模型提出可能的下一步，技能价值函数判断该动作在当前环境中是否可行、有多大概率成功。这样把“说什么”约束到机器人实际能做什么。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2204.01691"
+   }
+  },
+  {
+   "id": "inner-monologue",
+   "term": "Inner Monologue",
+   "aliases": [
+    "Inner Monologue"
+   ],
+   "zh": "内部独白",
+   "field": "机器人 · 反馈规划",
+   "explain": "让机器人在执行任务时接收成功检测、场景描述和人类反馈等语言信号，把这些信号作为“内部独白”放回提示，用于下一步规划。它强调闭环语言反馈，而不是一次性生成完整计划。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2207.05608"
+   }
+  },
+  {
+   "id": "sayplan",
+   "term": "SayPlan",
+   "aliases": [
+    "SayPlan"
+   ],
+   "zh": "场景图任务规划",
+   "field": "机器人 · 任务规划",
+   "explain": "用 3D 场景图表示大规模环境，让语言模型先在压缩后的图里做语义搜索，找到与任务相关的子图，再结合经典路径规划和场景图模拟器的反馈迭代修正计划。它面向多楼层、多房间的长程机器人任务。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.06135"
+   }
+  },
+  {
+   "id": "deps",
+   "term": "DEPS",
+   "aliases": [
+    "DEPS"
+   ],
+   "full": "Describe, Explain, Plan and Select",
+   "zh": "描述、解释、规划与选择",
+   "field": "智能体 · 开放世界规划",
+   "explain": "在 Minecraft 等开放世界里做交互式规划：先描述计划执行过程，再在失败时让模型解释原因，然后用目标选择器给并行的子目标排序。它认为只告诉 Agent“任务失败”不够，具体的失败原因才能帮助修改计划。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2302.01560"
+   }
+  },
+  {
+   "id": "rap",
+   "term": "RAP",
+   "aliases": [
+    "RAP"
+   ],
+   "full": "Reasoning via Planning",
+   "zh": "通过规划推理",
+   "field": "大模型 · 推理与搜索",
+   "explain": "把大语言模型同时当作世界模型和推理 Agent：模型预测行动后的状态，再用蒙特卡洛树搜索在推理空间里探索，按任务奖励选择路径。它适合需要前瞻和多次试错的规划或推理任务。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.14992"
+   }
+  },
+  {
+   "id": "memorybank",
+   "term": "MemoryBank",
+   "aliases": [
+    "MemoryBank"
+   ],
+   "zh": "长期记忆机制",
+   "field": "智能体 · 记忆",
+   "explain": "为对话 Agent 增加长期记忆：把记忆片段编码成向量，用稠密检索取回相关内容，并借鉴遗忘曲线按时间和重要性更新记忆。它面向长期陪伴、心理辅导等需要持续交互的场景。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.10250"
+   }
+  },
+  {
+   "id": "chatdb",
+   "term": "ChatDB",
+   "aliases": [
+    "ChatDB"
+   ],
+   "zh": "数据库式符号记忆",
+   "field": "智能体 · 记忆",
+   "explain": "把 SQL 数据库当作 LLM 的符号记忆：模型生成 SQL 语句来增加、删除、修改和查询记忆记录。它适合需要精确更新和多跳查询的结构化信息，与用向量相似度检索的自然语言记忆形成对照。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2306.03901"
+   }
+  },
+  {
+   "id": "ret-llm",
+   "term": "RET-LLM",
+   "aliases": [
+    "RET-LLM"
+   ],
+   "zh": "读写式通用记忆",
+   "field": "智能体 · 记忆",
+   "explain": "给 LLM 增加一个可读写的记忆单元，把自然语言句子提取成三元组保存，需要时再取回。它强调记忆的可扩展、可聚合、可更新和可解释，并用固定大小缓冲处理容量上限。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.14322"
+   }
+  },
+  {
+   "id": "gitm",
+   "term": "GITM",
+   "aliases": [
+    "GITM",
+    "Ghost in the Minecraft"
+   ],
+   "full": "Ghost in the Minecraft",
+   "zh": "Minecraft 通用智能体",
+   "field": "智能体 · 开放世界",
+   "explain": "用文本知识和记忆增强 LLM，在 Minecraft 中完成长程任务：它把任务拆成子目标，查询记忆中的成功动作，执行后把结果写回记忆。原论文报告在“获得钻石”任务上明显超过此前的强化学习方法。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.17144"
+   }
+  },
+  {
+   "id": "agentsims",
+   "term": "AgentSims",
+   "aliases": [
+    "AgentSims"
+   ],
+   "zh": "Agent 模拟沙盒",
+   "field": "智能体 · 社会模拟与评测",
+   "explain": "一个开源的 Agent 模拟沙盒：研究者可以在图形界面里添加 Agent 和建筑，也可以用少量代码替换记忆、规划和工具使用机制，观察不同设计在交互环境中的效果。它同时被用作社会模拟环境和评测平台。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.04026"
+   }
+  },
+  {
+   "id": "social-simulacra",
+   "term": "Social Simulacra",
+   "aliases": [
+    "Social Simulacra"
+   ],
+   "zh": "社会模拟原型",
+   "field": "智能体 · 社会模拟",
+   "explain": "根据设计者给出的社区目标、规则和成员画像，生成大量模拟成员及其帖子、回复和反社会行为，用来在系统真正上线前探索“如果这样设计会怎样”。它面向社会计算系统的原型设计，而不是预测真实社区。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2208.04024"
+   }
+  },
+  {
+   "id": "s3",
+   "term": "S3",
+   "aliases": [
+    "S3"
+   ],
+   "full": "S3: Social-network Simulation System with Large Language Model-Empowered Agents",
+   "zh": "社交网络模拟系统",
+   "field": "智能体 · 社会模拟",
+   "explain": "用 LLM 驱动的 Agent 模拟社交网络中的情绪、态度和互动行为，观察信息、情绪和态度在群体中的传播。这里的 S3 指该模拟系统，不是云存储服务。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.14984"
+   }
+  },
+  {
+   "id": "chatmof",
+   "term": "ChatMOF",
+   "aliases": [
+    "ChatMOF"
+   ],
+   "zh": "金属有机框架助手",
+   "field": "智能体 · 材料科学",
+   "explain": "从文字描述中提取关键信息，调用工具完成数据检索、性质预测和结构生成，用来研究金属有机框架（MOF）。它由 Agent、工具包和评估器三部分组成。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.01423"
+   }
+  },
+  {
+   "id": "chemcrow",
+   "term": "ChemCrow",
+   "aliases": [
+    "ChemCrow"
+   ],
+   "zh": "化学工具智能体",
+   "field": "智能体 · 化学",
+   "explain": "把一组专家设计的化学工具接给大语言模型，让 Agent 规划并执行有机合成、药物发现和材料设计等任务。它同时用工具验证化合物和识别危险物质；综述与原文对工具数量的记载不同，导读不采用具体数字。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2304.05376"
+   }
+  },
+  {
+   "id": "toolllm",
+   "term": "ToolLLM",
+   "aliases": [
+    "ToolLLM"
+   ],
+   "full": "ToolLLM: Facilitating Large Language Models to Master 16000+ Real-World APIs",
+   "zh": "工具使用训练框架",
+   "field": "智能体 · 工具使用",
+   "explain": "一个包含数据构造、模型训练和评测的工具使用框架：用 ChatGPT 从真实 API 生成指令和调用路径，再微调 LLaMA 得到 ToolLLaMA，并配一个 API 检索器。它的数据集称为 ToolBench。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.16789"
+   }
+  },
+  {
+   "id": "toolbench",
+   "term": "ToolBench",
+   "aliases": [
+    "ToolBench"
+   ],
+   "zh": "工具使用数据集",
+   "field": "智能体 · 工具使用基准",
+   "explain": "ToolLLM 使用的工具使用数据集：从 RapidAPI Hub 收集 49 个类别、16464 个真实 RESTful API，再用 ChatGPT 生成单工具和多工具指令及调用路径。它既用于训练，也用于评测模型的工具调用能力。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.16789"
+   }
+  },
+  {
+   "id": "roco",
+   "term": "RoCo",
+   "aliases": [
+    "RoCo"
+   ],
+   "zh": "多机器人对话协作",
+   "field": "多机器人 · 协作",
+   "explain": "让多个机器人各自带着 LLM 讨论任务策略，生成子任务计划和路径点，再用碰撞检测、逆运动学等环境检查反馈修改计划。它把高层语言协商和低层运动规划接在一起。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.04738"
+   }
+  },
+  {
+   "id": "llm-planner",
+   "term": "LLM-Planner",
+   "aliases": [
+    "LLM-Planner"
+   ],
+   "zh": "具身少样本规划",
+   "field": "具身智能 · 规划",
+   "explain": "用大语言模型为具身 Agent 做少样本规划，并在执行中根据环境反馈生成和更新计划。它强调用少量配对训练数据达到有竞争力的任务表现，适合 ALFRED 这类视觉感知环境中的指令跟随。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2212.04088"
+   }
+  },
+  {
+   "id": "chatlaw",
+   "term": "ChatLaw",
+   "aliases": [
+    "ChatLaw"
+   ],
+   "zh": "中文法律助手",
+   "field": "智能体 · 法律应用",
+   "explain": "面向中文法律咨询的 LLM 助手。综述把它列为法律应用示例；当前 arXiv 版本的摘要强调多 Agent 协作与角色对齐的混合专家架构，导读没有展开其具体机制。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2306.16092"
+   }
+  },
+  {
+   "id": "mcts",
+   "term": "MCTS",
+   "aliases": [
+    "MCTS"
+   ],
+   "full": "Monte Carlo Tree Search",
+   "zh": "蒙特卡洛树搜索",
+   "field": "搜索 · 规划",
+   "explain": "一种通过在搜索树上反复采样、评估和回传来选择行动的算法。它平衡“探索没试过的分支”和“利用当前看起来更好的分支”，常用于需要前瞻的规划与推理。"
+  },
+  {
+   "id": "pddl",
+   "term": "PDDL",
+   "aliases": [
+    "PDDL"
+   ],
+   "full": "Planning Domain Definition Language",
+   "zh": "规划领域定义语言",
+   "field": "自动规划 · 表示",
+   "explain": "一种描述规划问题的形式化语言：用谓词、对象、初始状态、目标和动作前提/效果来表示任务。经典规划器读入 PDDL 后，可以用搜索算法求出动作序列；LLM+P 这类方法用它把自然语言规划交给经典规划器。"
+  },
+  {
+   "id": "mechanism-engineering",
+   "term": "机制工程",
+   "aliases": [
+    "机制工程",
+    "mechanism engineering"
+   ],
+   "full": "Mechanism Engineering",
+   "field": "智能体 · 能力获取",
+   "explain": "不改模型参数，也不只改一句提示，而是设计专门的模块、工作规则和交互流程来提升 Agent 能力，例如加记忆、加反馈循环、加多 Agent 辩论。综述把它与微调、提示工程并列为 Agent 时代的能力获取方式。"
+  },
+  {
+   "id": "prompt-engineering",
+   "term": "提示工程",
+   "aliases": [
+    "提示工程",
+    "prompt engineering"
+   ],
+   "full": "Prompt Engineering",
+   "field": "大模型使用 · 方法",
+   "explain": "用自然语言指令、示例、推理引导或格式约束来改变模型输出，不更新模型参数。它适用于开闭源模型，但受上下文窗口限制，而且提示的微小改动可能带来很大差异。"
+  },
+  {
+   "id": "human-alignment",
+   "term": "人类对齐",
+   "aliases": [
+    "广义人类对齐",
+    "人类对齐",
+    "human alignment"
+   ],
+   "full": "Human Alignment",
+   "field": "大模型 · 对齐",
+   "explain": "让模型的行为符合人类价值、偏好和意图。传统对齐通常指向一套统一的安全价值；综述讨论的“广义人类对齐”则要求 Agent 能按不同模拟目的对齐不同人群的价值观。"
+  },
+  {
+   "id": "embodied-ai",
+   "term": "具身智能",
+   "aliases": [
+    "具身智能",
+    "embodied AI"
+   ],
+   "full": "Embodied AI",
+   "field": "机器人 · 系统形态",
+   "explain": "让智能体通过身体与环境交互，在感知、行动和反馈的循环中完成任务，而不是只处理静态文本。机器人操作、导航和 Minecraft 中的长程任务都属于这一类。"
+  },
+  {
+   "id": "turing-test",
+   "term": "图灵测试",
+   "aliases": [
+    "图灵测试",
+    "Turing test"
+   ],
+   "full": "Turing Test",
+   "field": "人工智能 · 评价",
+   "explain": "让评估者区分机器输出和人输出：如果分不出来，就认为机器在该任务上达到了类似人的表现。它适合评价“像不像人”，但不能说明任务是否正确、系统是否可靠。"
+  },
+  {
+   "id": "llm-as-judge",
+   "term": "LLM 评委",
+   "aliases": [
+    "LLM 评委",
+    "LLM-as-judge",
+    "LLM as judge"
+   ],
+   "full": "LLM-as-a-Judge",
+   "field": "大模型 · 评价",
+   "explain": "让大语言模型充当评估者，对候选回答打分、比较或给出理由。它比人工评价便宜、可重复，但评委本身也会出错，可能偏爱某种风格或与生成模型共享偏差，分数不能直接当作标准答案。"
+  },
+  {
+   "id": "autogen",
+   "term": "AutoGen",
+   "aliases": [
+    "AutoGen"
+   ],
+   "full": "AutoGen",
+   "zh": "AutoGen 框架",
+   "field": "多智能体系统 · 框架",
+   "explain": "微软研究院等机构 2023 年发布的开源框架，用“可交谈 Agent”和“对话编程”两个概念搭建语言模型应用。Agent 通过消息协作，收到消息后按自己的回复规则生成回复，因此流程由对话驱动，而不是由一个中央调度器安排。",
+   "guide": "/read/autogen/2#intro",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "conversable-agent",
+   "term": "可交谈 Agent",
+   "aliases": [
+    "可交谈 Agent",
+    "conversable agent",
+    "ConversableAgent"
+   ],
+   "full": "Conversable Agent",
+   "zh": "可交谈 Agent",
+   "field": "多智能体系统 · 抽象",
+   "explain": "AutoGen 中对参与者的统称：一个带角色、能收发消息、按收发记录维护上下文，并可被配置上语言模型、人、工具等能力的实体。框架里最上层的类叫 ConversableAgent，其他内置角色都由它派生。",
+   "builds": "把“能对话”作为最小接口，使不同后端的参与者可以用同一种方式组合。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "assistant-agent",
+   "term": "AssistantAgent",
+   "aliases": [
+    "AssistantAgent"
+   ],
+   "zh": "助手 Agent",
+   "field": "多智能体系统 · 内置角色",
+   "explain": "AutoGen 预配置的模型后端 Agent，默认带一份让模型用代码解决问题的系统消息。它通常负责提出方案与写代码，处理结果则交给执行者；具体行为仍由构造时的配置决定。",
+   "builds": "用户代理的常见搭档，两者组合即可构成一个双 Agent 闭环。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "user-proxy-agent",
+   "term": "UserProxyAgent",
+   "aliases": [
+    "UserProxyAgent"
+   ],
+   "zh": "用户代理 Agent",
+   "field": "多智能体系统 · 内置角色",
+   "explain": "AutoGen 预配置的代理角色，可以替人收集输入，也可以执行对方消息里的代码或函数调用并把结果发回。人的参与频率由 human_input_mode 决定，设为 ALWAYS 时每轮都询问人，设为 NEVER 时不再询问。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "group-chat-manager",
+   "term": "GroupChatManager",
+   "aliases": [
+    "GroupChatManager"
+   ],
+   "zh": "群聊管理者",
+   "field": "多智能体系统 · 编排角色",
+   "explain": "AutoGen 中负责动态群聊的内置角色，循环执行三步：选出下一位发言者、请该发言者回应、把回复广播给其他成员。选择发言者时的提示写法会影响成功率和调用次数。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "conversation-programming",
+   "term": "对话编程",
+   "aliases": [
+    "对话编程",
+    "conversation programming"
+   ],
+   "full": "Conversation Programming",
+   "zh": "对话编程",
+   "field": "多智能体系统 · 编程范式",
+   "explain": "AutoGen 提出的写法：把应用拆成“Agent 为产生回复所做的计算”和“这些计算发生的顺序与条件”，两者都以消息为线索。开发者只需定义 Agent 与它们的回复规则，之后流程由消息自动推进。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "auto-reply",
+   "term": "自动回复",
+   "aliases": [
+    "自动回复",
+    "自动回复机制",
+    "auto-reply"
+   ],
+   "zh": "自动回复机制",
+   "field": "多智能体系统 · 控制流程",
+   "explain": "Agent 收到消息后自动调用回复函数、把结果发回发送者，除非终止条件已经满足。它让对话不需要中央控制模块即可继续，代价是整条流程没有单一的代码位置可以通读。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "grounding-agent",
+   "term": "grounding agent",
+   "aliases": [
+    "grounding agent"
+   ],
+   "zh": "知识补充 Agent",
+   "field": "多智能体系统 · 角色设计",
+   "explain": "AutoGen 的 ALFWorld 应用中新增的角色，只在任务开始和助手重复同一动作时提供常识约束，例如“必须先拿起物体才能检查它”。它不产生动作，而是把知识交给执行者转达，用来打断重复犯错的循环。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.08155v2"
+   }
+  },
+  {
+   "id": "optiguide",
+   "term": "OptiGuide",
+   "aliases": [
+    "OptiGuide"
+   ],
+   "zh": "OptiGuide 系统",
+   "field": "大模型应用 · 优化决策",
+   "explain": "面向供应链优化模型的问答系统：用户提出假设性问题，系统写出修改约束的代码、运行优化器，再把结果解释成业务语言。AutoGen 论文把它改写成 Commander、Writer、Safeguard 三个 Agent 协作的版本。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.03875v2"
+   }
+  },
+  {
+   "id": "multi-agent-debate",
+   "term": "多智能体辩论",
+   "aliases": [
+    "多智能体辩论",
+    "Multi-Agent Debate"
+   ],
+   "zh": "多智能体辩论",
+   "field": "多智能体系统 · 交互模式",
+   "explain": "让多个模型实例扮演不同立场，按预设轮次互相批评并收敛答案的方法。它被用来鼓励发散思考、提高事实性与推理；AutoGen 论文把它列为对话顺序固定的代表，并指出这类系统不涉及工具与人的参与。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.19118v4"
+   }
+  },
+  {
+   "id": "math-dataset",
+   "term": "MATH 数据集",
+   "aliases": [
+    "MATH 数据集",
+    "MATH"
+   ],
+   "zh": "MATH 数据集",
+   "field": "评测基准 · 数学推理",
+   "explain": "收录竞赛数学题的评测集，题目按难度分为五级。AutoGen 论文用 120 道 Level-5 题和整套测试集比较不同系统，题解通常需要符号计算与代码执行配合。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2103.03874v2"
+   }
+  },
+  {
+   "id": "camel",
+   "term": "CAMEL",
+   "aliases": [
+    "CAMEL"
+   ],
+   "full": "Cooperative Role-playing Communication",
+   "zh": "CAMEL",
+   "field": "多智能体 · 角色扮演框架",
+   "explain": "本篇论文提出的双角色协作框架与系统名。两个对话模型分别扮演 AI user 和 AI assistant，按起始提示中的协议轮流给出指令和方案，直到结束标记或预算耗尽。",
+   "guide": "/read/camel/2",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2303.17760v2"
+   }
+  },
+  {
+   "id": "role-playing",
+   "term": "角色扮演",
+   "aliases": [
+    "role-playing"
+   ],
+   "full": "Role-Playing",
+   "zh": "角色扮演",
+   "field": "多智能体 · 协作方式",
+   "explain": "给对话模型分配明确角色，让它们按角色关系互相交流。CAMEL 中是一个人给想法和角色，一个模型负责提要求，另一个负责给方案。",
+   "guide": "/read/camel/2#framework",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2303.17760v2"
+   }
+  },
+  {
+   "id": "inception-prompting",
+   "term": "Inception Prompting",
+   "aliases": [
+    "Inception Prompting",
+    "inception prompting"
+   ],
+   "zh": "起始提示",
+   "field": "大模型使用 · 提示方法",
+   "explain": "只在对话开始前把角色、任务、交流格式和终止条件写进提示，之后让角色自动互相提示。CAMEL 用它来减少逐轮人工干预。",
+   "guide": "/read/camel/2#prompting",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2303.17760v2"
+   }
+  },
+  {
+   "id": "task-specifier",
+   "term": "Task Specifier",
+   "aliases": [
+    "task specifier",
+    "Task Specifier",
+    "任务具体化器"
+   ],
+   "zh": "任务具体化器",
+   "field": "多智能体 · 任务设计",
+   "explain": "把模糊的初步想法展开成一句明确任务的模型或提示。它让非领域专家也能启动任务，但补入的细节需要人确认是否符合原意。",
+   "guide": "/read/camel/2#task",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2303.17760v2"
+   }
+  },
+  {
+   "id": "ai-society",
+   "term": "AI Society",
+   "aliases": [
+    "AI Society"
+   ],
+   "zh": "AI Society 数据集",
+   "field": "数据集 · 多轮对话",
+   "explain": "CAMEL 用角色扮演流程生成的 25,000 段多轮对话：50 个 assistant 角色、50 个 user 角色，每个角色组合生成 10 个任务。它是模型生成的模拟数据，不是真实人群样本。",
+   "guide": "/read/camel/2#data",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2303.17760v2"
+   }
+  },
+  {
+   "id": "role-flipping",
+   "term": "Role Flipping",
+   "aliases": [
+    "role flipping",
+    "角色反转"
+   ],
+   "zh": "角色反转",
+   "field": "多智能体 · 协作失败",
+   "explain": "assistant 和 user 互换职责，通常表现为 assistant 开始给 user 下指令、user 照着执行。CAMEL 的一个终止条件就是检测 assistant 是否发出指令。",
+   "guide": "/read/camel/2#failures",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2303.17760v2"
+   }
+  },
+  {
+   "id": "flake-reply",
+   "term": "Flake Reply",
+   "aliases": [
+    "flake reply",
+    "flake replies",
+    "空泛承诺"
+   ],
+   "zh": "空泛承诺",
+   "field": "多智能体 · 协作失败",
+   "explain": "assistant 只承诺“我会去做”，却不给出具体做法、代码或结果的回复。它看起来在合作，实际没有推进任务。CAMEL 用“以 I will 开头”作为近似的统计特征。",
+   "guide": "/read/camel/2#failures",
+   "source": {
+    "label": "arXiv 原文 v2",
+    "url": "https://arxiv.org/abs/2303.17760v2"
+   }
+  },
+  {
+   "id": "humaneval",
+   "term": "HumanEval",
+   "aliases": [
+    "HumanEval",
+    "HumanEval+"
+   ],
+   "full": "HumanEval",
+   "field": "代码评测 · 基准",
+   "explain": "包含 164 道函数级编程题的代码生成基准，用单元测试判断程序是否正确；HumanEval+ 增加了更多测试。论文用 pass@k 报告 CAMEL-7B 的成绩。",
+   "guide": "/read/camel/2#finetuning",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2107.03374"
+   }
+  },
+  {
+   "id": "llama",
+   "term": "LLaMA",
+   "aliases": [
+    "LLaMA"
+   ],
+   "full": "Large Language Model Meta AI",
+   "zh": "LLaMA",
+   "field": "大模型 · 模型系列",
+   "explain": "Meta 发布的开源基础语言模型系列。CAMEL 用它做逐步微调实验，比较加入不同领域生成数据前后的表现。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2302.13971"
+   }
+  },
+  {
+   "id": "gpt4",
+   "term": "GPT-4",
+   "aliases": [
+    "GPT-4",
+    "GPT4"
+   ],
+   "full": "Generative Pre-trained Transformer 4",
+   "zh": "GPT-4",
+   "field": "大模型 · 模型系列",
+   "explain": "OpenAI 发布的多模态大语言模型。CAMEL 用它整理多轮对话方案、评价回答偏好，并生成 Math 与 Science 数据。",
+   "source": {
+    "label": "arXiv 技术报告",
+    "url": "https://arxiv.org/abs/2303.08774"
+   }
+  },
+  {
+   "id": "helm",
+   "term": "HELM",
+   "aliases": [
+    "HELM"
+   ],
+   "full": "Holistic Evaluation of Language Models",
+   "zh": "语言模型整体评测",
+   "field": "大模型评测 · 综合基准",
+   "explain": "一套把“场景”和“指标”分开的整体评测框架：先给可能的用途和评价维度分类，再挑出覆盖面广的子集，尽量对每个场景同时测准确率、校准、鲁棒性、公平性、偏见、毒性和效率七项。它强调多指标并报，避免只看准确率。",
+   "builds": "斯坦福 CRFM 等团队提出，2022 年首次发布。",
+   "guide": "/read/helm/2#u02",
+   "source": {
+    "label": "HELM 原文摘要",
+    "url": "https://arxiv.org/abs/2211.09110"
+   }
+  },
+  {
+   "id": "bertscore",
+   "term": "BERTScore",
+   "aliases": [
+    "BERTScore"
+   ],
+   "field": "文本生成评价 · 指标",
+   "explain": "用预训练 BERT 的上下文表示，把候选文本和参考文本的每个词元两两算相似度，再聚合成精确率、召回率和 F1。它比词面重合更能容纳同义改写，但对数字、否定和适用条件这类单点差异并不敏感。",
+   "source": {
+    "label": "BERTScore 原文摘要",
+    "url": "https://arxiv.org/abs/1904.09675"
+   }
+  },
+  {
+   "id": "agieval",
+   "term": "AGIEval",
+   "aliases": [
+    "AGIEval"
+   ],
+   "field": "大模型评测 · 基准",
+   "explain": "把评测放在人类熟悉的标准化考试上：高考、法学院入学考试、数学竞赛、律师资格考试等，用人类考生做参照来比较基础模型的通用能力。题目是真实考试题，而不是为模型临时编的数据集。",
+   "source": {
+    "label": "AGIEval 原文摘要",
+    "url": "https://arxiv.org/abs/2304.06364"
+   }
+  },
+  {
+   "id": "bigbench",
+   "term": "Big-Bench",
+   "aliases": [
+    "Big-Bench",
+    "BIG-bench"
+   ],
+   "full": "Beyond the Imitation Game Benchmark",
+   "field": "大模型评测 · 基准",
+   "explain": "一个由社区共同贡献的任务集合：204 个任务、450 位作者、132 个机构，题目来自语言学、儿童发展、数学、常识推理、生物、物理、社会偏见、软件开发等领域，重点收录当时语言模型还做不到的题。",
+   "source": {
+    "label": "Big-Bench 原文摘要",
+    "url": "https://arxiv.org/abs/2206.04615"
+   }
+  },
+  {
+   "id": "ceval",
+   "term": "C-Eval",
+   "aliases": [
+    "C-Eval"
+   ],
+   "field": "大模型评测 · 中文基准",
+   "explain": "面向中文基础模型的多层次、多学科评测集，按学科和难度组织题目，用来考察中文语境下的知识与推理能力。",
+   "source": {
+    "label": "C-Eval 原文摘要",
+    "url": "https://arxiv.org/abs/2305.08322"
+   }
+  },
+  {
+   "id": "promptbench",
+   "term": "PromptBench",
+   "aliases": [
+    "PromptBench"
+   ],
+   "field": "鲁棒性评测 · 基准",
+   "explain": "专门测模型对提示扰动的稳健性：在字符、词、句子和语义四个层级构造对抗提示，看意思相近的输入是否会让输出明显变化。原论文侧重提示工程与对抗稳健性的标准化比较。",
+   "source": {
+    "label": "PromptBench 原文摘要（现题 PromptRobust）",
+    "url": "https://arxiv.org/abs/2306.04528"
+   }
+  },
+  {
+   "id": "alpacaeval",
+   "term": "AlpacaEval",
+   "aliases": [
+    "AlpacaEval"
+   ],
+   "field": "自动评测 · 工具",
+   "explain": "用一个强模型当评委，把待评模型的回答与参考回答做比较并统计胜率，从而在不依赖人工标注的情况下快速比较指令跟随模型。它的结论取决于评委模型和提示模板。",
+   "source": {
+    "label": "AlpacaEval 项目页",
+    "url": "https://github.com/tatsu-lab/alpaca_eval"
+   }
+  },
+  {
+   "id": "pandalm",
+   "term": "PandaLM",
+   "aliases": [
+    "PandaLM"
+   ],
+   "field": "自动评测 · 评委模型",
+   "explain": "训练一个专门做比较的“评委模型”，给定同一指令下若干模型的回答，判断哪一个更好。除了客观正确性，还看简洁、清晰、遵循指令、全面和正式程度这些主观因素，目的是让指令微调的评测可复现。",
+   "source": {
+    "label": "PandaLM 原文摘要",
+    "url": "https://arxiv.org/abs/2306.05087"
+   }
+  },
+  {
+   "id": "kola",
+   "term": "KoLA",
+   "aliases": [
+    "KoLA"
+   ],
+   "full": "Knowledge-Oriented LLMs Evaluation Benchmark",
+   "field": "知识评测 · 基准",
+   "explain": "以世界知识为中心的评测基准，按知识的不同层次设计任务，检查模型是否真正理解并能运用知识，而不是只按表面模式匹配。",
+   "source": {
+    "label": "KoLA 原文摘要",
+    "url": "https://arxiv.org/abs/2306.09296"
+   }
+  },
+  {
+   "id": "dynabench",
+   "term": "DynaBench",
+   "aliases": [
+    "DynaBench"
+   ],
+   "field": "动态评测 · 平台",
+   "explain": "让标注者与模型在循环中对抗：人专门造模型当前答错的样本，模型再在这些新样本上训练和被测，测试集因此不断变难，用来缓解静态基准被记住的问题。",
+   "source": {
+    "label": "DynaBench 原文摘要",
+    "url": "https://arxiv.org/abs/2104.14337"
+   }
+  },
+  {
+   "id": "multimedqa",
+   "term": "MultiMedQA",
+   "aliases": [
+    "MultiMedQA"
+   ],
+   "field": "医学评测 · 基准",
+   "explain": "由 7 个医学问答数据集组成的评测集合，6 个来自已有资源、1 个为新增，覆盖医学考试、医学研究与消费者健康咨询，用来考察模型在临床知识与问答上的表现。",
+   "source": {
+    "label": "MultiMedQA 所在论文摘要",
+    "url": "https://arxiv.org/abs/2212.13138"
+   }
+  },
+  {
+   "id": "api-bank",
+   "term": "API-Bank",
+   "aliases": [
+    "API-Bank"
+   ],
+   "field": "工具使用评测 · 基准",
+   "explain": "面向工具增强模型的基准：提供一个可运行的 API 环境，配上一批带标注的工具调用对话，考察模型能否规划步骤、检索合适的 API 并正确调用。规模数字随手稿版本变化，引用时要写明版本。",
+   "source": {
+    "label": "API-Bank 原文摘要",
+    "url": "https://arxiv.org/abs/2304.08244"
+   }
+  },
+  {
+   "id": "socket-bench",
+   "term": "SOCKET",
+   "aliases": [
+    "SOCKET",
+    "SocKET"
+   ],
+   "field": "社会知识评测 · 基准",
+   "explain": "考察模型对社会知识概念的学习与识别，例如社会规范、角色与情境理解。综述把名称写作 SOCKET，原论文标题为 SocKET。",
+   "source": {
+    "label": "SocKET 原文摘要",
+    "url": "https://arxiv.org/abs/2305.14938"
+   }
+  },
+  {
+   "id": "m3exam",
+   "term": "M3Exam",
+   "aliases": [
+    "M3Exam"
+   ],
+   "full": "Multilingual, Multimodal, Multilevel Benchmark",
+   "field": "多语言评测 · 基准",
+   "explain": "把多语言、多模态（含图表的试题）和多难度层级结合在一起，用各地区的真实考试题考察大模型的通用能力。",
+   "source": {
+    "label": "M3Exam 原文摘要",
+    "url": "https://arxiv.org/abs/2306.05179"
+   }
+  },
+  {
+   "id": "glue-x",
+   "term": "GLUE-X",
+   "aliases": [
+    "GLUE-X"
+   ],
+   "field": "分布外鲁棒性 · 基准",
+   "explain": "把常用的语言理解基准 GLUE 扩展成分布外泛化评测：训练与测试的数据分布不同，用来检查模型在真实场景的偏移下是否还能保持表现。",
+   "source": {
+    "label": "GLUE-X 原文摘要",
+    "url": "https://arxiv.org/abs/2211.08073"
+   }
+  },
+  {
+   "id": "ood",
+   "term": "OOD",
+   "aliases": [
+    "OOD"
+   ],
+   "full": "Out-of-Distribution",
+   "zh": "分布外",
+   "field": "机器学习 · 泛化",
+   "explain": "分布外指测试输入来自与训练数据不同的分布：换一个领域、换一种表述方式，或换一批更难的样本。分布外鲁棒性衡量模型在这种偏移下还能保持多少表现，与“在同类题上更准”是两件事。"
+  },
+  {
+   "id": "auc",
+   "term": "AUC",
+   "aliases": [
+    "AUC"
+   ],
+   "full": "Area Under the ROC Curve",
+   "zh": "ROC 曲线下面积",
+   "field": "统计 · 指标",
+   "explain": "二分类里衡量“把正例排得比负例高”的总体能力的指标，取值在 0.5（与随机猜测相当）到 1（完全区分）之间。它不依赖某个具体判定阈值，因此常与准确率一起报告。"
+  },
+  {
+   "id": "agi",
+   "term": "AGI",
+   "aliases": [
+    "AGI"
+   ],
+   "full": "Artificial General Intelligence",
+   "zh": "通用人工智能",
+   "field": "人工智能 · 概念",
+   "explain": "指能像人一样完成广泛任务、而不局限于某一专项的智能体。它没有公认的操作定义，因此“用哪些任务能测出通用智能”本身就是一个开放问题。"
+  },
+  {
+   "id": "usmle",
+   "term": "USMLE",
+   "aliases": [
+    "USMLE"
+   ],
+   "full": "United States Medical Licensing Examination",
+   "zh": "美国医师执照考试",
+   "field": "医学 · 执业考试",
+   "explain": "美国医生执业所需的分阶段考试，题目以临床情境下的选择题为主。因为题目公开、难度可观，常被借用来比较模型在医学知识上的水平，但通过考试与能安全行医是两回事。"
+  },
+  {
+   "id": "mcp",
+   "term": "MCP",
+   "aliases": [
+    "MCP"
+   ],
+   "full": "Model Context Protocol",
+   "zh": "模型上下文协议",
+   "field": "多智能体 · 协议",
+   "explain": "让大模型 Agent 以统一方式接入外部工具、数据和服务的协议。它采用 JSON-RPC 的客户端—服务器结构，把一次调用拆成主机、客户端、服务器和资源四个角色：主机按用户请求发起调用，客户端管理连接并描述资源，服务器直接和工具或数据源打交道。综述把“把工具调用与模型输出解耦”列为它在安全上的好处。",
+   "source": {
+    "label": "MCP 官方文档",
+    "url": "https://modelcontextprotocol.io/introduction"
+   }
+  },
+  {
+   "id": "a2a",
+   "term": "A2A",
+   "aliases": [
+    "A2A"
+   ],
+   "full": "Agent-to-Agent Protocol",
+   "zh": "Agent 间协议",
+   "field": "多智能体 · 协议",
+   "explain": "面向 Agent 之间任务委托的协议。每个 Agent 用一张“Agent 卡”声明自己的能力，卡片经 HTTP 分发，其他 Agent 据此决定把哪一段任务交给它；通信是点对点的，并用服务器发送事件做异步消息。综述把它定位在企业规模的协作与任务外包。",
+   "source": {
+    "label": "A2A 协议文档（综述引用）",
+    "url": "https://google.github.io/A2A/"
+   }
+  },
+  {
+   "id": "anp",
+   "term": "ANP",
+   "aliases": [
+    "ANP"
+   ],
+   "full": "Agent Network Protocol",
+   "zh": "Agent 网络协议",
+   "field": "多智能体 · 协议",
+   "explain": "面向开放网络的去中心化 Agent 通信与发现协议。它用去中心化标识符确认身份，用 JSON-LD 图组织消息以获得语义清晰度，并叠加加密通道保护完整性。目标是让互不隶属的组织之间也能安全协作。",
+   "source": {
+    "label": "ANP 官方站点（综述引用）",
+    "url": "https://agent-network-protocol.com/"
+   }
+  },
+  {
+   "id": "did",
+   "term": "DID",
+   "aliases": [
+    "DID"
+   ],
+   "full": "Decentralized Identifier",
+   "zh": "去中心化标识符",
+   "field": "多智能体 · 身份",
+   "explain": "一种不依赖单一中心机构签发的身份标识，通常配合可验证凭证使用。在 Agent 网络里，它让互不相识的 Agent 能够互相验证身份，而不必先信任同一个平台；代价是身份的发布、解析与治理需要额外机制。",
+   "source": {
+    "label": "W3C DID 规范",
+    "url": "https://www.w3.org/TR/did-core/"
+   }
+  },
+  {
+   "id": "json-rpc",
+   "term": "JSON-RPC",
+   "aliases": [
+    "JSON-RPC"
+   ],
+   "zh": "JSON 远程调用",
+   "field": "网络 · 数据格式",
+   "explain": "一种用 JSON 描述请求与响应的远程调用约定：请求里写明方法名和参数，响应里带回结果或错误。它只规定消息长什么样，不规定传输方式，因此可以跑在 HTTP 或本地进程通道上。MCP 采用的就是这种结构。"
+  },
+  {
+   "id": "json-ld",
+   "term": "JSON-LD",
+   "aliases": [
+    "JSON-LD"
+   ],
+   "zh": "JSON 链接数据",
+   "field": "网络 · 数据格式",
+   "explain": "在 JSON 里加入 @context 等字段，让键名指向共享词汇表，从而把普通 JSON 变成机器可以合并的图数据。跨系统交换时，它减少同名字段含义不同的歧义；代价是双方必须约定同一套词汇表。"
+  },
+  {
+   "id": "speech-act",
+   "term": "Speech Act",
+   "aliases": [
+    "Speech Act",
+    "言语行为"
+   ],
+   "zh": "言语行为",
+   "field": "多智能体 · 通信范式",
+   "explain": "把一次发言看成一次行动：请求、承诺、宣告都会改变接收者的状态或义务。经典的多智能体系统用它规定消息类型，LLM 系统里则常由自然语言隐含同样的作用。综述指出，作用标得不清楚时，接收者可能在前提不满足时行动，导致连锁错误。"
+  },
+  {
+   "id": "blackboard",
+   "term": "Blackboard",
+   "aliases": [
+    "Blackboard",
+    "黑板系统"
+   ],
+   "zh": "黑板",
+   "field": "多智能体 · 通信范式",
+   "explain": "多个 Agent 通过一块共享空间协作：谁都可以往里写状态、读别人的更新，而不必点对点发送。它便于形成一致的系统视图，代价是共享点可能成为瓶颈，也需要权限管理和防止错误内容污染。"
+  },
+  {
+   "id": "chain-of-agents",
+   "term": "Chain-of-Agents",
+   "aliases": [
+    "Chain-of-Agents"
+   ],
+   "zh": "智能体链",
+   "field": "多智能体 · 长上下文",
+   "explain": "处理长文本的一种多 Agent 流程：多个工作 Agent 依次阅读不同分段，每人在提交结论前先概括前面的贡献，最后由一个管理 Agent 汇总成结果。每个 Agent 只面对短上下文，用来缓解长上下文里“读得全”和“读得准”的冲突。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2406.02818"
+   }
+  },
+  {
+   "id": "magis",
+   "term": "MAGIS",
+   "aliases": [
+    "MAGIS"
+   ],
+   "field": "多智能体 · 软件工程",
+   "explain": "面向 GitHub 仓库问题解决的多 Agent 框架，包含经理、仓库管理员、开发者和质量保证工程师四类角色，分工完成规划与编码。原论文在 SWE-bench 上报告解决 13.94% 的问题，并称相对直接让模型修改有较大幅度提升。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2403.17927"
+   }
+  },
+  {
+   "id": "polca",
+   "term": "POLCA",
+   "aliases": [
+    "POLCA"
+   ],
+   "field": "多智能体 · 谈判模拟",
+   "explain": "把政党联盟谈判建模为 LLM Agent 之间的协商，并给出多语言数据集，包含欧洲多国政党宣言与历次选举后的联盟协议。作者用层级马尔可夫决策过程描述谈判过程，用来预测联盟能否形成。综述把它列为团队架构与混合目标的例子。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2402.11712"
+   }
+  },
+  {
+   "id": "causal-gpt",
+   "term": "CausalGPT",
+   "aliases": [
+    "CausalGPT"
+   ],
+   "field": "多智能体 · 知识推理",
+   "explain": "用多个 Agent 协作改善知识推理的框架，重点是让推理链在因果上保持一致，减少概念错误与推理谬误。综述提到它把高层评估者放在推理过程中，用它们引导低层 Agent 的推理，以提高输出一致性。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.11914"
+   }
+  },
+  {
+   "id": "autoagents",
+   "term": "AutoAgents",
+   "aliases": [
+    "AutoAgents"
+   ],
+   "field": "多智能体 · 角色生成",
+   "explain": "按任务自动生成角色的多 Agent 框架：先根据任务内容决定需要哪些专家，再让这些 Agent 分工解决问题，并加入一个观察者角色对方案做反思。综述把它列为同时发言策略的例子，因为多个 Agent 会并发生成想法或方案路径。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2309.17288"
+   }
+  },
+  {
+   "id": "agentcoord",
+   "term": "AgentCoord",
+   "aliases": [
+    "AgentCoord"
+   ],
+   "field": "多智能体 · 协调可视化",
+   "explain": "辅助设计多 Agent 协作策略的可视化框架：把 Agent 关系、任务依赖和结果对应关系显示出来，让设计者在图上比较不同协调方案，而不必在一大段对话记录里翻找。综述把它列为使用自我通信与汇总者的例子。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2404.11943"
+   }
+  },
+  {
+   "id": "mdteamgpt",
+   "term": "MDTeamGPT",
+   "aliases": [
+    "MDTeamGPT"
+   ],
+   "field": "多智能体 · 医疗",
+   "explain": "面向多学科会诊的 LLM 多 Agent 框架：用共识聚合和残差讨论结构组织多轮会诊，并借助正确答案知识库积累经验。综述用它说明黑板范式在医疗场景的用法，共享信息空间让团队持续看到同一份病人信息与治疗方案。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2503.13856"
+   }
+  },
+  {
+   "id": "fixagent",
+   "term": "FixAgent",
+   "aliases": [
+    "FixAgent"
+   ],
+   "field": "多智能体 · 调试",
+   "explain": "把软件调试拆成定位、修补等环节，由不同 Agent 分别承担的多 Agent 框架；三级结构让不同复杂度的缺陷走不同深度的处理。综述把它当作混合架构的例子，并提到 Agent 会在动手前自评调试策略。该工作的 arXiv 标题为 UniDebugger。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2404.17153"
+   }
+  },
+  {
+   "id": "chatsim",
+   "term": "ChatSim",
+   "aliases": [
+    "ChatSim"
+   ],
+   "field": "多智能体 · 自动驾驶",
+   "explain": "面向自动驾驶场景编辑的多 Agent 系统：用自上而下的控制做场景渲染，用点对点协作整合场景资产。综述用它说明混合架构，以及环境信号（如实时交通与天气）如何作为隐式通信引导 Agent 的行为。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2402.05746"
+   }
+  },
+  {
+   "id": "tulip-agent",
+   "term": "Tulip Agent",
+   "aliases": [
+    "Tulip Agent"
+   ],
+   "field": "多智能体 · 工具使用",
+   "explain": "让 LLM Agent 在大规模工具库中完成任务的框架：Agent 在使用中动态发现并调用合适的工具，而不必预先为每种任务写死工具列表。综述把它列为混合架构的例子，强调其灵活性来自按需发现。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2407.21778"
+   }
+  },
+  {
+   "id": "agentfm",
+   "term": "AgentFM",
+   "aliases": [
+    "AgentFM"
+   ],
+   "field": "多智能体 · 数据库运维",
+   "explain": "面向分布式数据库故障管理的多 Agent 框架，按角色区分不同 Agent 的职责，让它们结构化地协作处理故障。综述把它列为“与其他 Agent 通信”的例子，说明可靠性来自协调而不是单个 Agent 的能力。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2504.06614"
+   }
+  },
+  {
+   "id": "embodiedgpt",
+   "term": "EmbodiedGPT",
+   "aliases": [
+    "EmbodiedGPT"
+   ],
+   "field": "多智能体 · 具身智能",
+   "explain": "面向具身智能的端到端多模态基础模型，让 Agent 同时具备多模态理解与动作规划能力；作者构建了带子目标链的具身规划数据集，并把 7B 规模的语言模型适配到该数据上。综述用它说明与环境通信需要把传感器输入转成可用的知识。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2305.15021"
+   }
+  },
+  {
+   "id": "peergpt",
+   "term": "PeerGPT",
+   "aliases": [
+    "PeerGPT"
+   ],
+   "field": "多智能体 · 教育",
+   "explain": "把 LLM Agent 放进儿童协作学习的场景，研究它们作为小组主持人和同伴时的作用。Agent 需要同时理解孩子的语言和动作，并维持互动。综述用它说明与人通信时需要处理语言差异、情感与社会信号，以及隐私与责任问题。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2403.14227"
+   }
+  },
+  {
+   "id": "medagents",
+   "term": "MedAgents",
+   "aliases": [
+    "MedAgents"
+   ],
+   "field": "多智能体 · 医疗",
+   "explain": "面向零样本医学推理的多学科协作框架：Agent 以不同专科角色参与多轮讨论，依次汇总分析、迭代讨论到达成共识，再给出结论。综述把它列为与人通信的例子，因为 Agent 需要与医疗专业人员配合完成诊断与治疗规划。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2311.10537"
+   }
+  },
+  {
+   "id": "autodata",
+   "term": "AutoData",
+   "aliases": [
+    "AutoData"
+   ],
+   "field": "多智能体 · 数据采集",
+   "explain": "面向开放网络数据采集的多 Agent 系统：用户只给一句自然语言说明想要的数据集，系统自行规划并执行采集。综述用它说明代码与结构化数据作为显式通信内容的用法，Agent 之间交换的是可解析的字段与指令。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2505.15859"
+   }
+  },
+  {
+   "id": "ecolang",
+   "term": "EcoLANG",
+   "aliases": [
+    "EcoLANG"
+   ],
+   "field": "多智能体 · 社会模拟",
+   "explain": "为大规模社会模拟降低通信成本的框架，分两个阶段：先通过类似于自然选择的筛选压缩词表与句式规则，演化出一套更省的语言；再让模拟中的 Agent 用这套语言交流。综述用它说明环境信号作为隐式内容的作用。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2505.06904"
+   }
+  },
+  {
+   "id": "richelieu",
+   "term": "Richelieu",
+   "aliases": [
+    "Richelieu"
+   ],
+   "field": "多智能体 · 谈判模拟",
+   "explain": "把 AI 外交建模为多 Agent 谈判的框架，Agent 会通过自我演化改进谈判策略。综述用它说明行为反馈这一隐式内容：谈判立场不只写在消息里，也通过 Agent 的举动间接传达。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2407.06813"
+   }
+  },
+  {
+   "id": "flooding",
+   "term": "Flooding",
+   "aliases": [
+    "Flooding"
+   ],
+   "field": "多智能体 · 安全",
+   "explain": "研究受操纵知识如何在 LLM 多 Agent 社区里扩散的工作：作者先建立威胁模型与模拟环境，再用说服性注入和篡改知识注入两阶段方法，观察不改变提示也能传播错误或有害信息。综述用它说明行为反馈与安全风险。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2407.07791"
+   }
+  },
+  {
+   "id": "gamechat",
+   "term": "GameChat",
+   "aliases": [
+    "GameChat"
+   ],
+   "field": "多智能体 · 导航",
+   "explain": "让多个 LLM Agent 用自然语言协商的导航框架：在拥挤受限的环境里，Agent 自行讨论并解决空间对称造成的僵局。作者在模拟的门洞与路口场景报告，即使最坏情况，所有 Agent 到达目标的总时间也减少了 35% 以上。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2503.12333"
+   }
+  },
+  {
+   "id": "gama-bench",
+   "term": "GAMA-Bench",
+   "aliases": [
+    "GAMA-Bench",
+    "GAMA–Bench"
+   ],
+   "field": "多智能体 · 评测",
+   "explain": "评估 LLM 在多方环境里博弈能力的基准：覆盖八种经典博弈场景，用随参数调整的动态打分，考察模型在竞争中的决策、稳健性与泛化。综述用它说明竞争类目标如何被测量。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2403.11807"
+   }
+  },
+  {
+   "id": "agent4debate",
+   "term": "Agent4Debate",
+   "aliases": [
+    "Agent4Debate"
+   ],
+   "field": "多智能体 · 辩论",
+   "explain": "面向竞技辩论的多 Agent 框架，四个角色分别负责检索、分析、写作和审阅，覆盖从准备到反驳、总结的多个阶段。作者用 66 个中文辩题、200 场辩论，比较模型与人类辩手，并用自动评分与人工评审两种方式排名。综述把它列为竞争目标的例子。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2408.04472"
+   }
+  },
+  {
+   "id": "multiagentbench",
+   "term": "MultiAgentBench",
+   "aliases": [
+    "MultiAgentBench"
+   ],
+   "field": "多智能体 · 评测",
+   "explain": "评估 LLM 多智能体协作与竞争的基准：除了任务完成，还用里程碑式的关键指标衡量协作质量，并比较星形、链式、树形、图状等协调协议与群体讨论等策略。综述指出它覆盖的场景仍然有限。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2503.01935"
+   }
+  },
+  {
+   "id": "realm-bench",
+   "term": "Realm-Bench",
+   "aliases": [
+    "Realm-Bench",
+    "RealWorldBench"
+   ],
+   "field": "多智能体 · 评测",
+   "explain": "面向真实世界规划与调度任务的基准，包含 14 个从易到难的问题，可以沿并行规划线程数、依赖复杂度和意外中断频率三个方向扩展。综述在讨论评价时写作 RealWorldBench，指的是这项工作。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2502.18836"
+   }
+  },
+  {
+   "id": "econagent",
+   "term": "EconAgent",
+   "aliases": [
+    "EconAgent"
+   ],
+   "field": "多智能体 · 宏观经济模拟",
+   "explain": "用 LLM 驱动的 Agent 模拟宏观经济活动的框架：Agent 通过感知模块做工作与消费决策，通过记忆模块跟踪宏观趋势，大量 Agent 同时交互产生市场动态。综述用它说明社会架构与同时发言策略。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.10436"
+   }
+  },
+  {
+   "id": "agentprune",
+   "term": "AgentPrune",
+   "aliases": [
+    "AgentPrune"
+   ],
+   "zh": "多智能体通信裁剪",
+   "field": "多智能体 · 通信优化",
+   "explain": "先用任务反馈学习同轮与跨轮连接的掩码，再一次性删去部分边的通信优化方法。后续对话或任务复用稀疏结构，减少消息输入；主要优化通信连接而非底座模型权重。",
+   "guide": "/read/agentprune/2#u03",
+   "source": {
+    "label": "AgentPrune 原论文 v1",
+    "url": "https://arxiv.org/abs/2410.02506v1"
+   }
+  },
+  {
+   "id": "dag",
+   "term": "DAG",
+   "aliases": [
+    "DAG",
+    "有向无环图"
+   ],
+   "full": "Directed Acyclic Graph",
+   "zh": "有向无环图",
+   "field": "图论 · 依赖关系",
+   "explain": "边有方向、且沿箭头无法绕回起点的图。可以把节点排成所有前置依赖都先执行的次序，因此常用来描述工作流和计算依赖；这类排序称为拓扑排序。",
+   "guide": "/read/agentprune/2#u01"
+  },
+  {
+   "id": "adjacency-matrix",
+   "term": "邻接矩阵",
+   "aliases": [
+    "邻接矩阵"
+   ],
+   "full": "Adjacency Matrix",
+   "field": "图论 · 图的表示",
+   "explain": "用一张方阵记录节点之间是否相连或连接权重。AgentPrune 的约定是第 i 行、第 j 列表示从 i 发往 j；不同实现可能采用转置约定，读取时要先确认方向。",
+   "guide": "/read/agentprune/2#u03"
+  },
+  {
+   "id": "communication-graph-mask",
+   "term": "图掩码",
+   "aliases": [
+    "图掩码"
+   ],
+   "full": "Graph Mask",
+   "field": "多智能体 · 图结构学习",
+   "explain": "与邻接矩阵同形状的一组参数，用于控制原有连接的选择。AgentPrune 在学习时使用连续掩码，结束后按分数裁剪为二值开关；掩码值不是对消息中文字做比例缩放。",
+   "guide": "/read/agentprune/2#u03"
+  },
+  {
+   "id": "spatial-communication-edge",
+   "term": "空间边",
+   "aliases": [
+    "空间边"
+   ],
+   "full": "Spatial Edge",
+   "field": "多智能体 · 同轮通信",
+   "explain": "AgentPrune 对同一轮中智能体消息依赖的称呼。一条从甲到乙的空间边，使乙能够读取甲本轮产生的消息；空间指交流组织方式，不指机器的物理位置。",
+   "guide": "/read/agentprune/2#u01"
+  },
+  {
+   "id": "temporal-communication-edge",
+   "term": "时间边",
+   "aliases": [
+    "时间边"
+   ],
+   "full": "Temporal Edge",
+   "field": "多智能体 · 跨轮通信",
+   "explain": "把上一轮某个智能体的输出送入本轮接收者输入的连接。发送者和接收者可以是同一角色，也可以是不同角色；时间边决定哪些历史继续参与后续推理。",
+   "guide": "/read/agentprune/2#temporal-reuse"
+  },
+  {
+   "id": "low-rank-regularization",
+   "term": "低秩约束",
+   "aliases": [
+    "低秩约束",
+    "低秩正则"
+   ],
+   "full": "Low-Rank Regularization",
+   "field": "数学优化 · 结构约束",
+   "explain": "鼓励矩阵由较少的独立模式组成的约束或惩罚。低秩矩阵可以仍有大量非零元素，所以低秩与少边是不同性质；AgentPrune 还需另做二值裁剪才能减少消息连接。",
+   "guide": "/read/agentprune/2#low-rank"
+  },
+  {
+   "id": "nuclear-norm",
+   "term": "核范数",
+   "aliases": [
+    "核范数"
+   ],
+   "full": "Nuclear Norm",
+   "field": "线性代数 · 矩阵范数",
+   "explain": "矩阵所有奇异值之和，常用作秩最小化的替代惩罚。它约束独立方向的总强度，不直接统计非零元素的数量。",
+   "guide": "/read/agentprune/2#low-rank"
+  },
+  {
+   "id": "frobenius-norm",
+   "term": "Frobenius 范数",
+   "aliases": [
+    "Frobenius 范数"
+   ],
+   "full": "Frobenius Norm",
+   "field": "线性代数 · 矩阵范数",
+   "explain": "把矩阵每个元素的平方相加，再开平方得到的量。对两个矩阵之差计算它，可以衡量二者整体相差多少；AgentPrune 用它约束学习掩码与原图的差异。",
+   "guide": "/read/agentprune/2#low-rank"
+  },
+  {
+   "id": "one-shot-pruning",
+   "term": "一次性裁剪",
+   "aliases": [
+    "一次性裁剪",
+    "One-Shot Pruning"
+   ],
+   "full": "One-Shot Pruning",
+   "field": "模型与图优化 · 裁剪",
+   "explain": "先取得重要性分数，再在一个阶段一次确定保留对象，区别于不断迭代地删去一小部分。AgentPrune 据此固定后续允许使用的通信边；这里的 One-Shot 与提示学习中的单样本含义不同。",
+   "guide": "/read/agentprune/2#one-shot-pruning"
+  },
+  {
+   "id": "gptswarm",
+   "term": "GPTSwarm",
+   "aliases": [
+    "GPTSwarm"
+   ],
+   "field": "多智能体 · 图结构优化",
+   "explain": "把语言智能体及其协作表示成可优化图的方法。可以调整节点提示或智能体间的连接，以任务表现指导改进；AgentPrune 将其作为交流结构对照和可接入框架。",
+   "source": {
+    "label": "Language Agents as Optimizable Graphs",
+    "url": "https://arxiv.org/abs/2402.16823"
+   }
+  },
+  {
+   "id": "llm-debate",
+   "term": "LLM-Debate",
+   "aliases": [
+    "LLM-Debate"
+   ],
+   "field": "多智能体 · 多轮辩论",
+   "explain": "让多个语言模型实例各自作答，再读取其他成员上一轮回答并继续修正的方法。AgentPrune 将这种跨轮共享视为密集时间通信结构，以研究哪些历史传递可以删去。",
+   "source": {
+    "label": "多智能体辩论原论文",
+    "url": "https://arxiv.org/abs/2305.14325"
+   }
+  },
+  {
+   "id": "dylan",
+   "term": "DyLAN",
+   "aliases": [
+    "DyLAN"
+   ],
+   "full": "Dynamic LLM-Powered Agent Network",
+   "field": "多智能体 · 动态协作",
+   "explain": "面向任务组织和调整语言智能体协作网络的方法。通过评价成员贡献等机制优化团队；AgentPrune 主要把它作为具有跨轮筛选能力的通信对照。",
+   "source": {
+    "label": "DyLAN 原论文",
+    "url": "https://arxiv.org/abs/2310.02170"
+   }
+  },
+  {
+   "id": "progressive-hint-prompting",
+   "term": "PHP",
+   "aliases": [
+    "PHP"
+   ],
+   "full": "Progressive-Hint Prompting",
+   "zh": "渐进提示法",
+   "field": "语言模型 · 推理提示",
+   "explain": "把之前生成的答案作为提示，帮助语言模型在后续交互中修正结果的方法。AgentPrune 将这一思路适配成把本轮决策传给下一轮多个成员的时间通信对照；此处与同名编程语言无关。",
+   "source": {
+    "label": "Progressive-Hint Prompting 原论文",
+    "url": "https://arxiv.org/abs/2304.09797"
+   }
+  },
+  {
+   "id": "gsm8k",
+   "term": "GSM8K",
+   "aliases": [
+    "GSM8K"
+   ],
+   "full": "Grade School Math 8K",
+   "field": "模型评价 · 数学推理",
+   "explain": "由小学难度的数学文字题组成的数据集，往往需要多步算术推理。常用最终数值答案的正确率评价模型表现，提示和解码方式会影响结果。",
+   "source": {
+    "label": "Training Verifiers to Solve Math Word Problems",
+    "url": "https://arxiv.org/abs/2110.14168"
+   }
+  },
+  {
+   "id": "pass-at-one",
+   "term": "Pass@1",
+   "aliases": [
+    "Pass@1",
+    "pass@1"
+   ],
+   "field": "模型评价 · 代码指标",
+   "explain": "从生成过程取得一个候选程序时，通过任务测试的成功率。可以用多个采样结果估计这一概率；其含义仍是单次候选成功，而不是多次尝试中至少一次成功。",
+   "source": {
+    "label": "HumanEval 与 pass@k 指标",
+    "url": "https://arxiv.org/abs/2107.03374"
+   }
+  },
+  {
+   "id": "multiarith",
+   "term": "MultiArith",
+   "aliases": [
+    "MultiArith"
+   ],
+   "field": "模型评价 · 数学文字题",
+   "explain": "多步算术文字题数据集，用于检查系统能否从题意组合多个计算步骤。它与其他数学任务的难度、格式和题目来源不同，准确率应分别报告。",
+   "source": {
+    "label": "Solving General Arithmetic Word Problems",
+    "url": "https://arxiv.org/abs/1608.01413"
+   }
+  },
+  {
+   "id": "svamp",
+   "term": "SVAMP",
+   "aliases": [
+    "SVAMP"
+   ],
+   "field": "模型评价 · 数学推理",
+   "explain": "对简单算术文字题作结构或表述变化的数据集，用于检验模型是否真正依照题意推理。相近措辞下答案可能变化，因此只依靠表面模式容易失败。",
+   "source": {
+    "label": "Are NLP Models really able to Solve Simple Math Word Problems?",
+    "url": "https://arxiv.org/abs/2103.07191"
+   }
+  },
+  {
+   "id": "aqua",
+   "term": "AQuA",
+   "aliases": [
+    "AQuA"
+   ],
+   "field": "模型评价 · 数学选择题",
+   "explain": "包含代数类文字选择题及自然语言解题过程的数据集。研究可使用推理过程辅助训练或提示，通常以最终选项是否正确评价作答。",
+   "source": {
+    "label": "Program Induction by Rationale Generation",
+    "url": "https://arxiv.org/abs/1705.04146"
+   }
+  },
+  {
+   "id": "mid-training",
+   "term": "中训练",
+   "aliases": [
+    "中训练",
+    "mid-training"
+   ],
+   "full": "Mid-training",
+   "zh": "中训练",
+   "field": "大模型训练 · 训练阶段",
+   "explain": "在通用预训练基础上，用更有目标的数据继续更新模型，例如数学、代码、长上下文和交互轨迹。它为后训练准备更合适的能力基础，与本次调用中临时提供上下文不同。",
+   "guide": "/read/llm-survey/2#mid-training"
+  },
+  {
+   "id": "cross-entropy",
+   "term": "交叉熵",
+   "aliases": [
+    "交叉熵"
+   ],
+   "full": "Cross-entropy",
+   "field": "机器学习 · 训练目标",
+   "explain": "衡量预测概率分布与目标分布差异的一种损失。在下一词元训练中，可理解为对真实后续词元的负对数概率求和或平均：给真实词元的概率越低，惩罚越大。",
+   "guide": "/read/llm-survey/2#u02"
+  },
+  {
+   "id": "chinchilla",
+   "term": "Chinchilla",
+   "aliases": [
+    "Chinchilla"
+   ],
+   "field": "大模型训练 · 规模分配",
+   "explain": "Hoffmann等人用于检验计算最优训练预测的语言模型。相关研究通过不同模型与数据规模的实验，提出固定训练预算下应更平衡地扩大参数和训练词元数，而不只扩大模型。",
+   "source": {
+    "label": "Training Compute-Optimal Large Language Models 摘要",
+    "url": "https://arxiv.org/abs/2203.15556"
+   }
+  },
+  {
+   "id": "data-curriculum",
+   "term": "数据课程",
+   "aliases": [
+    "数据课程",
+    "data curriculum"
+   ],
+   "field": "大模型训练 · 数据调度",
+   "explain": "安排训练不同阶段使用哪些数据、以什么比例和长度呈现。它与整个训练过程的总体数据配比不同：最终比例相同，呈现顺序和阶段变化仍可能不同。",
+   "guide": "/read/llm-survey/2#u03"
+  },
+  {
+   "id": "kv-cache",
+   "term": "KV cache",
+   "aliases": [
+    "KV cache",
+    "键值缓存"
+   ],
+   "full": "Key-Value Cache",
+   "zh": "键值缓存",
+   "field": "大模型推理 · 缓存",
+   "explain": "保存已经处理过的位置的键和值，使生成新词元时可以直接查询前文，而不必重算全部历史。缓存通常随序列长度增长，头数、共享方式、数值精度和分配策略都会影响其开销。",
+   "guide": "/read/llm-survey/2#architecture"
+  },
+  {
+   "id": "sparse-attention",
+   "term": "稀疏注意力",
+   "aliases": [
+    "稀疏注意力"
+   ],
+   "full": "Sparse Attention",
+   "field": "模型架构 · 注意力",
+   "explain": "让每个查询只访问部分位置，而不是完整序列的所有位置。保留位置可以按固定窗口选择，也可以依据内容动态选择；计算减少以后，要检查远处关键信息是否仍能被读取。",
+   "guide": "/read/llm-survey/2#architecture"
+  },
+  {
+   "id": "linear-attention",
+   "term": "线性注意力",
+   "aliases": [
+    "线性注意力"
+   ],
+   "full": "Linear Attention",
+   "field": "模型架构 · 序列计算",
+   "explain": "一类避免显式计算全部位置对的序列机制，常用可更新的固定大小状态汇总历史。它把长序列的计算与存储负担降下来，同时需要解决有限状态如何保留丰富历史信息的问题。",
+   "guide": "/read/llm-survey/2#architecture"
+  },
+  {
+   "id": "mqa",
+   "term": "MQA",
+   "aliases": [
+    "MQA",
+    "多查询注意力"
+   ],
+   "full": "Multi-Query Attention",
+   "zh": "多查询注意力",
+   "field": "模型架构 · 注意力缓存",
+   "explain": "保留多个查询头，让它们共享一套键和值。它减少增量生成时的缓存大小和读写需求，相比普通多头注意力，键值表示的共享程度更高。",
+   "source": {
+    "label": "MQA原论文摘要",
+    "url": "https://arxiv.org/abs/1911.02150"
+   },
+   "guide": "/read/llm-survey/2#architecture"
+  },
+  {
+   "id": "gqa",
+   "term": "GQA",
+   "aliases": [
+    "GQA"
+   ],
+   "full": "Grouped-Query Attention",
+   "zh": "分组查询注意力",
+   "field": "模型架构 · 注意力缓存",
+   "explain": "将查询头分成若干组，同组共享键和值，使键值头数介于一套和每查询头一套之间。它在普通多头与MQA之间折中，减少缓存开销，同时尽量保持模型质量。",
+   "source": {
+    "label": "GQA原论文摘要",
+    "url": "https://arxiv.org/abs/2305.13245"
+   },
+   "guide": "/read/llm-survey/2#architecture"
+  },
+  {
+   "id": "mla",
+   "term": "MLA",
+   "aliases": [
+    "MLA",
+    "多头潜在注意力"
+   ],
+   "full": "Multi-head Latent Attention",
+   "zh": "多头潜在注意力",
+   "field": "模型架构 · 注意力压缩",
+   "explain": "DeepSeek-V2采用的注意力设计，用低维潜在表示压缩键值缓存，再通过相应投影参与计算。它和GQA共享键值头的方式不同，目标都是减轻生成时的缓存负担。",
+   "source": {
+    "label": "DeepSeek-V2原论文摘要",
+    "url": "https://arxiv.org/abs/2405.04434"
+   },
+   "guide": "/read/llm-survey/2#architecture"
+  },
+  {
+   "id": "deepseek-v2",
+   "term": "DeepSeek-V2",
+   "aliases": [
+    "DeepSeek-V2"
+   ],
+   "field": "大语言模型 · 稀疏架构",
+   "explain": "结合MLA与混合专家的语言模型，分别从键值缓存压缩和稀疏计算改善训练与推理成本。比较它的整体结果时，需要区分这些组件及训练配方的贡献。",
+   "source": {
+    "label": "DeepSeek-V2原论文摘要",
+    "url": "https://arxiv.org/abs/2405.04434"
+   }
+  },
+  {
+   "id": "rope",
+   "term": "RoPE",
+   "aliases": [
+    "RoPE"
+   ],
+   "full": "Rotary Position Embedding",
+   "zh": "旋转位置编码",
+   "field": "模型架构 · 位置信息",
+   "explain": "根据位置旋转查询和键，使它们的匹配可以表达相对距离关系。它提供的是序列位置，而不是新的事实知识；扩展到更长上下文还需要相应适配。",
+   "source": {
+    "label": "RoFormer原论文摘要",
+    "url": "https://arxiv.org/abs/2104.09864"
+   }
+  },
+  {
+   "id": "alibi",
+   "term": "ALiBi",
+   "aliases": [
+    "ALiBi"
+   ],
+   "full": "Attention with Linear Biases",
+   "zh": "带线性偏置的注意力",
+   "field": "模型架构 · 位置信息",
+   "explain": "在查询与键的注意力分数中加入随位置距离增大的惩罚，而不是直接给词向量加位置嵌入。它带有偏向近处的归纳偏置，用于研究超出训练长度的序列处理。",
+   "source": {
+    "label": "ALiBi原论文摘要",
+    "url": "https://arxiv.org/abs/2108.12409"
+   }
+  },
+  {
+   "id": "mixtral",
+   "term": "Mixtral",
+   "aliases": [
+    "Mixtral"
+   ],
+   "field": "大语言模型 · 混合专家",
+   "explain": "Mixtral 8×7B在每层使用八个前馈专家，由路由器为每个词元选择其中两个并组合输出。总专家数量和当前词元实际激活的数量不同，下一个词元还可以选择不同的专家。",
+   "source": {
+    "label": "Mixtral of Experts 摘要",
+    "url": "https://arxiv.org/abs/2401.04088"
+   }
+  },
+  {
+   "id": "zero-optimizer",
+   "term": "ZeRO",
+   "aliases": [
+    "ZeRO",
+    "ZeRO-1",
+    "ZeRO-2",
+    "ZeRO-3"
+   ],
+   "full": "Zero Redundancy Optimizer",
+   "field": "大模型训练 · 状态分片",
+   "explain": "减少多设备训练中重复保存的优化器状态、梯度和模型参数。三个常见阶段逐级划分这些状态，需要时通过设备间通信获得所需部分，从而节省单设备显存。",
+   "source": {
+    "label": "ZeRO原论文摘要",
+    "url": "https://arxiv.org/abs/1910.02054"
+   },
+   "guide": "/read/llm-survey/2#training"
+  },
+  {
+   "id": "flashattention",
+   "term": "FlashAttention",
+   "aliases": [
+    "FlashAttention"
+   ],
+   "field": "大模型计算 · 存储访问优化",
+   "explain": "通过分块和在线归一化组织精确注意力计算，减少GPU不同存储层次之间的读写。标准形式不通过删去注意力位置对近似结果，降低存储访问负担与降低成对算术运算量需要区分。",
+   "source": {
+    "label": "FlashAttention原论文摘要",
+    "url": "https://arxiv.org/abs/2205.14135"
+   },
+   "guide": "/read/llm-survey/2#training"
+  },
+  {
+   "id": "llama31",
+   "term": "LLaMA-3.1",
+   "aliases": [
+    "LLaMA-3.1"
+   ],
+   "field": "大语言模型 · 模型系列",
+   "explain": "综述用作训练规模示例的模型系列。导读摘录的是表2中的405B参数版本，其参数量、累计训练词元数和单次上下文长度分列记录，不是对整个系列的统一描述。",
+   "guide": "/read/llm-survey/2#training"
+  },
+  {
+   "id": "self-instruct",
+   "term": "Self-Instruct",
+   "aliases": [
+    "Self-Instruct"
+   ],
+   "field": "大模型训练 · 指令合成",
+   "explain": "用少量种子引导模型生成指令、输入和输出，过滤无效或相似记录后，再用于微调。它扩充的是可模仿的示范数据，质量筛选是流程的一部分。",
+   "source": {
+    "label": "Self-Instruct原论文摘要",
+    "url": "https://arxiv.org/abs/2212.10560"
+   },
+   "guide": "/read/llm-survey/2#u04"
+  },
+  {
+   "id": "lora",
+   "term": "LoRA",
+   "aliases": [
+    "LoRA"
+   ],
+   "full": "Low-Rank Adaptation",
+   "zh": "低秩适配",
+   "field": "大模型训练 · 参数高效微调",
+   "explain": "冻结预训练权重，训练注入的低秩矩阵来表达更新，降低可训练参数和相关状态的成本。它仍然涉及训练，与只把示范放进当前上下文的ICL不同。",
+   "source": {
+    "label": "LoRA原论文摘要",
+    "url": "https://arxiv.org/abs/2106.09685"
+   },
+   "guide": "/read/llm-survey/2#u04"
+  },
+  {
+   "id": "verifier",
+   "term": "验证器",
+   "aliases": [
+    "验证器"
+   ],
+   "full": "Verifier",
+   "field": "模型训练与推理 · 正确性检查",
+   "explain": "检查候选答案或中间步骤是否满足特定条件的程序或模型。例如程序测试可以提供可执行反馈，模型评判器则依据学习到的标准评分；两者都需要明确检查覆盖的范围。",
+   "guide": "/read/llm-survey/2#rewards"
+  },
+  {
+   "id": "rlvr",
+   "term": "RLVR",
+   "aliases": [
+    "RLVR",
+    "可验证奖励强化学习"
+   ],
+   "full": "Reinforcement Learning with Verifiable Rewards",
+   "zh": "可验证奖励强化学习",
+   "field": "后训练 · 奖励来源",
+   "explain": "用可自动检查的任务结果提供强化学习奖励，例如数学答案和程序测试。它减少对逐条人工偏好或推理标注的依赖，优化目标取决于验证规则能够覆盖什么。",
+   "source": {
+    "label": "DeepSeek-R1原始报告摘要",
+    "url": "https://arxiv.org/abs/2501.12948v1"
+   },
+   "guide": "/read/llm-survey/2#rewards"
+  },
+  {
+   "id": "grpo",
+   "term": "GRPO",
+   "aliases": [
+    "GRPO"
+   ],
+   "full": "Group Relative Policy Optimization",
+   "zh": "组相对策略优化",
+   "field": "强化学习 · 策略更新",
+   "explain": "针对同一提示生成一组回答，根据组内奖励的相对关系构造优势，省去单独的价值模型。它是DeepSeekMath提出的PPO变体，组采样和奖励归一化会影响学习信号。",
+   "source": {
+    "label": "DeepSeekMath原论文摘要",
+    "url": "https://arxiv.org/abs/2402.03300"
+   },
+   "guide": "/read/llm-survey/2#optimization"
+  },
+  {
+   "id": "deepseekmath",
+   "term": "DeepSeekMath",
+   "aliases": [
+    "DeepSeekMath"
+   ],
+   "field": "大语言模型 · 数学推理",
+   "explain": "研究数学语料筛选、继续预训练和推理后训练的模型工作。该论文提出GRPO，因此既可用于理解领域数据的作用，也可用于追踪组相对优化的来源。",
+   "source": {
+    "label": "DeepSeekMath原论文摘要",
+    "url": "https://arxiv.org/abs/2402.03300"
+   }
+  },
+  {
+   "id": "rft",
+   "term": "RFT",
+   "aliases": [
+    "RFT",
+    "拒绝采样微调",
+    "在线 RFT"
+   ],
+   "full": "Rejection Fine-Tuning",
+   "zh": "拒绝采样微调",
+   "field": "后训练 · 筛选式学习",
+   "explain": "让模型产生候选，筛出正确或质量较高的回答，再对保留样本做监督微调。数据可以预先固定，也可以随训练继续生成和筛选；这与直接用相对奖励作策略梯度更新不同。",
+   "source": {
+    "label": "RFT原论文摘要",
+    "url": "https://arxiv.org/abs/2308.01825"
+   },
+   "guide": "/read/llm-survey/2#optimization"
+  },
+  {
+   "id": "dpo",
+   "term": "DPO",
+   "aliases": [
+    "DPO"
+   ],
+   "full": "Direct Preference Optimization",
+   "zh": "直接偏好优化",
+   "field": "后训练 · 离线偏好学习",
+   "explain": "根据同一请求的偏好与非偏好回答对，直接用分类式损失优化相对概率。标准形式不需要单独训练显式奖励模型，也不需要在训练中运行PPO式的在线生成循环。",
+   "source": {
+    "label": "DPO原论文摘要",
+    "url": "https://arxiv.org/abs/2305.18290"
+   },
+   "guide": "/read/llm-survey/2#optimization"
+  },
+  {
+   "id": "opd",
+   "term": "OPD",
+   "aliases": [
+    "OPD",
+    "在线策略蒸馏"
+   ],
+   "full": "On-Policy Distillation",
+   "zh": "在线策略蒸馏",
+   "field": "后训练 · 教师反馈",
+   "explain": "让学生模型生成自己的序列，再获取教师在这些前文上的分布反馈进行学习。它减少只在教师序列上训练、却在学生序列上推理的分布差异，与只筛出完整好回答的在线RFT不同。",
+   "source": {
+    "label": "On-Policy Distillation原论文摘要",
+    "url": "https://arxiv.org/abs/2306.13649"
+   },
+   "guide": "/read/llm-survey/2#optimization"
+  },
+  {
+   "id": "deepseek-r1",
+   "term": "DeepSeek-R1",
+   "aliases": [
+    "DeepSeek-R1",
+    "R1-Zero"
+   ],
+   "field": "大语言模型 · 推理训练",
+   "explain": "DeepSeek-R1工作研究通过强化学习培养推理行为，并以冷启动和多阶段训练改善综合表现。R1-Zero是其中不先做SFT的探索路线，原始报告同时指出它存在可读性差和语言混合问题。",
+   "source": {
+    "label": "DeepSeek-R1原始报告摘要",
+    "url": "https://arxiv.org/abs/2501.12948v1"
+   },
+   "guide": "/read/llm-survey/2#post-practice"
+  },
+  {
+   "id": "self-consistency",
+   "term": "Self-Consistency",
+   "aliases": [
+    "Self-Consistency",
+    "自一致性"
+   ],
+   "zh": "自一致性",
+   "field": "模型推理 · 多路径汇总",
+   "explain": "采样多条不同推理路径，再汇总最终答案的一致性来选择结果。它把单条贪心推理扩展成多次尝试，增加生成成本，也依赖候选路径具有足够多样性。",
+   "source": {
+    "label": "Self-Consistency原论文摘要",
+    "url": "https://arxiv.org/abs/2203.11171"
+   },
+   "guide": "/read/llm-survey/2#inference"
+  },
+  {
+   "id": "best-of-n",
+   "term": "Best-of-N",
+   "aliases": [
+    "Best-of-N"
+   ],
+   "field": "模型推理 · 候选选择",
+   "explain": "先生成N份候选，再按验证器、奖励模型或其他准则选出一份。它改变的是求解预算和选择过程，报告效果时需要同时交代候选数与评判成本。",
+   "guide": "/read/llm-survey/2#inference"
+  },
+  {
+   "id": "pagedattention",
+   "term": "PagedAttention",
+   "aliases": [
+    "PagedAttention"
+   ],
+   "field": "模型服务 · 缓存管理",
+   "explain": "借鉴操作系统分页，把逻辑键值缓存映射为可分配的物理块，减少碎片和重复保存。它主要改善多请求服务时的内存利用，与改变模型键值头数的架构方法不同。",
+   "source": {
+    "label": "PagedAttention原论文摘要",
+    "url": "https://arxiv.org/abs/2309.06180"
+   },
+   "guide": "/read/llm-survey/2#deployment"
+  },
+  {
+   "id": "speculative-decoding",
+   "term": "推测解码",
+   "aliases": [
+    "推测解码"
+   ],
+   "full": "Speculative Decoding",
+   "field": "模型推理 · 生成加速",
+   "explain": "用较便宜的草稿模型提出多个词元，再由目标模型并行验证，并按接受与修正规则产生输出。原始精确采样算法保持目标分布，收益依赖草稿成本、接受情况和运行系统。",
+   "source": {
+    "label": "推测解码原论文摘要",
+    "url": "https://arxiv.org/abs/2211.17192"
+   },
+   "guide": "/read/llm-survey/2#deployment"
+  },
+  {
+   "id": "prefill",
+   "term": "预填充",
+   "aliases": [
+    "预填充",
+    "prefill"
+   ],
+   "full": "Prefill",
+   "field": "模型推理 · 输入处理",
+   "explain": "生成前先处理整段提示，并建立供后续生成使用的状态和键值缓存。它和随后逐词元解码的负载不同，长输入的首词等待与长输出的生成速度需要分别测量。",
+   "guide": "/read/llm-survey/2#deployment"
+  },
+  {
+   "id": "decode",
+   "term": "逐词元解码",
+   "aliases": [
+    "逐词元解码"
+   ],
+   "full": "Decode",
+   "field": "模型推理 · 自回归生成",
+   "explain": "模型利用已有前文和缓存，一步一步产生后续词元的过程。它有顺序依赖，实际速度还受到权重与缓存访问、批处理和硬件条件影响。",
+   "guide": "/read/llm-survey/2#deployment"
+  },
+  {
+   "id": "quantization",
+   "term": "模型量化",
+   "aliases": [
+    "模型量化",
+    "quantization"
+   ],
+   "full": "Quantization",
+   "field": "模型部署 · 数值压缩",
+   "explain": "用较少位数的数值等级近似权重或激活，降低存储和部分计算负担。它会引入近似误差，需要检查敏感权重、异常值和任务性能，而不是只比较模型文件大小。",
+   "guide": "/read/llm-survey/2#deployment"
+  },
+  {
+   "id": "chatbot-arena",
+   "term": "Chatbot Arena",
+   "aliases": [
+    "Chatbot Arena"
+   ],
+   "field": "模型评测 · 人类偏好",
+   "explain": "通过众包的成对回答比较，收集用户偏好并估计模型的相对表现。它适合开放回答的选择评价，与固定正确答案测试不同，解释排名需要考虑问题和投票分布。",
+   "source": {
+    "label": "Chatbot Arena原论文摘要",
+    "url": "https://arxiv.org/abs/2403.04132"
+   },
+   "guide": "/read/llm-survey/2#u08"
+  },
+  {
+   "id": "agentverse",
+   "term": "AgentVerse",
+   "aliases": [
+    "AgentVerse"
+   ],
+   "zh": "多智能体协作框架",
+   "field": "多智能体系统 · 协作框架",
+   "explain": "把一次多智能体协作分成四个阶段：先按任务招募合适的专家角色，再由这些角色共同讨论决策，然后执行动作，最后由评估环节检查结果并决定是否重来。它让成员构成随任务变化，而不是固定一组角色一直用到底。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2308.10848"
+   }
+  },
+  {
+   "id": "agentcf",
+   "term": "AgentCF",
+   "aliases": [
+    "AgentCF"
+   ],
+   "zh": "推荐系统协作学习框架",
+   "field": "多智能体系统 · 推荐",
+   "explain": "把用户和物品都当作 Agent，双方各自带记忆模块，保存模拟出来的偏好与品味。每一步由用户 Agent 与物品 Agent 自主互动，再看这种互动产生的结果是否与真实行为记录一致，用来自动生成可交互的推荐模拟。"
+  },
+  {
+   "id": "llm-blender",
+   "term": "LLM-Blender",
+   "aliases": [
+    "LLM-Blender"
+   ],
+   "zh": "模型集成框架",
+   "field": "多智能体系统 · 集成",
+   "explain": "让多个模型对同一输入各答一次，再用成对比较的排序器判断哪份回答更好，最后把排名靠前的候选融合成一份输出。排序器同时编码输入与两份候选，因此能分辨差别很小的回答；代价是需要相当数量的成对推断。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2306.02561"
+   }
+  },
+  {
+   "id": "spp",
+   "term": "SPP",
+   "aliases": [
+    "SPP",
+    "Solo Performance Prompting",
+    "单人分饰多角提示"
+   ],
+   "full": "Solo Performance Prompting",
+   "zh": "单模型多角色自我协作",
+   "field": "多智能体系统 · 编排",
+   "explain": "让同一个模型按输入动态识别出需要的若干人格，再以这些人格反复自我对话，借用不同“头脑”的知识来解题。原论文报告这种协同只在能力较强的模型上出现，在较弱的模型上没有出现。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.05300"
+   }
+  },
+  {
+   "id": "mapcoder",
+   "term": "MapCoder",
+   "aliases": [
+    "MapCoder"
+   ],
+   "zh": "多智能体代码生成",
+   "field": "多智能体系统 · 代码生成",
+   "explain": "把程序综合的循环拆给四个 Agent：分别负责回忆相关例子、做规划、写代码、调试，按固定顺序交接。它用多智能体提示复现人类开发者从例题到调试的完整流程，而不是让一个模型一次写完整段程序。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2405.11403"
+   }
+  },
+  {
+   "id": "macrec",
+   "term": "MACRec",
+   "aliases": [
+    "MACRec"
+   ],
+   "zh": "推荐多智能体框架",
+   "field": "多智能体系统 · 推荐",
+   "explain": "让经理、用户与物品分析者、反思者、检索者、任务解释者等角色分工完成推荐任务，不同任务走不同的工作流。与把 Agent 用于模拟用户不同，它直接用多个 Agent 来完成推荐本身。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2402.15235"
+   }
+  },
+  {
+   "id": "eot",
+   "term": "交换之思",
+   "aliases": [
+    "Exchange-of-Thought",
+    "交换之思",
+    "EoT"
+   ],
+   "full": "Exchange-of-Thought",
+   "zh": "跨模型交换推理",
+   "field": "多智能体系统 · 推理",
+   "explain": "让多个模型在解题时互相交换推理链，定义了记忆、报告、中继、辩论四种通信范式，分别对应总线、星形、环形、树形拓扑。每种范式的消息路径与通信量不同，并配有置信度评估来抑制错误推理链的传播。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2312.01823"
+   }
+  },
+  {
+   "id": "llmarena",
+   "term": "LLMArena",
+   "aliases": [
+    "LLMArena"
+   ],
+   "zh": "多智能体能力评测环境",
+   "field": "多智能体系统 · 评测",
+   "explain": "用七个动态游戏环境评测语言模型在多智能体场景中的能力，按空间推理、策略规划、沟通、对手建模、团队协作等分项计分，避免只用静态数据集带来的泄漏。原论文报告，模型在对手建模与团队协作上仍有明显差距。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2402.16499"
+   }
+  },
+  {
+   "id": "competeai",
+   "term": "CompeteAI",
+   "aliases": [
+    "CompeteAI"
+   ],
+   "zh": "竞争动态模拟框架",
+   "field": "多智能体系统 · 社会模拟",
+   "explain": "搭一个虚拟小镇，让餐厅 Agent 争夺顾客 Agent，每家能看到对手前一天的表现，用模拟来研究竞争怎样改变策略。原论文在微观与宏观两个层面观察到与现有市场与社会学理论相符的现象。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.17512"
+   }
+  },
+  {
+   "id": "comm",
+   "term": "CoMM",
+   "aliases": [
+    "CoMM"
+   ],
+   "full": "Collaborative Multi-Agent, Multi-Reasoning-Path prompting",
+   "zh": "多智能体多推理路径提示",
+   "field": "多智能体系统 · 提示方法",
+   "explain": "让若干角色组成解题小组，每个角色用不同的推理路径作答，再按固定顺序把结果汇总。它把顺序串联与角色分工结合起来，用多个视角弥补单条推理链的偏差。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2404.17729"
+   }
+  },
+  {
+   "id": "federated-learning",
+   "term": "联邦学习",
+   "aliases": [
+    "联邦学习",
+    "federated learning"
+   ],
+   "full": "Federated Learning",
+   "zh": "联邦学习",
+   "field": "机器学习 · 分布式训练",
+   "explain": "多个客户端在本地用各自数据训练，只把模型更新（而不是原始数据）送到服务器聚合，再由服务器把汇总后的模型发回。它把数据留在本地，代价是通信轮次多、客户端之间的数据分布可能相差很大。"
+  },
+  {
+   "id": "theory-of-mind",
+   "term": "心智理论",
+   "aliases": [
+    "心智理论",
+    "Theory of Mind"
+   ],
+   "full": "Theory of Mind",
+   "zh": "心智理论",
+   "field": "认知科学 · 社会推理",
+   "explain": "推断他人拥有哪些信念、意图和情绪，并据此预测其行为的能力。放进多智能体系统里，它指的是一个 Agent 估计同伴知道什么、想做什么，再决定自己说什么或做什么。"
+  },
+  {
+   "id": "sop",
+   "term": "标准作业程序",
+   "aliases": [
+    "SOP",
+    "标准作业程序"
+   ],
+   "full": "Standard Operating Procedure",
+   "zh": "标准作业程序",
+   "field": "工程管理 · 流程规范",
+   "explain": "把一类任务的做法写成固定步骤与交接标准，让不同人按同一套流程协作。多智能体系统借用这个概念，把步骤和交接要求写进提示，用来减少角色之间的误解与遗漏。"
+  },
+  {
+   "id": "trueskill",
+   "term": "TrueSkill",
+   "aliases": [
+    "TrueSkill",
+    "Trueskill"
+   ],
+   "zh": "贝叶斯技能评分",
+   "field": "评测 · 评分方法",
+   "explain": "一种由多场对局结果估计参与者技能水平的评分方法，把技能看作分布而不是一个分数，因此对局数少时也能给出带不确定性的估计。常用于游戏或对弈环境的模型评测。"
+  },
+  {
+   "id": "bart",
+   "term": "BART",
+   "aliases": [
+    "BART",
+    "BART-large"
+   ],
+   "full": "Bidirectional and Auto-Regressive Transformers",
+   "zh": "双向编码与自回归解码的预训练模型",
+   "field": "语言模型 · 预训练架构",
+   "explain": "BART 是编码器—解码器模型：预训练时把文本打乱或遮去一部分，再学习恢复原文。编码器读取输入，解码器逐词元生成输出，适合问答、摘要等任务。原始 RAG 用 BART-large 读取输入与检索段落，再预测答案。",
+   "builds": "Mike Lewis 等提出；原始 RAG 在其基础上加入外部文档检索与概率边缘化。",
+   "guide": "/read/rag/3#components",
+   "source": {
+    "label": "BART 原论文摘要（已核对标题）",
+    "url": "https://arxiv.org/abs/1910.13461v1"
+   }
+  },
+  {
+   "id": "mips",
+   "term": "MIPS",
+   "aliases": [
+    "MIPS",
+    "最大内积搜索"
+   ],
+   "full": "Maximum Inner Product Search",
+   "zh": "最大内积搜索",
+   "field": "信息检索 · 向量搜索",
+   "explain": "给定一个查询向量，在大量已有向量中找出内积最大的若干项。文档向量可预先存入索引，查询时使用近似搜索减少计算。它按向量打分寻找候选，不检验文档中的事实是否正确。",
+   "guide": "/read/rag/3#components"
+  },
+  {
+   "id": "faiss",
+   "term": "FAISS",
+   "aliases": [
+    "FAISS"
+   ],
+   "full": "Facebook AI Similarity Search",
+   "zh": "向量相似性搜索库",
+   "field": "信息检索 · 索引工具",
+   "explain": "用于大量稠密向量的相似性搜索与聚类的工具库，提供多种索引与压缩方式。原始 RAG 用它保存文档向量并执行检索；它承担搜索计算，不负责生成答案。"
+  },
+  {
+   "id": "hnsw",
+   "term": "HNSW",
+   "aliases": [
+    "HNSW"
+   ],
+   "full": "Hierarchical Navigable Small World",
+   "zh": "分层可导航小世界图",
+   "field": "信息检索 · 近似向量搜索",
+   "explain": "把向量组织成多层图结构，查询时先在较稀疏的上层快速定位，再在较低层细找近邻。它通过近似搜索换取速度，适合无法逐项扫描的大向量集合。原始 RAG 用这一类结构加速文档搜索。"
+  },
+  {
+   "id": "bi-encoder",
+   "term": "双编码器",
+   "aliases": [
+    "双编码器"
+   ],
+   "full": "Bi-encoder",
+   "field": "信息检索 · 模型架构",
+   "explain": "分别把查询与文档编码为向量，再用内积等简单运算计算匹配分数。文档可以提前编码，适合大规模搜索；它与把查询和文档一起输入同一个网络来打分的方式不同。",
+   "guide": "/read/rag/3#components"
+  },
+  {
+   "id": "latent-variable",
+   "term": "潜变量",
+   "aliases": [
+    "潜变量"
+   ],
+   "full": "Latent variable",
+   "field": "概率模型 · 建模概念",
+   "explain": "参与模型计算、但没有在每个样本中直接观测或标注的变量。原始 RAG 中，训练给出输入与目标输出，却不指定正确文档，因此文档身份被当作潜变量。模型把不同文档可能性汇总后预测输出。",
+   "guide": "/read/rag/3#task"
+  },
+  {
+   "id": "marginalization",
+   "term": "边缘化",
+   "aliases": [
+    "边缘化"
+   ],
+   "full": "Marginalization",
+   "field": "概率模型 · 概率运算",
+   "explain": "对不需要最终输出的变量求和或积分，得到关心对象的概率。RAG 对候选文档的可能性求和，把文档权重与条件生成概率结合，最终得到答案概率。它保留多个可能性，而不是先硬选唯一一篇文档。",
+   "guide": "/read/rag/3#u03"
+  },
+  {
+   "id": "rag-sequence",
+   "term": "RAG-Sequence",
+   "aliases": [
+    "RAG-Sequence"
+   ],
+   "zh": "序列级检索增强生成",
+   "field": "检索增强 · 概率结构",
+   "explain": "原始 RAG 的一种形式：对每篇候选文档先计算整条输出序列的概率，再乘检索权重并对文档求和。每条潜在生成路线使用同一个文档贯穿整个输出，多条路线的贡献在序列级汇总。",
+   "guide": "/read/rag/3#u03",
+   "source": {
+    "label": "RAG 原论文（NeurIPS 2020）",
+    "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf"
+   }
+  },
+  {
+   "id": "rag-token",
+   "term": "RAG-Token",
+   "aliases": [
+    "RAG-Token"
+   ],
+   "zh": "词元级检索增强生成",
+   "field": "检索增强 · 概率结构",
+   "explain": "原始 RAG 的另一种形式：在每个输出位置先按检索权重混合各文档的下一词元概率，再沿输出位置相乘。不同位置可以由不同文档贡献更多概率，但候选仍是开始时按原输入取回的集合，不是逐词重新搜索。",
+   "guide": "/read/rag/3#u03",
+   "source": {
+    "label": "RAG 原论文（NeurIPS 2020）",
+    "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf"
+   }
+  },
+  {
+   "id": "document-posterior",
+   "term": "文档后验",
+   "aliases": [
+    "文档后验",
+    "后验责任"
+   ],
+   "full": "Document posterior",
+   "field": "检索增强 · 概率解释",
+   "explain": "已知输出后，综合检索权重与该文档下的生成概率，重新衡量各文档解释这次输出的相对贡献。它能随词元变化，即使检索先验保持不变。高贡献说明模型的概率解释偏向该文档，不代表对应事实已经得到核验。",
+   "guide": "/read/rag/3#posterior"
+  },
+  {
+   "id": "parametric-memory",
+   "term": "参数记忆",
+   "aliases": [
+    "参数记忆"
+   ],
+   "full": "Parametric memory",
+   "field": "语言模型 · 知识存储",
+   "explain": "通过训练保存在模型权重中的能力与知识。模型可以利用它续写或回答，但通常难以把某个事实直接对应到一条可编辑记录。原始 RAG 用这个词指 BART 参数所承载的知识。"
+  },
+  {
+   "id": "non-parametric-memory",
+   "term": "非参数记忆",
+   "aliases": [
+    "非参数记忆"
+   ],
+   "full": "Non-parametric memory",
+   "field": "检索增强 · 知识存储",
+   "explain": "相对于生成模型权重，单独保存并可按需取用的外部记录。原始 RAG 中是 Wikipedia 文档及其向量索引。名称强调知识内容可直接替换，并非说访问它的检索器没有参数。"
+  },
+  {
+   "id": "thorough-decoding",
+   "term": "Thorough Decoding",
+   "aliases": [
+    "Thorough Decoding"
+   ],
+   "zh": "补齐候选评分的解码",
+   "field": "检索增强 · 解码",
+   "explain": "RAG-Sequence 先在各文档条件下生成候选输出，再对每个候选补算未覆盖的文档条件概率，最后边缘化评分。它比快速近似多做前向计算，补齐的是已有候选的评分，而不是穷举全部可能句子。",
+   "guide": "/read/rag/3#decoding"
+  },
+  {
+   "id": "fast-decoding",
+   "term": "Fast Decoding",
+   "aliases": [
+    "Fast Decoding"
+   ],
+   "zh": "快速近似解码",
+   "field": "检索增强 · 解码",
+   "explain": "RAG-Sequence 的低成本近似：若某个候选没有在某篇文档条件下的搜索中出现，就把这一项概率近似为零，省去额外补算。它保留序列级文档汇总，但评分比 Thorough Decoding 更粗略。",
+   "guide": "/read/rag/3#decoding"
+  },
+  {
+   "id": "ms-marco",
+   "term": "MS-MARCO",
+   "aliases": [
+    "MS-MARCO"
+   ],
+   "full": "Microsoft MAchine Reading COmprehension",
+   "field": "评测 · 问答数据",
+   "explain": "包含真实查询、检索段落和答案的阅读理解与检索数据资源。原始 RAG 使用其中的自然语言生成任务，但不用随题提供的标准段落，而是自行检索 Wikipedia，因此与直接读取标准上下文的设置不同。",
+   "guide": "/read/rag/3#experiments"
+  },
+  {
+   "id": "curatedtrec",
+   "term": "CuratedTrec",
+   "aliases": [
+    "CuratedTrec"
+   ],
+   "field": "评测 · 开放域问答",
+   "explain": "由 TREC 问答材料整理得到的小规模事实问答数据集，常用于开放域问答比较。原始 RAG 从 NQ 模型初始化后适配它，并处理其正则表达式形式的答案标注，转换为生成模型可学习的文本目标。"
+  },
+  {
+   "id": "jeopardy-qgen",
+   "term": "Jeopardy",
+   "aliases": [
+    "Jeopardy"
+   ],
+   "field": "评测 · 知识题干生成",
+   "explain": "知识竞赛的一种形式：给出事实线索，让参与者猜对应实体。RAG 论文把任务反过来，输入实体名，生成具体的事实题干；题干通常是陈述句，论文仍称它为问题生成。",
+   "guide": "/read/rag/3#experiments"
+  },
+  {
+   "id": "q-bleu",
+   "term": "Q-BLEU-1",
+   "aliases": [
+    "Q-BLEU-1"
+   ],
+   "field": "评测 · 问题生成指标",
+   "explain": "用于问题生成的 BLEU 变体，除词面重合外，更重视实体等与题目内容密切相关的成分。RAG 论文使用它评价 Jeopardy 题干，并另做事实性和具体性的人工比较。分数本身不构成事实认证。"
+  },
+  {
+   "id": "nlg",
+   "term": "NLG",
+   "aliases": [
+    "NLG"
+   ],
+   "full": "Natural Language Generation",
+   "zh": "自然语言生成",
+   "field": "自然语言处理 · 任务类别",
+   "explain": "让模型产生自然语言文本的任务，包括完整句子问答、摘要和题干生成等。与只输出一个类别或从原文选片段相比，这类任务允许更灵活的措辞，也需要同时评价内容与表达。"
+  },
+  {
+   "id": "searchqa",
+   "term": "SearchQA",
+   "aliases": [
+    "SearchQA"
+   ],
+   "field": "评测 · 问答数据",
+   "explain": "由知识竞赛问答及搜索上下文构成的数据集。原始 RAG 沿用它的数据划分来训练与测试 Jeopardy 题干生成，即从答案实体生成相应线索。"
+  },
+  {
+   "id": "retrieval-collapse",
+   "term": "检索塌缩",
+   "aliases": [
+    "检索塌缩"
+   ],
+   "full": "Retrieval collapse",
+   "field": "检索增强 · 训练失败",
+   "explain": "检索器逐渐学成无论输入如何都返回相同或相似材料，生成器随后可能忽略这些材料。RAG 补充材料在初步故事生成实验中报告这一现象，并提出事实需求较弱或长目标带来不充分检索梯度的可能解释。",
+   "guide": "/read/rag/3#u06"
+  },
+  {
+   "id": "expected-calibration-error",
+   "term": "ECE",
+   "aliases": [
+    "ECE",
+    "期望校准误差"
+   ],
+   "full": "Expected Calibration Error",
+   "zh": "期望校准误差",
+   "field": "模型评测 · 校准",
+   "explain": "把模型预测按置信度分组，比较每组的平均置信度与实际正确率，再按组大小加权汇总差距。结果受分组方式和样本影响，数值越低表示所用分组下两者越接近。",
+   "guide": "/read/helm/3#calibration"
+  },
+  {
+   "id": "selective-classification",
+   "term": "选择性分类",
+   "aliases": [
+    "选择性分类"
+   ],
+   "full": "Selective Classification",
+   "zh": "选择性分类",
+   "field": "模型评测 · 不确定性",
+   "explain": "模型只对部分样本作预测，其余样本交由其他流程处理。可以按预测置信度选择样本，并同时报告保留比例和保留样本上的准确率。",
+   "guide": "/read/helm/3#calibration"
   }
  ]
 }

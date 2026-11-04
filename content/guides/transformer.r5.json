@@ -1,0 +1,399 @@
+{
+  "schemaVersion": 2,
+  "id": "transformer",
+  "paperId": "arxiv:1706.03762",
+  "revision": 5,
+  "title": "Transformer：只用注意力完成序列转换",
+  "paperTitle": "Attention Is All You Need",
+  "language": "zh-CN",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "以原论文图 1 为主线读懂 Transformer 架构，重点弄清缩放点积注意力和多头注意力怎样计算、为什么有效，再核对复杂度论证、训练配方与实验证据。",
+  "source": {
+    "id": "arxiv:1706.03762",
+    "version": "NIPS 2017 conference paper",
+    "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf"
+  },
+  "bodyFile": "transformer.r5.md",
+  "bodySha256": "790abcbfc414ca2a961cc5950ee53acb96fcadfcd3b4c53d9cf05c7d7b998fcd",
+  "units": [
+    {
+      "id": "intro",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "2017 年的问题：循环网络为什么慢"
+    },
+    {
+      "id": "u01",
+      "heading": "预测对象：编码器、解码器与自回归"
+    },
+    {
+      "id": "architecture",
+      "heading": "先看全貌：图 1 怎样读"
+    },
+    {
+      "id": "u02",
+      "heading": "缩放点积注意力：一次查询怎样取回信息"
+    },
+    {
+      "id": "u03",
+      "heading": "多头注意力（上）：为什么一组权重不够"
+    },
+    {
+      "id": "two-heads",
+      "heading": "多头注意力（下）：沿图 2 右侧算一遍"
+    },
+    {
+      "id": "u04",
+      "heading": "三种注意力通路、遮罩与位置编码"
+    },
+    {
+      "id": "feed-forward",
+      "heading": "前馈层与残差：接住注意力的输出"
+    },
+    {
+      "id": "u05",
+      "heading": "为什么用自注意力：复杂度、并行与路径长度"
+    },
+    {
+      "id": "training",
+      "heading": "训练配方：数据、硬件与正则化"
+    },
+    {
+      "id": "u06",
+      "heading": "实验结果与消融：证据说明了什么"
+    },
+    {
+      "id": "u07",
+      "heading": "这篇论文之后：从翻译架构到语言模型"
+    },
+    {
+      "id": "u08",
+      "heading": "回到原文：哪些地方值得亲自读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf",
+      "labels": [
+        "原论文摘要与 §1，PDF 第1–2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c02",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=2",
+      "labels": [
+        "§1，PDF 第1–2页",
+        "§2，PDF 第2页",
+        "§3，PDF 第2–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c03",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3",
+      "labels": [
+        "§3.1 与图 1，PDF 第3页",
+        "§3.2，PDF 第3页",
+        "§3.1，PDF 第3页",
+        "图 1 与 §3.2.3，PDF 第3–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c04",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=4",
+      "labels": [
+        "§3.2.1、图 2 与式 1，PDF 第4页",
+        "§3.2.1 与脚注 4，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c05",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=5",
+      "labels": [
+        "§3.2.2，PDF 第4–5页",
+        "§3.2.3，PDF 第5页",
+        "§3.3，PDF 第5页",
+        "§3.4，PDF 第5页",
+        "图 2 与 §3.2.2，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c06",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=6",
+      "labels": [
+        "§3.5，PDF 第5–6页",
+        "§4、表 1，PDF 第6–7页",
+        "§4 与表 1，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c07",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=7",
+      "labels": [
+        "§5，PDF 第7页",
+        "§5.4，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c08",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=8",
+      "labels": [
+        "§6.1、表 2，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    },
+    {
+      "id": "c09",
+      "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=9",
+      "labels": [
+        "§6.2、表 3，PDF 第8–9页",
+        "§7，PDF 第9页",
+        "表 3 与 §6.2，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NIPS 2017 conference paper"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "gpt3",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/transformer/figure-1-architecture.webp",
+      "sha256": "24777207a00520b2d6a3386f80fbc292cff96b733559a62cdfda3dc59a9fe9f7",
+      "mime": "image/webp",
+      "alt": "Transformer 整体架构图：左侧为编码器，右侧为解码器，各由 N 个相同层堆叠而成",
+      "origin": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3",
+      "rights": "Vaswani 等，NIPS 2017，图 1。arXiv 版首页声明：在注明出处的前提下，Google 允许在新闻或学术作品中复制本文图表。"
+    },
+    {
+      "path": "assets/transformer/figure-2-attention.webp",
+      "sha256": "e0bcaad238a06eb6d25f6cd13463958a8dba88a46535b268d1fedf75a9f49657",
+      "mime": "image/webp",
+      "alt": "左图为缩放点积注意力的计算步骤，右图为多头注意力的并行结构",
+      "origin": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=4",
+      "rights": "Vaswani 等，NIPS 2017，图 2。arXiv 版首页声明：在注明出处的前提下，Google 允许在新闻或学术作品中复制本文图表。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1–2: motivation, recurrent and convolutional baselines",
+      "§3.1–3.5: architecture, attention, feed-forward layers, embeddings and positions",
+      "§4: complexity, parallelism and path length",
+      "§5: data, hardware, optimizer and regularization",
+      "§6–7: translation results, model variations and conclusion"
+    ],
+    "figuresViewed": [
+      "Figure 1 — main PDF p3 (reproduced)",
+      "Figure 2 — main PDF p4 (reproduced)",
+      "Table 1 — main PDF p6",
+      "Table 2 — main PDF p8",
+      "Table 3 — main PDF p9"
+    ],
+    "limitations": [
+      "覆盖架构主线、训练条件、主要翻译成绩与开发集消融；表 2、表 3 只摘录部分行，没有逐项讲解全部超参数或引用工作。",
+      "会议 PDF 不含 arXiv 版附录中的注意力可视化；相关可解释性说法只作为作者观察转述。",
+      "英中翻译句子与双头手算都是导读自编的教学例子，参数为人为指定，不代表论文训练出的权重或实际译文。",
+      "“这篇论文之后”中的后续模型属于编辑背景，不是本论文结论；没有复现实验。"
+    ],
+    "reviewBasis": "Revision 5 rewrites the prose of revision 4 for readability: background and prediction task come first, Figure 1 is the main thread, and multi-head attention gets two sections (motivation and step-by-step computation). All numbers, shapes and ablation rows were re-checked against the NIPS 2017 conference PDF (pp1–9); the two-head arithmetic was recomputed. Figures 1–2 are the attributed originals already reviewed in earlier revisions. Authoring review by AI; reader acceptance pending."
+  },
+  "orientation": {
+    "shortTitle": "Transformer：理解注意力与序列建模",
+    "topics": [
+      {
+        "id": "self-attention",
+        "label": "自注意力",
+        "aliases": [
+          "self-attention",
+          "attention",
+          "注意力机制",
+          "多头注意力"
+        ]
+      },
+      {
+        "id": "transformer-architecture",
+        "label": "Transformer 架构",
+        "aliases": [
+          "Transformer",
+          "编码器解码器",
+          "因果遮罩",
+          "位置编码"
+        ]
+      },
+      {
+        "id": "sequence-transduction",
+        "label": "序列建模",
+        "aliases": [
+          "sequence transduction",
+          "机器翻译",
+          "自回归生成"
+        ]
+      }
+    ],
+    "summary": "从循环网络的顺序瓶颈出发，以原论文图 1 为主线讲清编码器—解码器结构，用三节细讲注意力与多头注意力，再看遮罩、位置编码、复杂度论证、训练配方和消融实验。",
+    "value": "把后续论文里的上下文、注意力和自回归还原为具体计算，能看懂一张 Transformer 结构图，分清每个注意力模块的 Q、K、V 从哪里来。",
+    "prerequisites": [
+      "可以先从翻译例和图中箭头读起，词元、查询、键和值在第一次使用时解释。",
+      "手算一节用到向量内积、加权平均和矩阵乘法，读者可在理解信息流后再核对形状。"
+    ],
+    "boundaries": [
+      "固定 NIPS 2017 会议 PDF；研究对象是机器翻译的序列转换架构，不是对话助手或 Agent。",
+      "完整讲解方法主线、训练配置、主要结果与消融，图 1、图 2 使用原论文图。",
+      "不覆盖后续 Transformer 变体、长上下文方案或附录可视化；没有实验复现。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Ashish Vaswani",
+        "Noam Shazeer",
+        "Niki Parmar",
+        "Jakob Uszkoreit",
+        "Llion Jones",
+        "Aidan N. Gomez",
+        "Łukasz Kaiser",
+        "Illia Polosukhin"
+      ],
+      "year": 2017,
+      "venue": "NIPS 2017 · Advances in Neural Information Processing Systems 30",
+      "publicationKind": "conference",
+      "url": "https://papers.nips.cc/paper_files/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html",
+      "preprintYear": 2017
+    },
+    "readingTargets": [
+      {
+        "unitId": "background",
+        "purpose": "说清循环网络为什么难以并行、卷积为什么难以连接远处的词，从而理解作者为什么要只用注意力。",
+        "concepts": [
+          "RNN",
+          "LSTM",
+          "顺序计算",
+          "长距离依赖",
+          "ConvS2S"
+        ],
+        "limit": "这是作者在 2017 年的问题设定，不代表循环网络在所有任务上都已被取代。"
+      },
+      {
+        "unitId": "u01",
+        "purpose": "区分训练时用参考译文作前文、生成时用自己写出的前文，理解训练并行与逐步生成并不矛盾。",
+        "concepts": [
+          "自回归",
+          "teacher forcing",
+          "训练并行",
+          "右移输入",
+          "编码器—解码器"
+        ],
+        "limit": "以原始编码器—解码器翻译模型解释，后续语言模型的结构可能不同。"
+      },
+      {
+        "unitId": "architecture",
+        "purpose": "能对照原论文图 1 说出编码器和解码器各有哪些子层，并沿翻译例子走一遍数据流。",
+        "concepts": [
+          "图 1",
+          "Add & Norm",
+          "残差连接",
+          "层归一化",
+          "交叉注意力"
+        ],
+        "limit": "归一化放在相加之后是原论文设置，后续模型常有不同。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "理解查询、键、值各自的作用，能沿图 2 左侧说出缩放点积注意力的五个步骤，以及为什么要除以 √dk。",
+        "concepts": [
+          "自注意力",
+          "QKV",
+          "缩放点积",
+          "softmax",
+          "attention"
+        ],
+        "limit": "注意力权重描述数值怎样混合，不等于理解或因果解释。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "说清单个注意力只有一组权重的限制，以及多头怎样让同一个位置同时读取不同的信息。",
+        "concepts": [
+          "多头注意力",
+          "有效分辨率",
+          "表示子空间"
+        ],
+        "limit": "各头的分工是训练出来的，论文没有预先规定每个头的职责。"
+      },
+      {
+        "unitId": "two-heads",
+        "purpose": "能沿图 2 右侧写出多头注意力每一步的矩阵形状，手算一个两头的小例子，并解释为什么 8 个头的计算量与单头相近。",
+        "concepts": [
+          "投影矩阵",
+          "Concat",
+          "输出投影",
+          "计算量"
+        ],
+        "limit": "手算例子的参数为人为指定，只演示计算步骤。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "按 Q、K、V 的来源分清三种注意力通路，理解遮罩与位置编码各自解决什么问题。",
+        "concepts": [
+          "因果遮罩",
+          "位置编码",
+          "交叉注意力",
+          "信息流"
+        ],
+        "limit": "正弦位置编码的长度外推只是作者的假设，论文没有验证。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "能用每层复杂度、顺序操作数、最大路径长度三个标准，比较自注意力、循环层和卷积层。",
+        "concepts": [
+          "复杂度",
+          "并行",
+          "路径长度",
+          "表 1"
+        ],
+        "limit": "自注意力更省计算的前提是序列长度小于表示维度；长序列下 n² 会成为负担。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "读懂表 2 的翻译成绩与训练成本，以及表 3 中头数和键维度的消融分别说明了什么。",
+        "concepts": [
+          "BLEU",
+          "机器翻译",
+          "消融",
+          "测试集",
+          "开发集"
+        ],
+        "limit": "历史 WMT 结果，不代表当前排名、其他语言任务或 Agent 能力。"
+      }
+    ]
+  }
+}

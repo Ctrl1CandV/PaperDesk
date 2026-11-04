@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 2,
+  "id": "tau-bench",
+  "paperId": "arxiv:2406.12045",
+  "revision": 2,
+  "title": "τ-bench：做对一次，离可靠服务还有多远",
+  "paperTitle": "τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains",
+  "language": "zh-Hans",
+  "type": "evaluation",
+  "mode": "standard",
+  "purpose": "以奖励和 pass^k 为主线，读懂 τ-bench 怎样把一次成功、过程合规与重复可靠性分开测量，并核对任务构建、实验协议、失败分析与覆盖边界。",
+  "source": {
+    "id": "arxiv:2406.12045",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2406.12045v1"
+  },
+  "bodyFile": "tau-bench.r2.md",
+  "bodySha256": "4fcf9c383903c9341b5244e0f99c96cfac9ecec61acf56e3659b88a3d48b2771",
+  "units": [
+    {
+      "id": "intro",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "已有评测漏掉了什么"
+    },
+    {
+      "id": "setup",
+      "heading": "一个任务由四样东西组成"
+    },
+    {
+      "id": "construction",
+      "heading": "唯一目标状态是怎样造出来的"
+    },
+    {
+      "id": "reward",
+      "heading": "奖励只检查两件事"
+    },
+    {
+      "id": "passk",
+      "heading": "pass^k：要求每一次都成功"
+    },
+    {
+      "id": "protocol",
+      "heading": "实验协议与主结果"
+    },
+    {
+      "id": "results",
+      "heading": "成功率与可靠性曲线"
+    },
+    {
+      "id": "failures",
+      "heading": "失败分析：低分从哪里来"
+    },
+    {
+      "id": "limits",
+      "heading": "这套测量没有覆盖什么"
+    },
+    {
+      "id": "closing",
+      "heading": "回到原文"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=1",
+      "labels": [
+        "原文摘要与 §1，PDF 第1–2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=7",
+      "labels": [
+        "表2与图4，PDF 第7页",
+        "§5.2，PDF 第7页",
+        "§5.1 与图3，PDF 第7页",
+        "§5.1，PDF 第7页",
+        "表2，PDF 第7页",
+        "§5.1 与图4，PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2406.12045v1",
+      "labels": [
+        "arXiv 2406.12045v1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=2",
+      "labels": [
+        "§1，PDF 第1–2页",
+        "§2，PDF 第2–3页",
+        "图1，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=3",
+      "labels": [
+        "§2，PDF 第2–3页",
+        "§3，PDF 第3页",
+        "图1与 §3，PDF 第2–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=13",
+      "labels": [
+        "§3 与 §B.1，PDF 第3、13–15页",
+        "§4 与图7，PDF 第5、13页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=15",
+      "labels": [
+        "§B.1，PDF 第15–19页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=4",
+      "labels": [
+        "§3 与图2，PDF 第3–4页",
+        "§3 Reward，PDF 第4页",
+        "§3 Pass^k，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=5",
+      "labels": [
+        "§4，PDF 第5页",
+        "表1与表4，PDF 第5、13页",
+        "§3 Reward 与 Pass^k，PDF 第4–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=20",
+      "labels": [
+        "§4 与 §B.2，PDF 第5、20–22页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=6",
+      "labels": [
+        "§4.1，PDF 第5–6页",
+        "§4.2，PDF 第6页",
+        "§5，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=8",
+      "labels": [
+        "§5.2 与 §C.2.2，PDF 第7–8、31–35页",
+        "§5.2 与图6，PDF 第8页",
+        "表3与 §5.2，PDF 第8页",
+        "§5.2、表3与图5–6，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=9",
+      "labels": [
+        "§6，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/abs/2506.07982",
+      "labels": [
+        "τ²-bench 摘要页"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 2506.07982（2025 年发布的后续基准，编辑背景）"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/pdf/2406.12045v1#page=25",
+      "labels": [
+        "§C.2 与 §D.2，PDF 第25、46页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-evaluation-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentbench",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/tau-bench/figure-1-setup-and-trajectory.webp",
+      "sha256": "cf18ad11d4d3318929d38375b376be34df5b5315de25fcfab7baf052d55218ca",
+      "mime": "image/webp",
+      "alt": "τ-bench 的信息边界与一条航空示例轨迹：左侧为工具、Agent、用户三层，右侧为对话流程",
+      "origin": "https://arxiv.org/pdf/2406.12045v1#page=2",
+      "rights": "Yao 等，τ-bench，arXiv 2406.12045v1，图 1。arXiv 摘要页标注 CC BY 4.0，允许在注明出处的前提下复制与再分发。"
+    },
+    {
+      "path": "assets/tau-bench/figure-2-components.webp",
+      "sha256": "d0b314afe77902633d13bc2d720638e66b8bb34f7283c81e6dc900aa4bf8d2ab",
+      "mime": "image/webp",
+      "alt": "τ-bench 的四类构建材料：订单数据库条目、接口函数、政策片段、任务说明与标注",
+      "origin": "https://arxiv.org/pdf/2406.12045v1#page=4",
+      "rights": "Yao 等，τ-bench，arXiv 2406.12045v1，图 2。arXiv 摘要页标注 CC BY 4.0，允许在注明出处的前提下复制与再分发。"
+    },
+    {
+      "path": "assets/tau-bench/figure-4-passk-curves.webp",
+      "sha256": "3e93465d34acd30e2c114b01947c86567dc26e52f18e4748b6875b330619489b",
+      "mime": "image/webp",
+      "alt": "零售任务上 pass^k 与 pass@k 随试验次数变化的曲线：实线下降，虚线上升",
+      "origin": "https://arxiv.org/pdf/2406.12045v1#page=7",
+      "rights": "Yao 等，τ-bench，arXiv 2406.12045v1，图 4。arXiv 摘要页标注 CC BY 4.0，允许在注明出处的前提下复制与再分发。"
+    },
+    {
+      "path": "assets/tau-bench/figure-5-failure-breakdown.webp",
+      "sha256": "bf136437bae58f430172d74262891784d3bfe24ecd6f2cbfac1cc0efdebb0de0",
+      "mime": "image/webp",
+      "alt": "36 条失败轨迹的原因分布环形图：参数错误 33.3%、信息错误 22.2%、决策错误 25.0%、部分完成 19.4%",
+      "origin": "https://arxiv.org/pdf/2406.12045v1#page=7",
+      "rights": "Yao 等，τ-bench，arXiv 2406.12045v1，图 5。arXiv 摘要页标注 CC BY 4.0，允许在注明出处的前提下复制与再分发。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1–2: motivation, existing agent and task-oriented dialogue benchmarks",
+      "§3: POMDP setup, databases and APIs, policy, user simulation, task instances, reward, pass^k",
+      "§4: three-stage construction, retail and airline domains, stated design characteristics",
+      "§5: models, methods, main results, cost, failure analysis, policy ablation, compound requests",
+      "§6: limitations, improvement directions and challenges for agents",
+      "Appendix B.1–B.2: policies, API design and data generation",
+      "Appendix C.2 and D.2: retail failure examples and a successful airline trajectory"
+    ],
+    "figuresViewed": [
+      "Figure 1 — PDF p2 (reproduced)",
+      "Figure 2 — PDF p4 (reproduced)",
+      "Figure 3 — PDF p7",
+      "Figure 4 — PDF p7 (reproduced)",
+      "Figure 5 — PDF p7 (reproduced)",
+      "Figure 6 — PDF p8",
+      "Figure 7 — PDF p13",
+      "Table 1 — PDF p5",
+      "Table 2 — PDF p7",
+      "Table 3 — PDF p8",
+      "Table 4 — PDF p13"
+    ],
+    "limitations": [
+      "固定 arXiv v1；没有复现实验，也没有核对 τ²-bench 等后续工作的正文与数字。",
+      "未逐条审阅全部数据库条目、115 个零售任务、50 个航空任务与每条对话轨迹；表 2 和表 3 只摘录了相关行。",
+      "终点奖励可能漏掉过程违规；表 2 与表 3 的航空基线不同（35.2 与 33.2），未合并为同一增益。",
+      "用户由 gpt-4-0613 模拟，任务说明由 gpt-4-turbo 试跑打磨；模拟用户不能代表真实用户分布，构建偏向没有被量化。",
+      "组合数表、两任务对比、0.6^8 与 0.84^8 的数量级计算是导读自编的教学例子或按表 2 所做的换算，不是论文实验。"
+    ],
+    "reviewBasis": "AI authoring review: downloaded the fixed arXiv v1 PDF and HTML, read the main text §1–6 and appendices B.1, B.2, C.2, D.2, checked Tables 1–4 and Figures 1–7, and visually inspected the four local crops used as assets. Claim-by-claim checks and unverified items are recorded in docs/research/tau-bench-r2-review.md. No human review or experimental reproduction; independent integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "τ-bench：终点、规则与可靠性",
+    "topics": [
+      {
+        "id": "agent-model-evaluation",
+        "label": "Agent与模型评测",
+        "aliases": [
+          "evaluation",
+          "benchmark",
+          "评测"
+        ]
+      },
+      {
+        "id": "interactive-benchmarks",
+        "label": "交互任务与可靠性",
+        "aliases": [
+          "任务成功率",
+          "过程评价"
+        ]
+      }
+    ],
+    "summary": "从已有 Agent 评测的缺口出发，讲清数据库、接口、政策与模拟用户怎样组成一个部分可观察任务，再以奖励和 pass^k 为主线，核对任务构建、主结果、失败分析与测量边界。",
+    "value": "能判断一个 Agent 评测测的是终点状态还是过程、单次成功还是稳定成功，并能保留领域权重、试验次数和接口形式后解读分数。",
+    "prerequisites": [
+      "了解语言模型输入输出与基本Agent交互即可；正文解释任务、指标和必要公式。"
+    ],
+    "boundaries": [
+      "固定 arXiv v1；没有复现实验，也没有核对 τ²-bench 等后续工作的正文与数字。",
+      "未逐项审查全部数据库、政策与对话附录；模拟用户不能证明真实人群的可靠性。",
+      "终点奖励可能漏掉过程违规；表 2 与表 3 的航空基线有差异，未合并为同一增益计算。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Shunyu Yao",
+        "Noah Shinn",
+        "Pedram Razavi",
+        "Karthik Narasimhan"
+      ],
+      "year": 2024,
+      "venue": "arXiv v1",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2406.12045v1",
+      "preprintYear": 2024
+    },
+    "readingTargets": [
+      {
+        "unitId": "setup",
+        "purpose": "说清数据库、接口、政策、模拟用户各自能看到什么、能改变什么，以及这为什么构成部分可观察任务。",
+        "concepts": [
+          "POMDP",
+          "工具调用",
+          "领域政策",
+          "用户模拟"
+        ],
+        "limit": "以两个简化领域为例，不代表真实业务政策的完整复杂度。"
+      },
+      {
+        "unitId": "construction",
+        "purpose": "解释唯一目标状态为什么是自动评分的前提，以及三阶段构建和 40 次以上试跑怎样消除歧义。",
+        "concepts": [
+          "唯一目标状态",
+          "人工标注",
+          "任务验证",
+          "数据生成"
+        ],
+        "limit": "唯一性只在作者设定的政策与偏好下成立，标注偏向没有被量化。"
+      },
+      {
+        "unitId": "reward",
+        "purpose": "说出 r_action 与 r_output 各检查什么，并能指出用户确认、身份验证和子串匹配不在检查范围内。",
+        "concepts": [
+          "r_action",
+          "r_output",
+          "终点判据",
+          "过程合规"
+        ],
+        "limit": "终点正确不等于整段服务合规；奖励不检查写操作前的确认。"
+      },
+      {
+        "unitId": "passk",
+        "purpose": "计算任务内的 pass^k 与 pass@k，解释为什么先算任务内组合再平均，以及 k 与 n 的关系。",
+        "concepts": [
+          "pass^k",
+          "pass@k",
+          "组合数",
+          "可靠性"
+        ],
+        "limit": "估计假设同一任务的试验独立同分布；高 k 需要足够多的试验。"
+      },
+      {
+        "unitId": "protocol",
+        "purpose": "保留领域权重、试验次数、接口形式和用户模拟模型后解读表 2 与图 4。",
+        "concepts": [
+          "实验协议",
+          "领域加权",
+          "function calling",
+          "ReAct"
+        ],
+        "limit": "分数来自 2024 年 6 月的模型快照，不是当前排名。"
+      },
+      {
+        "unitId": "failures",
+        "purpose": "把失败分类、政策消融和写操作数量联系起来，区分 Agent 错误、标注歧义与基线差异。",
+        "concepts": [
+          "失败分析",
+          "政策消融",
+          "复合请求",
+          "幻觉参数"
+        ],
+        "limit": "单次运行样本与主表的多试验平均不同，人工标签不是因果证明。"
+      }
+    ]
+  }
+}

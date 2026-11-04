@@ -1,0 +1,558 @@
+{
+  "schemaVersion": 2,
+  "id": "helm",
+  "paperId": "arxiv:2211.09110",
+  "revision": 3,
+  "title": "HELM：一个模型分数是怎样产生的",
+  "paperTitle": "Holistic Evaluation of Language Models",
+  "language": "zh-Hans",
+  "type": "evaluation",
+  "mode": "standard",
+  "purpose": "沿场景、适配、指标与汇总解释理解语言模型评价，并判断结果的条件和局限。",
+  "source": {
+    "id": "arxiv:2211.09110",
+    "version": "v2",
+    "url": "https://arxiv.org/pdf/2211.09110v2"
+  },
+  "bodyFile": "helm.r3.md",
+  "bodySha256": "49c3afc6d5ba46e1a8c0ef01ef25552849398bc420e89966c26f915354893fe6",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "各自都测过，为什么难比较"
+    },
+    {
+      "id": "u02",
+      "heading": "从一道题看评价接口"
+    },
+    {
+      "id": "adaptation",
+      "heading": "图 7：两条不同的答题通路"
+    },
+    {
+      "id": "prompt-evidence",
+      "heading": "同一模型，提示为什么改变结果"
+    },
+    {
+      "id": "u03",
+      "heading": "从一个分数到七类指标"
+    },
+    {
+      "id": "calibration",
+      "heading": "图 17：校准和选择性分类分别在算什么"
+    },
+    {
+      "id": "robustness-fairness",
+      "heading": "扰动、群体表现与生成风险"
+    },
+    {
+      "id": "u04",
+      "heading": "不同指标在结果中怎样关联"
+    },
+    {
+      "id": "comparison",
+      "heading": "模型比较与汇总的条件"
+    },
+    {
+      "id": "u05",
+      "heading": "评价边界在哪里"
+    },
+    {
+      "id": "u07",
+      "heading": "回到原文与本导读范围"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=1",
+      "labels": [
+        "摘要与 §1.1，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2211.09110v2",
+      "labels": [
+        "arXiv 2211.09110v2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=2",
+      "labels": [
+        "§1、图2–4，PDF 第2–5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=5",
+      "labels": [
+        "图4及脚注5，PDF 第5页；§6，PDF 第45页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=16",
+      "labels": [
+        "§3.1–3.2，PDF 第16–19页",
+        "§3.1、§3.3，PDF 第16、19–20页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=14",
+      "labels": [
+        "图5–6与 §2.1，PDF 第14页",
+        "§2.2，PDF 第14页",
+        "图5–7与 §2，PDF 第14–15页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=15",
+      "labels": [
+        "图7与 §2.3，PDF 第15页",
+        "图7，PDF 第15页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=47",
+      "labels": [
+        "§7，PDF 第47页",
+        "§7、§8.2，PDF 第47、58页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=160",
+      "labels": [
+        "§7，PDF 第47页；附录 J.1，PDF 第160页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=58",
+      "labels": [
+        "§8.2，PDF 第58页",
+        "图33与 §8.2，PDF 第58–59页",
+        "§8.2，PDF 第58–59页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=9",
+      "labels": [
+        "§1.2 发现23，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=56",
+      "labels": [
+        "图31与 §8.2，PDF 第56页",
+        "提示分析，PDF 第56–59页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=46",
+      "labels": [
+        "§7、§8.2，PDF 第46、56–57页",
+        "§7、§11.2，PDF 第46、81–82页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=57",
+      "labels": [
+        "图32与 §8.2，PDF 第57页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=25",
+      "labels": [
+        "§4，PDF 第25–27页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=3",
+      "labels": [
+        "§1.1，PDF 第3–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=27",
+      "labels": [
+        "表4，PDF 第27页",
+        "§4.4，PDF 第27–28页",
+        "表4和图17，PDF 第27–28页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=21",
+      "labels": [
+        "§3.5，PDF 第21–22页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=20",
+      "labels": [
+        "§3.4–3.5、§4.3，PDF 第20–22、27页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=33",
+      "labels": [
+        "§4.9，PDF 第33页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=6",
+      "labels": [
+        "§1.2、§6，PDF 第6、45页",
+        "§1.2、§8.1，PDF 第6、48–50页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=28",
+      "labels": [
+        "图17与 §4.4，PDF 第28页",
+        "§4.5，PDF 第28–30页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=30",
+      "labels": [
+        "§4.6，PDF 第30–31页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=31",
+      "labels": [
+        "§4.7–4.8，PDF 第31–33页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c25",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=48",
+      "labels": [
+        "图24与 §8.1，PDF 第48页",
+        "图24及 §8.1，PDF 第48–50页",
+        "图24，PDF 第48页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c26",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=7",
+      "labels": [
+        "§1.2、§8.1，PDF 第7、48–50页",
+        "§1.2、§8.1，PDF 第7、53–55页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c27",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=45",
+      "labels": [
+        "§6–7，PDF 第45页",
+        "§6、§11.1，PDF 第45、81页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c28",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=82",
+      "labels": [
+        "§11.3，PDF 第82页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c29",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=50",
+      "labels": [
+        "图26及 §8.1，PDF 第50–51页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c30",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=19",
+      "labels": [
+        "§3.2、§10.1，PDF 第19、78–79页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c31",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=23",
+      "labels": [
+        "§3.7、§4.8，PDF 第23–24、32–33页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    }
+  ],
+  "related": [],
+  "assets": [
+    {
+      "path": "assets/helm/figure-7-adaptation.webp",
+      "sha256": "64383f26257848fb5dd8eb089878a5265bfeb5c93f0ae38a99fc0ff0641722f4",
+      "mime": "image/webp",
+      "alt": "图7对照两种选择题适配。左侧先给出解剖学已答示例：胸膜问题的答案为C；省略号后是稳态问题及四个选项：A Anabolism、B Catabolism、C Tolerance、D Homeostasis，模型在Answer后生成D，图示对数概率为−0.26；温度0，最多生成1个词元。右侧分别将同一问题与候选拼接，图中画出Anabolism的对数概率−0.007及Homeostasis的−0.005，中间用省略号省去其他候选；温度0，最多生成0个词元。三个对数概率的来源未明确，仅用于说明接口。",
+      "origin": "https://arxiv.org/pdf/2211.09110v2#page=15",
+      "rights": "Liang 等，Holistic Evaluation of Language Models，图7；arXiv 2211.09110v2 页面标示 Creative Commons Attribution 4.0 International（CC BY 4.0），https://creativecommons.org/licenses/by/4.0/。"
+    },
+    {
+      "path": "assets/helm/figure-17-calibration.webp",
+      "sha256": "ef0b8f8e99097514c759947daeb3f4874c7b7658d04af271c325869e4a62784a",
+      "mime": "image/webp",
+      "alt": "图17上半列出八个预测，概率及对错依次为0.0正确、0.1错误、0.2错误、0.3正确、0.7正确、0.8错误、0.9正确、1.0正确。按概率分成等大小两组：第一组准确率0.5、平均概率0.15、误差0.35；第二组准确率0.75、平均概率0.85、误差0.10。各占一半，加权ECE为0.225。下半选出最高的0.8、0.9、1.0三项，其中0.8错误、后两项正确，选择性分类准确率为2/3。两组及选取三项均为图示例。",
+      "origin": "https://arxiv.org/pdf/2211.09110v2#page=28",
+      "rights": "Liang 等，Holistic Evaluation of Language Models，图17；arXiv 2211.09110v2 页面标示 Creative Commons Attribution 4.0 International（CC BY 4.0），https://creativecommons.org/licenses/by/4.0/。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "PDF 1–33：摘要、§1–4.9 的选定内容",
+      "PDF 45–59：§6 末、§7、§8.1–8.2",
+      "PDF 77–82：§9 末、§10–11"
+    ],
+    "figuresViewed": [
+      "Figure 7 — PDF p15，AI 查看裁图并复用",
+      "Figure 17 — PDF p28，AI 查看裁图并复用",
+      "Table 4 — PDF p27，AI 查看页面及说明，未逐格核验",
+      "Figure 24 — PDF p48，AI 查看页面、坐标与图例，未逐点核验",
+      "Figure 33 — PDF p58，AI 查看页面、图例和图注，未逐点核验"
+    ],
+    "limitations": [
+      "第34–44、60–76、83–159页未在作者核对范围内；第160–162页仅查阅附录J的部分适配说明。",
+      "表4、图24与图33已查看页面和相关说明，但未逐格或逐点视觉核验。",
+      "图7对数概率仅用作图示，来源未确认；OPT 54.8% 的 shot 条件未确认。",
+      "已有一份范围受限的独立抽查，见 docs/research/helm-r3-independent-review.md；它不是全文核对、复现或读者验收。历史结果不代表当前模型排名。"
+    ],
+    "reviewBasis": "作者依据固定 v2 已核页面及图7、17裁图自核；另有范围受限的独立抽查，见 docs/research/helm-r3-independent-review.md，非全文核对、复现或读者验收。"
+  },
+  "orientation": {
+    "shortTitle": "HELM：怎样全面而可解释地评价语言模型",
+    "topics": [
+      {
+        "id": "language-model-evaluation",
+        "label": "语言模型评价",
+        "aliases": [
+          "评测",
+          "评价",
+          "评估",
+          "evaluation",
+          "benchmark"
+        ]
+      },
+      {
+        "id": "evaluation-design",
+        "label": "场景与适配",
+        "aliases": [
+          "场景",
+          "适配",
+          "提示设置",
+          "实验设计"
+        ]
+      },
+      {
+        "id": "multi-metric-evaluation",
+        "label": "多指标评测",
+        "aliases": [
+          "指标",
+          "校准",
+          "鲁棒性",
+          "公平性",
+          "效率"
+        ]
+      }
+    ],
+    "summary": "以真实选择题说明场景、模型适配与指标，再手算校准并理解跨模型比较的条件。",
+    "value": "帮助读者从结果追问样本、协议和指标，区分多种能力与风险。",
+    "prerequisites": [
+      "了解模型输入、输出和任务样本的基本概念。",
+      "不要求熟记全部指标；正文用选择题和校准示例解释评价接口。"
+    ],
+    "boundaries": [
+      "覆盖评价研究主线与选定结果，不逐项展开所有场景和附录。",
+      "固定版本主要覆盖英语与所选任务，历史结果不代表当前模型榜单。",
+      "语言模型的非交互评测不能直接替代 Agent 的交互任务评价。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Percy Liang",
+        "Rishi Bommasani",
+        "Tony Lee",
+        "Dimitris Tsipras",
+        "Dilara Soylu",
+        "Michihiro Yasunaga",
+        "Yian Zhang",
+        "Deepak Narayanan",
+        "Yuhuai Wu",
+        "Ananya Kumar",
+        "Benjamin Newman",
+        "Binhang Yuan",
+        "Bobby Yan",
+        "Ce Zhang",
+        "Christian Cosgrove",
+        "Christopher D. Manning",
+        "Christopher Ré",
+        "Diana Acosta-Navas",
+        "Drew A. Hudson",
+        "Eric Zelikman",
+        "Esin Durmus",
+        "Faisal Ladhak",
+        "Frieda Rong",
+        "Hongyu Ren",
+        "Huaxiu Yao",
+        "Jue Wang",
+        "Keshav Santhanam",
+        "Laurel Orr",
+        "Lucia Zheng",
+        "Mert Yuksekgonul",
+        "Mirac Suzgun",
+        "Nathan Kim",
+        "Neel Guha",
+        "Niladri Chatterji",
+        "Omar Khattab",
+        "Peter Henderson",
+        "Qian Huang",
+        "Ryan Chi",
+        "Sang Michael Xie",
+        "Shibani Santurkar",
+        "Surya Ganguli",
+        "Tatsunori Hashimoto",
+        "Thomas Icard",
+        "Tianyi Zhang",
+        "Vishrav Chaudhary",
+        "William Wang",
+        "Xuechen Li",
+        "Yifan Mai",
+        "Yuhui Zhang",
+        "Yuta Koreeda"
+      ],
+      "year": 2023,
+      "venue": "Transactions on Machine Learning Research (TMLR)",
+      "publicationKind": "journal",
+      "url": "https://arxiv.org/pdf/2211.09110v2#page=1",
+      "preprintYear": 2022
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "用 MMLU 题目解释场景、模型、适配和指标各自的作用。",
+        "concepts": [
+          "场景",
+          "适配",
+          "MMLU"
+        ],
+        "limit": "一条题目只展示评价接口，不能代表全部场景。"
+      },
+      {
+        "unitId": "adaptation",
+        "purpose": "对照图7解释联合与分开适配的不同请求和输出。",
+        "concepts": [
+          "提示",
+          "候选评分",
+          "适配"
+        ],
+        "limit": "图中对数概率仅作接口图示。"
+      },
+      {
+        "unitId": "calibration",
+        "purpose": "手算图17的校准误差，并区分选择性分类与概率校准。",
+        "concepts": [
+          "校准",
+          "ECE",
+          "选择性分类"
+        ],
+        "limit": "图示的两组和选择比例不代表默认评测设置。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "根据指标方向解读跨模型关联，并区分关联与因果。",
+        "concepts": [
+          "准确性",
+          "鲁棒性",
+          "校准误差"
+        ],
+        "limit": "历史模型间的相关性不能证明因果。"
+      }
+    ]
+  }
+}

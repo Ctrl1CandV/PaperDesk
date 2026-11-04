@@ -1,0 +1,1054 @@
+{
+  "schemaVersion": 2,
+  "id": "multi-agent-communication-survey",
+  "paperId": "arxiv:2502.14321",
+  "revision": 2,
+  "title": "多智能体通信综述：谁在何时把什么交给谁",
+  "paperTitle": "Beyond Self-Talk: A Communication-Centric Survey of LLM-Based Multi-Agent Systems",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "沿该综述自己的两层框架，把架构、目标、协议与策略、范式、对象、内容七个通信维度讲成可追踪的设计选择，并说明怎样用它们定位一篇新的多智能体论文。",
+  "source": {
+    "id": "arxiv:2502.14321",
+    "version": "v3",
+    "url": "https://arxiv.org/pdf/2502.14321v3"
+  },
+  "bodyFile": "multi-agent-communication-survey.r2.md",
+  "bodySha256": "a97217f7495b555a87bc65dc7470690cef4070894339a887ae6f4a2023a290d1",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "背景：从单个 Agent 到会互相说话的系统"
+    },
+    {
+      "id": "framework",
+      "heading": "两层七个维度：综述的地图"
+    },
+    {
+      "id": "architecture",
+      "heading": "架构：允许的连接关系"
+    },
+    {
+      "id": "goals",
+      "heading": "目标：为什么说话"
+    },
+    {
+      "id": "protocols",
+      "heading": "协议：消息怎样真正流动"
+    },
+    {
+      "id": "strategy",
+      "heading": "策略：谁在什么时候说"
+    },
+    {
+      "id": "paradigm",
+      "heading": "范式：消息以什么形式出现"
+    },
+    {
+      "id": "objects",
+      "heading": "对象：和谁说话"
+    },
+    {
+      "id": "content",
+      "heading": "内容：传递什么"
+    },
+    {
+      "id": "evaluation",
+      "heading": "评价：分数之外还要看什么"
+    },
+    {
+      "id": "challenges",
+      "heading": "五个挑战与开放问题"
+    },
+    {
+      "id": "method-map",
+      "heading": "把一篇新论文放回框架"
+    },
+    {
+      "id": "source",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/html/2502.14321v3#S1",
+      "labels": [
+        "§1 引言"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/abs/2502.14321v3",
+      "labels": [
+        "论文身份与版本"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/html/2502.14321v3#S1.F1",
+      "labels": [
+        "图 1，PDF 第2页",
+        "§1 引言与图 1",
+        "图 1 与 §1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/html/2502.14321v3#S2",
+      "labels": [
+        "§2 背景"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/html/2502.14321v3#S2.SS1",
+      "labels": [
+        "§2.1 单 Agent 结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/html/2502.14321v3#S2.SS2",
+      "labels": [
+        "§2.2 传统多智能体系统"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/html/2502.14321v3#S2.SS3",
+      "labels": [
+        "§2.3 LLM-MAS"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/html/2502.14321v3#S4",
+      "labels": [
+        "§4 系统内部通信"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS1",
+      "labels": [
+        "§3.1 通信架构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.F3",
+      "labels": [
+        "图 3，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS1.SSS1",
+      "labels": [
+        "§3.1.1 扁平结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS1.SSS2",
+      "labels": [
+        "§3.1.2 层级结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/abs/2307.07924",
+      "labels": [
+        "ChatDev 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS1.SSS3",
+      "labels": [
+        "§3.1.3 团队结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/abs/2403.17927",
+      "labels": [
+        "MAGIS 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS1.SSS4",
+      "labels": [
+        "§3.1.4 社会结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/abs/2304.03442",
+      "labels": [
+        "Generative Agents 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS1.SSS5",
+      "labels": [
+        "§3.1.5 混合结构"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/abs/2404.17153",
+      "labels": [
+        "FixAgent 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/abs/2402.05746",
+      "labels": [
+        "ChatSim 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/html/2502.14321v3#S2.T1",
+      "labels": [
+        "表 1，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS2",
+      "labels": [
+        "§3.2 通信目标"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS2.SSS1",
+      "labels": [
+        "§3.2.1 合作"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/abs/2305.14325",
+      "labels": [
+        "多智能体辩论摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c25",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS2.SSS2",
+      "labels": [
+        "§3.2.2 竞争"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c26",
+      "url": "https://arxiv.org/abs/2403.11807",
+      "labels": [
+        "GAMA-Bench 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c27",
+      "url": "https://arxiv.org/abs/2408.04472",
+      "labels": [
+        "Agent4Debate 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c28",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS2.SSS3",
+      "labels": [
+        "§3.2.3 混合目标"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c29",
+      "url": "https://arxiv.org/abs/2402.11712",
+      "labels": [
+        "POLCA 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c30",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS3",
+      "labels": [
+        "§3.3 通信协议"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c31",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS3.SSS1",
+      "labels": [
+        "§3.3.1 MCP"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c32",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS3.SSS2",
+      "labels": [
+        "§3.3.2 A2A"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c33",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.SS3.SSS3",
+      "labels": [
+        "§3.3.3 ANP"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c34",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.F5",
+      "labels": [
+        "图 5，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c35",
+      "url": "https://arxiv.org/html/2502.14321v3#S3.T2",
+      "labels": [
+        "表 2，PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c36",
+      "url": "https://arxiv.org/html/2502.14321v3#S5.SS3",
+      "labels": [
+        "§5.3 统一协议"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c37",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS1",
+      "labels": [
+        "§4.1 通信策略"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c38",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS1.SSS1",
+      "labels": [
+        "§4.1.1 逐个发言"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c39",
+      "url": "https://arxiv.org/abs/2406.02818",
+      "labels": [
+        "Chain-of-Agents 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c40",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS1.SSS2",
+      "labels": [
+        "§4.1.2 同时发言"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c41",
+      "url": "https://arxiv.org/abs/2309.17288",
+      "labels": [
+        "AutoAgents 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c42",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS1.SSS3",
+      "labels": [
+        "§4.1.3 带汇总者"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c43",
+      "url": "https://arxiv.org/abs/2308.11914",
+      "labels": [
+        "CausalGPT 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c44",
+      "url": "https://arxiv.org/abs/2404.11943",
+      "labels": [
+        "AgentCoord 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c45",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.T3",
+      "labels": [
+        "表 3，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c46",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS2",
+      "labels": [
+        "§4.2 通信范式"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c47",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS2.SSS1",
+      "labels": [
+        "§4.2.1 消息传递"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c48",
+      "url": "https://arxiv.org/abs/2503.12333",
+      "labels": [
+        "GameChat 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c49",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS2.SSS2",
+      "labels": [
+        "§4.2.2 言语行为"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c50",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS2.SSS3",
+      "labels": [
+        "§4.2.3 黑板"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c51",
+      "url": "https://arxiv.org/abs/2308.00352",
+      "labels": [
+        "MetaGPT 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c52",
+      "url": "https://arxiv.org/abs/2503.13856",
+      "labels": [
+        "MDTeamGPT 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c53",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS3",
+      "labels": [
+        "§4.3 通信对象"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c54",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS3.SSS1",
+      "labels": [
+        "§4.3.1 与自身"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c55",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS3.SSS2",
+      "labels": [
+        "§4.3.2 与其他 Agent"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c56",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS3.SSS3",
+      "labels": [
+        "§4.3.3 与环境"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c57",
+      "url": "https://arxiv.org/abs/2305.15021",
+      "labels": [
+        "EmbodiedGPT 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c58",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS3.SSS4",
+      "labels": [
+        "§4.3.4 与人"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c59",
+      "url": "https://arxiv.org/abs/2403.14227",
+      "labels": [
+        "PeerGPT 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c60",
+      "url": "https://arxiv.org/abs/2311.10537",
+      "labels": [
+        "MedAgents 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c61",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS4",
+      "labels": [
+        "§4.4 通信内容"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c62",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS4.SSS1",
+      "labels": [
+        "§4.4.1 显式内容"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c63",
+      "url": "https://arxiv.org/abs/2505.15859",
+      "labels": [
+        "AutoData 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c64",
+      "url": "https://arxiv.org/html/2502.14321v3#S4.SS4.SSS2",
+      "labels": [
+        "§4.4.2 隐式内容"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c65",
+      "url": "https://arxiv.org/abs/2407.07791",
+      "labels": [
+        "Flooding 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c66",
+      "url": "https://arxiv.org/abs/2505.06904",
+      "labels": [
+        "EcoLANG 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c67",
+      "url": "https://arxiv.org/html/2502.14321v3#S5.SS6",
+      "labels": [
+        "§5.6 基准与评价"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c68",
+      "url": "https://arxiv.org/abs/2503.01935",
+      "labels": [
+        "MultiAgentBench 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c69",
+      "url": "https://arxiv.org/abs/2502.18836",
+      "labels": [
+        "Realm-Bench 摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（综述引用的代表工作）"
+    },
+    {
+      "id": "c70",
+      "url": "https://arxiv.org/html/2502.14321v3#S5",
+      "labels": [
+        "§5 挑战与机会"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c71",
+      "url": "https://arxiv.org/html/2502.14321v3#S5.SS1",
+      "labels": [
+        "§5.1 系统设计"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c72",
+      "url": "https://arxiv.org/html/2502.14321v3#S5.SS2",
+      "labels": [
+        "§5.2 竞争研究"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c73",
+      "url": "https://arxiv.org/html/2502.14321v3#S5.SS4",
+      "labels": [
+        "§5.4 多模态"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c74",
+      "url": "https://arxiv.org/html/2502.14321v3#S5.SS5",
+      "labels": [
+        "§5.5 通信安全"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c75",
+      "url": "https://arxiv.org/pdf/2502.14321v3",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c76",
+      "url": "https://arxiv.org/pdf/2502.14321v3#page=2",
+      "labels": [
+        "图 1 所在页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c77",
+      "url": "https://arxiv.org/pdf/2502.14321v3#page=4",
+      "labels": [
+        "图 3 与表 1 所在页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c78",
+      "url": "https://arxiv.org/pdf/2502.14321v3#page=7",
+      "labels": [
+        "图 6 与表 2 所在页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c79",
+      "url": "https://arxiv.org/pdf/2502.14321v3#page=8",
+      "labels": [
+        "表 3 所在页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c80",
+      "url": "https://arxiv.org/pdf/2502.14321v3#page=11",
+      "labels": [
+        "图 9 所在页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "multi-agent-collaboration-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/multi-agent-communication-survey/figure-1-communication-framework.webp",
+      "sha256": "22217f102a168a38968003d806f1b68a892088766ee8c8c18eeab77ea40525a8",
+      "mime": "image/webp",
+      "alt": "三栏对比图：上栏是综合型 LLM-MAS 综述，围绕系统架构、Profile/Memory/Planning/Tools 等 Agent 级动作和应用场景组织；中栏是领域型综述，分别面向物理、社会、网络模拟与软件工程的代码生成、测试、调试；下栏是本综述的通信中心视角，左侧是任务、目标、协议与架构构成的系统层通信，右侧是策略、范式、对象、内容构成的系统内部通信，下附七条说明",
+      "origin": "https://arxiv.org/pdf/2502.14321v3#page=2",
+      "rights": "Yan 等，arXiv:2502.14321v3，图 1。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/multi-agent-communication-survey/figure-3-architectures.webp",
+      "sha256": "450e165b10d439b8e41e71624502a3a2279770a27cd47462bd059e267429b133",
+      "mime": "image/webp",
+      "alt": "五类通信架构示意图：扁平是三个 Agent 横向并排、互相之间都有箭头；层级是一个 Agent 在上、三个在下，箭头由上层指向下层；团队是两个并排的框，每框内一个 Agent 在上、两个在下；社会是一个框内三个 Agent，框外写着 Rules，并有 join in 与 get out 的箭头；混合是左侧一个 Agent 分出两条箭头，右侧两个 Agent 两两相连",
+      "origin": "https://arxiv.org/pdf/2502.14321v3#page=4",
+      "rights": "Yan 等，arXiv:2502.14321v3，图 3。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/multi-agent-communication-survey/figure-4-goals.webp",
+      "sha256": "9cf5106d2ba149b8604eb0aeba27a18fad7a09c8be042138603c4822494de568",
+      "mime": "image/webp",
+      "alt": "通信目标示意图：从左到右四栏分别标着直接合作、通过辩论的合作、竞争与混合。每栏上下各有一个 Agent，中间是一个图标加一个箭头指向同一枚奖杯；第一栏中间是握手图标，第二栏是两个奖章式图标，一个带红叉、一个带绿勾，第三栏是两把交叉的剑；第四栏的虚线框里，两个 Agent 之间还有握手图标",
+      "origin": "https://arxiv.org/pdf/2502.14321v3#page=5",
+      "rights": "Yan 等，arXiv:2502.14321v3，图 4。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/multi-agent-communication-survey/figure-6-strategies.webp",
+      "sha256": "457147d9635c41185303d2579af5b644ccfe9d5f47c0c9dbcea40e8bf6f8e198",
+      "mime": "image/webp",
+      "alt": "三种通信策略示意图：左格三个 Agent 围成三角，箭头首尾相接成一个方向回路；中格四个 Agent 两两之间有双向箭头，表示同时发言；右格三个蓝色 Agent 各自指向一个黄色汇总者，标着同时发言加汇总",
+      "origin": "https://arxiv.org/pdf/2502.14321v3#page=7",
+      "rights": "Yan 等，arXiv:2502.14321v3，图 6。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/multi-agent-communication-survey/figure-9-content.webp",
+      "sha256": "ff4c6414939ab76c69c443bd2d49c14c813ad9f70698d5082d158d74799b39c2",
+      "mime": "image/webp",
+      "alt": "通信内容分类图：显式内容包含自然语言与程序化结构化语言，例子是“整体计划是……”“我的结果是……”以及 JSON 与 Python 代码；隐式内容包含行为反馈与环境信号，例子是“我不同意”和“你可以试试另一种方式”，以及代码错误告警与监控指标",
+      "origin": "https://arxiv.org/pdf/2502.14321v3#page=11",
+      "rights": "Yan 等，arXiv:2502.14321v3，图 9。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1: gap in general and domain-specific surveys, communication-centric definition and contributions",
+      "§2: LLM-based agents, traditional multi-agent systems, LLM-MAS",
+      "§3.1: flat, hierarchical, team, society and hybrid architectures with Table 1 counts",
+      "§3.2: cooperation (direct and through debate), competition and mixed goals",
+      "§3.3: MCP, A2A and ANP with the Table 2 comparison",
+      "§4.1: one-by-one, simultaneous-talk and simultaneous-talk-with-summarizer, with Table 3 strategy counts",
+      "§4.2: message passing, speech act and blackboard",
+      "§4.3: communication with self, other agents, environment and humans",
+      "§4.4: explicit (natural language, code and structured data) and implicit (behavioral feedback, environmental signal) content",
+      "§5: system design, competition, unified protocol, multimodal communication, security, benchmarks and evaluation",
+      "§6: conclusion"
+    ],
+    "figuresViewed": [
+      "Figure 1 — main PDF p2 (cropped and reproduced)",
+      "Figure 3 — main PDF p4 (cropped and reproduced)",
+      "Figure 4 — main PDF p5 (cropped and reproduced)",
+      "Figure 5 — main PDF p6 (cropped and inspected, not reproduced)",
+      "Figure 6 — main PDF p7 (cropped and reproduced)",
+      "Figure 9 — main PDF p11 (cropped and reproduced)",
+      "Table 1 — main PDF p4 (counted row by row)",
+      "Table 2 — main PDF p7 (compared with body text)",
+      "Table 3 — main PDF p8 (counted row by row)"
+    ],
+    "limitations": [
+      "覆盖通信主线（§1–§6 正文），未逐篇精读综述引用的 100 余项工作，也没有复现任何实验。",
+      "表 1、2、3 只摘录与论证相关的行列；文中的 68、28/22/30 等计数是按原表清点得出，计数口径已在正文写明。",
+      "代表方法的做法以综述描述为准，并对照各原论文摘要；未核对被引论文的实验设置与指标。",
+      "协议部分只解释概念与表 2 的技术差异，没有验证任何现行实现，也没有测试互操作性。",
+      "D-102 的角色、补丁、测试结果、秒数与消息条数是导读自编的教学设定，不是论文实验。",
+      "原文自身的问题（表 2 局限行与用例行重复、RealWorldBench 实为 Realm-Bench、FixAgent 的 arXiv 标题为 UniDebugger、表 3 的 MP. SA 分隔笔误）已在正文与核对记录中指出。"
+    ],
+    "reviewBasis": "Revision 2 rewrites the guide along the survey's own two-level framework and chapter order; §1–§6 were read in full in the fixed arXiv v3 PDF, Figures 1/3/4/5/6/9 were cropped and inspected, Tables 1–3 were counted row by row, and representative method descriptions were checked against their arXiv abstracts. Authoring review by AI; reader acceptance pending."
+  },
+  "orientation": {
+    "shortTitle": "通信综述：谁在何时把什么交给谁",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "LLM-MAS",
+          "消息传递"
+        ]
+      },
+      {
+        "id": "communication-architecture",
+        "label": "通信架构与时序",
+        "aliases": [
+          "扁平结构",
+          "层级结构",
+          "并行通信",
+          "汇总者"
+        ]
+      },
+      {
+        "id": "communication-evaluation",
+        "label": "通信效率与评价",
+        "aliases": [
+          "消息成本",
+          "协调效率",
+          "时延"
+        ]
+      }
+    ],
+    "summary": "这篇综述把 LLM 多智能体系统当成一套通信安排来看：系统层回答谁能连、为什么说、消息怎么走，系统内部回答何时说、以什么形式说、对谁说、说什么，七个维度合起来描述一次协作的信息通路。作者用五类架构、三类目标、三个协议、三种策略、三种范式、四类对象和四类内容整理现有工作，并按架构与目标、策略与范式等组合标注了 68 项研究。",
+    "value": "读完能拿到一套定位新论文的顺序：先看它改的是架构、目标、协议，还是内部四维中的一个；再看它用什么证据说明这个改动让消息改变了决策。它也能帮你把“多智能体更强”这类笼统结论拆成三个可分开检查的问题：结果、代价与过程。",
+    "prerequisites": [
+      "了解语言模型、输入上下文与工具调用的基本区别。",
+      "知道Agent会根据输入或环境反馈采取行动；无需先实现多智能体系统。"
+    ],
+    "boundaries": [
+      "主线讲解，不逐篇展开全部被引工作。",
+      "教学情境和对照建议未作为实验执行。",
+      "分类、角色名称与互通接口都不能单独证明协作有效。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Bingyu Yan",
+        "Zhibo Zhou",
+        "Litian Zhang",
+        "Lian Zhang",
+        "Ziyi Zhou",
+        "Dezhuang Miao",
+        "Zhoujun Li",
+        "Chaozhuo Li",
+        "Xiaoming Zhang"
+      ],
+      "year": 2025,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2502.14321v3",
+      "preprintYear": 2025
+    },
+    "readingTargets": [
+      {
+        "unitId": "framework",
+        "purpose": "能对着图 1 说出两层七维各自回答什么问题，并解释为什么它们可以同时描述同一个系统。",
+        "concepts": [
+          "系统层通信",
+          "系统内部通信",
+          "七个维度",
+          "描述性框架"
+        ],
+        "limit": "框架提供共同语言，不给性能排序；维度齐全并不代表系统更好。"
+      },
+      {
+        "unitId": "architecture",
+        "purpose": "区分五类架构，并能用连接数说明扁平与层级的开销差异，指出每类的瓶颈位置。",
+        "concepts": [
+          "扁平",
+          "层级",
+          "团队",
+          "社会",
+          "混合"
+        ],
+        "limit": "分类图与表 1 统计不比较各架构在具体任务上的效果。"
+      },
+      {
+        "unitId": "goals",
+        "purpose": "分开直接合作、辩论式合作、竞争与混合目标，并说明同一发言形式为何可服务于不同目标。",
+        "concepts": [
+          "直接合作",
+          "辩论式合作",
+          "竞争",
+          "混合目标"
+        ],
+        "limit": "目标划分来自综述归纳，不证明某类目标更有效。"
+      },
+      {
+        "unitId": "protocols",
+        "purpose": "说明 MCP、A2A、ANP 分别在解决哪一层问题，并能读懂表 2 的拓扑、发现、格式与安全差异。",
+        "concepts": [
+          "MCP",
+          "A2A",
+          "ANP",
+          "身份与发现"
+        ],
+        "limit": "只讲概念与原文表述，未验证现行实现，也不保证互操作。"
+      },
+      {
+        "unitId": "strategy",
+        "purpose": "解释逐个发言、同时发言与带汇总者如何改变等待时间与每个人看到的信息版本。",
+        "concepts": [
+          "逐个发言",
+          "同时发言",
+          "汇总者",
+          "状态陈旧"
+        ],
+        "limit": "时间数字是教学设定，不代表任何系统的实测延迟。"
+      },
+      {
+        "unitId": "paradigm",
+        "purpose": "区分消息传递、言语行为与黑板在“发给谁、要对方做什么、谁能看到”上的差别。",
+        "concepts": [
+          "消息传递",
+          "言语行为",
+          "黑板",
+          "言外之力"
+        ],
+        "limit": "范式分类描述形式，不说明消息内容是否为真。"
+      },
+      {
+        "unitId": "objects",
+        "purpose": "分辨四类通信对象，并说出每一类信息由谁产生、可靠性差别在哪里。",
+        "concepts": [
+          "与自身",
+          "与其他 Agent",
+          "与环境",
+          "与人"
+        ],
+        "limit": "举例来自综述，不比较各对象在任务中的贡献大小。"
+      },
+      {
+        "unitId": "content",
+        "purpose": "把同一件事分别写成自然语言、结构化数据、行为反馈与环境信号，并指出各自的解释成本。",
+        "concepts": [
+          "显式内容",
+          "隐式内容",
+          "结构化数据",
+          "行为反馈"
+        ],
+        "limit": "显式与隐式的区分不涉及可信度高低。"
+      },
+      {
+        "unitId": "evaluation",
+        "purpose": "把任务结果、资源代价与过程诊断分开记录，并说明现有榜单缺了哪些系统级指标。",
+        "concepts": [
+          "协调效率",
+          "通信带宽",
+          "时延",
+          "过程诊断"
+        ],
+        "limit": "三类记录是导读整理，具体指标仍在开放讨论中。"
+      }
+    ]
+  }
+}

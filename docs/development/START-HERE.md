@@ -1,6 +1,6 @@
 # 继续开发 PaperDesk
 
-PaperDesk 0.1.0 的功能开发已收口，产品规格为 1.1。先从[项目学习导览](../learning/README.md)认识代码，再看[当前状态](PROJECT-STATE.md)。
+PaperDesk 0.1.0 的功能开发已收口，产品规格为 1.1。先从[项目学习导览](../learning/README.md)认识代码，再看[当前状态](PROJECT-STATE.md)。导读的写法和最近一批修订见[导读写作工作流](../content/workflows/GUIDE-WRITING.md)与[批量修订汇总](../research/guide-depth-batch-2026-11-04.md)。
 
 探索现可通过私人 Git 仓库跨电脑传递：新版网页首次把原浏览器探索写入 `research-workspace/`，另一台拉取后启动会自动载入。方向、工作稿历史、文献关联和选文文件一并保留；“已保存到项目”后仍需提交推送。迁移和冲突说明见[探索 Git 传递](EXPLORATION-GIT.md)。
 

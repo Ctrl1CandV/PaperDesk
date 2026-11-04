@@ -1,0 +1,493 @@
+{
+  "schemaVersion": 2,
+  "id": "agentprune",
+  "paperId": "arxiv:2410.02506",
+  "revision": 2,
+  "title": "AgentPrune：哪些智能体消息可以不再发送",
+  "paperTitle": "Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "deep",
+  "purpose": "沿原论文消息图理解空间与时间通信、图掩码、策略梯度、低秩约束及一次裁剪，并把任务适配开销纳入效果与成本比较。",
+  "source": {
+    "id": "arxiv:2410.02506",
+    "version": "v1",
+    "url": "https://arxiv.org/html/2410.02506v1"
+  },
+  "bodyFile": "agentprune.r2.md",
+  "bodySha256": "330cec22525c98b3bb1c323856ad5f5e60157a15f1d5f5dd2262234796f4b738",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "背景：多一个同伴，为什么会多出许多输入"
+    },
+    {
+      "id": "u01",
+      "heading": "图模型：同一轮的边与跨轮的边"
+    },
+    {
+      "id": "u02",
+      "heading": "通信冗余：作者先做了什么实验"
+    },
+    {
+      "id": "architecture",
+      "heading": "对照图 4：一条消息怎样影响本轮和下一轮"
+    },
+    {
+      "id": "u03",
+      "heading": "图掩码：把开关变成可学习的分数"
+    },
+    {
+      "id": "policy-gradient",
+      "heading": "策略梯度：任务得分怎样教会图选择连接"
+    },
+    {
+      "id": "low-rank",
+      "heading": "低秩约束：作者希望图学出什么样的规律"
+    },
+    {
+      "id": "one-shot-pruning",
+      "heading": "一次裁剪：从连续分数回到真正少传消息"
+    },
+    {
+      "id": "temporal-reuse",
+      "heading": "时间裁剪与多查询复用：省下来的东西留在哪里"
+    },
+    {
+      "id": "u04",
+      "heading": "成本核算：学习图要多久才能回本"
+    },
+    {
+      "id": "setup",
+      "heading": "实验设置：每一组比较究竟比较什么"
+    },
+    {
+      "id": "u05",
+      "heading": "主要结果：少交流是否还保得住任务质量"
+    },
+    {
+      "id": "plugin-results",
+      "heading": "接入已有框架：输入省了，输出和账单怎样变"
+    },
+    {
+      "id": "robustness-ablation",
+      "heading": "鲁棒性与消融：哪些证据支持设计理由"
+    },
+    {
+      "id": "u06",
+      "heading": "论文之后：把通信结构当作研究对象"
+    },
+    {
+      "id": "u07",
+      "heading": "回到原文：哪些位置值得亲自读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/abs/2410.02506v1",
+      "labels": [
+        "论文身份、作者与摘要"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=9",
+      "labels": [
+        "表 3，PDF 第9页",
+        "§4.3、表 3，PDF 第9页",
+        "§4.4，PDF 第9–10页",
+        "图 6，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=2",
+      "labels": [
+        "§1 与 §5，PDF 第2、10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=3",
+      "labels": [
+        "§2、式 (1)–(4)，PDF 第3页",
+        "§2，PDF 第3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=16",
+      "labels": [
+        "附录 A，PDF 第16页",
+        "附录 A–E，PDF 第16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=30",
+      "labels": [
+        "附录 I.1，PDF 第30页",
+        "表 6，PDF 第30页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=4",
+      "labels": [
+        "§2 与图 3，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=5",
+      "labels": [
+        "图 4 与 §3.1，PDF 第5页",
+        "§3.1、式 (7)，PDF 第5页",
+        "式 (8)，PDF 第5页",
+        "方法核心，PDF 第5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=6",
+      "labels": [
+        "§3.2、式 (9)–(10)，PDF 第6页",
+        "§3.2、式 (8)、(11)，PDF 第5–6页",
+        "§3.3、式 (12)，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=35",
+      "labels": [
+        "附录 I.2 与图 30，PDF 第35页",
+        "跨轮连接案例，PDF 第35页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=7",
+      "labels": [
+        "§3.4，PDF 第6–7页",
+        "§3.4 成本分析，PDF 第7页",
+        "§4.1，PDF 第7页",
+        "表 1，PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=17",
+      "labels": [
+        "附录 D，PDF 第16–17页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=18",
+      "labels": [
+        "附录 E，PDF 第17–18页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=8",
+      "labels": [
+        "§4.1，PDF 第8页",
+        "§4.2，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=22",
+      "labels": [
+        "附录 G.1，PDF 第22–24页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/pdf/2410.02506v1#page=27",
+      "labels": [
+        "附录 G.3，PDF 第27页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/html/2410.02506v1",
+      "labels": [
+        "固定 HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/pdf/2410.02506v1",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "autogen",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "camel",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/agentprune/figure-3-random-pruning.webp",
+      "sha256": "2b1d71ef4dffc0fa2aea62d8609967540430af386e77930e4afcdd35bd88631e",
+      "mime": "image/webp",
+      "alt": "两幅箱线图分别表示空间剪枝和时间剪枝；横轴为随机删除连接的比例，纵轴为 MMLU 准确率，较低比例下部分结果高于参考线，较高比例下整体下降。",
+      "origin": "https://arxiv.org/pdf/2410.02506v1#page=4",
+      "rights": "Guibin Zhang 等，Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems，arXiv:2410.02506v1，原论文图 3。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/agentprune/figure-4-communication-pruning.webp",
+      "sha256": "946aff63700f582a692205fe1e87723e8b8bb26f23af96c2ce3b9bfe4987ed2b",
+      "mime": "image/webp",
+      "alt": "左右对比三个解题者与一个汇总者裁剪前后的交流；右侧删除部分本轮连接及跨轮历史，原图在箭头上标出消息词元数。",
+      "origin": "https://arxiv.org/pdf/2410.02506v1#page=5",
+      "rights": "Guibin Zhang 等，Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems，arXiv:2410.02506v1，原论文图 4。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/agentprune/figure-30-temporal-pruning.webp",
+      "sha256": "22bee3cce4d3e796516462e46f17f4d0caf72bf94e38574e20f5ef28885a2513",
+      "mime": "image/webp",
+      "alt": "HumanEval 的五角色跨轮通信图，蓝列表示上一轮，绿列表示下一轮；左侧密集连接，右侧仅保留部分从设计、编码、测试到修复与管理的跨轮通路。",
+      "origin": "https://arxiv.org/pdf/2410.02506v1#page=35",
+      "rights": "Guibin Zhang 等，Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems，arXiv:2410.02506v1，原论文图 30。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "正文 §1–6（PDF 第1–10页）",
+      "附录 A–E（删环、算法、多查询与成本）",
+      "附录 G（基线适配、角色、攻击）",
+      "附录 H.4（消融与敏感性）",
+      "附录 I.1–I.3 相关文字及图30"
+    ],
+    "figuresViewed": [
+      "Figure 3 — PDF p4 (AI viewed; reproduced)",
+      "Figure 4 — PDF p5 (AI viewed; reproduced)",
+      "Figure 30 — PDF p35 (AI viewed; reproduced)",
+      "Figure 5 — PDF p8 (AI viewed; inconsistencies recorded, not reproduced)",
+      "Figure 6 — PDF p9 (AI viewed; selected values checked)",
+      "Figure 21 — PDF p30 (AI viewed; qualitative trends only)",
+      "Tables 1, 3, 6 — PDF pp7, 9, 30 (AI viewed; selected values checked)",
+      "Equations 1–4, 7–17 and Algorithm 3 — PDF pp3, 5–7, 18 (AI viewed)"
+    ],
+    "limitations": [
+      "未运行作者代码、复现模型调用或审计训练日志；无独立审阅者复核。",
+      "未穷尽全部基线、附录拓扑案例与参考文献；未核实所有实验样本数、重复次数和前缀训练计分口径。",
+      "广播计数、掩码矩阵、伯努利策略梯度、低秩矩阵和回本算例均为导读自编教学示例，不是论文实验。",
+      "v1 式(10)概率记号、式(12)TopK约定、式(13)成本展开与部分图表存在疑点；导读的重排与取舍已标明，详见核对记录。",
+      "图4中的模型轨迹不作为正确数学证明；图5的成本倍数与部分点位不用于定量结论。",
+      "攻击结论限于论文的单成员角色破坏或随机输出设置；后续研究建议为编辑延伸。"
+    ],
+    "reviewBasis": "AI通读固定v1正文并补读方法与实验附录，打开相关PDF页核对公式、表格及图像，逐项重算正文摘录的差值与成本；图3、4、30裁切PNG均已查看。核对记录：docs/research/agentprune-r2-review.md。结构检查另记，不代替独立学术审查或页面验收。"
+  },
+  "orientation": {
+    "shortTitle": "AgentPrune：哪些智能体消息可以不再发送",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "通信冗余"
+        ]
+      },
+      {
+        "id": "communication-efficiency",
+        "label": "通信效率",
+        "aliases": [
+          "AgentPrune",
+          "图剪枝",
+          "token成本"
+        ]
+      }
+    ],
+    "summary": "AgentPrune 将同轮与跨轮消息表示为两张图，以任务反馈学习连接掩码，用低秩约束引导搜索，再一次裁剪并复用稀疏图。核心是把消息依赖、学习过程和成本账本连起来。",
+    "value": "能对着原图指出每条边传递的消息与轮次，区分连续掩码、采样图和二值裁剪，并按输入、输出、学习开销与复用次数解释效率证据。",
+    "prerequisites": [
+      "了解模型根据提示生成文本；会读矩阵、简单概率与求导。图、核范数、策略梯度及任务指标均在正文中解释。"
+    ],
+    "boundaries": [
+      "固定 arXiv v1；未复现代码或实验。",
+      "原版公式和部分图表不一致已注明；教学推导与作者结果分开。",
+      "查询级结构使用前缀任务反馈学习，跨任务泛化与统计显著性仍需额外验证。",
+      "角色攻击结果不提供通用提示注入安全保证。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Guibin Zhang",
+        "Yanwei Yue",
+        "Zhixun Li",
+        "Sukwon Yun",
+        "Guancheng Wan",
+        "Kun Wang",
+        "Dawei Cheng",
+        "Jeffrey Xu Yu",
+        "Tianlong Chen"
+      ],
+      "year": 2024,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2410.02506v1",
+      "preprintYear": 2024
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "分清候选图、跨轮依赖与实际执行的无环图，解释一个角色何时能读取另一角色的输出。",
+        "concepts": [
+          "空间边",
+          "时间边",
+          "DAG",
+          "拓扑排序"
+        ],
+        "limit": "剪枝后的候选空间图仍可能有环，执行前要做删环处理。"
+      },
+      {
+        "unitId": "architecture",
+        "purpose": "沿图4从问题到历史追踪消息，算清同一份输出被多次读取的词元开销。",
+        "concepts": [
+          "消息传递",
+          "汇总",
+          "历史输入"
+        ],
+        "limit": "图内作答文字是模型轨迹，示意词元账没有计入学习阶段。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "把行发送、列接收的邻接矩阵与图掩码对应起来，说明哪些边属于可选范围。",
+        "concepts": [
+          "邻接矩阵",
+          "图掩码",
+          "逐元素乘法"
+        ],
+        "limit": "教学矩阵数值为人为指定，方法主要筛选原图已有连接。"
+      },
+      {
+        "unitId": "policy-gradient",
+        "purpose": "用一个可选边的算例理解任务得分怎样改变结构的采样倾向。",
+        "concepts": [
+          "策略梯度",
+          "采样概率",
+          "任务效用"
+        ],
+        "limit": "伯努利例子解释一般原理，未逐行还原原文概率表达或代码。"
+      },
+      {
+        "unitId": "low-rank",
+        "purpose": "分清低秩正则引导结构模式与裁剪减少非零边数的不同作用。",
+        "concepts": [
+          "低秩",
+          "核范数",
+          "Frobenius范数"
+        ],
+        "limit": "低秩本身不保证少边或识别恶意消息。"
+      },
+      {
+        "unitId": "one-shot-pruning",
+        "purpose": "从六条边的分数排序得到四条保留边，并解释各角色的新输入。",
+        "concepts": [
+          "二值掩码",
+          "一次性裁剪",
+          "保留比例"
+        ],
+        "limit": "原文TopK取整与同分规则未完全说明；教学选择整数个保留项。"
+      },
+      {
+        "unitId": "temporal-reuse",
+        "purpose": "对照图30识别跨轮路径，区分按对话轮学习与按任务前缀学习。",
+        "concepts": [
+          "时间裁剪",
+          "多查询训练",
+          "结构复用"
+        ],
+        "limit": "前缀任务反馈属于适配成本，跨领域迁移需独立评测。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "按学习额外开销与后续每轮节省，判断结构优化何时回本。",
+        "concepts": [
+          "摊销",
+          "采样开销",
+          "输入与输出"
+        ],
+        "limit": "推导使用固定平均消息长度；v1式(13)与成本分项不一致。"
+      },
+      {
+        "unitId": "plugin-results",
+        "purpose": "分别解释输入词元、总词元、费用与任务表现的变化。",
+        "concepts": [
+          "HumanEval",
+          "Pass@1",
+          "成本口径"
+        ],
+        "limit": "历史API费用不是当前报价，v1 GSM8K部分行存在内部不一致。"
+      },
+      {
+        "unitId": "robustness-ablation",
+        "purpose": "判断攻击与消融各自支持哪些设计选择，并识别收益随任务变化的现象。",
+        "concepts": [
+          "角色提示攻击",
+          "低秩消融",
+          "敏感性"
+        ],
+        "limit": "小差值缺少重复统计支持；攻击限定为一个成员被破坏。"
+      }
+    ]
+  }
+}

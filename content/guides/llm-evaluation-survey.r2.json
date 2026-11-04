@@ -1,0 +1,513 @@
+{
+  "schemaVersion": 2,
+  "id": "llm-evaluation-survey",
+  "paperId": "arxiv:2307.03109",
+  "revision": 2,
+  "title": "大模型评测综述：先确定测什么，再解释一个分数",
+  "paperTitle": "A Survey on Evaluation of Large Language Models",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "这篇导读帮读者把“模型好不好”拆成任务、数据、过程、判定四段可以逐项核查的证据，并用同一道虚构的规则问答题看清每一步各能错在哪里。",
+  "source": {
+    "id": "arxiv:2307.03109",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2307.03109v1"
+  },
+  "bodyFile": "llm-evaluation-survey.r2.md",
+  "bodySha256": "ebf6401389f2220968f575854f77966b613cda3322a519ffe9b349e4763cc29c",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "framework",
+      "heading": "图 1：一篇综述怎样把评测拆成三个问题"
+    },
+    {
+      "id": "chain",
+      "heading": "图 3：一次评测其实是一条证据链"
+    },
+    {
+      "id": "u01",
+      "heading": "测什么之一：语言任务里的能力与错误"
+    },
+    {
+      "id": "what-risks",
+      "heading": "测什么之二：鲁棒性、伦理与可信性"
+    },
+    {
+      "id": "what-domains",
+      "heading": "测什么之三：领域应用与 Agent"
+    },
+    {
+      "id": "u02",
+      "heading": "在哪里测：基准目录能回答和不能回答的"
+    },
+    {
+      "id": "u03",
+      "heading": "怎样测之一：自动指标与模型评分"
+    },
+    {
+      "id": "u04",
+      "heading": "怎样测之二：人工评审与新的测试协议"
+    },
+    {
+      "id": "summary",
+      "heading": "作者总结的成功与失败，应该怎样读"
+    },
+    {
+      "id": "u05",
+      "heading": "七个挑战：污染、动态与评测自身的可信"
+    },
+    {
+      "id": "u06",
+      "heading": "把综述变成一张检查表"
+    },
+    {
+      "id": "u07",
+      "heading": "回到原文：从哪几页读起"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=2",
+      "labels": [
+        "摘要与 §1，PDF 第1–3页",
+        "图 1 与 §1，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2307.03109v1",
+      "labels": [
+        "2023 年 7 月的 arXiv v1"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=4",
+      "labels": [
+        "§3.1 脚注 1，PDF 第4页",
+        "图 3 与 §2.2，PDF 第4页",
+        "§2.2，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=3",
+      "labels": [
+        "图 2 与 §2，PDF 第3页",
+        "§2.1，PDF 第3–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=5",
+      "labels": [
+        "§3.1 与 §6.1，PDF 第4–15页",
+        "§3.1.1，PDF 第4–5页",
+        "§3.1.1，PDF 第5页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=6",
+      "labels": [
+        "§3.1.1，PDF 第5–6页",
+        "§3.1.2，PDF 第6页",
+        "§3.1.3，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=7",
+      "labels": [
+        "§3.1.3，PDF 第6–7页",
+        "§3.1.4–3.1.5，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=8",
+      "labels": [
+        "§3.2 与表 3，PDF 第8页",
+        "§3.2.1，PDF 第8–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=9",
+      "labels": [
+        "§3.2.1，PDF 第9页",
+        "§3.2.2，PDF 第8–9页",
+        "§3.2.2，PDF 第9页",
+        "§3.2.3，PDF 第9页",
+        "§3.3–3.7，PDF 第9–13页",
+        "§3.3，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=10",
+      "labels": [
+        "§3.4.1，PDF 第9–10页",
+        "§3.4.2–3.4.3，PDF 第10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=11",
+      "labels": [
+        "§3.5，PDF 第10–11页",
+        "§3.6，PDF 第11页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=12",
+      "labels": [
+        "§3.7，PDF 第11–13页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=13",
+      "labels": [
+        "§4 与表 7，PDF 第13–14页",
+        "§4.1，PDF 第13页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=14",
+      "labels": [
+        "§4 与表 7，PDF 第13–14页",
+        "§4.2，PDF 第13–14页",
+        "§5.1，PDF 第14页",
+        "§5.2，PDF 第14页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/abs/2211.09110",
+      "labels": [
+        "HELM 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "HELM 原文摘要，arXiv 2211.09110v2"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/abs/2304.06364",
+      "labels": [
+        "AGIEval 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "AGIEval 原文摘要，arXiv 2304.06364v2"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/abs/2306.05087",
+      "labels": [
+        "PandaLM 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "PandaLM 原文摘要，arXiv 2306.05087v2"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/abs/2206.04615",
+      "labels": [
+        "Big-Bench 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "Big-Bench 原文摘要，arXiv 2206.04615v3"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/abs/2304.08244",
+      "labels": [
+        "API-Bank 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "API-Bank 原文摘要，arXiv 2304.08244v2"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/abs/1904.09675",
+      "labels": [
+        "BERTScore 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "BERTScore 原文摘要，arXiv 1904.09675v3"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=15",
+      "labels": [
+        "§6.2 与表 8，PDF 第15页",
+        "§6.1，PDF 第15页",
+        "§7，PDF 第15–17页",
+        "§6.1 与 §7，PDF 第15–16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/pdf/2307.03109v1#page=16",
+      "labels": [
+        "§7.4，PDF 第16页",
+        "§7.5，PDF 第16页",
+        "§7.7，PDF 第16页",
+        "§3–7，PDF 第4–16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c23",
+      "url": "https://doi.org/10.1145/3641289",
+      "labels": [
+        "ACM 期刊页面"
+      ],
+      "role": "background",
+      "sourceVersion": "ACM TIST 出版记录"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agent-evaluation-survey",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/llm-evaluation-survey/figure-1-structure.webp",
+      "sha256": "e7ea090de5a8b4ca9a6b840c6871b737de4f0af8e27fa5b96edc5558f76fab45",
+      "mime": "image/webp",
+      "alt": "综述结构图：最左侧根节点“LLMs evaluation”向右分出五条主干，依次是测什么（§3）、在哪里测（§4）、怎样测（§5）、总结（§6）和重大挑战（§7）；右侧按主题列出自然语言处理、鲁棒性与伦理、社会科学、自然科学与工程、医学、Agent 等分支及其被引论文。",
+      "origin": "https://arxiv.org/pdf/2307.03109v1#page=2",
+      "rights": "原论文图 1，作者 Chang 等，arXiv:2307.03109v1，CC BY 4.0；在私有仓库中作个人学术阅读引用并保留署名。"
+    },
+    {
+      "path": "assets/llm-evaluation-survey/figure-2-paper-trend.webp",
+      "sha256": "bfb80d86c5986962749190a2b4d6491263156579d566f5c431a9927a93cf5d5c",
+      "mime": "image/webp",
+      "alt": "折线图：纵轴标注“Number of papers”，范围 0 到 35；横轴从 2020 年到 2023 年 6 月以后逐月排列。曲线在 2020 至 2022 年停留在 0 到 3 之间，2023 年 1 月约 2 篇，此后逐月上升，2023 年 6 月以后约 33 篇。",
+      "origin": "https://arxiv.org/pdf/2307.03109v1#page=3",
+      "rights": "原论文图 2，作者 Chang 等，arXiv:2307.03109v1，CC BY 4.0；在私有仓库中作个人学术阅读引用并保留署名。"
+    },
+    {
+      "path": "assets/llm-evaluation-survey/figure-3-evaluation-process.webp",
+      "sha256": "dea09f06b1cf482903b0bcf27bc8a2992e94afa1e80e9606d59fdcaa05220f0b",
+      "mime": "image/webp",
+      "alt": "示意图：四个带图标的方框从左到右依次是 Model、What（Task）、Where（Data）、How（Process），方框之间各有一个右向箭头，表示模型评测依次经过任务、数据和处理三步。",
+      "origin": "https://arxiv.org/pdf/2307.03109v1#page=4",
+      "rights": "原论文图 3，作者 Chang 等，arXiv:2307.03109v1，CC BY 4.0；在私有仓库中作个人学术阅读引用并保留署名。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1–2: 评测动机、三个问题、图 1 与图 3、传统评测协议",
+      "§3.1: 自然语言理解、推理、生成、多语言与事实性",
+      "§3.2: 鲁棒性、伦理与偏见、可信性",
+      "§3.3–3.7: 社会科学、自然科学与工程、医学、Agent 与其他应用",
+      "§4: 表 7 的 16 个基准与通用/特定分组",
+      "§5: 自动评测与人工评测",
+      "§6: 成功与失败清单，表 8 的三种新协议",
+      "§7–8: 七条挑战与结论"
+    ],
+    "figuresViewed": [
+      "Figure 1 — PDF p2 (reproduced crop, checked at zoom 4)",
+      "Figure 2 — PDF p3 (reproduced crop, checked at zoom 5)",
+      "Figure 3 — PDF p4 (reproduced crop, checked at zoom 8)",
+      "Table 1 — PDF p4 (read)",
+      "Table 2 — PDF p5 (read)",
+      "Table 3 — PDF p8 (read)",
+      "Table 4 — PDF p9 (read)",
+      "Table 5 — PDF p11 (read)",
+      "Table 6 — PDF p12 (read)",
+      "Table 7 — PDF p14 (read; 16 rows rewritten)",
+      "Table 8 — PDF p15 (read)"
+    ],
+    "limitations": [
+      "固定 arXiv v1（2023-07-06，23 页）；未与 2024 年 ACM TIST 正式版逐段比较，不混用两版正文、数字或页码。",
+      "覆盖正文 §1–8 与表 1–8 的主线，未逐篇核查综述引用的大量文献，也未覆盖参考文献列表，不能视为 full-survey。",
+      "没有复现任何评测，没有验证任何自动指标或模型评委的准确率；对 2023 年之后出现的基准、评委与模型不作评价。",
+      "棠溪图书馆的规则、题目、三个答案与要点覆盖率均为导读自编的教学例子，没有作为实验运行。",
+      "综述自身的数字问题（表 7 行数、API-Bank 规模、§3.3 末段错置）已如实标注，未自行裁定勘误。"
+    ],
+    "reviewBasis": "AI authoring review: downloaded the fixed arXiv v1 PDF and its abs page, extracted the full text, read §1–8 with Tables 1–8, and visually inspected cropped renders of Figures 1, 2 and 3. Claim-by-claim checks, source inconsistencies and the exact scope are recorded in docs/research/llm-evaluation-survey-r2-review.md. No human review and no experimental reproduction; independent integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "LLM 评测：目标、基准与判断",
+    "topics": [
+      {
+        "id": "agent-model-evaluation",
+        "label": "Agent与模型评测",
+        "aliases": [
+          "evaluation",
+          "benchmark",
+          "评测"
+        ]
+      },
+      {
+        "id": "evaluation-methodology",
+        "label": "评测方法与边界",
+        "aliases": [
+          "评价协议",
+          "评分方法"
+        ]
+      }
+    ],
+    "summary": "评测的分数要连着测什么、在哪里测、怎样判定才能解释。这篇综述把大模型评测拆成三个相连的问题，先按语言任务、风险维度和领域应用整理“测什么”，再用表 7 的 16 个基准回答“在哪里测”，最后比较自动指标、模型评委与人工评审，并汇总成败清单和七条挑战。固定于 2023 年 7 月的 arXiv v1。",
+    "value": "读完后拿到一张评测结果表，可以逐段追问：任务说得够具体吗，样本是否可能进过训练，提示和工具改变了被测对象吗，判分方法认不认得关键错误。也能分清字面相似、按要点覆盖和人工判断给同一批答案排出的不同名次，并为自己的系统挑一套能自查的对照。",
+    "prerequisites": [
+      "知道大模型按提示生成文本、可以被 API 调用即可；软投票、链式法则、指标含义等会在正文用到时解释。",
+      "不需要统计学基础；会读表格和百分比就能跟完要点覆盖率的手算。"
+    ],
+    "boundaries": [
+      "固定 2023 年 7 月的 arXiv v1，未混入 2024 年正式版；文中模型表现属于当时观察，不是当前排名。",
+      "覆盖正文主线与表 1–8，未逐篇核查综述引用的文献，也未复现任何评测或验证评分器质量。",
+      "棠溪图书馆的规则与答案、要点覆盖率都是导读自编的教学例子。",
+      "表 7 行数、API-Bank 规模与 §3.3 末段错置等原文出入已标注，未自行勘误。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Yupeng Chang",
+        "Xu Wang",
+        "Jindong Wang",
+        "Yuan Wu",
+        "Kaijie Zhu",
+        "Hao Chen",
+        "Linyi Yang",
+        "Xiaoyuan Yi",
+        "Cunxiang Wang",
+        "Yidong Wang",
+        "Wei Ye",
+        "Yue Zhang",
+        "Yi Chang",
+        "Philip S. Yu",
+        "Qiang Yang",
+        "Xing Xie"
+      ],
+      "year": 2023,
+      "venue": "arXiv v1（另有 ACM TIST 2024 正式版）",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2307.03109v1",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "framework",
+        "purpose": "解释综述为什么用“测什么、在哪里测、怎样测”组织内容，并说出五条主干各自的章节入口。",
+        "concepts": [
+          "评测框架",
+          "分类维度"
+        ],
+        "limit": "分类只是作者的一种划法，类别之间会交叉，不能当作互斥的科目表。"
+      },
+      {
+        "unitId": "chain",
+        "purpose": "按模型、任务、数据、过程四段复述一次评测，并说明传统交叉验证为什么搬不过来。",
+        "concepts": [
+          "评测链",
+          "静态验证集"
+        ],
+        "limit": "把一次回答读成多步决策是导读的解释，论文没有据此提出过程指标。"
+      },
+      {
+        "unitId": "u01",
+        "purpose": "区分语言任务里“类上很强、难档掉队”的结论，并指出每个数字依赖的数据集条件。",
+        "concepts": [
+          "语言任务",
+          "事实性"
+        ],
+        "limit": "这些数字来自不同数据集与提示，不能横比成一张能力排序。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "读懂表 7 的三列，判断一个基准能支持什么结论、有没有被污染的风险。",
+        "concepts": [
+          "基准",
+          "评测协议"
+        ],
+        "limit": "基准目录是 2023 年中的快照，各基准的维护状态与规模需回原论文核对。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "用同一批回答比较字面重合、要点覆盖与人工判断，说明指标在奖励什么。",
+        "concepts": [
+          "自动评测",
+          "评分口径"
+        ],
+        "limit": "手算的要点口径由导读设定，换一套口径排序就会变。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "解释人工评审在哪里补足自动指标，以及评分标准前置如何减少分歧。",
+        "concepts": [
+          "人工评价",
+          "评审分歧"
+        ],
+        "limit": "人评方差与标准差异是综述自己指出的问题，正文没有实测其大小。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "把七条挑战归到“测量跟不上变化”和“测量工具自身要可信”两类，并解释污染的两种来源。",
+        "concepts": [
+          "数据污染",
+          "动态评测"
+        ],
+        "limit": "这些是 2023 年中的判断，不能直接当作今天的研究空白。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "用四段检查表和现象反查表，定位一次评测结论最薄弱的一环。",
+        "concepts": [
+          "错误分析",
+          "对照设计"
+        ],
+        "limit": "检查表用于组织问题，不替代目标场景中的实测。"
+      }
+    ]
+  }
+}

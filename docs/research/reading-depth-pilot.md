@@ -1,6 +1,6 @@
 # 导读加深试点 · Transformer 与 RAG 综述
 
-当前试读版本为 r4。两篇仍待读者分别验收。读者明确认可两篇的内容、深度和读法后，再讨论推广。
+当前内容状态以 r5 为准：Transformer r5 与 RAG 综述 r5 已由读者确认，作为[导读写作工作流](../content/workflows/GUIDE-WRITING.md)的样例；其余导读的批量修订见[汇总](guide-depth-batch-2026-11-04.md)。本页下面保留 r4 及更早试读轮次的历史记录，不再代表当前修订。
 
 ## 第三轮试读
 

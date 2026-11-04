@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 2,
+  "id": "react",
+  "paperId": "arxiv:2210.03629",
+  "revision": 3,
+  "title": "ReAct：让推理、行动与环境反馈形成循环",
+  "paperTitle": "ReAct: Synergizing Reasoning and Acting in Language Models",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "理解推理、行动与外部观察如何交错，并根据具体对照判断收益和限制。",
+  "source": {
+    "id": "arxiv:2210.03629",
+    "version": "v3",
+    "url": "https://arxiv.org/pdf/2210.03629v3"
+  },
+  "bodyFile": "react.r3.md",
+  "bodySha256": "05f21ac0f8f1c6e1bb5a0b13a3dee09df77b8f4a87c5ff3a4ac98446ff545488",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "背景：只推理和只行动各缺什么"
+    },
+    {
+      "id": "u01",
+      "heading": "任务与接口：模型实际能做什么"
+    },
+    {
+      "id": "u02",
+      "heading": "全貌：沿图 1 看四种解题方式"
+    },
+    {
+      "id": "cycle",
+      "heading": "核心循环：一次观察怎样改变下一步"
+    },
+    {
+      "id": "demonstrations",
+      "heading": "示范与对照：怎样把循环教给模型"
+    },
+    {
+      "id": "u03",
+      "heading": "问答结果：检索有帮助，也会带来新失败"
+    },
+    {
+      "id": "combination",
+      "heading": "把 CoT 与 ReAct 接起来：收益和额外预算"
+    },
+    {
+      "id": "finetuning",
+      "heading": "微调：为什么较小模型的表现顺序变了"
+    },
+    {
+      "id": "u04",
+      "heading": "ALFWorld：用稀疏思考管理长任务"
+    },
+    {
+      "id": "webshop",
+      "heading": "WebShop：属性分数和完整成功率"
+    },
+    {
+      "id": "u05",
+      "heading": "局限、风险与后续阅读"
+    },
+    {
+      "id": "u06",
+      "heading": "回到原文：沿轨迹检查证据"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2210.03629v3",
+      "labels": [
+        "摘要与 §1，PDF 第1–3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=3",
+      "labels": [
+        "§2–4，PDF 第3–8页",
+        "§2，PDF 第3页",
+        "§2、§3.2，PDF 第3–5页",
+        "§2，PDF 第3–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=2",
+      "labels": [
+        "§1 与图 1，PDF 第2页",
+        "图 1，PDF 第2页",
+        "图 1、§2，PDF 第2–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=4",
+      "labels": [
+        "§3.1，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=5",
+      "labels": [
+        "§3.2，PDF 第5页",
+        "表 1，PDF 第5页",
+        "§3.2–3.3、图 2，PDF 第5–6页",
+        "图 2–3、表 1–4，PDF 第5–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=6",
+      "labels": [
+        "§3.3、表 2，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=7",
+      "labels": [
+        "§3.2–3.3、图 3，PDF 第5–7页",
+        "§4，PDF 第7页",
+        "§4，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=8",
+      "labels": [
+        "§4、表 3，PDF 第7–8页",
+        "表 4，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=9",
+      "labels": [
+        "§6，PDF 第9–10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/pdf/2210.03629v3#page=10",
+      "labels": [
+        "伦理声明，PDF 第10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v3"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/react/figure-1-trajectories.webp",
+      "sha256": "a6e8539c8438934ef037f4a472e5b53525e344064abb903db89e4b90ba301dc7",
+      "mime": "image/webp",
+      "alt": "原论文图1：上半部对比四种问答方法。ReAct 搜索 Apple Remote 得到 Front Row；搜索 Front Row 失败后从候选中选 Front Row (software)，再查到键盘功能键并提交答案。只行动方法查到软件页面却提交 yes，只推理方法采用错误的 Apple TV 前提。下半部是家庭任务：只行动方法在水槽观察不到胡椒瓶仍两次尝试取物，均无效；ReAct 在台面观察到胡椒瓶并取起，随后发现抽屉关闭、打开抽屉并放入瓶子，环境确认放置。图中绿色标出有效信息，红色标出错误，蓝色标出思考。",
+      "origin": "https://arxiv.org/pdf/2210.03629v3#page=2",
+      "rights": "原论文图 1，Yao 等；CC BY 4.0 许可记录沿用 r2，本次未联网独立核实。"
+    },
+    {
+      "path": "assets/react/figure-3-scaling.webp",
+      "sha256": "25a3529797af3738947945896bee4967cd24c416d85ee886a4378ce60a8f0a08",
+      "mime": "image/webp",
+      "alt": "论文图3的两组柱状图：左图为提示，右图为微调；横轴是8B、62B、540B模型规模，纵轴是HotpotQA精确匹配率，四种颜色对应Standard、CoT、Act和ReAct。在8B和62B时，提示的ReAct柱低于其他三种方法，微调后的ReAct柱则高于其他三种方法；右图没有540B微调柱。",
+      "origin": "https://arxiv.org/pdf/2210.03629v3#page=7",
+      "rights": "原论文图 3，Yao 等；CC BY 4.0 许可记录沿用 r2，本次未联网独立核实。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1–6",
+      "Ethics and reproducibility statements"
+    ],
+    "figuresViewed": [
+      "Figure 1 — PDF p2 (reproduced)",
+      "Figure 2 — PDF p5",
+      "Figure 3 — PDF p7 (reproduced)"
+    ],
+    "limitations": [
+      "未逐项展开附录示范与额外实验。",
+      "未复现实验；历史模型与基准结果不代表当前表现。",
+      "投票与属性计分情形为导读自编教学例子。",
+      "可读轨迹不能证明内部推理忠实。"
+    ],
+    "reviewBasis": "作者自核：阅读 arXiv 2210.03629v3 正文 PDF 第1–10页；查看图1–3、表1–4及图1、3裁图；未独立审阅或复现实验。"
+  },
+  "orientation": {
+    "shortTitle": "ReAct：推理与行动怎样互相支持",
+    "topics": [
+      {
+        "id": "reasoning-and-acting",
+        "label": "Agent 推理与行动",
+        "aliases": [
+          "Agent",
+          "ReAct",
+          "reasoning and acting",
+          "推理行动"
+        ]
+      },
+      {
+        "id": "tool-interaction",
+        "label": "环境交互",
+        "aliases": [
+          "工具调用",
+          "环境反馈",
+          "交互决策"
+        ]
+      }
+    ],
+    "summary": "解释 ReAct 怎样交错生成思考和行动、接收环境观察，并用问答与交互实验分析收益及失败。",
+    "value": "能够区分模型判断、实际动作和环境观察，并根据示范、工具与预算比较实验结果。",
+    "prerequisites": [
+      "了解语言模型根据上下文生成文字；正文会解释策略、动作与观察的区别。",
+      "知道提示示范与参数微调是两种不同的适配方式，不要求预先掌握强化学习算法。"
+    ],
+    "boundaries": [
+      "覆盖研究主线、关键图表与主要对照，未展开全部附录轨迹或复现实验。",
+      "方法没有在所有任务上胜过纯推理；检索失败、重复行动和上下文容量都影响效果。",
+      "论文中可读的轨迹不等于对内部推理忠实性或实际系统可靠性的认证。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Shunyu Yao",
+        "Jeffrey Zhao",
+        "Dian Yu",
+        "Nan Du",
+        "Izhak Shafran",
+        "Karthik Narasimhan",
+        "Yuan Cao"
+      ],
+      "year": 2023,
+      "venue": "ICLR 2023 · International Conference on Learning Representations",
+      "publicationKind": "conference",
+      "url": "https://arxiv.org/abs/2210.03629v3",
+      "preprintYear": 2022
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "解释任务、策略、动作空间及观察来源的区别。",
+        "concepts": [
+          "Agent",
+          "ReAct",
+          "工具调用"
+        ],
+        "limit": "接口是论文特定的百科操作，不是任意浏览器。"
+      },
+      {
+        "unitId": "u02",
+        "purpose": "沿图1解释搜索失败如何改变下一次搜索，以及思考如何管理子目标。",
+        "concepts": [
+          "ReAct",
+          "推理",
+          "环境反馈"
+        ],
+        "limit": "图示是个案，不是总体成功率。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "比较问答对照并区分轨迹错误分析的分母。",
+        "concepts": [
+          "HotpotQA",
+          "CoT",
+          "幻觉"
+        ],
+        "limit": "结果取决于论文指定模型与检索接口。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "解释长任务中的子目标与平均、最好提示结果。",
+        "concepts": [
+          "Agent",
+          "子目标"
+        ],
+        "limit": "模拟环境结果不代表真实环境可靠性。"
+      }
+    ]
+  }
+}

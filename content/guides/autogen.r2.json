@@ -1,0 +1,499 @@
+{
+  "schemaVersion": 2,
+  "id": "autogen",
+  "paperId": "arxiv:2308.08155",
+  "revision": 2,
+  "title": "AutoGen：把多智能体通信组织成可执行的协作",
+  "paperTitle": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+  "language": "zh-Hans",
+  "type": "system",
+  "mode": "standard",
+  "purpose": "以图 2 的接口与自动回复为主线，读懂 AutoGen 怎样把 Agent 能力、消息与控制流程组合起来，再借助六类应用分清框架能力、实验证据与设计代价。",
+  "source": {
+    "id": "arxiv:2308.08155",
+    "version": "v2",
+    "url": "https://arxiv.org/html/2308.08155v2"
+  },
+  "bodyFile": "autogen.r2.md",
+  "bodySha256": "5e6cf5387b9a826b9b453efbe602c3e78258d745e69d2d9e0a2c52915eea0ee4",
+  "units": [
+    {
+      "id": "intro",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "背景：为什么把应用组织成对话"
+    },
+    {
+      "id": "architecture",
+      "heading": "全貌：图 1 里的三个层次"
+    },
+    {
+      "id": "agents",
+      "heading": "Agent 由什么组成"
+    },
+    {
+      "id": "programming",
+      "heading": "对话编程：自动回复怎样接住控制"
+    },
+    {
+      "id": "flow",
+      "heading": "一次任务在对话里怎样走完"
+    },
+    {
+      "id": "groupchat",
+      "heading": "群聊：发言顺序由对话决定"
+    },
+    {
+      "id": "evidence",
+      "heading": "六类应用：证据支持了什么"
+    },
+    {
+      "id": "tradeoffs",
+      "heading": "设计取舍与代价"
+    },
+    {
+      "id": "research",
+      "heading": "把框架读成通信研究问题"
+    },
+    {
+      "id": "sources",
+      "heading": "回到原文：入口与覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/html/2308.08155v2#S1",
+      "labels": [
+        "摘要与 §1",
+        "§1 导言",
+        "§1 与图 1，PDF 第1页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/abs/2308.08155v2",
+      "labels": [
+        "固定版本记录"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=15",
+      "labels": [
+        "附录 A 与表 1，PDF 第14–15页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/html/2308.08155v2#S2.SS1",
+      "labels": [
+        "§2.1 可交谈 Agent"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=18",
+      "labels": [
+        "附录 C 默认系统消息，PDF 第18页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/html/2308.08155v2#S2.SS2",
+      "labels": [
+        "§2.2 对话编程",
+        "§2.2 与图 2，PDF 第4页",
+        "§2.1–2.2 与图 2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/html/2308.08155v2#S2.I1.i1",
+      "labels": [
+        "§2.2 设计模式一"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/html/2308.08155v2#S2.I1.i2",
+      "labels": [
+        "§2.2 设计模式二"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=22",
+      "labels": [
+        "附录 D 应用 A2 工作流，PDF 第22页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/html/2308.08155v2#S3.SSx2",
+      "labels": [
+        "§3 应用 A2",
+        "图 4b 与 §3 应用 A2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=26",
+      "labels": [
+        "附录 D 应用 A4 与图 11，PDF 第26页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=24",
+      "labels": [
+        "附录 D 应用 A3，PDF 第24页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/html/2308.08155v2#S3.SSx5",
+      "labels": [
+        "§3 应用 A5"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=28",
+      "labels": [
+        "图 12 与 §3 应用 A5，PDF 第28页",
+        "附录 D 应用 A5 与表 5、表 6，PDF 第28页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/html/2308.08155v2#S3",
+      "labels": [
+        "§3 应用总览与图 3"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=19",
+      "labels": [
+        "附录 D 应用 A1，PDF 第19–20页",
+        "表 2，PDF 第19页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=7",
+      "labels": [
+        "图 4a，PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=25",
+      "labels": [
+        "表 3 与 §3 应用 A3，PDF 第25页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/html/2308.08155v2#S3.SSx4",
+      "labels": [
+        "图 4d 与 §3 应用 A4"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=27",
+      "labels": [
+        "附录 D 应用 A4 用户研究与表 4，PDF 第27页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/html/2308.08155v2#S3.SSx6",
+      "labels": [
+        "§3 应用 A6"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/html/2308.08155v2#S4",
+      "labels": [
+        "§4 讨论"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/pdf/2308.08155v2#page=17",
+      "labels": [
+        "附录 B 未来工作，PDF 第17页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/pdf/2308.08155v2",
+      "labels": [
+        "固定 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c25",
+      "url": "https://arxiv.org/html/2308.08155v2",
+      "labels": [
+        "HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "camel",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentprune",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/autogen/figure-1-overview.webp",
+      "sha256": "b92e73f0a8baa81626928dba06cf7511e6981cbb346ffe03501e516701b633f8",
+      "mime": "image/webp",
+      "alt": "AutoGen 总览图：左侧为可交谈 Agent 的能力组合，中部为多智能体对话与静态、分层等对话拓扑，右侧为一次包含人手修改需求的实际对话",
+      "origin": "https://arxiv.org/pdf/2308.08155v2#page=1",
+      "rights": "Wu 等，arXiv:2308.08155v2，图 1。arXiv 摘要页标注该文采用知识共享署名 4.0（CC BY 4.0）许可，允许在署名前提下复制与分发。"
+    },
+    {
+      "path": "assets/autogen/figure-2-conversation-programming.webp",
+      "sha256": "40dd0e2e4ed144414ac5dab2376da683af0f7f602962409e3729af62b613baeb",
+      "mime": "image/webp",
+      "alt": "AutoGen 对话编程图：上部为 Agent 定制与统一接口，中部为定义 Agent、注册回复函数并发起对话的开发者代码，下部为程序执行时消息在收发与回复函数之间的流转",
+      "origin": "https://arxiv.org/pdf/2308.08155v2#page=4",
+      "rights": "Wu 等，arXiv:2308.08155v2，图 2。arXiv 摘要页标注该文采用知识共享署名 4.0（CC BY 4.0）许可，允许在署名前提下复制与分发。"
+    },
+    {
+      "path": "assets/autogen/figure-9-alfworld-two-three-agents.webp",
+      "sha256": "e0aafcccfeb8f64f8243926ce4c62f426fe3dfe6fadf93ccad28d243bbae41d4",
+      "mime": "image/webp",
+      "alt": "ALFWorld 的两种 Agent 结构：左侧两 Agent 版本由助手提出动作、执行者回报状态；右侧三 Agent 版本增加一个提供常识约束的 grounding agent",
+      "origin": "https://arxiv.org/pdf/2308.08155v2#page=24",
+      "rights": "Wu 等，arXiv:2308.08155v2，图 9。arXiv 摘要页标注该文采用知识共享署名 4.0（CC BY 4.0）许可，允许在署名前提下复制与分发。"
+    },
+    {
+      "path": "assets/autogen/figure-12-group-chat.webp",
+      "sha256": "8fca73e12f095974d0750a1efdad7013713c7cbc27805affc70351f9b840fed2",
+      "mime": "image/webp",
+      "alt": "动态群聊的三个步骤：管理者先选出下一位发言者，再请该发言者回应，最后把回复广播给所有成员",
+      "origin": "https://arxiv.org/pdf/2308.08155v2#page=28",
+      "rights": "Wu 等，arXiv:2308.08155v2，图 12。arXiv 摘要页标注该文采用知识共享署名 4.0（CC BY 4.0）许可，允许在署名前提下复制与分发。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1: motivation, the two design questions and the comparison with related systems",
+      "§2.1–2.2: conversable agents, conversation programming, auto-reply and control patterns",
+      "§3: six applications A1–A6 with their reported results",
+      "§4: discussion, risks and future work",
+      "Appendix A: related single-agent and multi-agent systems, Table 1",
+      "Appendix B: usage guidelines and future directions",
+      "Appendix C: default assistant system message (v0.1.1)",
+      "Appendix D: application details, Tables 2–6 and Figures 7–11"
+    ],
+    "figuresViewed": [
+      "Figure 1 — main PDF p1 (reproduced)",
+      "Figure 2 — main PDF p4 (reproduced)",
+      "Figure 3 — main PDF p6",
+      "Figure 9 — appendix D PDF p24 (reproduced)",
+      "Figure 12 — appendix D PDF p28 (reproduced)",
+      "Table 1 — PDF p15",
+      "Table 2 — PDF p19",
+      "Table 3 — PDF p25",
+      "Table 4 — PDF p27",
+      "Table 5 and Table 6 — PDF p28"
+    ],
+    "limitations": [
+      "覆盖正文 §1–4 与附录 A–D 的主线；附录 E 的示例输出（表 8–19）只抽查了与失败原因相关的几处，没有逐页阅读。",
+      "没有复现任何实验，也没有在当时的框架版本上运行代码；数字均为论文报告值，未重算。",
+      "未逐篇精读被引系统；CAMEL、MetaGPT、多智能体辩论与 BabyAGI 的描述取自本文附录 A 与表 1。",
+      "固定于 2023 年 v2，接口与配置同当前 AutoGen 软件包已不同；不验证后续版本的行为。",
+      "“把框架读成通信研究问题”中的研究建议属于导读延伸；消息序列表与 OptiGuide 步骤表是导读按原文图与附录整理的。"
+    ],
+    "reviewBasis": "Revision 2 rewrites revision 1 as a full guide: the framework section now follows Figure 2 (interfaces, auto-reply, control paths), the six applications are read against the appendix settings, and the group-chat pilot numbers are quoted with their sample size. Text, numbers and table rows were checked against the fixed arXiv v2 PDF (pp1–28) and the v2 HTML section anchors; Figures 1, 2, 9 and 12 are attributed originals cropped from that PDF and viewed after cropping. Authoring review by AI; independent review pending."
+  },
+  "orientation": {
+    "shortTitle": "AutoGen：把多智能体通信组织成可执行的协作",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "消息路由"
+        ]
+      },
+      {
+        "id": "agent-orchestration",
+        "label": "Agent 编排",
+        "aliases": [
+          "AutoGen",
+          "群聊",
+          "反馈循环"
+        ]
+      }
+    ],
+    "summary": "从“多个模型轮流说话还不够”出发，用原论文图 1 与图 2 讲清 AutoGen 的两个概念：可交谈 Agent 与对话编程。重点在统一接口、自动回复机制和三条控制路径，再用检索问答、供应链代码分析和文本环境任务走一遍消息流程，最后读群聊的发言者选择、六类应用的证据与设计代价。",
+    "value": "能看懂一张多智能体系统图里哪些是角色、哪些是消息、哪些是控制条件，并判断一篇新论文改的是接收者、控制词还是验证者；也能分清“框架支持某种编排”与“该编排在实验中有效”两件事。",
+    "prerequisites": [
+      "了解语言模型通过对话上下文生成回复；涉及代码执行与向量检索处给出直观解释。"
+    ],
+    "boundaries": [
+      "未逐项复现六类应用或完整审阅全部附录。",
+      "固定于 2023 年 v2，不验证当前 SDK。",
+      "跨系统比较保留模型、任务范围和配置差异。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Qingyun Wu",
+        "Gagan Bansal",
+        "Jieyu Zhang",
+        "Yiran Wu",
+        "Beibin Li",
+        "Erkang Zhu",
+        "Li Jiang",
+        "Xiaoyun Zhang",
+        "Shaokun Zhang",
+        "Jiale Liu",
+        "Ahmed Hassan Awadallah",
+        "Ryen W. White",
+        "Doug Burger",
+        "Chi Wang"
+      ],
+      "year": 2023,
+      "venue": "arXiv",
+      "publicationKind": "preprint",
+      "url": "https://arxiv.org/abs/2308.08155v2",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "architecture",
+        "purpose": "把图 1 拆成个体能力、对话拓扑和一次具体对话三个层次，并能指出右侧示例中哪条消息改变了下一步。",
+        "concepts": [
+          "可交谈 Agent",
+          "对话拓扑",
+          "示例对话"
+        ],
+        "limit": "图中的拓扑是示意，实际应用的成员数与连接方式由各自代码决定。"
+      },
+      {
+        "unitId": "agents",
+        "purpose": "说清可交谈 Agent 的三类后端、内置类的默认职责，以及系统消息里哪些句子其实是控制流。",
+        "concepts": [
+          "AssistantAgent",
+          "UserProxyAgent",
+          "默认系统消息"
+        ],
+        "limit": "类名只表示默认倾向，行为由配置决定。"
+      },
+      {
+        "unitId": "programming",
+        "purpose": "解释自动回复怎样把控制交给消息，并分清自然语言控制、代码控制与两者之间的交接。",
+        "concepts": [
+          "对话编程",
+          "自动回复",
+          "TERMINATE",
+          "UPDATE CONTEXT"
+        ],
+        "limit": "约定词是否生效取决于模型是否遵守，框架本身不保证。"
+      },
+      {
+        "unitId": "flow",
+        "purpose": "沿检索问答、OptiGuide 和 ALFWorld 三个任务复述消息怎样在角色之间传递，并指出反馈来自哪里。",
+        "concepts": [
+          "检索增强对话",
+          "Safeguard",
+          "grounding agent"
+        ],
+        "limit": "三个流程是论文的实现方式，不是该框架的唯一写法。"
+      },
+      {
+        "unitId": "groupchat",
+        "purpose": "说出 GroupChatManager 的三个步骤，并用 pilot 数字区分“成功率更高”与“调用更少”。",
+        "concepts": [
+          "GroupChatManager",
+          "发言者选择",
+          "广播"
+        ],
+        "limit": "结论来自 12 个手工任务的一次比较，样本很小。"
+      },
+      {
+        "unitId": "evidence",
+        "purpose": "按任务与条件读出六类应用的数字，判断哪一组实验真正支持了机制归因。",
+        "concepts": [
+          "MATH",
+          "Natural Questions",
+          "不安全代码识别"
+        ],
+        "limit": "多数实验比较的是完整系统对基线，不能把差别单独归给通信设计。"
+      }
+    ]
+  }
+}

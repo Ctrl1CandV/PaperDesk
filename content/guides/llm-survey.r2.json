@@ -1,0 +1,967 @@
+{
+  "schemaVersion": 2,
+  "id": "llm-survey",
+  "paperId": "doi:10.1007/s11704-026-60308-3",
+  "revision": 2,
+  "title": "大语言模型综述：从训练、使用到 Agent 的知识地图",
+  "paperTitle": "A Survey of Large Language Models",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "deep",
+  "purpose": "沿正式版的开发与使用过程，讲清参数学习、任务表达、外部知识和环境交互分别改变什么，并用原图和代表方法建立可回查的研究地图。",
+  "source": {
+    "id": "doi:10.1007/s11704-026-60308-3",
+    "version": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)",
+    "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf"
+  },
+  "bodyFile": "llm-survey.r2.md",
+  "bodySha256": "3a411060e9436e10e2392af7cbe0903fa5b3addf691a6be6109e8d08faf1fa0c",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从语言模型的来路看四维地图"
+    },
+    {
+      "id": "u02",
+      "heading": "下一词元预测怎样连接任务与规模"
+    },
+    {
+      "id": "u03",
+      "heading": "预训练之一：数据从来源走到训练课程"
+    },
+    {
+      "id": "architecture",
+      "heading": "预训练之二：架构改的是哪一种资源负担"
+    },
+    {
+      "id": "training",
+      "heading": "预训练之三：让训练装得下、跑得稳"
+    },
+    {
+      "id": "mid-training",
+      "heading": "中训练：在通用基础上强化目标能力"
+    },
+    {
+      "id": "u04",
+      "heading": "后训练之一：SFT 怎样把续写变成任务行为"
+    },
+    {
+      "id": "rewards",
+      "heading": "后训练之二：把偏好和正确性变成奖励"
+    },
+    {
+      "id": "optimization",
+      "heading": "后训练之三：PPO、GRPO、DPO 与筛选微调"
+    },
+    {
+      "id": "post-practice",
+      "heading": "多阶段后训练怎样把这些部件组合起来"
+    },
+    {
+      "id": "u05",
+      "heading": "使用之一：提示、上下文学习与思维链"
+    },
+    {
+      "id": "inference",
+      "heading": "使用之二：额外计算怎样变成推理改进"
+    },
+    {
+      "id": "u06",
+      "heading": "使用之三：RAG 让答案接触外部知识"
+    },
+    {
+      "id": "u07",
+      "heading": "使用之四：Agent 把记忆、规划和执行接成闭环"
+    },
+    {
+      "id": "deployment",
+      "heading": "使用之五：部署优化为什么也在方法地图里"
+    },
+    {
+      "id": "u08",
+      "heading": "评测：能力、任务、评分者与条件"
+    },
+    {
+      "id": "challenges",
+      "heading": "挑战：为什么四个维度需要一起改进"
+    },
+    {
+      "id": "method-map",
+      "heading": "把方法放回地图：从一篇新论文找到下一步阅读"
+    },
+    {
+      "id": "u09",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf",
+      "labels": [
+        "摘要、§1 与版本说明，PDF 第1–3页",
+        "固定原文PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c02",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=2",
+      "labels": [
+        "§1–2，PDF 第1–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c03",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=3",
+      "labels": [
+        "图2与§2，PDF 第3页",
+        "§2，PDF 第3–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c04",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=4",
+      "labels": [
+        "§2 Scaling law，PDF 第4页",
+        "§2 Representative abilities，PDF 第4页",
+        "§3.1与图3，PDF 第4–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/abs/2001.08361",
+      "labels": [
+        "Kaplan 等原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/abs/2203.15556",
+      "labels": [
+        "Hoffmann 等原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c07",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=5",
+      "labels": [
+        "§3.1.2，PDF 第5页",
+        "§3.1.3，PDF 第5–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c08",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=6",
+      "labels": [
+        "§3.1.4，PDF 第6页",
+        "§3.2与表1，PDF 第6–9页",
+        "§3.2.1，PDF 第6–7页",
+        "§3.2.1，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/abs/1911.02150",
+      "labels": [
+        "MQA原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/abs/2305.13245",
+      "labels": [
+        "GQA原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c11",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=7",
+      "labels": [
+        "表1，PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/abs/2405.04434",
+      "labels": [
+        "DeepSeek-V2原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c13",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=8",
+      "labels": [
+        "§3.2.2，PDF 第8页",
+        "§3.2.3，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/abs/2104.09864",
+      "labels": [
+        "RoPE原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/abs/2108.12409",
+      "labels": [
+        "ALiBi原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/abs/2401.04088",
+      "labels": [
+        "Mixtral原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c17",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=9",
+      "labels": [
+        "§3.3，PDF 第9–11页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c18",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=10",
+      "labels": [
+        "§3.3.2，PDF 第10页",
+        "表2，PDF 第10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/abs/1910.02054",
+      "labels": [
+        "ZeRO原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c20",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=11",
+      "labels": [
+        "§3.3.2，PDF 第11页",
+        "§3.4，PDF 第11–12页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/abs/2205.14135",
+      "labels": [
+        "FlashAttention原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/pdf/2205.14135v2#page=5",
+      "labels": [
+        "原论文§3.1、定理1，PDF第5页"
+      ],
+      "role": "background",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c23",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=12",
+      "labels": [
+        "§3.4.2，PDF 第12页",
+        "§4.1，PDF 第12–13页",
+        "图4与§4，PDF 第12页",
+        "§4.1.1，PDF 第12页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/abs/2212.10560",
+      "labels": [
+        "Self-Instruct原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c25",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=13",
+      "labels": [
+        "§4.1.1，PDF 第12–13页",
+        "§4.1.2，PDF 第13页",
+        "§4.1.3，PDF 第13页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c26",
+      "url": "https://arxiv.org/abs/2106.09685",
+      "labels": [
+        "LoRA原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c27",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=14",
+      "labels": [
+        "§4.2.1–4.2.2，PDF 第14–15页",
+        "§4.2.2，PDF 第14–15页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c28",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=15",
+      "labels": [
+        "§4.2.3，PDF 第15页",
+        "§4.2.3与表3，PDF 第15–17页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c29",
+      "url": "https://arxiv.org/abs/2203.02155",
+      "labels": [
+        "InstructGPT原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c30",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=16",
+      "labels": [
+        "§4.2.3 Training issues，PDF 第16页",
+        "§4.3.1与表3，PDF 第16–17页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c31",
+      "url": "https://arxiv.org/abs/1707.06347",
+      "labels": [
+        "PPO原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c32",
+      "url": "https://arxiv.org/abs/2402.03300",
+      "labels": [
+        "GRPO原论文摘要：DeepSeekMath"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c33",
+      "url": "https://arxiv.org/abs/2308.01825",
+      "labels": [
+        "RFT原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c34",
+      "url": "https://arxiv.org/abs/2305.18290",
+      "labels": [
+        "DPO原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c35",
+      "url": "https://arxiv.org/abs/2306.13649",
+      "labels": [
+        "OPD原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c36",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=17",
+      "labels": [
+        "§4.3.2，PDF 第17–18页",
+        "§4.3.2 Reasoning-oriented training，PDF 第17页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c37",
+      "url": "https://arxiv.org/abs/2501.12948v1",
+      "labels": [
+        "DeepSeek-R1原始报告摘要，v1"
+      ],
+      "role": "background",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c38",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=18",
+      "labels": [
+        "§5与图5，PDF 第18页",
+        "§5.1.2，PDF 第18–19页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c39",
+      "url": "https://arxiv.org/abs/2005.14165",
+      "labels": [
+        "GPT-3原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c40",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=19",
+      "labels": [
+        "§5.1.2 Underlying mechanism，PDF 第19页",
+        "§5.1.3，PDF 第19页",
+        "§5.2.1，PDF 第19–20页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c41",
+      "url": "https://arxiv.org/abs/2201.11903",
+      "labels": [
+        "CoT原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c42",
+      "url": "https://arxiv.org/abs/2203.11171",
+      "labels": [
+        "Self-Consistency原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c43",
+      "url": "https://arxiv.org/abs/2305.10601",
+      "labels": [
+        "ToT原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c44",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=20",
+      "labels": [
+        "§5.2.1 Long-CoT reasoning，PDF 第20页",
+        "§5.2.2，PDF 第20页",
+        "§5.2.2 Improvement strategies，PDF 第20页",
+        "§5.3，PDF 第20–22页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c45",
+      "url": "https://arxiv.org/abs/2212.10509",
+      "labels": [
+        "IRCoT原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c46",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "labels": [
+        "ReAct原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c47",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=21",
+      "labels": [
+        "§5.3.2 Long-context management，PDF 第21页",
+        "§5.3.1与§5.3.2，PDF 第21页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c48",
+      "url": "https://arxiv.org/abs/2303.11366",
+      "labels": [
+        "Reflexion原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c49",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=22",
+      "labels": [
+        "§5.4，PDF 第22–23页",
+        "§5.4.2，PDF 第22页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c50",
+      "url": "https://arxiv.org/abs/2309.06180",
+      "labels": [
+        "PagedAttention原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c51",
+      "url": "https://arxiv.org/abs/2211.17192",
+      "labels": [
+        "推测解码原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c52",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=23",
+      "labels": [
+        "§5.4.3，PDF 第22–23页",
+        "§6，PDF 第23–25页",
+        "§6.1–6.2，PDF 第23–24页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c53",
+      "url": "https://arxiv.org/abs/2009.03300",
+      "labels": [
+        "MMLU原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c54",
+      "url": "https://arxiv.org/abs/2107.03374",
+      "labels": [
+        "HumanEval原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c55",
+      "url": "https://arxiv.org/abs/2406.12045",
+      "labels": [
+        "τ-bench原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c56",
+      "url": "https://arxiv.org/abs/2403.04132",
+      "labels": [
+        "Chatbot Arena原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c57",
+      "url": "https://arxiv.org/abs/2211.09110",
+      "labels": [
+        "HELM原论文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "被引方法原论文摘要；经 arXiv API 核对标题及摘要，未逐篇阅读全文"
+    },
+    {
+      "id": "c58",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=24",
+      "labels": [
+        "§6.2，PDF 第24页",
+        "§6.3，PDF 第24–25页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c59",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=25",
+      "labels": [
+        "§7，PDF 第25–26页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c60",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=26",
+      "labels": [
+        "§7 Agentic AI及Sustainability，PDF 第26页"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026, formal journal PDF (40 pages)"
+    },
+    {
+      "id": "c61",
+      "url": "https://link.springer.com/article/10.1007/s11704-026-60308-3",
+      "labels": [
+        "正式发表记录"
+      ],
+      "role": "primary",
+      "sourceVersion": "Frontiers of Computer Science 2026 正式发表记录；技术内容以固定40页PDF为准"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "transformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "gpt3",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "instructgpt",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "chain-of-thought",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "rag",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "toolformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "reflexion",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/llm-survey/figure-2-lifecycle.webp",
+      "sha256": "89b938fb56ffbb5dec0f71a532c2f8a4a345eccd959d895067ece6adf91e616c",
+      "mime": "image/webp",
+      "alt": "上半部从左至右为预训练、中训练、监督微调和奖励反馈强化学习，下半部为使用方法和基础及高级能力评测。",
+      "origin": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=3",
+      "rights": "Wayne Xin Zhao 等，A Survey of Large Language Models，Frontiers of Computer Science 2026，图2。固定PDF第26–27页声明 CC BY 4.0，图中无另列权利声明。许可：https://creativecommons.org/licenses/by/4.0/ 。裁去图注并转码，图内内容未改。"
+    },
+    {
+      "path": "assets/llm-survey/figure-3-data-pipeline.webp",
+      "sha256": "11b8dd6a834f940ae56e9b4caa4d017bd5eb08b6b17221d62646fc5a4c087367",
+      "mime": "image/webp",
+      "alt": "三列依次展示通用、专业及合成来源，去重过滤隐私处理和分词，以及各训练阶段的数据配比。",
+      "origin": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=4",
+      "rights": "Wayne Xin Zhao 等，A Survey of Large Language Models，Frontiers of Computer Science 2026，图3。固定PDF第26–27页声明 CC BY 4.0，图中无另列权利声明。许可：https://creativecommons.org/licenses/by/4.0/ 。裁去图注并转码，图内内容未改。"
+    },
+    {
+      "path": "assets/llm-survey/figure-4-post-training.webp",
+      "sha256": "24b1e80b9c004974b70cafc1c646454581cce35b8371ea3dd3722680641ab568",
+      "mime": "image/webp",
+      "alt": "基础模型通过一般指令和长推理指令监督微调，再按偏好和推理任务的反馈更新；底部虚线表示多阶段迭代。",
+      "origin": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=12",
+      "rights": "Wayne Xin Zhao 等，A Survey of Large Language Models，Frontiers of Computer Science 2026，图4。固定PDF第26–27页声明 CC BY 4.0，图中无另列权利声明。许可：https://creativecommons.org/licenses/by/4.0/ 。裁去图注并转码，图内内容未改。"
+    },
+    {
+      "path": "assets/llm-survey/figure-5-utilization.webp",
+      "sha256": "9a39664e070a27a878e3929139fd67fd4006275798ed39f5130d1eef0f1d645d",
+      "mime": "image/webp",
+      "alt": "使用方法树由基本提示、高级推理与RAG、Agent系统、高效部署四个彩色分支组成，右侧列举代表方法。",
+      "origin": "https://link.springer.com/content/pdf/10.1007/s11704-026-60308-3.pdf#page=18",
+      "rights": "Wayne Xin Zhao 等，A Survey of Large Language Models，Frontiers of Computer Science 2026，图5。固定PDF第26–27页声明 CC BY 4.0，图中无另列权利声明。许可：https://creativecommons.org/licenses/by/4.0/ 。裁去图注并转码，图内内容未改。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§§1–2，PDF p1–4：历史、四维总览、自回归训练、规模规律及代表性能力",
+      "§3，PDF p4–12：数据、架构、训练与中训练；架构和工程按机制分支讲解，非全部算法推导",
+      "§4，PDF p12–18：SFT、奖励来源、在线与离线优化、方法比较及多阶段实践",
+      "§5，PDF p18–23：提示、推理增强、RAG、Agent与部署",
+      "§§6–8，PDF p23–26：评测、挑战与结论；参考文献按代表方法查阅"
+    ],
+    "figuresViewed": [
+      "Figure 2 — PDF p3, cropped PNG visually inspected by AI and reproduced",
+      "Figure 3 — PDF p4, cropped PNG visually inspected by AI and reproduced",
+      "Figure 4 — PDF p12, cropped PNG visually inspected by AI and reproduced",
+      "Figure 5 — PDF p18, cropped PNG visually inspected by AI and reproduced",
+      "Table 1 — PDF p7, page pixels inspected; grouping/cache interpretation checked, not all equations reproduced",
+      "Table 2 — PDF p10, page pixels inspected; GPT-3 and LLaMA-3.1 rows excerpted",
+      "Table 3 — PDF p16, page pixels inspected; all seven method categories checked",
+      "Figure 6 — PDF p24, page pixels inspected for qualitative role only; plotted scores not transcribed"
+    ],
+    "limitations": [
+      "采用2026年正式40页期刊PDF；未全面比较arXiv长版。",
+      "范围为mainline；不逐项展开全部注意力、位置编码、优化器、通信算法、图5叶节点与应用。",
+      "代表方法核对综述与arXiv API摘要，必要的FlashAttention澄清另查原论文复杂度；没有逐篇精读全部被引文献或复现实验。",
+      "表2只摘录两行训练规模；图6未逐点核对原始成绩，不作当前排行榜。",
+      "文件汇总器、100批次课程、八头缓存表、四回答奖励和五路径投票为导读自编教学例子；语言模型与SFT损失为通用教学表达，非论文新公式。",
+      "Mixtral专家激活数和FlashAttention复杂度的易误读表述按被引原论文澄清；表1线性注意力公式疑点未作为正文依据。",
+      "跨导读顺序为编辑建议；未进行独立第二审阅、网页渲染或真机测试，阅读行为不改变个人状态。"
+    ],
+    "reviewBasis": "本轮取得并通读固定正式PDF正文§§1–8（p1–26），查阅相关参考文献与p26–27许可。AI实际查看图2–5裁切PNG及表1–3、图6页面像素，核对本文数字、来源和方法主张；代表方法摘要保存为API响应。核对细目见docs/research/llm-survey-r2-review.md。作者自审，不冒充独立内容审阅或实验复现。"
+  },
+  "orientation": {
+    "shortTitle": "LLM 综述：从语言模型走向 Agent",
+    "topics": [
+      {
+        "id": "large-language-models",
+        "label": "大语言模型",
+        "aliases": [
+          "LLM",
+          "large language models",
+          "语言模型基础"
+        ]
+      },
+      {
+        "id": "pretraining-posttraining",
+        "label": "预训练与后训练",
+        "aliases": [
+          "pre-training",
+          "post-training",
+          "SFT",
+          "RLHF"
+        ]
+      },
+      {
+        "id": "model-utilization-evaluation",
+        "label": "模型使用与评测",
+        "aliases": [
+          "上下文学习",
+          "ICL",
+          "模型评测",
+          "推理方法"
+        ]
+      }
+    ],
+    "summary": "按原文章节展开预训练、后训练、使用与评测，借四张原图讲清示范、反馈、上下文和环境怎样参与模型能力。",
+    "value": "读新论文时能定位改变对象、解释相邻方法的差异，并把收益与数据、采样、反馈和成本条件一起核查。",
+    "prerequisites": [
+      "知道向量、条件概率与神经网络能通过数据更新参数即可；正文解释词元、自回归、键值缓存、偏好及在线训练。",
+      "无需预先熟悉所有方法名；注意力细节可转向固定修订Transformer导读。"
+    ],
+    "boundaries": [
+      "固定2026正式40页期刊PDF，不混用arXiv长版。",
+      "覆盖主线而非穷尽全部方法；被引论文以摘要核对为主，独立审阅和实际渲染仍待整合者完成。",
+      "自编例子仅解释机制，没有运行训练、评测或工具任务。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Wayne Xin Zhao",
+        "Kun Zhou",
+        "Junyi Li",
+        "Tianyi Tang",
+        "Zican Dong",
+        "Yupeng Hou",
+        "Beichen Zhang",
+        "Yingqian Min",
+        "Junjie Zhang",
+        "Peiyu Liu",
+        "Xiaolei Wang",
+        "Yifan Du",
+        "Chen Yang",
+        "Yushuo Chen",
+        "Zhipeng Chen",
+        "Jinhao Jiang",
+        "Ruiyang Ren",
+        "Yifan Li",
+        "Xinyu Tang",
+        "Zikang Liu",
+        "Yiwen Hu",
+        "Jian-Yun Nie",
+        "Ji-Rong Wen"
+      ],
+      "year": 2026,
+      "venue": "Frontiers of Computer Science 20 · Article 2012627",
+      "publicationKind": "journal",
+      "url": "https://link.springer.com/article/10.1007/s11704-026-60308-3",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "u01",
+        "purpose": "对照图2说明预训练、后训练、使用与评测怎样联系。",
+        "concepts": [
+          "预训练",
+          "后训练",
+          "中训练",
+          "模型使用"
+        ],
+        "limit": "图示是研究框架，不是所有模型必须依次通过的固定工序。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "区分数据来源、预处理、总体配比与分阶段课程。",
+        "concepts": [
+          "BPE",
+          "数据课程",
+          "数据质量"
+        ],
+        "limit": "教学批次数值不是实际训练配方。"
+      },
+      {
+        "unitId": "architecture",
+        "purpose": "用缓存形状表解释MQA、GQA与MLA，并区分缓存共享、稀疏注意力和MoE。",
+        "concepts": [
+          "GQA",
+          "MQA",
+          "MLA",
+          "KV cache",
+          "MoE"
+        ],
+        "limit": "形状表只计算指定教学设置的一层键值标量数，不代表完整显存或速度。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "沿图4说清示范怎样训练行为，合成指令与LoRA分别改变什么。",
+        "concepts": [
+          "SFT",
+          "Self-Instruct",
+          "LoRA"
+        ],
+        "limit": "SFT需要基础能力和示范质量；图4不是唯一训练配方。"
+      },
+      {
+        "unitId": "rewards",
+        "purpose": "把偏好、可验证奖励及过程奖励与更新算法分开。",
+        "concepts": [
+          "RLHF",
+          "RLVR",
+          "奖励模型",
+          "验证器"
+        ],
+        "limit": "偏好与验证只覆盖所定义的任务和判据。"
+      },
+      {
+        "unitId": "optimization",
+        "purpose": "解释表3的在线与离线轴，并用小例说明GRPO组内相对信号。",
+        "concepts": [
+          "PPO",
+          "GRPO",
+          "DPO",
+          "RFT",
+          "OPD"
+        ],
+        "limit": "简化奖励算例不是完整优化目标或训练实现。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "对照图5定位提示、推理、Agent与部署，并区分ICL和训练。",
+        "concepts": [
+          "ICL",
+          "CoT",
+          "上下文"
+        ],
+        "limit": "图中右端代表名称不是本次全部展开和独立核验的清单。"
+      },
+      {
+        "unitId": "u07",
+        "purpose": "追踪记忆、规划、执行及观察怎样形成闭环，区分文本经验与权重更新。",
+        "concepts": [
+          "Agent",
+          "ReAct",
+          "Reflexion",
+          "记忆"
+        ],
+        "limit": "教学轨迹没有运行，不作为任务成功证据。"
+      },
+      {
+        "unitId": "u08",
+        "purpose": "将能力目标、任务形式、评分者和预算配成完整测量条件。",
+        "concepts": [
+          "MMLU",
+          "HumanEval",
+          "HELM",
+          "数据污染"
+        ],
+        "limit": "介绍测量机制，不提供当前模型排行榜。"
+      }
+    ]
+  }
+}

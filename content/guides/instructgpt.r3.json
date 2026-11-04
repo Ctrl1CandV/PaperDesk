@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 2,
+  "id": "instructgpt",
+  "paperId": "arxiv:2203.02155",
+  "revision": 3,
+  "title": "InstructGPT：人类反馈怎样变成模型的回答习惯",
+  "paperTitle": "Training language models to follow instructions with human feedback",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "deep",
+  "purpose": "对照原图与手算，理解人类示范和偏好怎样经过奖励模型、PPO 与约束目标塑造回答，并分辨实验支持的行为改善及边界。",
+  "source": {
+    "id": "arxiv:2203.02155",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2203.02155v1"
+  },
+  "bodyFile": "instructgpt.r3.md",
+  "bodySha256": "7edefae0e5e5f59587fffcdc13ec15b87e507ac5bcef373d40edcadc93f4eebd",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "从会续写到会做事：作者看见了什么差距"
+    },
+    {
+      "id": "task",
+      "heading": "任务是什么：提示、回答与生成概率"
+    },
+    {
+      "id": "u02",
+      "heading": "人的要求如何进入数据：示范、排序和无标签提示"
+    },
+    {
+      "id": "u03",
+      "heading": "对照图 2：三个阶段怎样接起来"
+    },
+    {
+      "id": "sft",
+      "heading": "第一阶段：SFT 怎样把示范变成生成习惯"
+    },
+    {
+      "id": "reward-model",
+      "heading": "第二阶段：RM 怎样从排序学出一个分数"
+    },
+    {
+      "id": "ppo",
+      "heading": "第三阶段：PPO 怎样让高分回答更常出现"
+    },
+    {
+      "id": "objective",
+      "heading": "KL 与预训练混合：为什么不能只追高分"
+    },
+    {
+      "id": "evaluation",
+      "heading": "训练与评价怎样组织：谁和谁比较"
+    },
+    {
+      "id": "u04",
+      "heading": "偏好结果：小模型为何能胜过大模型"
+    },
+    {
+      "id": "behavior",
+      "heading": "回答究竟改善在哪里：事实性、约束与安全"
+    },
+    {
+      "id": "alignment-tax",
+      "heading": "对齐税与消融：保留能力为何需要另一种目标"
+    },
+    {
+      "id": "limitations",
+      "heading": "局限与失败：更会听话以后还缺什么"
+    },
+    {
+      "id": "u05",
+      "heading": "论文之后：把训练链路放回知识地图"
+    },
+    {
+      "id": "u06",
+      "heading": "回到原文：重点入口与覆盖说明"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=1",
+      "labels": [
+        "摘要、§1 与主要结果，PDF 第1–4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/abs/2203.02155v1",
+      "labels": [
+        "固定版本记录"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2203.02155v1",
+      "labels": [
+        "固定原文 PDF"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=2",
+      "labels": [
+        "§1 的目标错位，PDF 第1–2页",
+        "图 1 与图注，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=4",
+      "labels": [
+        "§2 相关工作与 §3.1，PDF 第4–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=3",
+      "labels": [
+        "模型规模与任务，PDF 第3、7页",
+        "图 2，PDF 第3页；§3.1，PDF 第6页",
+        "图 2"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=6",
+      "labels": [
+        "§3.2–3.4，PDF 第6–8页",
+        "表 1 与 §3.3，PDF 第6–7页",
+        "三步之间的迭代关系，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=33",
+      "labels": [
+        "数据规模与单位，PDF 第7、33页",
+        "数据规模"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=36",
+      "labels": [
+        "§3.4 与附录 B.2，PDF 第8、36页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=8",
+      "labels": [
+        "§3.5 的 SFT 设置，PDF 第8页",
+        "比较数量与训练组织，PDF 第8、41–42页",
+        "式（1）及符号定义，PDF 第8页",
+        "标注一致性，PDF 第8页；方法局限，PDF 第19页",
+        "奖励模型公式"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=42",
+      "labels": [
+        "附录 C.3，PDF 第42页",
+        "附录 C.4 的价值函数，PDF 第42页",
+        "本文 PPO 设置，PDF 第42页",
+        "实际系数，PDF 第42页",
+        "预训练混合实现，附录 C.4，PDF 第42页",
+        "附录 C.2–C.4，PDF 第41–42页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=41",
+      "labels": [
+        "§3.5，PDF 第8页；附录 C.2，PDF 第41页",
+        "实现细节"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=9",
+      "labels": [
+        "奖励平移与归一化，PDF 第9页",
+        "强化学习环境与 PPO，PDF 第9页",
+        "§3.5 与式（2），PDF 第9页",
+        "基线与评价设置，PDF 第9–10页",
+        "强化学习目标"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/pdf/1707.06347v2#page=3",
+      "labels": [
+        "PPO 原论文 v2，§2–3、PDF 第2–3页"
+      ],
+      "role": "background",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=10",
+      "labels": [
+        "§3.6，PDF 第10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=11",
+      "labels": [
+        "直接比较，PDF 第11页",
+        "图 3 与 §4.1，PDF 第11–12页",
+        "偏好结果与泛化检查"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=12",
+      "labels": [
+        "图 5、§4.1 与附录 C.5，PDF 第12–13、42–43页",
+        "图 4 与图注，PDF 第12页",
+        "行为与安全评价"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=13",
+      "labels": [
+        "§4.2、图 6，PDF 第13页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=14",
+      "labels": [
+        "图 7 与测试条件，PDF 第14页",
+        "偏见测试及解释，PDF 第14页；附录 D.1，PDF 第44页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=15",
+      "labels": [
+        "§4.2 的性能回退，PDF 第14–15页",
+        "§4.3、图 8，PDF 第15–16页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=55",
+      "labels": [
+        "图 33，PDF 第55页",
+        "图 34，PDF 第55页",
+        "消融实验"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=53",
+      "labels": [
+        "附录 E.6 的规模、参考与混合条件，PDF 第53页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=18",
+      "labels": [
+        "§5.2–5.4，PDF 第18–20页",
+        "讨论与局限"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/pdf/2203.02155v1#page=16",
+      "labels": [
+        "§4.3 与图 9，PDF 第16–17页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/instructgpt/figure-2-training-pipeline.webp",
+      "sha256": "ba368a0f5eb773aa6129d78bae76acb2e203c6e0c98fa8cb779060a8a937af6f",
+      "mime": "image/webp",
+      "alt": "原论文三阶段训练图：左列由人类示范训练 SFT 回答模型；中列将同一提示下的候选回答排序，用排序训练 RM；右列由策略生成新回答，经 RM 打分后用 PPO 更新策略，蓝色箭头表示用于训练的反馈。",
+      "origin": "https://arxiv.org/pdf/2203.02155v1#page=3",
+      "rights": "Ouyang 等，Training language models to follow instructions with human feedback，arXiv:2203.02155v1，Figure 2。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/instructgpt/figure-1-preference.webp",
+      "sha256": "be252c0f15548966b00907b2ba1835ef8f82da542d2ffdbd074c8491a87370ca",
+      "mime": "image/webp",
+      "alt": "图 1 以模型参数规模为横轴，以相对于 175B SFT 的人类偏好胜率为纵轴；GPT、加提示 GPT、SFT、PPO、PPO-ptx 五条曲线逐步升高，PPO 两条曲线在各规模下均高于 GPT 基线，虚线标出 50%，误差线为 95% 置信区间。",
+      "origin": "https://arxiv.org/pdf/2203.02155v1#page=2",
+      "rights": "Ouyang 等，Training language models to follow instructions with human feedback，arXiv:2203.02155v1，Figure 1。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/instructgpt/figure-4-behavior.webp",
+      "sha256": "203e45f885ad6183e08ef7a2a36797ef587362bd58199429983c71861ede04ee",
+      "mime": "image/webp",
+      "alt": "图 4 的四个面板分别比较正确尝试任务、遵循明确约束、闭域幻觉和助手用语适当性的发生比例；PPO 系列在任务与约束方面更好，幻觉低于 GPT，但 SFT 的幻觉柱更低，四个面板的纵轴范围不同。",
+      "origin": "https://arxiv.org/pdf/2203.02155v1#page=12",
+      "rights": "Ouyang 等，Training language models to follow instructions with human feedback，arXiv:2203.02155v1，Figure 4。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/instructgpt/figure-33-pretraining-mix.webp",
+      "sha256": "450447f023ff7a1e594899f5c63d8d56733f3638a1d36fbca99e8c2dc2088065",
+      "mime": "image/webp",
+      "alt": "图 33 横轴为预训练损失系数，对数刻度；左图显示 DROP 与 SQuADv2 的 F1 随系数增大而提高，虚线为 GPT 基线；右图显示验证奖励在系数很大时明显下降，说明保持公共任务与奖励之间存在取舍。",
+      "origin": "https://arxiv.org/pdf/2203.02155v1#page=55",
+      "rights": "Ouyang 等，Training language models to follow instructions with human feedback，arXiv:2203.02155v1，Figure 33。arXiv 默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "正文 §1–5，PDF 第1–20页",
+      "附录 A.3 数据规模，PDF 第33页",
+      "附录 B.1–B.2 与最终评价说明，PDF 第36–37页",
+      "附录 C.2–C.5，PDF 第41–43页",
+      "附录 D.1，PDF 第44页",
+      "附录 E.6 与图33–34，PDF 第53、55页"
+    ],
+    "figuresViewed": [
+      "Figure 1 — PDF p2 (AI viewed cropped PNG; reproduced)",
+      "Figure 2 — PDF p3 (AI viewed cropped PNG; reproduced)",
+      "Figure 3 — PDF p11 (AI viewed page)",
+      "Figure 4 — PDF p12 (AI viewed cropped PNG and page; reproduced)",
+      "Figure 5 — PDF p12 (AI viewed page)",
+      "Figure 6 — PDF p13 (AI viewed page)",
+      "Figure 7 — PDF p14 (AI viewed page)",
+      "Figure 33 — PDF p55 (AI viewed cropped PNG and page; reproduced)",
+      "Figure 34 — PDF p55 (AI viewed page)",
+      "Tables 1–2 — PDF p6; Table 3 — PDF p9; Table 6 — PDF p33 (AI viewed pages)"
+    ],
+    "limitations": [
+      "覆盖方法和主要证据主线，不逐项解释全部附录基准、超参数、样例及参考文献；没有复现训练或评测。",
+      "青禾阅览室通知、候选摘要、奖励分数、两行动策略梯度与 KL 数值是自编教学例子，不是论文实验。",
+      "PPO 只解释采样、优势、价值函数和受限更新的作用，不推导完整 PPO 算法；通用数学解释及后续阅读联系属于编辑背景。",
+      "图8–9的定性行为依据正文、图内可提取文字与图注说明，不作额外视觉细节推断；并非系统泛化率。",
+      "作者自查与 AI 原图查看已完成；未取得独立审阅者或读者验收，未检查整合后的应用渲染。"
+    ],
+    "reviewBasis": "重新取得固定 arXiv v1 PDF，通读正文第1–20页，选读相关附录，核对原页公式、表格及原图；记录见 docs/research/instructgpt-r3-review.md。元数据由 new-revision.mjs 生成；不沿用旧版核验作为本轮证据。"
+  },
+  "orientation": {
+    "shortTitle": "InstructGPT：人类反馈怎样塑造回答",
+    "topics": [
+      {
+        "id": "instruction-following",
+        "label": "指令跟随",
+        "aliases": [
+          "指令微调",
+          "instruction following",
+          "SFT"
+        ]
+      },
+      {
+        "id": "rlhf",
+        "label": "人类反馈学习",
+        "aliases": [
+          "RLHF",
+          "人类偏好",
+          "偏好学习"
+        ]
+      },
+      {
+        "id": "reward-modeling",
+        "label": "奖励模型",
+        "aliases": [
+          "reward model",
+          "奖励建模"
+        ]
+      }
+    ],
+    "summary": "先用示范学习回答，再用排序学习评分，最后以 PPO 优化奖励，同时通过 KL 和预训练混合控制偏离与性能回退。沿原图、公式和实验理解目标如何转化为行为。",
+    "value": "能说明三个阶段分别更新谁、比较分数如何形成奖励，以及人类偏好、事实性和任务能力为什么需要分别评价。",
+    "prerequisites": [
+      "知道条件概率、对数和梯度更新的基本含义；正文解释策略、优势、价值函数和 KL。",
+      "不要求先修完整强化学习课程；不熟悉自回归生成时可先补读 GPT-3。"
+    ],
+    "boundaries": [
+      "固定 2022 年 arXiv v1，覆盖研究主线与选定附录，不是当前模型训练配方大全。",
+      "偏好反映给定提示分布、标注群体和规则，不能替代事实性、安全性或所有任务能力。",
+      "教学计算与原论文实验分开，不提供实验复现或完整 PPO 实现。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Long Ouyang",
+        "Jeffrey Wu",
+        "Xu Jiang",
+        "Diogo Almeida",
+        "Carroll Wainwright",
+        "Pamela Mishkin",
+        "Chong Zhang",
+        "Sandhini Agarwal",
+        "Katarina Slama",
+        "Alex Ray",
+        "John Schulman",
+        "Jacob Hilton",
+        "Fraser Kelton",
+        "Luke Miller",
+        "Maddie Simens",
+        "Amanda Askell",
+        "Peter Welinder",
+        "Paul F Christiano",
+        "Jan Leike",
+        "Ryan Lowe"
+      ],
+      "year": 2022,
+      "venue": "NeurIPS 2022 · Advances in Neural Information Processing Systems 35",
+      "publicationKind": "conference",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/b1efde53be364a73914f58805a001731-Abstract-Conference.html",
+      "preprintYear": 2022
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "区分示范、排序、无标签提示，并解释数据来源和划分如何影响最终评价。",
+        "concepts": [
+          "人类反馈",
+          "偏好数据",
+          "示范",
+          "数据划分"
+        ],
+        "limit": "数据反映特定使用场景和标注规则，不代表所有人的偏好。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "对照图2说明三列分别训练谁，哪些信号来自人、哪些来自模型。",
+        "concepts": [
+          "SFT",
+          "RM",
+          "PPO",
+          "RLHF"
+        ],
+        "limit": "总图省略实现中的初始化与约束，不能当作每次推理的在线流水线。"
+      },
+      {
+        "unitId": "reward-model",
+        "purpose": "由一对回答的分数差算出偏好概率，解释奖励为何没有绝对质量零点。",
+        "concepts": [
+          "奖励模型",
+          "sigmoid",
+          "偏好排序"
+        ],
+        "limit": "分数预测相对偏好，胜出回答仍可能有缺点。"
+      },
+      {
+        "unitId": "ppo",
+        "purpose": "说明采样奖励怎样改变生成概率，并分清策略、奖励模型和价值函数。",
+        "concepts": [
+          "策略梯度",
+          "优势",
+          "价值函数",
+          "PPO"
+        ],
+        "limit": "两行动例子只展示更新方向，不替代逐词 PPO 的完整推导。"
+      },
+      {
+        "unitId": "objective",
+        "purpose": "拆开式2中的奖励、KL与预训练项，并区分固定参考约束和单轮更新控制。",
+        "concepts": [
+          "KL 散度",
+          "PPO-ptx",
+          "预训练混合"
+        ],
+        "limit": "约束优化没有提供事实正确或安全的保证，系数效果需实验检验。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "分辨共同参照胜率与直接对战结果，把小模型更受偏好放回评价协议。",
+        "concepts": [
+          "人类评价",
+          "模型规模",
+          "置信区间"
+        ],
+        "limit": "偏好胜率不是正确率，也不是当前模型的能力排名。"
+      },
+      {
+        "unitId": "alignment-tax",
+        "purpose": "从系数扫描同时读出任务恢复和奖励损失，解释预训练混合为何不同于加大KL。",
+        "concepts": [
+          "对齐税",
+          "消融",
+          "预训练混合"
+        ],
+        "limit": "图33–34为1.3B消融，其中图34关闭混合并以预训练GPT作参考，不能套成所有规模的最终成绩。"
+      }
+    ]
+  }
+}

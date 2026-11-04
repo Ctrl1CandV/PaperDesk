@@ -107,14 +107,14 @@ function assertRange(result, unit) {
   }
 }
 
-test('three current r2 guides complete budgeted synthetic search/read/final rounds through both actual providers', async t => {
+test('three current guides complete budgeted synthetic search/read/final rounds through both actual providers', async t => {
   const { content, papers } = await fixture(t);
   for (const guideId of guideIds) for (const provider of ['api', 'chatgpt']) for (const limit of [8, 12]) {
-    await t.test(`${guideId} r2 / ${provider} / search limit ${limit}`, async subtest => {
-      assert.equal(content.catalog.currentRevisions[guideId], 2);
-      const guide = content.get(guideId, 2), paper = papers.get(guideId);
+    const revision = content.catalog.currentRevisions[guideId];
+    await t.test(`${guideId} r${revision} / ${provider} / search limit ${limit}`, async subtest => {
+      const guide = content.get(guideId, revision), paper = papers.get(guideId);
       const active = [...guide.units].filter(unit => unit.heading).sort((left, right) => Buffer.byteLength(right.text) - Buffer.byteLength(left.text))[0];
-      const request = { requestId: randomUUID(), guideId, revision: 2, bodySha256: guide.metadata.bodySha256, unitId: active.id, question: 'SYNTHETIC budget regression: 检索合成材料，补读一个有明确边界的原文单元，并保留当前导读依据。', webSearch: false };
+      const request = { requestId: randomUUID(), guideId, revision, bodySha256: guide.metadata.bodySha256, unitId: active.id, question: 'SYNTHETIC budget regression: 检索合成材料，补读一个有明确边界的原文单元，并保留当前导读依据。', webSearch: false };
       const prepared = content.prepare(request, [], config);
       const metadata = JSON.parse(prepared.context.metadataJson);
       assert.ok(Array.isArray(metadata.guideRanges) && metadata.guideRanges.length > 0, 'Guide excerpts must expose their precise sent ranges.');

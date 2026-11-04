@@ -50,25 +50,35 @@ test('approved bodies, retained revisions, current orientations and all explorat
   assert.equal(result.summary.guides, result.catalog.entries.length);
   assert.equal(result.summary.lenses, 3);
   assert.equal(result.summary.explorationTargets, 12);
-  const originalCollection = result.guides.filter(guide => ['agent-survey', 'instructgpt', 'helm'].includes(guide.metadata.id));
+  const originalCollection = result.guides.filter(guide => ['agent-survey', 'instructgpt', 'helm'].includes(guide.metadata.id) && guide.metadata.revision <= 2);
   assert.equal(originalCollection.reduce((sum, guide) => sum + guide.metadata.units.length, 0), 46);
   assert.equal(new Set(originalCollection.flatMap(guide => guide.metadata.citations.map(citation => citation.url))).size, 39);
-  for (const id of ['agent-survey', 'instructgpt', 'helm']) {
+  const currentRevisions = { 'agent-survey': 3, instructgpt: 3, helm: 3 };
+  for (const [id, revision] of Object.entries(currentRevisions)) {
     const original = result.guides.find(guide => guide.metadata.id === id && guide.metadata.revision === 1);
-    const current = result.guides.find(guide => guide.metadata.id === id && guide.metadata.revision === 2);
-    assert.equal(result.catalog.currentRevisions[id], 2);
+    const migrated = result.guides.find(guide => guide.metadata.id === id && guide.metadata.revision === 2);
+    const current = result.guides.find(guide => guide.metadata.id === id && guide.metadata.revision === revision);
+    assert.equal(result.catalog.currentRevisions[id], revision);
     assert.equal(original.metadata.schemaVersion, 1);
-    assert.equal(current.metadata.schemaVersion, 2);
-    assert.equal(current.metadata.bodySha256, original.metadata.bodySha256);
-    assert.equal(current.body, original.body);
-    assert.deepEqual(current.metadata.coverage, original.metadata.coverage);
-    assert.deepEqual(current.metadata.citations, original.metadata.citations);
+    assert.equal(migrated.metadata.schemaVersion, 2);
+    assert.equal(migrated.metadata.bodySha256, original.metadata.bodySha256);
+    assert.equal(migrated.body, original.body);
+    assert.deepEqual(migrated.metadata.coverage, original.metadata.coverage);
+    assert.deepEqual(migrated.metadata.citations, original.metadata.citations);
+    assert.ok(current, `${id} r${revision} must be available`);
+    if (revision > 2) {
+      assert.equal(current.metadata.schemaVersion, 2);
+      assert.notEqual(current.metadata.bodySha256, original.metadata.bodySha256);
+      assert.ok(current.metadata.orientation.readingTargets.length > 0);
+    }
   }
   for (const id of ['react', 'toolformer', 'reflexion']) {
+    const revision = result.catalog.currentRevisions[id];
     const versions = result.guides.filter(guide => guide.metadata.id === id);
-    assert.equal(versions.length, 1);
-    assert.equal(result.catalog.currentRevisions[id], 1);
-    const guide = versions[0];
+    assert.equal(revision, id === 'react' ? 3 : 1);
+    assert.equal(versions.length, revision);
+    const guide = versions.find(version => version.metadata.revision === revision);
+    assert.ok(guide);
     assert.equal(guide.metadata.schemaVersion, 2);
     assert.equal(guide.metadata.type, 'method');
     assert.equal(guide.metadata.coverage.scope, 'mainline');

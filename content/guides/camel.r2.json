@@ -1,0 +1,552 @@
+{
+  "schemaVersion": 2,
+  "id": "camel",
+  "paperId": "arxiv:2303.17760",
+  "revision": 2,
+  "title": "CAMEL：两个角色怎样把一段对话推进下去",
+  "paperTitle": "CAMEL: Communicative Agents for “Mind” Exploration of Large Language Model Society",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "standard",
+  "purpose": "以图 1 的双角色消息循环为主线，讲清 CAMEL 的任务具体化、inception prompting、失败与终止条件，并把偏好评价、微调基准和提示消融三类证据分开。",
+  "source": {
+    "id": "arxiv:2303.17760",
+    "version": "v2",
+    "url": "https://arxiv.org/html/2303.17760v2"
+  },
+  "bodyFile": "camel.r2.md",
+  "bodySha256": "1f4417740c5084cd66b8e69cc69bc29061bcf6400161c1b9dad5a4830844a53f",
+  "units": [
+    {
+      "id": "intro",
+      "heading": null
+    },
+    {
+      "id": "background",
+      "heading": "人类提示为什么成了瓶颈"
+    },
+    {
+      "id": "task",
+      "heading": "从一句想法到一个可执行任务"
+    },
+    {
+      "id": "framework",
+      "heading": "图 1：两个角色怎样轮流说话"
+    },
+    {
+      "id": "prompting",
+      "heading": "三条提示怎样固定交流协议"
+    },
+    {
+      "id": "example",
+      "heading": "沿交易机器人例子走两轮"
+    },
+    {
+      "id": "failures",
+      "heading": "四种失败与五种结束方式"
+    },
+    {
+      "id": "data",
+      "heading": "用同一套协议批量生成对话数据"
+    },
+    {
+      "id": "evaluation",
+      "heading": "评价：人说更喜欢，说明了什么"
+    },
+    {
+      "id": "finetuning",
+      "heading": "微调后的模型：另一条证据链"
+    },
+    {
+      "id": "ablation",
+      "heading": "提示消融：协议改变了什么"
+    },
+    {
+      "id": "after",
+      "heading": "论文之后：角色协议怎样进入多智能体系统"
+    },
+    {
+      "id": "reading",
+      "heading": "回到原文：哪些页值得读"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/abs/2303.17760v2",
+      "labels": [
+        "论文 v2 记录"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=1",
+      "labels": [
+        "摘要与 §3，PDF 第1–5页",
+        "§1，PDF 第1–2页",
+        "§1，PDF 第1页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=4",
+      "labels": [
+        "§3.1 与图 1，PDF 第4页",
+        "§3.1、§6 与附录 N，PDF 第4–5、10、52页",
+        "§3.1，PDF 第4页",
+        "§3.1，PDF 第4–5页",
+        "§3.1 与式 1–4，PDF 第4–5页",
+        "图 1 与附录 A，PDF 第4、11页",
+        "§3.1–3.2、§4.1 与表 1，PDF 第4–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c04",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=2",
+      "labels": [
+        "§2，PDF 第2–3页",
+        "§1 与 §4.1，PDF 第2、8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=5",
+      "labels": [
+        "§3.1 与附录 N，PDF 第5、52页",
+        "§3.1 与附录 O，PDF 第5、54页",
+        "§3.2，PDF 第5页",
+        "§3.2 与图 2，PDF 第5–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=52",
+      "labels": [
+        "附录 N，PDF 第52页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=6",
+      "labels": [
+        "§3.2 与图 2，PDF 第6页",
+        "§3.2 与图 2，PDF 第6–7页",
+        "§3.2，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=7",
+      "labels": [
+        "§3.2 与 §4.1，PDF 第7–8页",
+        "§4.1，PDF 第7–8页",
+        "§4.1 与图 3，PDF 第7–8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=8",
+      "labels": [
+        "§4.1 与附录 J，PDF 第8、38页",
+        "§4.1 与附录 G，PDF 第8、28页",
+        "§5.1，PDF 第8–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/html/2303.17760v2",
+      "labels": [
+        "HTML 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=28",
+      "labels": [
+        "附录 G，PDF 第28页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=38",
+      "labels": [
+        "附录 J 与图 8，PDF 第38页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=25",
+      "labels": [
+        "附录 E 与图 6，PDF 第25页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=26",
+      "labels": [
+        "附录 F 与表 4，PDF 第26页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=40",
+      "labels": [
+        "附录 J，PDF 第40–43页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=45",
+      "labels": [
+        "附录 K.4，PDF 第45页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=29",
+      "labels": [
+        "附录 H，PDF 第29页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=9",
+      "labels": [
+        "§5.1 与附录 K.5，PDF 第9、46页",
+        "§5.1 与表 1，PDF 第9页",
+        "§5.2，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=44",
+      "labels": [
+        "附录 K.1，PDF 第44页",
+        "附录 K.2，PDF 第44页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=10",
+      "labels": [
+        "§5.2 与表 2，PDF 第10页",
+        "§5.3 与表 3，PDF 第10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=68",
+      "labels": [
+        "附录 T 与附录 J，PDF 第38–39、68页",
+        "附录 T 与表 9，PDF 第68页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/pdf/2303.17760v2#page=39",
+      "labels": [
+        "附录 J 与图 9，PDF 第39页",
+        "附录 J 与图 10，PDF 第39页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v2"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "autogen",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentprune",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/camel/figure-1-role-playing.webp",
+      "sha256": "987e138109e2905b628bb74c42c9f9dd83a5a735f5601bd891a683d84a4775cf",
+      "mime": "image/webp",
+      "alt": "CAMEL 角色扮演框架：左侧是人的想法与角色分配，中间是任务具体化器，右侧是 AI user 与 AI assistant 的对话记录",
+      "origin": "https://arxiv.org/pdf/2303.17760v2#page=4",
+      "rights": "Guohao Li 等，NeurIPS 2023，图 1。arXiv v2 页面标注 CC BY 4.0；复制时保留作者、标题与出处。"
+    },
+    {
+      "path": "assets/camel/figure-8-termination.webp",
+      "sha256": "e3406a86a9f893d58ff2245554241ba2ea528ba07f5f9fda12b84b99b236decd",
+      "mime": "image/webp",
+      "alt": "两个环形图分别统计 AI Society 与 Code 数据集的对话结束原因，颜色对应五种终止条件",
+      "origin": "https://arxiv.org/pdf/2303.17760v2#page=38",
+      "rights": "Guohao Li 等，NeurIPS 2023，附录图 8。arXiv v2 页面标注 CC BY 4.0；复制时保留作者、标题与出处。"
+    },
+    {
+      "path": "assets/camel/figure-9-prompt-ablation.webp",
+      "sha256": "c3878372d047a32a4b4a6d9ee639bed425e866848ca9b9ea2781c197c3328dae",
+      "mime": "image/webp",
+      "alt": "两个环形图比较 Prompt V2 与 Prompt V1 + Task Planner 的对话结束原因，蓝色为任务完成标记，橙色为角色反转",
+      "origin": "https://arxiv.org/pdf/2303.17760v2#page=39",
+      "rights": "Guohao Li 等，NeurIPS 2023，附录图 9。arXiv v2 页面标注 CC BY 4.0；复制时保留作者、标题与出处。"
+    },
+    {
+      "path": "assets/camel/figure-10-flake.webp",
+      "sha256": "9a48edcf8a75ddfb02f2cecb45b5398302f2459914cf6877889c78287a75666a",
+      "mime": "image/webp",
+      "alt": "柱状图比较三种提示下以 I will 开头的空泛消息数量，原始提示最低，加入任务规划器最高",
+      "origin": "https://arxiv.org/pdf/2303.17760v2#page=39",
+      "rights": "Guohao Li 等，NeurIPS 2023，附录图 10。arXiv v2 页面标注 CC BY 4.0；复制时保留作者、标题与出处。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "sections",
+    "sections": [
+      "§1–2：人类提示的瓶颈、通信智能体与提示工程的相关工作",
+      "§3.1：角色扮演框架、任务具体化、式 1–4 与评论者扩展",
+      "§3.2：inception prompting 的三条提示与格式条款",
+      "§4.1：AI Society 数据生成、四类失败与五种终止条件",
+      "§5.1：人工与 GPT-4 偏好评价（表 1）",
+      "§5.2–5.3：逐步微调、知识涌现（表 2）与 HumanEval（表 3）",
+      "§6：结论",
+      "附录 A、C–H、J–K、N–O、Q–T 中与主线相关的部分"
+    ],
+    "figuresViewed": [
+      "Figure 1 — PDF p4（复制）",
+      "Table 1 — PDF p9",
+      "Table 2 — PDF p10",
+      "Table 3 — PDF p10",
+      "Figure 7 — PDF p28",
+      "Figure 8 — PDF p38（复制）",
+      "Figure 9 — PDF p39（复制）",
+      "Figure 10 — PDF p39（复制）",
+      "Figure 20 与 Table 9 — PDF p68"
+    ],
+    "limitations": [
+      "正文 §1–6 通读；附录为选读，没有逐页阅读附录 L、M、P 的全部案例，也没有逐条核对参考文献。",
+      "没有复现双角色对话、微调训练或 HumanEval 评测；没有独立运行论文中的代码方案。",
+      "表 1 是偏好评价，不是任务执行成功率；表 2–3 是微调后单个模型的基准表现，不是运行时协作结果。",
+      "交易机器人例子和附录失败对话来自论文，本导读没有重新标注失败类型。",
+      "AI Society 是模型生成的模拟对话数据，不代表真实人群；数据集只允许研究用途。",
+      "图 9–10 的百分比按图读取，图 10 的约 1.8 倍是近似读数；原始数据未公开在正文表格中。"
+    ],
+    "reviewBasis": "作者依据固定 arXiv v2 PDF 与 HTML 通读正文并核对图表；四张复制图逐张查看裁切结果；偏好评价、微调与消融数字对照原表、原图；没有独立审阅者从原文重新审核。"
+  },
+  "orientation": {
+    "shortTitle": "CAMEL：两个角色怎样把一段对话推进下去",
+    "topics": [
+      {
+        "id": "multi-agent-communication",
+        "label": "多智能体通信",
+        "aliases": [
+          "Multi-Agent Communication",
+          "CAMEL"
+        ]
+      },
+      {
+        "id": "role-protocol",
+        "label": "角色与协议",
+        "aliases": [
+          "role-playing",
+          "inception prompting",
+          "停止条件"
+        ]
+      }
+    ],
+    "summary": "从人类逐轮提示的瓶颈出发，以图 1 的双角色消息循环为主线，讲清任务具体化、inception prompting、共享历史与五种终止条件；再分开读偏好评价、微调基准和提示消融三类证据，说明 CAMEL 能支持什么、不能支持什么。",
+    "value": "能读懂一段多智能体对话的角色、历史与停止条件，并判断一篇论文报告的是偏好、执行成功率还是训练后模型成绩。也可以把这套最小协议当作设计或排查多智能体系统的起点。",
+    "prerequisites": [
+      "了解对话模型按提示生成文本，知道系统提示和对话历史的作用。",
+      "不需要微调或多智能体框架的先验知识；正文会在用到时解释相关术语。"
+    ],
+    "boundaries": [
+      "表 1 的百分比是偏好比例，不是任务成功率或代码执行结果。",
+      "表 2–3 来自单个 7B 模型的逐步微调与一个代码基准，不能外推到运行时双角色系统。",
+      "AI Society 是模型生成的模拟对话，不代表真实社会或当前产品。",
+      "本导读没有复现实验；图 9–10 的读数和表 1–2 的条件需一起看。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Guohao Li",
+        "Hasan Abed Al Kader Hammoud",
+        "Hani Itani",
+        "Dmitrii Khizbullin",
+        "Bernard Ghanem"
+      ],
+      "year": 2023,
+      "venue": "NeurIPS 2023",
+      "publicationKind": "conference",
+      "url": "https://arxiv.org/abs/2303.17760v2",
+      "preprintYear": 2023
+    },
+    "readingTargets": [
+      {
+        "unitId": "background",
+        "purpose": "说清人类提示为什么成为瓶颈，以及 CAMEL 想替代哪一部分人工工作。",
+        "concepts": [
+          "人类提示",
+          "领域知识",
+          "role flipping",
+          "flake reply"
+        ],
+        "limit": "四类失败来自作者的初步观察，不是系统综述。"
+      },
+      {
+        "unitId": "task",
+        "purpose": "区分初步想法、任务具体化和角色分配三件事。",
+        "concepts": [
+          "task specifier",
+          "specified task",
+          "AI user",
+          "AI assistant"
+        ],
+        "limit": "任务具体化可能补入人没有指定的假设。"
+      },
+      {
+        "unitId": "framework",
+        "purpose": "沿图 1 与式 1–4 说清一轮对话的消息流、共享历史和成本结构。",
+        "concepts": [
+          "消息历史",
+          "交互式规划",
+          "消息传递图",
+          "critic-in-the-loop"
+        ],
+        "limit": "框架是文本循环，不含执行环境或工具调用。"
+      },
+      {
+        "unitId": "prompting",
+        "purpose": "说出三条提示各自约束什么，以及输出格式为什么是协议的一部分。",
+        "concepts": [
+          "inception prompting",
+          "系统提示",
+          "Next request",
+          "TASK_DONE"
+        ],
+        "limit": "提示是文字约束，不能保证模型遵守。"
+      },
+      {
+        "unitId": "example",
+        "purpose": "把交易机器人的两轮消息代进公式，分清计划文本与执行结果。",
+        "concepts": [
+          "指令—方案对",
+          "共享历史",
+          "沙盒"
+        ],
+        "limit": "例子没有真实运行，第二轮不检查第一轮是否成功。"
+      },
+      {
+        "unitId": "failures",
+        "purpose": "区分四类失败与五种结束条件，读懂图 8 的分母。",
+        "concepts": [
+          "role flipping",
+          "flake reply",
+          "终止条件",
+          "token limit"
+        ],
+        "limit": "终止原因不是任务成功率。"
+      },
+      {
+        "unitId": "data",
+        "purpose": "说明 25,000 段 AI Society 对话怎样生成，以及数据集的边界。",
+        "concepts": [
+          "AI Society",
+          "Code 数据集",
+          "Math 与 Science",
+          "Misalignment"
+        ],
+        "limit": "数据是模型生成的模拟对话，不代表真实社会。"
+      },
+      {
+        "unitId": "evaluation",
+        "purpose": "区分人工与 GPT-4 偏好、执行成功和事实正确。",
+        "concepts": [
+          "人工评价",
+          "GPT-4 评价",
+          "偏好",
+          "平局"
+        ],
+        "limit": "偏好评价没有运行代码，也没有匹配预算。"
+      },
+      {
+        "unitId": "finetuning",
+        "purpose": "读懂表 2 的成对比较和 HumanEval 的 pass@k。",
+        "concepts": [
+          "LLaMA-7B",
+          "HumanEval",
+          "pass@k",
+          "逐步微调"
+        ],
+        "limit": "微调基准不是运行时协作成功率。"
+      },
+      {
+        "unitId": "ablation",
+        "purpose": "说明提示协议对结束原因和空泛消息的影响。",
+        "concepts": [
+          "提示消融",
+          "任务规划器",
+          "空泛消息"
+        ],
+        "limit": "消融只覆盖 AI Society 和 GPT-4 评判；结束标记不等于完成。"
+      },
+      {
+        "unitId": "after",
+        "purpose": "把 CAMEL 放回多智能体通信与成本问题的位置。",
+        "concepts": [
+          "AutoGen",
+          "AgentPrune",
+          "共享历史"
+        ],
+        "limit": "后续工作属于编辑背景，不是论文结论。"
+      },
+      {
+        "unitId": "reading",
+        "purpose": "按页码找到图 1、失败例子、表 1、图 8 和消融。",
+        "concepts": [
+          "原文入口",
+          "覆盖范围"
+        ],
+        "limit": "没有覆盖全部附录。"
+      }
+    ]
+  }
+}

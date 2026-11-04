@@ -1,0 +1,454 @@
+{
+  "schemaVersion": 2,
+  "id": "rag",
+  "paperId": "arxiv:2005.11401",
+  "revision": 3,
+  "title": "RAG：让生成模型通过检索使用外部知识",
+  "paperTitle": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "language": "zh-Hans",
+  "type": "method",
+  "mode": "deep",
+  "purpose": "沿原图、两词元手算和训练反馈，理解原始 RAG 怎样整合候选文档的生成概率，并用任务结果、检索消融和索引替换检验这套机制。",
+  "source": {
+    "id": "arxiv:2005.11401",
+    "version": "NeurIPS 2020 camera-ready",
+    "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf"
+  },
+  "bodyFile": "rag.r3.md",
+  "bodySha256": "346c9c6a7a557e7a14041c9d6e9004141027e15634e31c3284ff27b840bc61db",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "u01",
+      "heading": "为什么要把参数知识与外部记忆接起来"
+    },
+    {
+      "id": "task",
+      "heading": "先明确任务：输入、候选文档与输出"
+    },
+    {
+      "id": "u02",
+      "heading": "对照图 1：一次输入怎样穿过整个系统"
+    },
+    {
+      "id": "components",
+      "heading": "检索器与生成器：两种概率各管什么"
+    },
+    {
+      "id": "u03",
+      "heading": "两种边缘化：求和放在句外还是词内"
+    },
+    {
+      "id": "u04",
+      "heading": "训练怎样把正确答案变成检索反馈"
+    },
+    {
+      "id": "decoding",
+      "heading": "解码：有了输出概率，怎样真正写出一句话"
+    },
+    {
+      "id": "posterior",
+      "heading": "图 2 的海明威例子：文档贡献为什么会变"
+    },
+    {
+      "id": "experiments",
+      "heading": "实验怎样安排：同一架构面对四类任务"
+    },
+    {
+      "id": "u05",
+      "heading": "问答结果：生成式答案比抽取多了什么"
+    },
+    {
+      "id": "generation-results",
+      "heading": "完整句子、题干与分类：怎样读更多证据"
+    },
+    {
+      "id": "ablations",
+      "heading": "消融与图 3：学检索、换检索、多检索分别怎样"
+    },
+    {
+      "id": "u06",
+      "heading": "替换索引：知识更新实验到底更新了什么"
+    },
+    {
+      "id": "u07",
+      "heading": "从原始方法到后来的 RAG：带走哪些分析问题"
+    },
+    {
+      "id": "source-return",
+      "heading": "回到原文：重点入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf",
+      "labels": [
+        "摘要与 §1，PDF 第1–2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c02",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=6",
+      "labels": [
+        "表1与索引替换实验，PDF 第6、8页",
+        "表1与 §4.1，PDF 第5–6页",
+        "§4.1，PDF 第6页",
+        "表2与 §4.2–4.4，PDF 第6页",
+        "主结果，PDF 第6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c03",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=2",
+      "labels": [
+        "§1，PDF 第1–2页",
+        "图1与 §2，PDF 第2页",
+        "方法入口，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c04",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=9",
+      "labels": [
+        "§1、§5，PDF 第2、8–9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c05",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=3",
+      "labels": [
+        "§2，PDF 第2–3页",
+        "§2.2，PDF 第3页",
+        "§2.3，PDF 第3页",
+        "§2.1，两种模型公式，PDF 第3页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c06",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=4",
+      "labels": [
+        "§3，PDF 第4页",
+        "§2.4，PDF 第3–4页",
+        "§2.5，PDF 第4页",
+        "§3.1–3.4，PDF 第4–5页",
+        "解码，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c07",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=5",
+      "labels": [
+        "§2.2、§4.1，PDF 第3、5页",
+        "§3.3，PDF 第5页",
+        "§3.4，PDF 第5页",
+        "§3.3、§4.3，PDF 第5–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c08",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Supplemental.pdf#page=1",
+      "labels": [
+        "补充材料 A，PDF 第1页／印刷页17",
+        "补充材料 C，PDF 第1页／印刷页17",
+        "补充材料 B，PDF 第1页／印刷页17",
+        "实际配置，补充 PDF 第1页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c09",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=7",
+      "labels": [
+        "§4.3 与图2，PDF 第6–7页",
+        "表3，PDF 第7页",
+        "§4.4，PDF 第6–7页",
+        "文档贡献案例，PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c10",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Supplemental.pdf#page=2",
+      "labels": [
+        "补充材料 E，PDF 第2页／印刷页18",
+        "补充材料 D，PDF 第2页／印刷页18",
+        "补充材料 F、H，PDF 第2–3页／印刷页18–19"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c11",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=8",
+      "labels": [
+        "表4，PDF 第8页",
+        "表5，PDF 第8页",
+        "§4.5、表6，PDF 第7–8页",
+        "§4.5，索引热替换，PDF 第7–8页",
+        "消融与知识更新，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    },
+    {
+      "id": "c12",
+      "url": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=10",
+      "labels": [
+        "Broader Impact，PDF 第10页"
+      ],
+      "role": "primary",
+      "sourceVersion": "NeurIPS 2020 camera-ready"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "transformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "toolformer",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "react",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/rag/figure-1-architecture.webp",
+      "sha256": "aecede31f827c64ced4c9a8be1bae5364ca4e5e165161899aec882535310c792",
+      "mime": "image/webp",
+      "alt": "RAG 总体架构：输入经过查询编码器、最大内积搜索与文档索引，原始输入和各候选分别送入生成器，边缘化后输出；训练反馈更新查询编码器与生成器。",
+      "origin": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=2",
+      "rights": "Patrick Lewis、Ethan Perez 等，NeurIPS 2020，原论文图1。裁切自会议正式 PDF；会议条目未核到明确复制许可，arXiv 论文条目为默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/rag/figure-2-document-posterior.webp",
+      "sha256": "6a9c8797b527805fd33ecdafa4d9bd5b19074e30be6d89bc73232bbeab17b8a4",
+      "mime": "image/webp",
+      "alt": "海明威题干生成的五篇文档后验热图：文档2在 Sun 附近贡献较高，文档1在 A Farewell to Arms 开始处贡献较高；左侧展示相关原文片段。",
+      "origin": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=7",
+      "rights": "Patrick Lewis、Ethan Perez 等，NeurIPS 2020，原论文图2。裁切自会议正式 PDF；会议条目未核到明确复制许可，arXiv 论文条目为默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    },
+    {
+      "path": "assets/rag/figure-3-retrieval-count.webp",
+      "sha256": "31b5c66c031ecca2a559c02db265212f9a5334611ba35ed5284c8ce92014e17c",
+      "mime": "image/webp",
+      "alt": "检索数量实验的三个面板：NQ 精确匹配、NQ 答案召回、MS-MARCO 的 BLEU-1 与 ROUGE-L；增加候选提高召回但最终生成指标的变化方向不同。",
+      "origin": "https://proceedings.neurips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf#page=8",
+      "rights": "Patrick Lewis、Ethan Perez 等，NeurIPS 2020，原论文图3。裁切自会议正式 PDF；会议条目未核到明确复制许可，arXiv 论文条目为默认非独占分发许可，未授予再发布权；仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "NeurIPS 2020 camera-ready main paper §§1–6 (PDF pp1–9)",
+      "Broader Impact (PDF p10)",
+      "Same conference record supplemental Appendices A–I (separate PDF pp1–3, printed pp17–19); selective exposition"
+    ],
+    "figuresViewed": [
+      "Figure 1 — main PDF p2 (reproduced; final crop visually inspected by AI)",
+      "Probability formulas — main PDF p3 (page visually inspected by AI)",
+      "Tables 1–2 — main PDF p6 (page visually inspected by AI)",
+      "Figure 2 and Table 3 — main PDF p7 (page and final figure crop visually inspected by AI)",
+      "Tables 4–6 and Figure 3 — main PDF p8 (page and final figure crop visually inspected by AI)"
+    ],
+    "limitations": [
+      "解释 NeurIPS 2020 原始 RAG 主线，不是当代 RAG 技术的完整综述。",
+      "未复现实验，未逐条审计语料、生成事实、实现与被引文献；未逐项展开所有附录细节。",
+      "检索权重、两词元概率表和梯度责任数值为自编教学例子；后验与梯度简式为教学推导，固定当前候选集合。",
+      "主文 §4.3 与表4关于事实性 Both good 的比例冲突，本导读不采用该争议项。",
+      "补充材料 G 的维度与可训练参数表述存在疑点，本导读不采用其精确向量维数或总可训练参数数字。",
+      "开放域 QA 两种 RAG 的测试候选数及解码配置不同；消融为开发集结果。",
+      "未查看补充图4的界面像素或表7的像素；人工评价流程依据补充材料文字，不复述界面细节或表7精确样本数。",
+      "三张原图仅供私有仓库个人学术阅读引用，未取得公开再发布授权；后续系统比较为编辑背景。"
+    ],
+    "reviewBasis": "Read main paper §§1–6 and Broader Impact in full; read the three-page conference supplement A–I. AI visually inspected main PDF pp3,6,7,8 and final crops of Figures 1–3. Checked task conditions, all quoted results, sequence/token formulas, two-token expansion, fixed-candidate gradient derivation, training scope, Appendix A decoding budgets, Appendix D TriviaQA splits and Appendix E FEVER implementation. Author self-review only; no independent reviewer, model reproduction or browser rendering review. See docs/research/rag-r3-review.md."
+  },
+  "orientation": {
+    "shortTitle": "RAG：从外部知识中检索并生成答案",
+    "topics": [
+      {
+        "id": "retrieval-augmented-generation",
+        "label": "检索增强生成",
+        "aliases": [
+          "RAG",
+          "retrieval augmented generation",
+          "知识增强"
+        ]
+      },
+      {
+        "id": "dense-retrieval",
+        "label": "稠密检索",
+        "aliases": [
+          "dense retrieval",
+          "DPR",
+          "向量检索"
+        ]
+      },
+      {
+        "id": "parametric-memory",
+        "label": "参数与外部记忆",
+        "aliases": [
+          "parametric memory",
+          "non-parametric memory",
+          "知识更新"
+        ]
+      }
+    ],
+    "summary": "原始 RAG 把预训练 DPR 与 BART 接成概率模型，分别读候选文档，再按 Sequence 或 Token 方式边缘化；任务答案损失共同训练查询编码器与生成器。",
+    "value": "能对照图1解释文字、向量、概率与梯度的流向，手算两种文档边缘化，并区分任务成绩、检索召回、文档后验和知识更新各自支持的结论。",
+    "prerequisites": [
+      "知道向量内积与条件概率的基本含义；双编码器、BART、自回归和潜变量在正文中解释。",
+      "能阅读求和与乘积；两词元例子可手算，梯度推导为可选加深部分。"
+    ],
+    "boundaries": [
+      "固定 NeurIPS 2020 camera-ready 主文及同会议补充材料，知识源为固定 Wikipedia 快照。",
+      "Token 在固定候选集合上混合词元概率；文档后验不构成逐条事实认证。",
+      "问答测试候选数及解码条件不同，索引替换仅检验82个特定职位问题；未复现实验。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Patrick Lewis",
+        "Ethan Perez",
+        "Aleksandra Piktus",
+        "Fabio Petroni",
+        "Vladimir Karpukhin",
+        "Naman Goyal",
+        "Heinrich Küttler",
+        "Mike Lewis",
+        "Wen-tau Yih",
+        "Tim Rocktäschel",
+        "Sebastian Riedel",
+        "Douwe Kiela"
+      ],
+      "year": 2020,
+      "venue": "NeurIPS 2020 · Advances in Neural Information Processing Systems 33",
+      "publicationKind": "conference",
+      "url": "https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html",
+      "preprintYear": 2020
+    },
+    "readingTargets": [
+      {
+        "unitId": "u02",
+        "purpose": "沿图1说明查询、文档原文、检索权重、条件生成与训练反馈怎样连接。",
+        "concepts": [
+          "DPR",
+          "BART",
+          "MIPS",
+          "边缘化"
+        ],
+        "limit": "各文档分别参与生成，共用生成器参数；不是把所有候选拼成一个长提示。"
+      },
+      {
+        "unitId": "components",
+        "purpose": "分清文档检索概率与词元生成概率，以及一次生成步骤的概率表。",
+        "concepts": [
+          "双编码器",
+          "稠密检索",
+          "softmax",
+          "条件概率"
+        ],
+        "limit": "检索权重表达候选间的相对偏好，不是材料事实正确率。"
+      },
+      {
+        "unitId": "u03",
+        "purpose": "手算两文档两词元的概率，解释求和与乘积位置怎样改变潜在文档路径。",
+        "concepts": [
+          "RAG-Sequence",
+          "RAG-Token",
+          "潜变量",
+          "边缘化"
+        ],
+        "limit": "教学概率人为指定；Token 不在每个生成位置重新检索。"
+      },
+      {
+        "unitId": "u04",
+        "purpose": "解释答案损失怎样借助文档后验责任影响检索分数，以及实际更新哪些参数。",
+        "concepts": [
+          "负对数似然",
+          "后验责任",
+          "参数冻结",
+          "联合训练"
+        ],
+        "limit": "DPR 已用过检索监督；文档编码器及索引固定，梯度简式以当前候选集合为条件。"
+      },
+      {
+        "unitId": "decoding",
+        "purpose": "分清 Token 的逐步混合与 Sequence 的候选并集、补算及快速近似。",
+        "concepts": [
+          "束搜索",
+          "Thorough Decoding",
+          "Fast Decoding"
+        ],
+        "limit": "论文 QA 测试中 Token 与 Sequence 分别取15和50篇文档，成绩差异不只来自概率结构。"
+      },
+      {
+        "unitId": "posterior",
+        "purpose": "对照图2说明检索先验不变时，文档后验为何仍会随词元变化。",
+        "concepts": [
+          "文档后验",
+          "参数记忆",
+          "非参数记忆"
+        ],
+        "limit": "海明威案例与续写检查支持作者的解释，但不提供普遍因果归属证明。"
+      },
+      {
+        "unitId": "u05",
+        "purpose": "读懂问答 EM、TriviaQA 两个划分以及生成相对抽取的优势来源。",
+        "concepts": [
+          "EM",
+          "TriviaQA",
+          "开放域问答"
+        ],
+        "limit": "不同测试划分不能混比，最终答案正确与来源支持分别评价。"
+      },
+      {
+        "unitId": "ablations",
+        "purpose": "区分学习检索、改用词面检索和增加候选数量分别检验的假设。",
+        "concepts": [
+          "BM25",
+          "检索消融",
+          "答案召回"
+        ],
+        "limit": "表6为开发集，图3为所示配置的趋势，不给出普遍最优候选数量。"
+      },
+      {
+        "unitId": "u06",
+        "purpose": "用两年索引与两年答案的交叉结果解释知识热替换改变了什么。",
+        "concepts": [
+          "索引热替换",
+          "知识更新",
+          "检索塌缩"
+        ],
+        "limit": "82个已知变化的职位问题不覆盖混合版本或通用时序推理。"
+      }
+    ]
+  }
+}

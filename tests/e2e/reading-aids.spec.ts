@@ -15,10 +15,9 @@ test('a term opens a small card on first mention and closes back to the text', a
   await expect(term).toBeFocused();
 });
 
-test('starting Transformer from the shelf leads directly to the original architecture figure', async ({ page }) => {
-  await page.goto('/library?article=transformer');
-  await page.getByRole('link', { name: '开始导读' }).click();
-  const figure = page.locator('article.prose .paper-figure').first();
+test('the Transformer architecture section opens on the original figure', async ({ page }) => {
+  await page.goto(`/read/transformer/${revision}#architecture`);
+  const figure = page.locator('#architecture .paper-figure').first();
   await expect(figure.locator('figcaption')).toContainText('原论文图 1');
   await expect(figure.locator('img')).toBeInViewport();
   await figure.getByRole('button', { name: /放大查看/ }).click();
@@ -36,7 +35,7 @@ test('a returning Transformer reader can open the new edition at its actual begi
   await expect(page.locator('.orientation-actions').getByRole('link', { name: '继续阅读' })).toHaveAttribute('href', '/read/transformer/3');
   await page.getByRole('link', { name: `从头阅读第 ${revision} 版` }).click();
   await expect(page.locator('article.prose section').first()).toBeFocused();
-  await expect(page.locator('article.prose .paper-figure img').first()).toBeInViewport();
+  await expect(page.locator('article.prose h1')).toBeInViewport();
 });
 
 for (const id of ['transformer', 'rag-survey'] as const) {
