@@ -23,6 +23,10 @@ export interface GuideMetadata {
   coverage: { scope: string; basis: string; sections: string[]; figuresViewed: string[]; limitations: string[]; reviewBasis: string };
   orientation?: GuideOrientation;
 }
+export interface GuideTranslationAsset { path: string; alt: string; rights: string }
+export interface GuideTranslationInfo {
+  title: string; bodyPath: string; bodySha256: string; assets: GuideTranslationAsset[];
+}
 export interface Guide {
   metadata: GuideMetadata; body: string; bodyPath: string; packageDirectory: string;
   units: { id: string; heading: string | null; markdown: string }[];
@@ -37,6 +41,8 @@ export interface GuideSummary {
   figures: FigureInfo[];
   bodyPath: string;
   packageDirectory: string;
+  /** Optional reviewed alternate-language bodies; the `en` key is currently used. */
+  translations?: { en?: GuideTranslationInfo };
 }
 export interface FigureInfo { path: string; alt: string; origin: string; rights: string; width?: number; height?: number }
 export interface EditorialTarget { guideId: string; revision: number; unitId: string; purpose: string }

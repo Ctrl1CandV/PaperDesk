@@ -1,15 +1,15 @@
 import './reading-aids.css';
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { glossaryEntry } from '../content/glossary';
+import { englishGlossaryEntry, glossaryEntry } from '../content/glossary';
 import { AppLink } from '../app/navigation';
 
 // One open card at a time across the page.
 let closeOpen: (() => void) | undefined;
 
 /** A quiet underline on the first mention of a term; tap or click opens a small card. */
-export function TermHint({ id, children }: { id: string; children: ReactNode }) {
-  const entry = glossaryEntry(id);
+export function TermHint({ id, children, language = 'zh' }: { id: string; children: ReactNode; language?: 'zh' | 'en' }) {
+  const entry = language === 'en' ? englishGlossaryEntry(id) : glossaryEntry(id);
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ left: number; top: number; above: boolean }>();
   const button = useRef<HTMLButtonElement>(null);
@@ -41,20 +41,21 @@ export function TermHint({ id, children }: { id: string; children: ReactNode }) 
     };
   }, [open]);
   if (!entry) return <>{children}</>;
-  const names = [entry.full, entry.zh].filter(Boolean).join(' · ');
+  const english = language === 'en';
+  const names = english ? (entry.full && entry.full !== entry.term ? entry.full : '') : [entry.full, entry.zh].filter(Boolean).join(' · ');
   // A link back into the article being read adds nothing.
   const guide = entry.guide && !entry.guide.startsWith(`${window.location.pathname}#`) && entry.guide !== window.location.pathname ? entry.guide : undefined;
   return <>
     <button ref={button} type="button" className="term-hint" aria-expanded={open} aria-controls={open ? cardId : undefined} aria-haspopup="dialog" onClick={() => setOpen(value => !value)}>{children}</button>
-    {open && createPortal(<div ref={card} id={cardId} className="term-card" role="dialog" aria-label={`术语：${entry.term}`} tabIndex={-1} data-above={position?.above || undefined}
+    {open && createPortal(<div ref={card} id={cardId} className="term-card" role="dialog" aria-label={english ? `Term: ${entry.term}` : `术语：${entry.term}`} tabIndex={-1} data-above={position?.above || undefined}
       style={position ? { left: position.left, top: position.top } : { visibility: 'hidden', left: 0, top: 0 }}>
       <p className="term-card-name"><strong lang={/^[\x20-\x7e]+$/.test(entry.term) ? 'en' : undefined}>{entry.term}</strong>{names && <span>{names}</span>}</p>
       <p className="term-card-field">{entry.field}</p>
       <p className="term-card-explain">{entry.explain}</p>
-      {entry.builds && <p className="term-card-builds"><span>来龙去脉</span>{entry.builds}</p>}
+      {entry.builds && <p className="term-card-builds"><span>{english ? 'Background' : '来龙去脉'}</span>{entry.builds}</p>}
       {(guide || entry.source) && <p className="term-card-links" onClickCapture={() => close()}>
-        {guide && <AppLink to={guide}>本库导读 →</AppLink>}
-        {entry.source && <a href={entry.source.url} target="_blank" rel="noopener noreferrer" title={entry.source.label}>原始论文 ↗</a>}
+        {guide && <AppLink to={guide}>{english ? 'Guide in library' : '本库导读'} →</AppLink>}
+        {entry.source && <a href={entry.source.url} target="_blank" rel="noopener noreferrer" title={entry.source.label}>{english ? 'Original paper' : '原始论文'} ↗</a>}
       </p>}
     </div>, document.body)}
   </>;

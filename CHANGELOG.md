@@ -1,5 +1,12 @@
 # Changelog
 
+## English reading pilot — 2026-11-05
+
+- Added a Chinese/English toggle to deep reading for Transformer r5 and RAG survey r5; the header control is labeled `English`/`中文`, and only the article prose and its term cards switch, while figures, formulas, navigation and page chrome stay unchanged.
+- Older retained revisions now show a neutral notice with a link to the current revision; translation buttons appear only where a complete English body exists.
+- Added reviewed English guide bodies, English figure text and a 40-entry English glossary as a separate content layer; the Chinese revisions and catalog hashes are untouched.
+- Build and 530 Node tests pass (1 skipped). A headless rendered-build check covered both toggles, English prose, all figures, term cards and a 390 px simulated viewport; the live Playwright server remains unavailable in this environment.
+
 ## Guide depth batch — 2026-11-04
 
 - Applied the new guide-writing workflow to 17 current revisions, with `react` and `helm` completing at r3; kept all previous revisions and merged the brief/glossary/catalog updates.

@@ -55,6 +55,14 @@ export function Reader({ guide }: { guide: Guide }) {
   const [source, setSource] = useState<SourceSelection | null>(null);
   const [active, setActive] = useState(guide.units[0].id);
   const [fontSize, setFontSize] = useState(18);
+  const [language, setLanguage] = useState<'zh' | 'en'>('zh');
+  const [englishGuide, setEnglishGuide] = useState<Guide>();
+  const [englishLoading, setEnglishLoading] = useState(false);
+  const [englishError, setEnglishError] = useState('');
+  const translationAvailable = contentRepository.hasTranslation(guide.metadata.id, guide.metadata.revision);
+  const currentRevision = contentRepository.currentRevision(guide.metadata.id);
+  const displayGuide = language === 'en' && englishGuide ? englishGuide : guide;
+  const displayLanguage = displayGuide.metadata.language === 'en' ? 'en' : 'zh';
   const [selection, setSelection] = useState<ReadingContext | undefined>(buffer?.selection);
   const [noteContext, setNoteContext] = useState<ReadingContext | undefined>(buffer?.noteContext);
   const [evidence, setEvidence] = useState<GuideEvidence | undefined>(buffer?.evidence);
@@ -77,6 +85,21 @@ export function Reader({ guide }: { guide: Guide }) {
     media.addEventListener('change', update); sidebarMedia.addEventListener('change', update);
     return () => { media.removeEventListener('change', update); sidebarMedia.removeEventListener('change', update); };
   }, []);
+  useEffect(() => {
+    if (language !== 'en' || !translationAvailable || englishGuide) return;
+    const controller = new AbortController();
+    setEnglishLoading(true); setEnglishError('');
+    void contentRepository.get(guide.metadata.id, guide.metadata.revision, { language: 'en', signal: controller.signal }).then(next => {
+      if (controller.signal.aborted) return;
+      if (!next) throw new Error('英文版暂不可用。');
+      setEnglishGuide(next);
+    }).catch(error => {
+      if (controller.signal.aborted) return;
+      setEnglishError(error instanceof Error ? error.message : '英文版暂不可用，已保留中文内容。');
+      setLanguage('zh');
+    }).finally(() => { if (!controller.signal.aborted) setEnglishLoading(false); });
+    return () => controller.abort();
+  }, [language, translationAvailable, englishGuide, guide.metadata.id, guide.metadata.revision]);
   const ready = useRef(false);
   const openCitation = useCallback((citation: Citation, label: string, trigger: HTMLButtonElement) => setSource({ citation, label, trigger }), []);
   useEffect(() => { readingEditors.set(bufferKey, { selection, noteContext, evidence }); }, [bufferKey, selection, noteContext, evidence]);
@@ -127,13 +150,13 @@ export function Reader({ guide }: { guide: Guide }) {
       if (!start || start !== end || !start.closest('.prose')) return;
       const clone = range.cloneContents(); clone.querySelectorAll('[aria-hidden="true"],.teaching-diagram').forEach(node => node.remove());
       const text = clone.textContent?.trim(); if (!text) return;
-      const context = sectionContext(guide, start.id);
+      const context = sectionContext(displayGuide, start.id);
       const paragraph = (range.startContainer instanceof Element ? range.startContainer : range.startContainer.parentElement)?.closest('[data-paragraph]')?.getAttribute('data-paragraph');
       setSelection({ ...context, text, locator: `${context.locator}${paragraph ? ` / ${paragraph}` : ''} / 选中文本` });
     };
     document.addEventListener('selectionchange', capture); return () => document.removeEventListener('selectionchange', capture);
-  }, [guide]);
-  const context = () => selection ?? sectionContext(guide, active);
+  }, [guide, displayGuide]);
+  const context = () => selection ?? sectionContext(displayGuide, active);
   const contextHeading = guide.units.find(unit => unit.id === (selection?.unitId ?? active))?.heading ?? '阅读起点';
   const statusLabel = (status?: ReadingStatus) => statuses.find(item => item[0] === status)?.[1] ?? '未记录';
   // Authored reading targets for this section, shown quietly beside the article.
@@ -158,9 +181,11 @@ export function Reader({ guide }: { guide: Guide }) {
     <div className={`mobile-tools${assistantWide ? ' assistant-mobile-tools' : ''}`}><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
     <div className={`reader-layout${assistantWide ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>{guide.units.length - 1} 节</span></div><Contents guide={guide} active={active} aim={aim} /><details className="reading-lens"><summary>读{lens.name}时可以留意</summary><ul>{lens.questions.map(question => <li key={question}>{question}</li>)}</ul></details>{terms.length > 0 && <details className="reading-terms"><summary>本文术语 <span>{terms.length}</span></summary><ul>{terms.map(entry => <li key={entry.id}><TermHint id={entry.id}>{entry.term}</TermHint><span>{entry.zh ?? entry.full}</span></li>)}</ul></details>}<div className="sidebar-footer"><AppLink to="/explore">探索 →</AppLink></div>{sidebarTools && readingTools}</aside>
       <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述解读' : '论文解读'}</span><span>导读修订 {guide.metadata.revision}</span><span title={coverageHint(guide.metadata.coverage.scope) || undefined}>{coverageLabel(guide.metadata.coverage.scope)}</span></div></div>
-        <div className="reading-identity"><a className="reading-original" href={guide.metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 · {guide.metadata.source.version ?? '版本未指定'} ↗</a><div className="reader-heading-actions"><div className="desktop-font">{controls}</div><button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)} title={`本篇解读 · ${statusLabel(guideState?.status)}；原论文 · ${statusLabel(originalState?.status)}`}><strong>阅读记录</strong><span aria-hidden="true">⌄</span></button></div></div>
+        <div className="reading-identity"><a className="reading-original" href={guide.metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 · {guide.metadata.source.version ?? '版本未指定'} ↗</a><div className="reader-heading-actions"><div className="desktop-font">{controls}</div>{translationAvailable && <button type="button" className="reader-language-toggle" aria-pressed={language === 'en'} aria-label={language === 'en' ? '切换回中文' : '切换英文阅读'} title={language === 'en' ? '切换回中文' : 'English reading'} disabled={englishLoading} onClick={() => setLanguage(value => value === 'en' ? 'zh' : 'en')}>{englishLoading ? '…' : language === 'en' ? '中文' : 'English'}</button>}<button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)} title={`本篇解读 · ${statusLabel(guideState?.status)}；原论文 · ${statusLabel(originalState?.status)}`}><strong>阅读记录</strong><span aria-hidden="true">⌄</span></button></div></div>
+        {currentRevision !== undefined && currentRevision !== guide.metadata.revision && <p className="revision-notice">这是保留的旧修订 {guide.metadata.revision}；当前推荐修订 {currentRevision}。<AppLink to={`/read/${guide.metadata.id}/${currentRevision}`}>阅读当前修订</AppLink></p>}
         {storageError && <p className="status-warning" role="status">{storageError}</p>}
-        <article className="prose" style={{ '--reading-size': `${fontSize}px` } as React.CSSProperties}>{guide.units.map(unit => <section id={unit.id} tabIndex={-1} key={unit.id} data-unit={unit.id}><Markdown guide={guide} markdown={unit.markdown} unitId={unit.id} onCitation={openCitation} /></section>)}</article>
+        {englishError && <p className="status-warning" role="status">{englishError}</p>}
+        <article className="prose" lang={displayLanguage === 'en' ? 'en' : 'zh-Hans'} style={{ '--reading-size': `${fontSize}px` } as React.CSSProperties}>{displayGuide.units.map(unit => <section id={unit.id} tabIndex={-1} key={unit.id} data-unit={unit.id}><Markdown guide={displayGuide} markdown={unit.markdown} unitId={unit.id} language={displayLanguage} onCitation={openCitation} /></section>)}</article>
         <footer className="reading-footer">
           <div className="reading-close" role="group" aria-label="读完这篇">
             <p className="reading-close-marks"><span>这篇导读：{statusLabel(guideState?.status)}</span>{guideState?.status !== 'read' && <button type="button" className="text-action" disabled={saving} onClick={() => void mark('guide', 'read')}>标为已读</button>}<span>原论文：{statusLabel(originalState?.status)}</span><button type="button" className="text-action" onClick={() => setStateOpen(true)}>修改记录</button>{stateMessage && !stateOpen && <span role="status">{stateMessage}</span>}</p>
@@ -169,7 +194,7 @@ export function Reader({ guide }: { guide: Guide }) {
           <div className="reading-footer-links"><AppLink to="#orientation">回到阅读起点 ↑</AppLink><AppLink to="/explore">探索 →</AppLink></div>
         </footer>
       </main>
-      {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={selection?.text} wide={assistantWide} topicRequest={topicRequest} onClose={() => { setAssistantOpen(false); setTopicRequest(undefined); }} />}
+      {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={language === 'en' ? undefined : selection?.text} wide={assistantWide} topicRequest={topicRequest} onClose={() => { setAssistantOpen(false); setTopicRequest(undefined); }} />}
     </div>
     {!sidebarTools && readingTools}
     {source && <SourceDialog selection={source} guide={guide} onClose={() => setSource(null)} />}

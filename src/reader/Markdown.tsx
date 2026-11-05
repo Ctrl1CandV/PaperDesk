@@ -11,6 +11,7 @@ import { Diagram } from './Diagram';
 import { PaperFigure } from './PaperFigure';
 import { TermHint } from './TermHint';
 import { remarkTerms } from './remark-terms';
+import { englishGlossaryMatcher, glossaryMatcher } from '../content/glossary';
 import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
 
 function textOf(children: ReactNode): string {
@@ -20,22 +21,23 @@ function textOf(children: ReactNode): string {
 function citationDisplay(label: string) {
   return label.replace(/PDF\s*第([^页]+)页/g, 'p.$1').replace(/(原文(?:论)?(?:文)?)\s*v\d+(?:[.\d]*)[，,、]?\s*/g, '$1 ');
 }
-export function Formula({ source, display }: { source: string; display: boolean }) {
+export function Formula({ source, display, language = 'zh' }: { source: string; display: boolean; language?: 'zh' | 'en' }) {
   try {
     const html = katex.renderToString(source, { displayMode: display, trust: false, strict: 'error', throwOnError: true, maxExpand: 200, maxSize: 20, macros: {} });
     if (!display) return <span className="inline-formula" dangerouslySetInnerHTML={{ __html: html }} />;
-    return <span className="formula-block"><span className="formula-scroll" role="region" tabIndex={0} aria-label="公式，可横向滚动" dangerouslySetInnerHTML={{ __html: html }} /><span className="overflow-hint">长公式可横向滚动，键盘聚焦后用方向键查看。</span></span>;
+    return <span className="formula-block"><span className="formula-scroll" role="region" tabIndex={0} aria-label={language === 'en' ? 'Formula, horizontally scrollable' : '公式，可横向滚动'} dangerouslySetInnerHTML={{ __html: html }} /><span className="overflow-hint">{language === 'en' ? 'Long formulas can scroll horizontally; focus and use the arrow keys.' : '长公式可横向滚动，键盘聚焦后用方向键查看。'}</span></span>;
   } catch {
-    return <span className="formula-error">公式未能显示：<code>{source}</code></span>;
+    return <span className="formula-error">{language === 'en' ? 'Formula could not be displayed:' : '公式未能显示：'}<code>{source}</code></span>;
   }
 }
-export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCitation }: {
-  guide: Guide; markdown: string; unitId: string;
+export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCitation, language = 'zh' }: {
+  guide: Guide; markdown: string; unitId: string; language?: 'zh' | 'en';
   onCitation: (citation: Citation, label: string, trigger: HTMLButtonElement) => void;
 }) {
   let citationIndex = 0;
   let paragraphIndex = 0;
-  return <ReactMarkdown skipHtml remarkPlugins={[remarkGfm, remarkMath, [remarkTerms, { title: guide.metadata.title }]]}
+  const matcher = language === 'en' ? englishGlossaryMatcher : glossaryMatcher;
+  return <ReactMarkdown skipHtml remarkPlugins={[remarkGfm, remarkMath, [remarkTerms, { title: guide.metadata.title, matcher }]]}
     urlTransform={url => isSafeExternalUrl(url) || contentRepository.resolveRelated(guide, url) || contentRepository.resolveAsset(guide, url) ? url : ''}
     components={{
       p: ({ node, children }) => {
@@ -46,7 +48,7 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
       },
       abbr: ({ children, ...props }) => {
         const id = (props as Record<string, unknown>)['data-term'];
-        return typeof id === 'string' ? <TermHint id={id}>{children}</TermHint> : <>{children}</>;
+        return typeof id === 'string' ? <TermHint id={id} language={language}>{children}</TermHint> : <>{children}</>;
       },
       h1: ({ children }) => <h1>{children}</h1>,
       a: ({ href, children }) => {
@@ -59,15 +61,16 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
       },
       img: ({ src, alt, title }) => {
         const figure = typeof src === 'string' ? contentRepository.figure(guide.metadata.id, guide.metadata.revision, src) : undefined;
-        return figure ? <PaperFigure figure={figure} caption={title ?? undefined} /> : <span className="content-fallback">{alt ? `图片：${alt}` : '未提供可显示的本地图片'}</span>;
+        const asset = typeof src === 'string' ? guide.metadata.assets.find(item => item.path === src) : undefined;
+        return figure ? <PaperFigure figure={{ ...figure, alt: alt || asset?.alt || figure.alt, rights: asset?.rights || figure.rights }} caption={title ?? undefined} language={language} /> : <span className="content-fallback">{alt ? `${language === 'en' ? 'Image' : '图片'}：${alt}` : (language === 'en' ? 'No local image available' : '未提供可显示的本地图片')}</span>;
       },
       pre: ({ children }) => <div className="code-block">{children}</div>,
       code: ({ className, children }) => {
         const source = String(children).trimEnd();
         if (className === 'language-mermaid') return <Diagram source={source} />;
-        if (className?.includes('language-math')) return <Formula source={source} display={className.includes('math-display')} />;
+        if (className?.includes('language-math')) return <Formula source={source} display={className.includes('math-display')} language={language} />;
         return <code className={className}>{children}</code>;
       },
-      table: ({ children }) => <div className="table-wrap"><p className="overflow-hint">表格可横向滚动，键盘聚焦后用方向键查看。</p><div className="table-scroll" role="region" tabIndex={0} aria-label="正文表格，可横向滚动"><table>{children}</table></div></div>,
+      table: ({ children }) => <div className="table-wrap"><p className="overflow-hint">{language === 'en' ? 'Tables can scroll horizontally; focus and use the arrow keys.' : '表格可横向滚动，键盘聚焦后用方向键查看。'}</p><div className="table-scroll" role="region" tabIndex={0} aria-label={language === 'en' ? 'Article table, horizontally scrollable' : '正文表格，可横向滚动'}><table>{children}</table></div></div>,
     }}>{markdown}</ReactMarkdown>;
 });

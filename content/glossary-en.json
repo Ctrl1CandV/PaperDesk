@@ -1,0 +1,592 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "transformer",
+      "term": "Transformer",
+      "aliases": [
+        "Transformer"
+      ],
+      "field": "Deep learning · architecture",
+      "explain": "The Transformer is a sequence model that uses attention rather than recurrence to exchange information between positions. The original translation model has an encoder and a decoder, along with feed-forward layers, positional encodings, residual connections, and normalization.",
+      "guide": "/read/transformer/5#architecture",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3"
+      }
+    },
+    {
+      "id": "seq2seq",
+      "term": "encoder–decoder",
+      "aliases": [
+        "encoder–decoder",
+        "encoder-decoder",
+        "sequence-to-sequence",
+        "seq2seq"
+      ],
+      "field": "Deep learning · sequence modeling",
+      "explain": "An encoder turns an input sequence into representations, while a decoder uses those representations to produce an output sequence. In the original Transformer, the decoder attends to the encoder's output and generates target tokens one at a time.",
+      "guide": "/read/transformer/5#u01",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3"
+      }
+    },
+    {
+      "id": "self-attention",
+      "term": "self-attention",
+      "aliases": [
+        "self-attention"
+      ],
+      "field": "Deep learning · attention",
+      "explain": "Self-attention computes queries, keys, and values from representations of the same sequence. Each position combines information from permitted positions; a causal mask restricts decoder positions from looking ahead.",
+      "guide": "/read/transformer/5#u04",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=5"
+      }
+    },
+    {
+      "id": "scaled-dot-product-attention",
+      "term": "scaled dot-product attention",
+      "aliases": [
+        "scaled dot-product attention",
+        "Scaled Dot-Product Attention"
+      ],
+      "field": "Deep learning · attention",
+      "explain": "Scaled dot-product attention compares queries with keys using dot products, divides the scores by the square root of the key dimension, and applies softmax. The resulting weights combine value vectors; a mask can exclude forbidden positions before softmax.",
+      "guide": "/read/transformer/5#u02",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=4"
+      }
+    },
+    {
+      "id": "multi-head",
+      "term": "multi-head attention",
+      "aliases": [
+        "multi-head attention",
+        "Multi-Head Attention"
+      ],
+      "field": "Deep learning · attention",
+      "explain": "Multi-head attention projects queries, keys, and values into several learned spaces and computes attention separately in each head. It concatenates the head outputs and applies an output projection, allowing different mixtures of information to be combined.",
+      "guide": "/read/transformer/5#u03",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=5"
+      }
+    },
+    {
+      "id": "positional-encoding",
+      "term": "positional encoding",
+      "aliases": [
+        "positional encoding",
+        "Positional Encoding"
+      ],
+      "field": "Deep learning · sequence representation",
+      "explain": "A positional encoding supplies information about sequence position to a model whose attention mechanism does not by itself encode order. The original Transformer adds sinusoidal position vectors to token embeddings and also reports a comparison with learned positional embeddings.",
+      "guide": "/read/transformer/5#u04",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=6"
+      }
+    },
+    {
+      "id": "autoregressive",
+      "term": "autoregression",
+      "aliases": [
+        "autoregression",
+        "autoregressive generation"
+      ],
+      "field": "Sequence modeling · generation",
+      "explain": "Autoregression factors a sequence prediction into successive predictions conditioned on earlier output. At inference, the original Transformer's decoder uses previously generated tokens to predict the next one, so generation proceeds sequentially.",
+      "guide": "/read/transformer/5#u01",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3"
+      }
+    },
+    {
+      "id": "residual",
+      "term": "residual connection",
+      "aliases": [
+        "residual connection",
+        "residual connections"
+      ],
+      "field": "Deep learning · network structure",
+      "explain": "A residual connection adds a sublayer's input to its output, creating a shortcut through the sublayer. In the original Transformer, this addition is followed by layer normalization.",
+      "guide": "/read/transformer/5#architecture",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3"
+      }
+    },
+    {
+      "id": "layernorm",
+      "term": "layer normalization",
+      "aliases": [
+        "layer normalization",
+        "LayerNorm"
+      ],
+      "field": "Deep learning · normalization",
+      "explain": "Layer normalization standardizes a representation across its features and applies learned scaling and shifting. The original Transformer applies it after each sublayer's residual addition; later architectures may put it elsewhere.",
+      "guide": "/read/transformer/5#architecture",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3"
+      }
+    },
+    {
+      "id": "teacher-forcing",
+      "term": "teacher forcing",
+      "aliases": [
+        "teacher forcing"
+      ],
+      "field": "Sequence modeling · training",
+      "explain": "Teacher forcing supplies the reference output rather than the model's own generated output as preceding context during training. In the Transformer, shifted target inputs and a causal mask allow next-token predictions at different positions to be computed in parallel.",
+      "guide": "/read/transformer/5#u01",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=3"
+      }
+    },
+    {
+      "id": "beam-search",
+      "term": "beam search",
+      "aliases": [
+        "beam search"
+      ],
+      "field": "Sequence modeling · decoding",
+      "explain": "Beam search approximately searches for a high-scoring output by retaining a limited number of candidate sequences as generation proceeds. The Transformer paper reports translation results with beam size four and a length penalty of 0.6.",
+      "guide": "/read/transformer/5#u06",
+      "source": {
+        "label": "Original paper",
+        "url": "https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf#page=8"
+      }
+    },
+    {
+      "id": "bleu",
+      "term": "BLEU",
+      "aliases": [
+        "BLEU"
+      ],
+      "full": "Bilingual Evaluation Understudy",
+      "field": "Machine translation · evaluation",
+      "explain": "BLEU scores a generated translation using overlap with reference translations and a penalty for excessive brevity. It is useful for comparing systems under a specified evaluation setup, but overlap alone does not establish that every meaning is correct.",
+      "guide": "/read/transformer/5#u06",
+      "source": {
+        "label": "Original metric paper",
+        "url": "https://aclanthology.org/P02-1040/"
+      }
+    },
+    {
+      "id": "rag",
+      "term": "retrieval-augmented generation",
+      "aliases": [
+        "RAG",
+        "retrieval-augmented generation",
+        "Retrieval-Augmented Generation"
+      ],
+      "full": "Retrieval-Augmented Generation",
+      "field": "Natural language processing · knowledge augmentation",
+      "explain": "Retrieval-augmented generation combines generation with information obtained through retrieval. In a common inference-time pipeline, retrieved passages and the question are supplied to a language model, but access to passages does not guarantee a supported or correct answer.",
+      "builds": "The original RAG model fine-tuned a retriever and generator; the survey also discusses later inference-time and training-time approaches.",
+      "guide": "/read/rag-survey/5#u01",
+      "source": {
+        "label": "Original RAG paper",
+        "url": "https://arxiv.org/abs/2005.11401"
+      }
+    },
+    {
+      "id": "naive-rag",
+      "term": "Naive RAG",
+      "aliases": [
+        "Naive RAG"
+      ],
+      "field": "Retrieval augmentation · paradigm",
+      "explain": "Naive RAG organizes a basic system as indexing, retrieval, and generation. A question retrieves indexed passages, which are supplied to a generator; errors can arise in either retrieval or the use of the passages.",
+      "guide": "/read/rag-survey/5#u02",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S2.SS1"
+      }
+    },
+    {
+      "id": "advanced-rag",
+      "term": "Advanced RAG",
+      "aliases": [
+        "Advanced RAG"
+      ],
+      "field": "Retrieval augmentation · paradigm",
+      "explain": "Advanced RAG improves a basic pipeline before and after retrieval. For example, it can rewrite a query or improve an index before searching, then rerank or compress the retrieved material.",
+      "guide": "/read/rag-survey/5#u02",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S2.SS2"
+      }
+    },
+    {
+      "id": "modular-rag",
+      "term": "Modular RAG",
+      "aliases": [
+        "Modular RAG"
+      ],
+      "field": "Retrieval augmentation · paradigm",
+      "explain": "Modular RAG organizes a system as replaceable or rearrangeable components rather than one fixed pipeline. Routing, search, and iterative retrieval are examples of ways to compose those components; extra modules do not automatically improve performance.",
+      "guide": "/read/rag-survey/5#u02",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S2.SS3"
+      }
+    },
+    {
+      "id": "retrieval-quality",
+      "term": "retrieval quality",
+      "aliases": [
+        "retrieval quality",
+        "Retrieval quality"
+      ],
+      "field": "Information retrieval · evaluation",
+      "explain": "Retrieval quality describes how well a system finds and ranks useful material for a question. Measures such as precision, recall, and reciprocal rank emphasize different aspects, so a high score on one need not mean that all necessary evidence was found.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S6.SS2"
+      }
+    },
+    {
+      "id": "generation-quality",
+      "term": "generation quality",
+      "aliases": [
+        "generation quality",
+        "Generation quality"
+      ],
+      "field": "Retrieval augmentation · evaluation",
+      "explain": "Generation quality concerns the answer produced from a question and available context. Evaluation can separately examine whether the answer addresses the question, is supported by the context, and is factually correct.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S6.SS2"
+      }
+    },
+    {
+      "id": "retrieval-augmentation",
+      "term": "retrieval augmentation",
+      "aliases": [
+        "retrieval augmentation"
+      ],
+      "field": "Retrieval augmentation · process",
+      "explain": "Retrieval augmentation supplies a generator with information obtained through a retrieval process. The survey distinguishes iterative, recursive, and adaptive processes that can decide how or when to retrieve beyond a single pass.",
+      "guide": "/read/rag-survey/5#u05",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S5"
+      }
+    },
+    {
+      "id": "chunk",
+      "term": "chunking",
+      "aliases": [
+        "chunking",
+        "Chunking"
+      ],
+      "field": "Information retrieval · indexing",
+      "explain": "Chunking divides source material into smaller passages for indexing and retrieval. Larger chunks can preserve more context but add noise, while smaller chunks can omit conditions needed to interpret a fact.",
+      "guide": "/read/rag-survey/5#u03",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S3.SS2"
+      }
+    },
+    {
+      "id": "embedding-model",
+      "term": "embedding model",
+      "aliases": [
+        "embedding model",
+        "Embedding model"
+      ],
+      "field": "Information retrieval · representation",
+      "explain": "An embedding model maps text to a numerical vector that can be compared with other vectors. In dense retrieval, query and passage embeddings are compared to rank candidates, but their similarity is not a guarantee of relevance.",
+      "guide": "/read/rag-survey/5#query",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S3.SS4"
+      }
+    },
+    {
+      "id": "vector-db",
+      "term": "vector database",
+      "aliases": [
+        "vector database"
+      ],
+      "field": "Information retrieval · indexing",
+      "explain": "A vector database stores vectors and supports searching for vectors similar to a query. In the survey's basic RAG example, chunk embeddings are stored for retrieval; the index can only return material that has been included in it.",
+      "guide": "/read/rag-survey/5#u01",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S2.SS1"
+      }
+    },
+    {
+      "id": "dense-retrieval",
+      "term": "dense retrieval",
+      "aliases": [
+        "dense retrieval",
+        "Dense retrieval"
+      ],
+      "field": "Information retrieval · retrieval method",
+      "explain": "Dense retrieval encodes queries and candidate passages as vectors and ranks candidates using a similarity score. It can match related wording, although exact identifiers and other details may still be missed.",
+      "guide": "/read/rag-survey/5#query",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S3.SS4"
+      }
+    },
+    {
+      "id": "sparse-retrieval",
+      "term": "sparse retrieval",
+      "aliases": [
+        "Sparse retrieval"
+      ],
+      "field": "Information retrieval · retrieval method",
+      "explain": "Sparse retrieval uses term-based representations or scores to match queries with documents. BM25 is an example; such methods can be useful for exact terms and can be combined with dense retrieval.",
+      "guide": "/read/rag-survey/5#query",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S3.SS4"
+      }
+    },
+    {
+      "id": "hyde",
+      "term": "HyDE",
+      "aliases": [
+        "HyDE"
+      ],
+      "full": "Hypothetical Document Embeddings",
+      "field": "Information retrieval · query transformation",
+      "explain": "HyDE generates a hypothetical document in response to a question, embeds it, and uses that embedding to retrieve real documents. The hypothetical text can contain false details and is a retrieval aid, not evidence for the answer.",
+      "guide": "/read/rag-survey/5#query",
+      "source": {
+        "label": "Original method paper",
+        "url": "https://arxiv.org/abs/2212.10496"
+      }
+    },
+    {
+      "id": "self-rag",
+      "term": "Self-RAG",
+      "aliases": [
+        "Self-RAG"
+      ],
+      "full": "Self-Reflective Retrieval-Augmented Generation",
+      "field": "Retrieval augmentation · adaptive retrieval",
+      "explain": "Self-RAG trains a model to produce reflection tokens that control retrieval and assess aspects of its output. Its judgments include passage relevance and support for generated text, but those judgments can still require independent evaluation.",
+      "guide": "/read/rag-survey/5#u05",
+      "source": {
+        "label": "Original method paper",
+        "url": "https://arxiv.org/abs/2310.11511"
+      }
+    },
+    {
+      "id": "flare",
+      "term": "FLARE",
+      "aliases": [
+        "FLARE"
+      ],
+      "full": "Forward-Looking Active REtrieval augmented generation",
+      "field": "Retrieval augmentation · adaptive retrieval",
+      "explain": "FLARE anticipates a forthcoming sentence during long-form generation and can retrieve when predicted words have low probability. It then regenerates the sentence using retrieved material; high model confidence alone does not establish that a claim is correct.",
+      "guide": "/read/rag-survey/5#u05",
+      "source": {
+        "label": "Original method paper",
+        "url": "https://arxiv.org/abs/2305.06983"
+      }
+    },
+    {
+      "id": "ircot",
+      "term": "IRCoT",
+      "aliases": [
+        "IRCoT"
+      ],
+      "full": "Interleaving Retrieval with Chain-of-Thought",
+      "field": "Retrieval augmentation · multi-step reasoning",
+      "explain": "IRCoT interleaves retrieval with intermediate reasoning steps for multi-step questions. Each step can guide the next search, so an incorrect intermediate conclusion can also misdirect later retrieval.",
+      "guide": "/read/rag-survey/5#u05",
+      "source": {
+        "label": "Original method paper",
+        "url": "https://arxiv.org/abs/2212.10509"
+      }
+    },
+    {
+      "id": "ra-dit",
+      "term": "RA-DIT",
+      "aliases": [
+        "RA-DIT"
+      ],
+      "full": "Retrieval-Augmented Dual Instruction Tuning",
+      "field": "Retrieval augmentation · fine-tuning",
+      "explain": "RA-DIT adapts both a language model and a retriever in separate fine-tuning steps. The language model learns to use retrieved information, and the retriever is tuned toward material useful to the model.",
+      "guide": "/read/rag-survey/5#u04",
+      "source": {
+        "label": "Original method paper",
+        "url": "https://arxiv.org/abs/2310.01352"
+      }
+    },
+    {
+      "id": "rerank",
+      "term": "reranking",
+      "aliases": [
+        "reranking",
+        "Reranking"
+      ],
+      "field": "Information retrieval · post-processing",
+      "explain": "Reranking reorders an already retrieved set of candidates using another relevance assessment. It can help important passages survive a context limit, but it cannot recover a passage absent from the candidate set.",
+      "guide": "/read/rag-survey/5#u04",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S4.SS1"
+      }
+    },
+    {
+      "id": "context-relevance",
+      "term": "context relevance",
+      "aliases": [
+        "context relevance",
+        "Context relevance"
+      ],
+      "field": "Retrieval augmentation · evaluation",
+      "explain": "Context relevance asks whether the material supplied to a generator is useful for the question. A passage can mention the same entities yet omit the information needed to answer.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S6.SS3"
+      }
+    },
+    {
+      "id": "answer-faithfulness",
+      "term": "answer faithfulness",
+      "aliases": [
+        "Answer faithfulness"
+      ],
+      "field": "Retrieval augmentation · evaluation",
+      "explain": "Answer faithfulness asks whether claims in an answer are supported by the supplied context. A faithful answer can still be factually wrong if its source material is wrong, and a correct guess can lack support in the supplied context.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S6.SS3"
+      }
+    },
+    {
+      "id": "answer-relevance",
+      "term": "answer relevance",
+      "aliases": [
+        "answer relevance",
+        "Answer relevance"
+      ],
+      "field": "Retrieval augmentation · evaluation",
+      "explain": "Answer relevance asks whether an answer addresses the user's question. An answer can be supported by its sources yet omit a requested part, so relevance and faithfulness should be checked separately.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S6.SS3"
+      }
+    },
+    {
+      "id": "mrr",
+      "term": "MRR",
+      "aliases": [
+        "MRR"
+      ],
+      "full": "Mean Reciprocal Rank",
+      "field": "Information retrieval · evaluation",
+      "explain": "Reciprocal rank is one divided by the rank of the first relevant result, or zero if none is found. MRR averages this value across questions and does not establish that every document needed for a multi-step answer was retrieved.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S6.SS2"
+      }
+    },
+    {
+      "id": "ares",
+      "term": "ARES",
+      "aliases": [
+        "ARES"
+      ],
+      "field": "Retrieval augmentation · evaluation tool",
+      "explain": "ARES evaluates RAG systems on dimensions including context relevance, answer faithfulness, and answer relevance. It trains lightweight judges using automatically generated data and uses a small human-labeled sample for statistical calibration; automated judgments can still be wrong.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAG survey",
+        "url": "https://arxiv.org/html/2312.10997v5#S6.SS4"
+      }
+    },
+    {
+      "id": "token",
+      "term": "token",
+      "aliases": [
+        "token",
+        "tokens"
+      ],
+      "field": "Language modeling · input unit",
+      "explain": "A token is the unit a tokenizer maps text to before a model processes it. It may be a word, a subword, or a character; context limits and many costs are measured in tokens.",
+      "guide": "/read/transformer/5#u01"
+    },
+    {
+      "id": "attention",
+      "term": "attention mechanism",
+      "aliases": [
+        "attention mechanism",
+        "attention operation"
+      ],
+      "field": "Deep learning · core mechanism",
+      "explain": "An attention mechanism compares a query with keys, turns the scores into weights, and returns a weighted sum of values. It lets a position read selected positions directly rather than through a fixed recurrent state.",
+      "builds": "The Transformer uses self-attention, encoder–decoder attention, and masked decoder self-attention. Multi-head attention runs several attention operations in parallel.",
+      "guide": "/read/transformer/5#u02",
+      "source": {
+        "label": "Original attention paper",
+        "url": "https://arxiv.org/abs/1409.0473"
+      }
+    },
+    {
+      "id": "hallucination",
+      "term": "hallucination",
+      "aliases": [
+        "hallucination",
+        "hallucinations"
+      ],
+      "field": "Language models · failure mode",
+      "explain": "A hallucination is a fluent model output that asserts unsupported or false information. It can arise from missing knowledge, misleading context, or a model preferring a plausible continuation over evidence.",
+      "guide": "/read/rag-survey/5#u01"
+    },
+    {
+      "id": "icl",
+      "term": "in-context learning",
+      "aliases": [
+        "in-context learning",
+        "ICL"
+      ],
+      "full": "In-Context Learning",
+      "field": "Language models · prompting",
+      "explain": "In-context learning is the ability to infer a task from instructions and examples placed in the prompt without updating the model parameters. The examples change the conditional distribution for the current request only.",
+      "source": {
+        "label": "GPT-3 paper",
+        "url": "https://arxiv.org/abs/2005.14165"
+      }
+    },
+    {
+      "id": "ragas",
+      "term": "RAGAS",
+      "aliases": [
+        "RAGAS",
+        "Ragas"
+      ],
+      "full": "Retrieval-Augmented Generation Assessment",
+      "field": "Retrieval augmentation · evaluation",
+      "explain": "RAGAS is an evaluation framework for RAG systems that scores dimensions such as answer faithfulness, answer relevance, and context relevance, often with an LLM as judge. Its scores depend on the judge, prompts, references, and data.",
+      "guide": "/read/rag-survey/5#u06",
+      "source": {
+        "label": "RAGAS paper",
+        "url": "https://arxiv.org/abs/2309.15217"
+      }
+    }
+  ]
+}

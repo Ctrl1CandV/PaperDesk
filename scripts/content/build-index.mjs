@@ -9,6 +9,8 @@ const project = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const root = resolve(project, 'content');
 const catalogBytes = await readFile(resolve(root, 'catalog.json'));
 const catalog = JSON.parse(catalogBytes);
+const translationBytes = await readFile(resolve(root, 'translations.json')).catch(() => undefined);
+const translations = translationBytes ? JSON.parse(translationBytes) : { schemaVersion: 1, guides: [] };
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 // Intrinsic sizes let figures reserve their space before the image arrives.
 function imageSize(bytes) {
@@ -33,12 +35,14 @@ for (const entry of catalog.entries) {
     const size = imageSize(await readFile(resolve(root, directory, asset.path)));
     figures.push({ path: asset.path, alt: asset.alt, origin: asset.origin, rights: asset.rights, ...(size ? { width: size[0], height: size[1] } : {}) });
   }
+  const translation = translations.guides?.find(item => item.guideId === id && item.revision === revision && item.language === 'en');
+  const english = translation ? { title: translation.title, bodyPath: translation.bodyFile, bodySha256: translation.bodySha256, assets: translation.assets ?? [] } : undefined;
   entries.push({ ...entry, metadataSha256: sha256(bytes), bodySha256: metadata.bodySha256,
     guide: { metadata: { id, paperId, revision, title, paperTitle, type, purpose, source,
       ...(current && orientation ? { orientation } : {}),
       related: current ? metadata.related ?? [] : [],
       coverage: { limitations: current ? metadata.coverage.limitations : [] } },
-    units, figures, bodyPath: directory + metadata.bodyFile, packageDirectory: directory } });
+    units, figures, bodyPath: directory + metadata.bodyFile, packageDirectory: directory, ...(english ? { translations: { en: english } } : {}) } });
 }
 const seeds = {};
 for (const [revision, file] of Object.entries(catalog.exploration.revisions)) {

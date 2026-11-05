@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "guides": [
+    {
+      "guideId": "transformer",
+      "revision": 5,
+      "language": "en",
+      "title": "Transformer: Sequence Transduction Using Attention Alone",
+      "bodyFile": "guides/transformer.r5.en.md",
+      "assets": [
+        {
+          "path": "assets/transformer/figure-1-architecture.webp",
+          "alt": "Overview of the Transformer architecture: an encoder on the left and a decoder on the right, each stacked from N identical layers.",
+          "rights": "Vaswani et al., NIPS 2017, Figure 1. The arXiv version states on its first page that Google permits reproduction of figures in news or scholarly works with attribution."
+        },
+        {
+          "path": "assets/transformer/figure-2-attention.webp",
+          "alt": "Left: the steps of scaled dot-product attention. Right: the parallel structure of multi-head attention.",
+          "rights": "Vaswani et al., NIPS 2017, Figure 2. The arXiv version states on its first page that Google permits reproduction of figures in news or scholarly works with attribution."
+        }
+      ],
+      "bodySha256": "0d5d337ac3d8e654d175b9b7ec46994b282f82d82aa0dfd9418530d0057494d6"
+    },
+    {
+      "guideId": "rag-survey",
+      "revision": 5,
+      "language": "en",
+      "title": "The RAG Survey: A Map of Retrieval-Augmented Generation",
+      "bodyFile": "guides/rag-survey.r5.en.md",
+      "assets": [
+        {
+          "path": "assets/rag-survey/figure-2-rag-process.webp",
+          "alt": "Example RAG question-answering workflow: a question retrieves passages from a document collection; the passages and question are combined in a prompt for an LLM to answer.",
+          "rights": "Gao et al., arXiv:2312.10997v5, Figure 2. The arXiv default non-exclusive distribution license grants no right of republication; used only for personal scholarly reading in this private repository."
+        },
+        {
+          "path": "assets/rag-survey/figure-1-technology-tree.webp",
+          "alt": "Technology tree of RAG research: a timeline for 2020, 2023, and 2024, with three branches for pretraining, fine-tuning, and inference-time augmentation, annotated with representative methods.",
+          "rights": "Gao et al., arXiv:2312.10997v5, Figure 1. The arXiv default non-exclusive distribution license grants no right of republication; used only for personal scholarly reading in this private repository."
+        },
+        {
+          "path": "assets/rag-survey/figure-3-paradigms.webp",
+          "alt": "Three RAG paradigms: Naive RAG as a linear pipeline; Advanced RAG with pre- and post-retrieval optimization; Modular RAG as flexible composition of modules.",
+          "rights": "Gao et al., arXiv:2312.10997v5, Figure 3. The arXiv default non-exclusive distribution license grants no right of republication; used only for personal scholarly reading in this private repository."
+        },
+        {
+          "path": "assets/rag-survey/figure-4-rag-vs-finetuning.webp",
+          "alt": "A quadrant plot comparing prompt engineering, fine-tuning, and RAG by the need to change the model and the need for external knowledge; RAG moves from Naive to Modular and can combine with fine-tuning.",
+          "rights": "Gao et al., arXiv:2312.10997v5, Figure 4. The arXiv default non-exclusive distribution license grants no right of republication; used only for personal scholarly reading in this private repository."
+        },
+        {
+          "path": "assets/rag-survey/figure-5-retrieval-processes.webp",
+          "alt": "Three retrieval-augmentation processes: iterative retrieval alternates retrieval and generation; recursive retrieval rewrites or decomposes the query; adaptive retrieval lets the model decide whether and when to retrieve.",
+          "rights": "Gao et al., arXiv:2312.10997v5, Figure 5. The arXiv default non-exclusive distribution license grants no right of republication; used only for personal scholarly reading in this private repository."
+        }
+      ],
+      "bodySha256": "33acad2ed9739662ed1b497510772e8a8c496645d25cc3e6fd694227455997be"
+    }
+  ]
+}

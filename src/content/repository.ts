@@ -54,26 +54,46 @@ function remember(key: string, guide: Guide, bytes: number) {
   }
   cache.set(key, { guide, bytes }); cacheBytes += bytes;
 }
-async function loadGuide(id: string, revision: number, options: { signal?: AbortSignal } = {}): Promise<Guide | undefined> {
-  const key = `${id}/${revision}`, entry = byKey.get(key), signal = options.signal;
+type Language = 'zh' | 'en';
+
+function nodeText(node: { value?: string; children?: unknown[] }): string {
+  return node.value ?? (node.children ?? []).map(child => nodeText(child as { value?: string; children?: unknown[] })).join('');
+}
+
+async function loadGuide(id: string, revision: number, options: { signal?: AbortSignal; language?: Language } = {}): Promise<Guide | undefined> {
+  const language = options.language ?? 'zh';
+  const baseKey = `${id}/${revision}`, key = `${baseKey}/${language}`, entry = byKey.get(baseKey), signal = options.signal;
   if (signal?.aborted) throw new DOMException('已取消读取', 'AbortError');
   if (!entry) return undefined;
+  const translation = language === 'en' ? entry.guide.translations?.en : undefined;
+  if (language === 'en' && !translation) return undefined;
   const cached = cache.get(key);
   if (cached) { cache.delete(key); cache.set(key, cached); return cached.guide; }
   let task = pending.get(key);
   if (!task || task.controller.signal.aborted) {
     const controller = new AbortController();
     const promise = (async () => {
+      const bodyPath = translation?.bodyPath ?? entry.guide.bodyPath;
+      const bodyHash = translation?.bodySha256 ?? entry.bodySha256;
       const [raw, body] = await Promise.all([
         checkedText(entry.metadataFile, entry.metadataSha256, 2 * 1024 * 1024, controller.signal),
-        checkedText(entry.guide.bodyPath, entry.bodySha256, 1024 * 1024, controller.signal),
+        checkedText(bodyPath, bodyHash, 1024 * 1024, controller.signal),
       ]);
-      const metadata = JSON.parse(raw) as GuideMetadata;
+      const baseMetadata = JSON.parse(raw) as GuideMetadata;
+      const metadata: GuideMetadata = translation ? {
+        ...baseMetadata, title: translation.title, language: 'en', bodyFile: translation.bodyPath, bodySha256: translation.bodySha256,
+        assets: baseMetadata.assets.map(asset => {
+          const override = translation.assets.find(item => item.path === asset.path);
+          return override ? { ...asset, alt: override.alt, rights: override.rights } : asset;
+        }),
+      } : baseMetadata;
       const tree = unified().use(remarkParse).parse(body);
+      const headings = tree.children.filter(node => node.type === 'heading' && node.depth === 2).map(node => nodeText(node as { value?: string; children?: unknown[] }));
+      if (translation && headings.length !== baseMetadata.units.length - 1) throw new Error('英文版章节数量与导读修订不一致，请重新构建内容。');
       const offsets = [0, ...tree.children.filter(node => node.type === 'heading' && node.depth === 2).map(node => node.position!.start.offset!)];
       const definitions = tree.children.filter(node => node.type === 'definition').map(node => body.slice(node.position!.start.offset!, node.position!.end.offset!)).join('\n');
-      const guide: Guide = { metadata, body, bodyPath: entry.guide.bodyPath, packageDirectory: entry.guide.packageDirectory,
-        units: metadata.units.map((unit, at) => ({ ...unit, markdown: body.slice(offsets[at], offsets[at + 1]) + (definitions ? `\n\n${definitions}\n` : '') })) };
+      const guide: Guide = { metadata, body, bodyPath, packageDirectory: entry.guide.packageDirectory,
+        units: metadata.units.map((unit, at) => ({ ...unit, heading: at ? headings[at - 1] : null, markdown: body.slice(offsets[at], offsets[at + 1]) + (definitions ? `\n\n${definitions}\n` : '') })) };
       if (!controller.signal.aborted) remember(key, guide, (raw.length + body.length + guide.units.reduce((sum, unit) => sum + unit.markdown.length, 0)) * 2);
       return guide;
     })();
@@ -104,6 +124,7 @@ async function loadGuide(id: string, revision: number, options: { signal?: Abort
 
 export const contentRepository = {
   get: loadGuide,
+  hasTranslation(id: string, revision: number, language: Language = 'en') { return language === 'en' && Boolean(byKey.get(`${id}/${revision}`)?.guide.translations?.en); },
   getSummary(id: string, revision: number) { return byKey.get(`${id}/${revision}`)?.guide; },
   currentRevision(id: string) { return current[id]; },
   revisions(id: string) { return entries.filter(entry => entry.guideId === id).map(entry => entry.revision); },
