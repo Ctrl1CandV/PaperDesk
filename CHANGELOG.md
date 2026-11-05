@@ -1,5 +1,12 @@
 # Changelog
 
+## Workflow completion and cleanup — 2026-11-05
+
+- Completed the missed `agent-evaluation-survey` at r2 with the guide-writing workflow; all 18 shelf guides now carry this round's revision.
+- Added an English-version section to the guide-writing workflow, plus rules for figure alt text, metric gaming and batch integration; added `scripts/content/translation-work.mjs` for parallel-safe English checks and merges.
+- Replaced the Transformer English teaching example with the paper's own English–German pair (*Ufer* / *Bank*).
+- Build and 530 Node tests pass (1 skipped); browser tests were not run in this pass.
+
 ## English reading pilot — 2026-11-05
 
 - Added a Chinese/English toggle to deep reading for Transformer r5 and RAG survey r5; the header control is labeled `English`/`中文`, and only the article prose and its term cards switch, while figures, formulas, navigation and page chrome stay unchanged.

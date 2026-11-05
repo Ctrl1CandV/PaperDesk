@@ -5323,6 +5323,284 @@
    "field": "模型评测 · 不确定性",
    "explain": "模型只对部分样本作预测，其余样本交由其他流程处理。可以按预测置信度选择样本，并同时报告保留比例和保留样本上的准确率。",
    "guide": "/read/helm/3#calibration"
+  },
+  {
+   "id": "trajectory",
+   "term": "轨迹",
+   "aliases": [
+    "轨迹",
+    "trajectory",
+    "trajectories"
+   ],
+   "full": "Agent trajectory",
+   "zh": "轨迹",
+   "field": "Agent 评测 · 观察单位",
+   "explain": "一次运行中按顺序记录的观察、模型输出、工具调用、返回值和环境状态变化。它比最终结果多出过程信息，因此能用来检查顺序、依赖、重复和错误恢复；判定一条轨迹是否合理，通常需要参考路径或分步规则。"
+  },
+  {
+   "id": "swe-bench",
+   "term": "SWE-bench",
+   "aliases": [
+    "SWE-bench"
+   ],
+   "full": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+   "zh": "SWE-bench",
+   "field": "Agent 评测 · 软件工程基准",
+   "explain": "从真实 GitHub issue 与对应合并请求构造的软件工程基准。模型拿到问题描述和完整代码仓库，在可执行环境里修改代码，判定方式是仓库自带的验证测试是否通过。原始论文包含 2,294 个问题，来自 12 个 Python 仓库；Lite、Verified、SWE-bench+ 等变体分别处理题目过滤、描述质量与答案泄漏。",
+   "builds": "Jimenez 等人在 2023 年提出，后发表于 ICLR 2024。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.06770"
+   }
+  },
+  {
+   "id": "gaia",
+   "term": "GAIA",
+   "aliases": [
+    "GAIA"
+   ],
+   "full": "GAIA: a benchmark for General AI Assistants",
+   "zh": "通用 AI 助手基准",
+   "field": "Agent 评测 · 通用基准",
+   "explain": "一组贴近真实、对人概念上简单却需要多种工具的问题，考推理、多模态理解、网页浏览和通用工具使用。原始论文给出 466 个问题与答案，其中 300 个答案保留给排行榜；人类受访者的正确率约 92%，配插件的 GPT-4 约 15%。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2311.12983"
+   }
+  },
+  {
+   "id": "toolsandbox",
+   "term": "ToolSandbox",
+   "aliases": [
+    "ToolSandbox"
+   ],
+   "zh": "工具沙箱",
+   "field": "Agent 评测 · 工具调用基准",
+   "explain": "把工具调用放进带状态的环境里评测：工具执行会改变状态，工具之间存在隐式依赖，内置用户模拟器支持在策略的对话评测，并在任意轨迹上动态检查中间与最终里程碑。它针对的是单步、无状态接口评测覆盖不到的情形。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2408.04682"
+   }
+  },
+  {
+   "id": "llf-bench",
+   "term": "LLF-Bench",
+   "aliases": [
+    "LLF-Bench"
+   ],
+   "full": "Learning from Language Feedback Benchmark",
+   "zh": "语言反馈学习基准",
+   "field": "Agent 评测 · 反思能力基准",
+   "explain": "评测 Agent 能否根据自然语言反馈边做边学的交互式决策基准，任务包括推荐、写诗、导航和机器人控制。它把任务说明放进环境而不是 Agent 一侧，并可以随机化说明与反馈的措辞，以减少对某一套表述的过拟合。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2312.06853"
+   }
+  },
+  {
+   "id": "webarena",
+   "term": "WebArena",
+   "aliases": [
+    "WebArena"
+   ],
+   "zh": "WebArena",
+   "field": "Agent 评测 · 网页基准",
+   "explain": "在自托管的、功能完整的多类网站上评测网页 Agent 的环境，任务用自然语言给出，成功与否通过检查网站状态判定。它比静态页面数据集更接近真实交互，也带来环境版本与任务构造的额外条件。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2307.13854"
+   }
+  },
+  {
+   "id": "webcanvas",
+   "term": "WebCanvas",
+   "aliases": [
+    "WebCanvas"
+   ],
+   "zh": "WebCanvas",
+   "field": "Agent 评测 · 网页基准",
+   "explain": "面向在线网页环境的 Agent 评测框架，用关键导航节点的完成情况来判定任务，而不只看最终页面是否到达。配套的 Mind2Web-Live 数据集由静态数据改造而来，适合观察动态网页中哪一步卡住。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2406.12373"
+   }
+  },
+  {
+   "id": "osworld",
+   "term": "OSWorld",
+   "aliases": [
+    "OSWorld"
+   ],
+   "zh": "OSWorld",
+   "field": "Agent 评测 · 计算机操作基准",
+   "explain": "在真实操作系统环境中评测多模态 Agent 的基准，覆盖 Ubuntu、Windows 和 macOS，任务包括任务配置、执行与基于执行结果的判定。它把评测对象从网页扩展到完整的桌面与跨应用操作。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2404.07972"
+   }
+  },
+  {
+   "id": "scienceagentbench",
+   "term": "ScienceAgentBench",
+   "aliases": [
+    "ScienceAgentBench"
+   ],
+   "zh": "ScienceAgentBench",
+   "field": "Agent 评测 · 科学任务基准",
+   "explain": "评估语言 Agent 完成数据驱动科学发现任务的基准，任务从 44 篇同行评审论文中抽取，共 102 个，覆盖四个学科，并由领域专家验证。它主张先严格评估单个环节的任务，再讨论端到端自动化科研。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2410.05080"
+   }
+  },
+  {
+   "id": "core-bench",
+   "term": "CORE-Bench",
+   "aliases": [
+    "CORE-Bench"
+   ],
+   "full": "Computational Reproducibility Agent Benchmark",
+   "zh": "计算可复现性基准",
+   "field": "Agent 评测 · 科学任务基准",
+   "explain": "评测 Agent 能否用给定的代码和数据复现已发表结果，包含 270 个任务，基于 90 篇论文。它把科研中的计算可复现性单独拿出来测量，判定依据是复现是否成功。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2409.11363"
+   }
+  },
+  {
+   "id": "theagentcompany",
+   "term": "TheAgentCompany",
+   "aliases": [
+    "TheAgentCompany"
+   ],
+   "zh": "模拟公司环境基准",
+   "field": "Agent 评测 · 数字工作基准",
+   "explain": "一个可扩展的模拟软件公司环境，Agent 在里面浏览内部网站、写代码、运行程序并与同事沟通，完成有实际后果的工作任务。它用来观察 Agent 在接近真实职业场景中的表现，而不是单项能力分数。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2412.14161"
+   }
+  },
+  {
+   "id": "intellagent",
+   "term": "IntellAgent",
+   "aliases": [
+    "IntellAgent"
+   ],
+   "zh": "IntellAgent",
+   "field": "Agent 评测 · 对话基准生成",
+   "explain": "自动生成对话 Agent 测试的框架：输入数据库结构与公司政策文档，构造政策图、采样事件，模拟被测 Agent 与用户 Agent 的对话，再由评审 Agent 给出针对政策的反馈。它把测试构造从人工编写转向自动生成。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2501.11067"
+   }
+  },
+  {
+   "id": "agentharm",
+   "term": "AgentHarm",
+   "aliases": [
+    "AgentHarm"
+   ],
+   "zh": "Agent 有害行为基准",
+   "field": "Agent 评测 · 安全基准",
+   "explain": "测量 Agent 被滥用时有害程度的基准，包含 110 个明确有害的任务，加上增强后共 440 个，覆盖 11 类危害。评分既看模型是否拒绝，也看被越狱后能否保持完成多步任务的能力。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2410.09024"
+   }
+  },
+  {
+   "id": "planbench",
+   "term": "PlanBench",
+   "aliases": [
+    "PlanBench"
+   ],
+   "zh": "PlanBench",
+   "field": "Agent 评测 · 规划基准",
+   "explain": "评估大模型规划与变化推理能力的可扩展基准，覆盖多个领域。综述转述它的观察：模型擅长短期的战术性计划，在需要长程策略时表现下降。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2206.10498"
+   }
+  },
+  {
+   "id": "memgpt",
+   "term": "MemGPT",
+   "aliases": [
+    "MemGPT"
+   ],
+   "zh": "MemGPT",
+   "field": "Agent 记忆 · 系统方法",
+   "explain": "把大模型的上下文管理类比成操作系统内存管理的记忆机制：分层存放信息，在需要时换入换出，以支持长文档和跨会话对话。评测通常在长文本问答和多会话聊天数据上进行。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2310.08560"
+   }
+  },
+  {
+   "id": "streambench",
+   "term": "StreamBench",
+   "aliases": [
+    "StreamBench"
+   ],
+   "zh": "StreamBench",
+   "field": "Agent 评测 · 持续学习基准",
+   "explain": "评估 Agent 能否利用外部记忆（包括此前交互和外部反馈）随任务流持续提升，而不是停在单次任务上。它覆盖文本到 SQL、工具调用和多跳问答等任务，同时看质量与效率。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2406.08747"
+   }
+  },
+  {
+   "id": "ltm-benchmark",
+   "term": "LTM benchmark",
+   "aliases": [
+    "LTM benchmark",
+    "LTMbenchmark"
+   ],
+   "zh": "长期记忆基准",
+   "field": "Agent 评测 · 记忆基准",
+   "explain": "在单次很长的用户—Agent 交互里穿插多个任务，并频繁切换上下文，用来测长期记忆、持续学习和信息整合。原始论文报告：模型在单任务上表现不错，任务交错后明显变差；配长期记忆系统的短上下文模型可以追上更大的上下文窗口。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2409.20222"
+   }
+  },
+  {
+   "id": "aaar-1",
+   "term": "AAAR-1.0",
+   "aliases": [
+    "AAAR-1.0"
+   ],
+   "full": "Assessing AI's Potential to Assist Research",
+   "zh": "科研辅助评测",
+   "field": "Agent 评测 · 科学任务基准",
+   "explain": "面向科研辅助的评测集，包含四项需要领域专长的任务：方程推断、实验设计、论文弱点识别和评审意见撰写。它把“帮助研究”拆成可以分别判定的环节。",
+   "source": {
+    "label": "arXiv 原文",
+    "url": "https://arxiv.org/abs/2410.22394"
+   }
+  },
+  {
+   "id": "agent-as-a-judge",
+   "term": "Agent-as-a-Judge",
+   "aliases": [
+    "Agent-as-a-Judge"
+   ],
+   "zh": "Agent 评委",
+   "field": "Agent 评测 · 评分方法",
+   "explain": "让具备工具和多步能力的 Agent 充当评价者，检查另一个 Agent 的轨迹与产出，而不只给最终答案打分。它能减少人工标注并给出过程反馈，同时把评委自身的偏差和成本带进结果。"
+  },
+  {
+   "id": "almita",
+   "term": "ALMITA",
+   "aliases": [
+    "ALMITA"
+   ],
+   "zh": "ALMITA",
+   "field": "Agent 评测 · 对话基准",
+   "explain": "面向客服对话 Agent 的测试集，由自动化流水线生成意图、处理流程、工具接口和对话路径，再抽取对话前缀作为测试。人工筛选后的版本包含 14 种意图、192 段对话，共 1,420 个测试。"
   }
  ]
 }

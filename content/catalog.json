@@ -22,7 +22,7 @@
     "camel": 2,
     "agentprune": 2,
     "llm-evaluation-survey": 2,
-    "agent-evaluation-survey": 1,
+    "agent-evaluation-survey": 2,
     "agentbench": 2,
     "tau-bench": 2
   },
@@ -531,6 +531,16 @@
       "guideId": "agent-evaluation-survey",
       "revision": 1,
       "metadataFile": "guides/agent-evaluation-survey.json",
+      "recommendation": {
+        "rank": 15,
+        "relation": "editorial-reading-order",
+        "reason": "把模型能力、行动过程和任务结果联系起来。"
+      }
+    },
+    {
+      "guideId": "agent-evaluation-survey",
+      "revision": 2,
+      "metadataFile": "guides/agent-evaluation-survey.r2.json",
       "recommendation": {
         "rank": 15,
         "relation": "editorial-reading-order",

@@ -47,6 +47,10 @@ The English view is a presentation layer over the same guide identity. Notes, re
 - `tests/e2e/english-reading.spec.ts` covers the toggle, English body, figures and term card in a normal browser environment.
 - The current sandbox cannot bind the local loopback server, so the Playwright web-server run was not available. A headless Chromium check against the built static assets verified the transformer and RAG toggles, English prose, all figures, English term cards and a 390 px simulated viewport without horizontal overflow. This is a rendered-build check, not a live-server or physical-device test.
 
+## Producing more translations
+
+Follow section 13 of the [guide-writing workflow](../content/workflows/GUIDE-WRITING.md). Each translation is prepared in `.cache/translation-work/<id>/` and checked with `node scripts/content/translation-work.mjs check <id>`, which validates against a temporary manifest and glossary and reports negation density; the integrator then runs `merge`. Several translations can therefore be written at once without editing `content/translations.json` or `content/glossary-en.json` directly.
+
 ## Next increment
 
 Add more translations through the same manifest and body convention; do not add a language toggle to a revision without a complete English body and glossary coverage. Reader review should check English terminology, example adaptation, figure captions and whether the untranslated surrounding interface is acceptable.

@@ -25,6 +25,7 @@
 | multi-agent-communication-survey | r2 | 24,614 | 6 | 无，作者自核 |
 | multi-agent-collaboration-survey | r2 | 22,819 | 9 | 无，作者自核 |
 | helm | r3 | 18,004 | 12 | 有独立抽查报告；中等问题已修正，未二次独立复核 |
+| agent-evaluation-survey | r2 | 21,362 | 6 | 无，作者自核；2026-11-05 补做 |
 
 `react` 的 r2 与 `helm` 的 r2 作为旧修订保留；当前选择分别是 r3。上表中 16 个有 `.cache/guide-work/<id>/spec.json` 的修订通过：
 
@@ -74,6 +75,7 @@ npm test
 - **浏览器检查未完成**：`npm run test:e2e -- reading-aids.spec.ts reading-guidance.spec.ts library-brief.spec.ts` 在启动本地 `4174` 服务后超时；手动启动 Vite 后 `curl http://127.0.0.1:4174/` 返回 `No route to host`。这是当前执行环境的本机回环限制，不应当报告为浏览器测试通过。
 - **页面视觉未检查**：本轮没有查看新修订的书架卡、深读正文、图 7/17、桌面或 390px 模拟窄屏截图；构建通过不代表视觉验收。
 - **内容事实仍有边界**：`helm` 的 OPT 175B 分开校正 54.8% 对应 shot 数、图 7 对数概率来源、图 26 缺失/平局计入规则仍未确认；`react` 的原图 CC BY 4.0 记录沿用 r2，本轮未联网独立核实。
+- **补做一篇（2026-11-05）**：`agent-evaluation-survey` 当初漏派，已由 deepseek-flash 按同一工作流补做 r2，整合者抽读核心章节后合并；书架上的 18 篇导读至此全部完成本轮修订。
 - **读者验收未完成**：除读者已确认的 Transformer/RAG 两篇样例，其余导读尚待实际试读；独立抽查不是读者接受。
 - **Git**：没有提交、推送或部署。
 

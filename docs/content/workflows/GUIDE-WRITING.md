@@ -327,6 +327,7 @@ node scripts/content/guide-work.mjs check <id>
 
 - 每张图在 spec 的 `assets` 中都要有 `alt`、`origin`（原图所在页面的固定地址，例如 PDF 加 `#page=N`）和 `rights`（来源和许可依据）。
 - 不要放与讲解无关的图；不要把表格截成图，表格用 Markdown 重写需要的行。
+- `alt` 只描述图里画了什么：结构、箭头、坐标、图例和关键标注，供看不到图的读者使用。“图中数值来源未说明”“不能据此推断……”这类判断写在正文里，不写进 `alt`。
 
 ## 九、spec.json 格式
 
@@ -397,3 +398,65 @@ node scripts/content/guide-work.mjs check <id>
 5. **信息卡：** 三部分是否具体，有没有空话。
 
 发现的问题直接修改。如果同类问题反复出现，说明本文写得不够清楚，要把对应规则补进本文，并附上“不好 / 好”的例子。
+
+**指标只是线索，不能代替通读。** `check` 报告的长度、否定词密度和段落数，用来发现明显的问题。作者为了凑指标做的机械改写（例如为降低否定词把必要条件删掉，或为增加篇幅重复内容）比原来的问题更糟，审查时要对照“目标不是归零”和第四节第 4 条判断。
+
+**批量实施的整合要点：**
+
+- 每篇导读一个作者会话，提示只写“按照本文修订导读 `<id>`”，不附加本文以外的指导；审查意见作为后续消息发回同一会话。
+- 作者中途停下（只下载了原文、只读了开头）时，在同一会话里请它继续，直到 `check` 通过；连续多次只推进一小步、长时间没有产出的会话，换一个作者重新开始。
+- 合并前逐篇通读核心章节，抽查实验数字，检查新术语的别名有没有歧义；合并后运行 `npm run build`。
+- 开始前列出全部待修订的 `guideId`，结束时逐一核对当前修订号，避免漏掉某一篇。
+
+## 十三、英文版
+
+英文版是同一修订的另一种语言呈现，供想直接读英文的读者使用。中文修订、元数据和引用清单保持不变；英文版不新增章节、引用或图片。只为已经验收的中文修订做英文版。
+
+### 交付物
+
+为了能同时翻译多篇，英文版也先写在工作目录里，由整合者合并：
+
+| 文件 | 内容 |
+| --- | --- |
+| `content/guides/<id>.r<N>.en.md` | 英文正文 |
+| `.cache/translation-work/<id>/entry.json` | 清单条目：`guideId`、`revision`、`"language": "en"`、`title`（与正文 H1 完全一致）、`bodyFile`（`guides/<id>.r<N>.en.md`）、`assets`（每张图的英文 `alt` 和 `rights`，覆盖该修订的全部图片） |
+| `.cache/translation-work/<id>/glossary-en.json` | 需要新增的英文术语卡，格式同第七节，字段全部用英文；没有就写 `{"entries": []}` |
+| `docs/research/<id>-r<N>-en-review.md` | 翻译核对记录 |
+
+检查与合并：
+
+```text
+node scripts/content/translation-work.mjs check <id>    # 作者运行，不改共享文件
+node scripts/content/translation-work.mjs merge <id>    # 整合者运行
+```
+
+`check` 会校验结构（一个 H1、`##` 数量与中文修订一致、只用中文修订已声明的引用和图片、正文不含汉字），并报告英文否定词密度。两篇样例（`transformer.r5.en.md`、`rag-survey.r5.en.md`）约为每千词 6–7 个；超过 10 或低于 3 时会给出警告。
+
+### 写法
+
+1. **翻译意思，不翻译句子。** 按第四节的标准写英文：每节开头交代要回答的问题，一段讲一件事，条件只在结论处说一次。英文版读起来应该像一篇用英文写的导读，而不是逐句对照的译文。中文里为照顾读者添加的解释（例如“词元”是什么）在英文里同样保留。
+2. **术语跟论文走。** 使用原论文的英文术语（scaled dot-product attention、encoder–decoder attention、label smoothing）。导读自己的说法（例如“交叉注意力”）可以用通行的英文名，但第一次出现时说明它对应论文里的哪个概念。
+3. **例子要在英文里成立。** 中文版的教学例子如果依赖中文（同一个英文词对应两个不同的中文词），不要在英文版里用“想象中的中文译文的英文注释”勉强保留；改用论文自己的语言或数据。语言无关的例子（虚构的档案问答、手算数值）可以直接沿用。
+
+   > 不好：“translating *They reached the river bank* as *They arrived at the riverbank*… the target shown here is an English word-by-word gloss of an imagined Chinese output.”
+   >
+   > 好：“translating *They reached the river bank* into German as *Sie erreichten das Ufer*… German separates the two senses of *bank*: a river bank is *Ufer*, while a financial bank is *Bank*.”（论文本身测试的就是英德翻译。）
+
+   改了例子，就把所有用到它的段落一起改（右移输入、遮罩表、多头例子），并在文末覆盖说明里写清新例子的身份。
+4. **不要把中文版没有的保留意见加进来，也不要删掉中文版必要的条件。** 翻译时最常见的两种走样，一是把语气改得更犹豫（“may possibly”“not necessarily”成串），二是把“仅在开发集”“每类只抽了 50 条”之类的条件译丢。
+5. **数字、公式、链接一律照中文修订。** 发现中文版有错时，不要只在英文版里改；记在核对记录里，由整合者决定是否发布新的中文修订。表格能更清楚时可以调整排版（例如把合在一列的两项成本分开），但不能新增原表没有的数字。
+6. **图的 `alt` 和图注重新用英文写**，描述图本身；`rights` 照中文意思写英文版。
+
+### 英文术语卡
+
+- 英文卡片只放英文读者可能不认识的术语和方法名，解释用英文写，长度与中文卡相当。
+- 别名不要用单独的普通词。例如组合概念 encoder–decoder 的别名只用 “encoder–decoder”“encoder-decoder”“sequence-to-sequence”，不要单独用 “encoder” 或 “decoder”，否则读到 “the encoder” 时会弹出整个结构的定义。attention、model、context 这类词也不要单独作别名。
+- `guide` 链接指向同一导读的固定修订和单元。
+
+### 自查
+
+- [ ] `node scripts/content/translation-work.mjs check <id>` 通过，否定词密度在 3–10 之间。
+- [ ] 通读一遍英文：不看中文也能读懂，每个例子在英文里讲得通。
+- [ ] 抽查核心章节和实验部分的数字、公式，与中文修订和原论文一致。
+- [ ] 中文版的必要条件都还在；没有新增中文版没有的结论。
+- [ ] 核对记录写清了改动过的例子、术语选择和没有核对的部分。

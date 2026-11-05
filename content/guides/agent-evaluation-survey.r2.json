@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 2,
+  "id": "agent-evaluation-survey",
+  "paperId": "arxiv:2503.16416",
+  "revision": 2,
+  "title": "Agent 评测综述：先定义被测系统，再解释一个分数",
+  "paperTitle": "Survey on Evaluation of LLM-based Agents",
+  "language": "zh-Hans",
+  "type": "survey",
+  "mode": "standard",
+  "purpose": "读懂一次 Agent 评测由哪些条件组成：被测系统、任务与环境、判定指标、证据粒度，以及成本与重复运行怎样改变结论；从而能判断一个基准分数支持什么、缺少什么。",
+  "source": {
+    "id": "arxiv:2503.16416",
+    "version": "v1",
+    "url": "https://arxiv.org/pdf/2503.16416v1"
+  },
+  "bodyFile": "agent-evaluation-survey.r2.md",
+  "bodySha256": "41d5c7594ee1a7333c8722ac5b9f13ae95a695adb5e9e243f905949fac69a830",
+  "units": [
+    {
+      "id": "orientation",
+      "heading": null
+    },
+    {
+      "id": "map",
+      "heading": "图 1：四个视角与一条主线"
+    },
+    {
+      "id": "system",
+      "heading": "先定义被测系统与三样东西"
+    },
+    {
+      "id": "capabilities",
+      "heading": "能力评测：把一个大问题缩小"
+    },
+    {
+      "id": "web-swe",
+      "heading": "真实环境之一：网页与软件工程"
+    },
+    {
+      "id": "science-conversation",
+      "heading": "真实环境之二：科学任务与对话服务"
+    },
+    {
+      "id": "generalist",
+      "heading": "通用 Agent：跨任务分数能说明什么"
+    },
+    {
+      "id": "frameworks",
+      "heading": "评测框架：把评价放进开发流程"
+    },
+    {
+      "id": "granularity",
+      "heading": "结果、步骤与轨迹：三种粒度各回答什么"
+    },
+    {
+      "id": "gaps",
+      "heading": "成本、安全与作者列出的缺口"
+    },
+    {
+      "id": "method-map",
+      "heading": "把基准放回问题：一张速查表"
+    },
+    {
+      "id": "source",
+      "heading": "原文入口与本次覆盖"
+    }
+  ],
+  "citations": [
+    {
+      "id": "c01",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=1",
+      "labels": [
+        "摘要与 §1，PDF 第1页",
+        "§1，PDF 第1页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c02",
+      "url": "https://arxiv.org/pdf/2503.16416v1",
+      "labels": [
+        "arXiv v1 全文"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c03",
+      "url": "https://arxiv.org/abs/2503.16416v1",
+      "labels": [
+        "v1 版本记录"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c04",
+      "url": "https://aclanthology.org/2026.findings-acl.1330/",
+      "labels": [
+        "Findings of ACL 2026 发表记录",
+        "Findings of ACL 2026"
+      ],
+      "role": "background",
+      "sourceVersion": "publication record"
+    },
+    {
+      "id": "c05",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=2",
+      "labels": [
+        "图 1 与 §1，PDF 第2页",
+        "图 1，PDF 第2页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c06",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=6",
+      "labels": [
+        "§3，PDF 第6页",
+        "§3.1，PDF 第6–7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c07",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=3",
+      "labels": [
+        "§2.1，PDF 第3页",
+        "§2–§5，PDF 第3–11页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c08",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=4",
+      "labels": [
+        "§2.1，PDF 第4页",
+        "§2.2，PDF 第4页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c09",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=5",
+      "labels": [
+        "§2.2，PDF 第4–5页",
+        "§2.3，PDF 第5页",
+        "§2.4，PDF 第5–6页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c10",
+      "url": "https://arxiv.org/abs/2408.04682",
+      "labels": [
+        "ToolSandbox 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（ToolSandbox 原文）"
+    },
+    {
+      "id": "c11",
+      "url": "https://arxiv.org/abs/2312.06853",
+      "labels": [
+        "LLF-Bench 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（LLF-Bench 原文）"
+    },
+    {
+      "id": "c12",
+      "url": "https://arxiv.org/abs/2409.20222",
+      "labels": [
+        "LTM benchmark 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（LTM benchmark 原文）"
+    },
+    {
+      "id": "c13",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=7",
+      "labels": [
+        "§3.1，PDF 第7页",
+        "§3.2，PDF 第7页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c14",
+      "url": "https://arxiv.org/abs/2310.06770",
+      "labels": [
+        "SWE-bench 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（SWE-bench 原文）"
+    },
+    {
+      "id": "c15",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=8",
+      "labels": [
+        "§3.3，PDF 第8页",
+        "§3.4，PDF 第8页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c16",
+      "url": "https://arxiv.org/abs/2410.05080",
+      "labels": [
+        "ScienceAgentBench 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（ScienceAgentBench 原文）"
+    },
+    {
+      "id": "c17",
+      "url": "https://arxiv.org/abs/2409.11363",
+      "labels": [
+        "CORE-Bench 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（CORE-Bench 原文）"
+    },
+    {
+      "id": "c18",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=9",
+      "labels": [
+        "§3.4，PDF 第9页",
+        "§4，PDF 第9页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c19",
+      "url": "https://arxiv.org/abs/2406.12045",
+      "labels": [
+        "τ-bench 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（τ-bench 原文 v1）"
+    },
+    {
+      "id": "c20",
+      "url": "https://arxiv.org/abs/2311.12983",
+      "labels": [
+        "GAIA 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（GAIA 原文）"
+    },
+    {
+      "id": "c21",
+      "url": "https://arxiv.org/abs/2308.03688",
+      "labels": [
+        "AgentBench 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（AgentBench 原文）"
+    },
+    {
+      "id": "c22",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=10",
+      "labels": [
+        "§5，PDF 第10页",
+        "§5，PDF 第10–11页",
+        "§5 与表 1，PDF 第10–11页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c23",
+      "url": "https://arxiv.org/pdf/2503.16416v1#page=11",
+      "labels": [
+        "§5，PDF 第11页",
+        "§6，PDF 第11页",
+        "§6，PDF 第11–12页"
+      ],
+      "role": "primary",
+      "sourceVersion": "v1"
+    },
+    {
+      "id": "c24",
+      "url": "https://arxiv.org/abs/2410.09024",
+      "labels": [
+        "AgentHarm 原文摘要"
+      ],
+      "role": "background",
+      "sourceVersion": "arXiv 摘要页（AgentHarm 原文）"
+    }
+  ],
+  "related": [
+    {
+      "guideId": "agent-survey",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "helm",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "agentbench",
+      "relation": "editorial-reading-order"
+    },
+    {
+      "guideId": "tau-bench",
+      "relation": "editorial-reading-order"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/agent-evaluation-survey/figure-1-survey-map.webp",
+      "sha256": "a42c49345f31d1ff39eefe2dc57e9a6dcf1449aba201f02a9cca24d0af2d2644",
+      "mime": "image/webp",
+      "alt": "综述结构树：根节点 Agent Evaluation 分出五条主干，依次是能力评测（规划与多步推理、函数调用与工具使用、自我反思、记忆）、应用评测（网页、软件工程、科学、对话服务）、通用 Agent 评测、评测框架（开发框架与 Gym 类环境）和讨论（趋势与新兴方向），右侧格子列出各主题的代表基准",
+      "origin": "https://arxiv.org/pdf/2503.16416v1#page=2",
+      "rights": "原论文图 1，作者 Asaf Yehudai 等，arXiv:2503.16416v1；该版本采用 CC BY-NC-SA 4.0 许可，在此保留署名，仅在私有仓库中作个人学术阅读引用。"
+    }
+  ],
+  "coverage": {
+    "scope": "mainline",
+    "basis": "fulltext",
+    "sections": [
+      "§1: 范围、四类读者与四个组织方向",
+      "§2: 规划与多步推理、函数调用与工具使用、自我反思、记忆",
+      "§3: 任务、环境、指标三要素与网页、软件工程、科学、对话四类应用",
+      "§4: 通用 Agent 基准与统一平台",
+      "§5: 开发框架、单步与轨迹评价、表 1、Gym 类环境",
+      "§6–7: 当前趋势、新兴方向与结论"
+    ],
+    "figuresViewed": [
+      "Figure 1 — PDF p2（裁切后放大查看原图）",
+      "Table 1 — PDF p11（逐格核对并转录为 Markdown）"
+    ],
+    "limitations": [
+      "技术内容固定 arXiv v1（2025 年 3 月，20 页）；已核对 Findings of ACL 2026 发表记录，但未审读正式版新增章节，也未混用两版分类。",
+      "未逐篇核验综述列举的全部基准与框架；只对 SWE-bench、GAIA、τ-bench、ToolSandbox、LLF-Bench、ScienceAgentBench、CORE-Bench、LTM benchmark、AgentHarm 对照了原始 arXiv 摘要。",
+      "蓝隼航空的订单、政策与四套运行，以及重复运行算式，都是导读自编的教学例子；没有运行任何评测，也没有复现任何性能结果。",
+      "表 1 与框架功能是 v1 记录的 2025 年初快照，未核各产品当前版本；多 Agent 通信联系属于编辑补充，不是 v1 的实验结论。"
+    ],
+    "reviewBasis": "AI authoring review: downloaded the fixed v1 PDF and HTML, extracted all 20 pages of text, read §1–§7 (PDF pp1–13), rendered and visually inspected the Figure 1 crop, transcribed Table 1 from p11 cell by cell, checked nine benchmark abstracts through the arXiv API, and recomputed the repeat-run illustration. Claim-by-claim notes are in docs/research/agent-evaluation-survey-r2-review.md. No human review and no experimental reproduction; integration review remains separate."
+  },
+  "orientation": {
+    "shortTitle": "Agent 评测：能力、过程与结果",
+    "topics": [
+      {
+        "id": "agent-model-evaluation",
+        "label": "Agent与模型评测",
+        "aliases": [
+          "evaluation",
+          "benchmark",
+          "评测"
+        ]
+      },
+      {
+        "id": "evaluation-methodology",
+        "label": "评测方法与边界",
+        "aliases": [
+          "评价协议",
+          "评分方法"
+        ]
+      }
+    ],
+    "summary": "综述把 Agent 评测分成四层：基础能力、应用领域、通用基准和开发框架，并把任务、环境、指标视为任何一次测量的三要素。导读据此说明同一分数在不同粒度、不同预算下各回答什么问题。",
+    "value": "能判断一个基准到底定义了哪些条件、证据落在结果还是过程，并把成本、重复运行和评委可靠性纳入对分数的解释；也能在自建评测时写清被测系统与判定规则。",
+    "prerequisites": [
+      "了解语言模型输入输出与基本Agent交互即可；正文解释任务、指标和必要公式。"
+    ],
+    "boundaries": [
+      "技术内容固定 arXiv v1；已核对ACL2026发表记录，但未审读正式版新增章节。",
+      "未逐篇核验综述列举的基准，也未验证评测框架当前功能；不把目录当作实施事实。",
+      "多Agent、具身和游戏不在v1主要范围；通信研究联系为编辑解释，没有实验复现。"
+    ],
+    "bibliography": {
+      "authors": [
+        "Asaf Yehudai",
+        "Lilach Eden",
+        "Alan Li",
+        "Guy Uziel",
+        "Yilun Zhao",
+        "Roy Bar-Haim",
+        "Arman Cohan",
+        "Michal Shmueli-Scheuer"
+      ],
+      "year": 2026,
+      "venue": "Findings of ACL 2026（本文采用 arXiv v1）",
+      "publicationKind": "conference",
+      "url": "https://aclanthology.org/2026.findings-acl.1330/",
+      "preprintYear": 2025
+    },
+    "readingTargets": [
+      {
+        "unitId": "system",
+        "purpose": "说清被测系统包含什么，以及任务、环境、指标三要素各自约束了什么。",
+        "concepts": [
+          "被测系统",
+          "任务",
+          "环境",
+          "指标"
+        ],
+        "limit": "三要素是综述在应用章节给出的界定，用于组织问题；具体基准的构造仍需回原论文核对。"
+      },
+      {
+        "unitId": "capabilities",
+        "purpose": "分辨四类基础能力各自的测法，理解局部能力分数为什么只是机制证据。",
+        "concepts": [
+          "规划",
+          "工具使用",
+          "自我反思",
+          "记忆"
+        ],
+        "limit": "能力分数不支持端到端任务成功的结论；额外反馈与预算会改变比较结果。"
+      },
+      {
+        "unitId": "web-swe",
+        "purpose": "比较网页与软件工程基准的环境与判定，理解检验方式如何限定结论。",
+        "concepts": [
+          "WebArena",
+          "SWE-bench",
+          "测试通过",
+          "政策合规"
+        ],
+        "limit": "SWE-bench 家族的版本与测试强度不同，跨版本分数不可直接比较。"
+      },
+      {
+        "unitId": "science-conversation",
+        "purpose": "看清科学任务与对话服务怎样用可执行产物、数据库状态和领域政策判定成功。",
+        "concepts": [
+          "ScienceAgentBench",
+          "τ-bench",
+          "模拟用户",
+          "领域政策"
+        ],
+        "limit": "产物可执行或数据库到达目标状态，只说明该判据通过，不说明结论在领域内成立。"
+      },
+      {
+        "unitId": "frameworks",
+        "purpose": "理解开发框架提供的最终回复、单步与轨迹评价，并读懂表 1 的能力对照。",
+        "concepts": [
+          "评测框架",
+          "轨迹评价",
+          "LLM 评委"
+        ],
+        "limit": "表 1 是 2025 年初的 v1 快照，产品功能会变化。"
+      },
+      {
+        "unitId": "granularity",
+        "purpose": "把结果、单步、轨迹和重复运行分开，能说出每层回答什么、又留下什么未解释。",
+        "concepts": [
+          "结果评价",
+          "过程合规",
+          "轨迹",
+          "pass^k"
+        ],
+        "limit": "手算的重复运行数值假设各次独立；真实系统要按观测到的运行记录报告。"
+      },
+      {
+        "unitId": "method-map",
+        "purpose": "按要回答的问题挑选基准，并列出还需补充的证据。",
+        "concepts": [
+          "选型",
+          "证据条件"
+        ],
+        "limit": "速查表只缩小范围，具体规模、版本与判定以原论文为准。"
+      }
+    ]
+  }
+}

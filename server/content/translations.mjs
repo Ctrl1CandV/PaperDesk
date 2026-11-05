@@ -24,8 +24,7 @@ function walk(node, visit) {
  * guide metadata remains authoritative; an English body may not add citations,
  * images or sections. This is structural validation, not a translation review.
  */
-export async function validateTranslations({ rootDir = projectRoot, guides } = {}) {
-  const manifestFile = 'content/translations.json';
+export async function validateTranslations({ rootDir = projectRoot, guides, manifestFile = 'content/translations.json', glossaryFile = 'content/glossary-en.json' } = {}) {
   let data;
   try { data = JSON.parse(utf8.decode(await readFile(await packageFile(rootDir, manifestFile)))); }
   catch (error) { if (error.code === 'ENOENT') return { guides: 0, glossary: 0 }; throw error; }
@@ -97,7 +96,6 @@ export async function validateTranslations({ rootDir = projectRoot, guides } = {
   // The English glossary is a separate card layer; validate it with the same
   // shared rules, then require English-only prose and resolvable guide links.
   let glossary = 0;
-  const glossaryFile = 'content/glossary-en.json';
   try {
     const value = JSON.parse(utf8.decode(await readFile(await packageFile(rootDir, glossaryFile))));
     glossary = validateGlossary(value, (id, revision, unitId) => guides.some(guide => guide.metadata.id === id && guide.metadata.revision === revision && (!unitId || guide.metadata.units.some(unit => unit.id === unitId))));
