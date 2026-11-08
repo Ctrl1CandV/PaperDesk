@@ -40,7 +40,8 @@ test('commands are explicit, recorded with the turn, and reading marks travel on
   assert.deepEqual(turn.context.command, accumulation.command); assert.deepEqual(turn.context.readingProgress, progress);
   const messages = assembleAssistantContext(prepared, accumulation, turn);
   assert.equal(messages.at(-1).content, accumulation.question);
-  assert.ok(messages.at(-2).content.startsWith(commandInstruction(accumulation.command, { linked: false })));
+  assert.ok(messages.at(-2).content.startsWith(commandInstruction(accumulation.command, { linked: false, compact: true, outputTokens:config.maxOutputTokens })));
+  assert.match(messages.at(-2).content,/本轮输出上限1000 tokens/);
   assert.match(messages.at(-2).content, /SYNTHETIC Survey Title/); assert.match(messages.at(-2).content, /synthetic-survey r1：导读已读/);
   assert.ok(!messages.some(message => message.content.includes(RESEARCH_GUIDANCE)), 'ordinary reading keeps its prompt');
   complete(store, turn, '# 选文实施文件：SYNTHETIC');

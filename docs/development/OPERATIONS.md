@@ -65,6 +65,8 @@ Strict validation rejects unsupported versions, unknown fields, unsafe URLs, inv
 
 ### AI history, capacity and recovery
 
+The 2026-11-06 reader records actual character ranges for guide evidence as well as original evidence. This version still imports older records without those optional guide ranges. New AI backups, research archives and workspace revisions containing guide `readRanges` require the updated reader on the receiving computer; the same application or backup version number alone does not imply that older code can read them. Do not strip ranges or point an older program at the updated SQLite/IndexedDB/workspace. Preserve a pre-upgrade backup separately if a later code downgrade is needed.
+
 Use the AI panel's **备份与恢复** for conversations. v3/v4 NDJSON downloads use a consistent temporary SQLite snapshot; import validates in a separate SQLite stage and commits once, rejecting any conversation/turn/request ID collision. A preview does not reserve IDs; confirmation revalidates against current data. Legacy JSON imports remain bounded to 16 MiB. Restore never starts model inference. History pages contain compact summaries and a cursor; use **读取完整问答与…条依据** for full saved evidence instead of assuming the preview is the complete answer.
 
 Large AI downloads require the browser's File System Access save picker, which pipes to a selected file. The fallback Blob path is capped at 32 MiB; without direct-save support, the interface asks for a supporting desktop Chrome/Edge browser. Confirm completion before relying on the file. This AI download path differs from the personal-record Blob exporter described above.

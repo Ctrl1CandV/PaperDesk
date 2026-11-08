@@ -13,7 +13,7 @@ test('current reading tools and next-reading panels remain readable at desktop a
   };
   await page.goto(`/read/agent-survey/${catalog.currentRevisions['agent-survey']}`);
   await expect(page.locator('.reading-state-trigger')).toBeVisible();
-  await expect(page.locator('.teaching-diagram svg')).toBeAttached();
+  await expect(page.locator('.paper-figure img').first()).toBeAttached();
   await shot('reader-desktop');
   await page.getByRole('button', { name: '记笔记', exact: true }).click();
   await page.getByLabel('我的笔记或问题', { exact: true }).fill('合成视觉检查：理解模型、行动与环境之间的关系。');

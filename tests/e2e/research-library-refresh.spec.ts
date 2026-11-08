@@ -6,8 +6,8 @@ const current = catalog.currentRevisions as Record<string, number>;
 const archived = (catalog as { archivedGuideIds?: string[] }).archivedGuideIds ?? [];
 const screenshotDirectory = '.cache/screenshots/research-refresh';
 
-async function metadata(id: string) {
-  const entry = catalog.entries.find(item => item.guideId === id && item.revision === current[id]);
+async function metadata(id: string, revision = current[id]) {
+  const entry = catalog.entries.find(item => item.guideId === id && item.revision === revision);
   expect(entry, `retained catalog identity for ${id}`).toBeDefined();
   return JSON.parse(await readFile(`content/${entry!.metadataFile}`, 'utf8'));
 }
@@ -78,16 +78,16 @@ test('archived readings remain available at their retained revision URLs', async
   expect(state.originalStates).toEqual([]);
 });
 
-test('the three communication guides render their teaching diagrams and exact source entry', async ({ page }) => {
+test('the retained communication guides render their teaching diagrams and exact source entry', async ({ page }) => {
   await mkdir(screenshotDirectory, { recursive: true });
   for (const [id, unitId, label, tail] of [
     ['autogen', 'u03', '返回结果或错误', '条件成立时结束本次对话'],
     ['camel', 'u02', '提出当前指令', '触发条件时保留结果并结束'],
     ['agentprune', 'u03', '固定稀疏通信图', '继续任务并评价效果与成本'],
   ]) {
-    const guide = await metadata(id);
+    const guide = await metadata(id, 1);
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto(`/read/${id}/${current[id]}#${unitId}`);
+    await page.goto(`/read/${id}/1#${unitId}`);
     const diagram = page.locator(`#${unitId} .teaching-diagram`);
     await expect(diagram.locator('svg')).toBeVisible();
     await expect(diagram.locator('svg')).toContainText(label);
@@ -116,9 +116,13 @@ test('AgentBench and tau-bench render both display formulas and preserve narrow 
   for (const id of ['agentbench', 'tau-bench']) {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(`/read/${id}/${current[id]}#u04`);
-    await expect(page.locator('.prose .formula-block .katex')).toHaveCount(2);
+    const guide = await metadata(id);
+    const body = await readFile(`content/guides/${guide.bodyFile}`, 'utf8');
+    const displayFormulaCount = (body.match(/^\$\$\s*$/gm) ?? []).length / 2;
+    expect(displayFormulaCount).toBeGreaterThan(0);
+    await expect(page.locator('.prose .formula-block .katex')).toHaveCount(displayFormulaCount);
     await expect(page.locator('.formula-error')).toHaveCount(0);
-    const formula = page.locator('#u04 .formula-block');
+    const formula = page.locator('.prose .formula-block').first();
     await expect(formula.locator('.katex')).toBeVisible();
     await formula.screenshot({ path: `${screenshotDirectory}/${id}-formula-desktop.png` });
     await narrowReader(page);

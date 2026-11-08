@@ -6,10 +6,22 @@ export function utf8Prefix(text, byteLimit) {
   if (low && /[\uD800-\uDBFF]/u.test(text[low - 1])) low--;
   return text.slice(0, low);
 }
+/** Keep room for an explicit command's still-pending structured write. The
+ * provider serializes those arguments into the next request as well as its
+ * reply; output-token reservation alone does not cover that continuation. */
+export function pendingResearchWriteReserve(context) {
+  if (context?.command?.name === 'direction') {
+    return context.directionDraft || context.researchProposals?.length ? 0 : 6000;
+  }
+  if (context?.command?.name === 'notebook' && !context.notebookDraft) {
+    return Math.min(14000, Math.max(4500, Buffer.byteLength(JSON.stringify(context.researchSnapshot?.notebook?.body ?? '')) + 1500));
+  }
+  return 0;
+}
 export function localResultBudget(context, search = false) {
   const budget = context?.budget;
   if (!budget) return search ? 7000 : 14000;
-  const remaining = Math.max(0, budget.limit - budget.outputTokens - budget.inputTokens - 1200);
+  const remaining = Math.max(0, budget.limit - budget.outputTokens - budget.inputTokens - 1200 - pendingResearchWriteReserve(context));
   return Math.floor(Math.min(search ? 7000 : 14000, remaining * (search ? .45 : 1)));
 }
 

@@ -273,6 +273,10 @@ async function completion(model, input, tools, auth, signal, emit, fetchImpl, {
   signal?.addEventListener('abort', abort, { once: true });
   let buffer = '', size = 0, completed = null, thinkingReported = false, trailingCarriageReturn = false, responseId;
   const visible = new ChatGptStreamText(answerChars, emit);
+  // Some official subscription streams finish with output: [] after supplying
+  // complete output_item.done records. Keep only finalized records in memory;
+  // deltas alone never establish a successful answer or executable tool call.
+  const completedOutput = new Map();
   function appendChunk(chunk) {
     if (!chunk) return;
     // SSE permits LF, CRLF and bare CR. Preserve a CRLF pair split between
@@ -302,17 +306,31 @@ async function completion(model, input, tools, auth, signal, emit, fetchImpl, {
     if (event.type === 'response.output_text.delta' || event.type === 'response.refusal.delta') visible.part(event, event.delta, true);
     if (event.type === 'response.output_text.done') visible.part(event, event.text);
     if (event.type === 'response.refusal.done') visible.part(event, event.refusal);
-    if (event.type === 'response.output_item.done' && event.item?.type === 'message') {
-      inspectOutput([event.item]); visible.item(event);
+    if (event.type === 'response.output_item.done') {
+      inspectOutput([event.item]);
+      if (event.item.type === 'message') visible.item(event);
+      if (event.item.status === 'completed' || event.item.type === 'reasoning' && !event.item.status) {
+        const index = event.output_index ?? 0;
+        const existing = completedOutput.get(index);
+        if (!Number.isSafeInteger(index) || index < 0 || index >= 1024 || existing && existing.id !== event.item.id)
+          throw new PublicError('ChatGPT 完成记录的格式或标识无效，已保留收到的内容。', 502);
+        completedOutput.set(index, event.item);
+      }
     }
     if (event.type === 'response.completed') {
       if (!event.response || event.response.status && event.response.status !== 'completed') throw new PublicError('ChatGPT 的完成状态无效。', 502);
-      const result = inspectOutput(event.response.output);
+      let output = event.response.output;
+      const reconstructed = event.response.status === 'completed' && Array.isArray(output) && output.length === 0 && completedOutput.size > 0;
+      if (reconstructed) output = [...completedOutput.entries()].sort(([a], [b]) => a - b).map(([, item]) => item);
+      const result = inspectOutput(output);
       if (!result.calls.length && !result.text.trim()) throw new PublicError('ChatGPT 没有返回最终可见回答，已保留此前内容。请重新提问。', 502);
+      if (reconstructed && !result.calls.length && !output.some(item => item.type === 'message' && (!item.phase || item.phase === 'final_answer')
+        && item.content.some(part => (part.type === 'output_text' ? part.text : part.refusal)?.trim())))
+        throw new PublicError('ChatGPT 仅返回了过程说明，没有最终回答，已保留收到的内容。请重新提问。', 502);
       // A validated terminal response is authoritative, including corrections
       // and ordering across multiple output items. Do not replay paid inference.
-      visible.complete(event.response.output, result.text);
-      completed = { ...result, output: event.response.output };
+      visible.complete(output, result.text);
+      completed = { ...result, output };
     }
     // Only a generic progress state is exposed; reasoning text, summaries and
     // argument deltas are never shown or persisted.

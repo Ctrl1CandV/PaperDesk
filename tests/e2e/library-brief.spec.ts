@@ -11,12 +11,11 @@ const helm = JSON.parse(readFileSync(`content/${helmEntry.metadataFile}`, 'utf8'
   units: { id: string; heading: string | null }[];
 };
 const chapters = helm.units.filter(unit => unit.heading);
-const helmLabels = briefs.entries.find(entry => entry.guideId === 'helm' && entry.guideRevision === helmRevision)!.chapterLabels as Record<string, string>;
-const helmParagraphs = [
-  '不同模型常在不同任务、提示方式和指标下报告成绩，分数很难直接比较。HELM 将场景、适配方式与评价指标明确分开，在尽可能一致的条件下评测语言模型，并同时考察准确率、校准、鲁棒性等表现，使比较依据和指标之间的取舍更清楚。',
-  '如果你正在设计模型评测，本文值得借鉴的是如何把研究问题落实成可执行的评测协议：任务覆盖什么，提示与评分怎样设定，哪些条件需要保持一致。公开的提示、模型输出和工具也提供了复查入口，便于判断分数差异可能来自模型能力，还是实验设置。',
-  '了解模型输入、输出与任务样本即可开始。建议先读评测流程，再看多指标结果；原论文的核心场景限于英语，历史结果不代表当前模型排名。',
-];
+const currentBrief = (guideId: string) => briefs.entries.find(entry => entry.guideId === guideId && entry.guideRevision === revisions[guideId])!;
+const briefParagraphs = (brief: ReturnType<typeof currentBrief>) => [brief.overview, brief.value, brief.advice].flatMap(text => text.split(/\n\n+/));
+const helmBrief = currentBrief('helm');
+const helmLabels = helmBrief.chapterLabels as Record<string, string>;
+const helmParagraphs = briefParagraphs(helmBrief);
 
 // Explicitly synthetic reading positions in Playwright's isolated browser store.
 async function seedResume(page: Page, revision: number, unitId: string) {
@@ -73,10 +72,10 @@ test('HELM explains its contribution in full paragraphs with immediate reading a
 
   // Another paper must explain its own method instead of reusing HELM's evaluation brief.
   await page.locator('#choose-instructgpt').click();
+  await expect(page.locator('.orientation-prose p')).toHaveText(briefParagraphs(currentBrief('instructgpt')));
   const otherParagraphs = await page.locator('.orientation-prose p').allTextContents();
-  expect(otherParagraphs).toHaveLength(3);
   expect(otherParagraphs.every(paragraph => !helmParagraphs.includes(paragraph))).toBe(true);
-  expect(otherParagraphs.join('')).toMatch(/人类反馈|人工反馈/);
+  expect(otherParagraphs.join('')).toMatch(/人类示范|偏好反馈/);
   expect(otherParagraphs.join('')).not.toContain('HELM 将场景');
 });
 

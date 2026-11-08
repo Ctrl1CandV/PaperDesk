@@ -58,6 +58,7 @@ export function Sources({ sources, turnId }: { sources: AiSource[]; turnId: stri
       return <li key={`${source.id}-${index}`} id={`ai-source-${turnId}-${source.id}`} tabIndex={-1}><div className="ai-source-heading"><span className="ai-source-id">[{source.id}]</span><span>{source.kind === 'guide' ? '导读章节' : source.kind === 'original' ? '固定原文' : '网页摘录'}{source.version ? ` · ${source.version}` : ''}</span></div>
         {target ? source.kind === 'guide' ? <AppLink to={target}>{source.title}</AppLink> : <a href={target} target="_blank" rel="noopener noreferrer">{source.title} ↗</a> : <span>{source.title}（原位置暂不可用）</span>}
         <p>{source.text}</p>
+        {source.kind === 'guide' && source.readRanges && <p className="ai-fine-print">{source.readRanges.length === 1 && source.readRanges[0].start === 0 && source.readRanges[0].end === source.readRanges[0].total ? '本轮已取得这个导读章节的完整文本。' : `本轮依据只包含这个导读章节的 ${source.readRanges.length} 段节选，未读部分未纳入依据。`}</p>}
         {source.kind === 'original' && <OriginalSource source={source} />}
       </li>;
     })}</ol>

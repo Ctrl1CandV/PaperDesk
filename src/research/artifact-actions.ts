@@ -5,7 +5,7 @@ import { emptyResearchState, researchSnapshotData, type PersistentEvidenceRef } 
 import { personalStore } from '../records/store';
 import { contentRepository } from '../content/repository';
 import type { AiTurn } from '../assistant/api';
-import type { Exploration } from '../records/types';
+import type { Exploration, ExplorationDraft } from '../records/types';
 
 /** Saves a completed answer as an ordinary research document of a direction. */
 export async function saveAnswerArtifact(explorationId: string, turn: AiTurn): Promise<void> {
@@ -29,16 +29,31 @@ const turnRefs = (turn: AiTurn): PersistentEvidenceRef[] => turn.sources.map(sou
  * versions remain; the catalog snapshot records the inventory at generation time.
  * New library arrivals alone are not evidence that a paper belongs to this topic.
  */
-export async function saveReadingBrief(record: Exploration, turn: AiTurn, purpose: BriefPurpose, topic: string): Promise<{ record: Exploration; artifact: ResearchArtifact }> {
-  const research = record.research ?? emptyResearchState();
-  const existing = research.artifacts?.find(item => item.sourceTurnId === turn.id);
-  if (existing) return { record, artifact: existing };
+export async function saveReadingBrief(record: Exploration | ExplorationDraft, turn: AiTurn, purpose: BriefPurpose, topic: string): Promise<{ record: Exploration; artifact: ResearchArtifact }> {
+  if (turn.status !== 'complete' || turn.summaryOnly || turn.context?.command?.name !== 'reading-brief') throw Error('选文文件只能由完整完成的 /选文 回答保存。');
   const snapshot = turn.context?.researchSnapshot as { explorationId?: string; recordRevision?: number } | undefined;
   if (snapshot?.explorationId && snapshot.explorationId !== record.id) throw Error('这份选文文件属于另一个方向，未保存。');
+  const savedBrief = (owner: Exploration | ExplorationDraft) => {
+    const existing = owner.research?.artifacts?.find(item => item.sourceTurnId === turn.id);
+    if (existing && (existing.kind !== 'reading-brief' || existing.body !== turn.answer || existing.purpose !== purpose)) throw Error('同一 AI 选文回答对应不同内容，未重复保存。');
+    return existing;
+  };
+  const research = record.research ?? emptyResearchState();
+  const existing = savedBrief(record);
+  if (existing && record.recordRevision !== undefined) return { record: record as Exploration, artifact: existing };
   const artifact = createResearchArtifact({ kind: 'reading-brief', title: `${READING_BRIEF.label}：${topic}`.slice(0, 300), body: turn.answer,
-    recordRevision: snapshot?.recordRevision ?? record.recordRevision, sourceTurnId: turn.id, evidenceRefs: turnRefs(turn), purpose, librarySnapshot: currentGuideIds() });
-  const saved = await personalStore.saveExploration({ ...record, research: { ...research, artifacts: [...(research.artifacts ?? []), artifact] } }, record.recordRevision);
-  return { record: saved, artifact };
+    recordRevision: snapshot?.recordRevision ?? record.recordRevision ?? 1, sourceTurnId: turn.id, evidenceRefs: turnRefs(turn), purpose, librarySnapshot: currentGuideIds() });
+  try {
+    // A new accumulation and its file are one transaction, so a failed save leaves no empty entry.
+    const saved = await personalStore.saveExploration({ ...record, research: { ...research, artifacts: [...(research.artifacts ?? []), artifact] } }, record.recordRevision ?? null);
+    return { record: saved, artifact };
+  } catch (error) {
+    // Another tab may have saved this exact completed turn, or readback may have failed after commit.
+    const current = await personalStore.get('explorations', record.id);
+    const committed = current && savedBrief(current);
+    if (current && committed) return { record: current, artifact: committed };
+    throw error;
+  }
 }
 export function currentGuideIds() { return [...new Set(contentRepository.list().map(entry => entry.guide.metadata.id))]; }
 /** Guides in the library now that were absent when the file was saved. */

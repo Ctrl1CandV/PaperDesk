@@ -94,6 +94,7 @@ test('keyboard browsing uses the page scroll and the last article opens a dismis
   await expect(page.locator('#orientation-title')).toBeFocused();
   await page.getByRole('button', { name: '关闭导学', exact: true }).click();
   await expect(last).toBeFocused();
+  await expect(last).toBeInViewport();
   await expect(page).not.toHaveURL(/article=/);
 });
 
@@ -141,6 +142,7 @@ test('wide browsing and the preview follow each article at a stable open-state r
   await page.keyboard.press('Escape');
   await expect(page.locator(`#choose-${lastGuide.guideId}`)).toBeFocused();
   await expect(page.locator(`#choose-${lastGuide.guideId}`)).toBeInViewport();
+  await page.screenshot({ path: '.cache/screenshots/library-return-last-1920.png', animations: 'disabled' });
   await centeredBrowse(page);
   expect((await page.locator('.guide-entry').first().boundingBox())!.width).toBeGreaterThan(originalWidth);
   expect(errors).toEqual([]);

@@ -61,7 +61,7 @@ window.addEventListener('popstate', () => {
   window.dispatchEvent(new Event('paperdesk:navigate'));
 });
 
-export function useLocation() {
+export function useLocation(restorePosition = true) {
   const [location, setLocation] = useState(currentLocation);
   useEffect(() => {
     const update = () => setLocation(currentLocation());
@@ -70,6 +70,7 @@ export function useLocation() {
     return () => { window.removeEventListener('paperdesk:navigate', update); window.removeEventListener('hashchange', update); };
   }, []);
   useEffect(() => {
+    if (!restorePosition) return;
     const previous = returning ? positions.get(activeKey) : undefined;
     const requestedTarget = navigationTarget;
     navigationTarget = undefined;
@@ -119,7 +120,7 @@ export function useLocation() {
       window.removeEventListener('keydown', interrupt);
       window.removeEventListener('pointerdown', interrupt);
     };
-  }, [location]);
+  }, [location, restorePosition]);
   return location;
 }
 

@@ -116,6 +116,69 @@ test('synthetic output_item.done supplies text missing from deltas exactly once'
   assert.equal(f.requests.length, 1);
 });
 
+test('synthetic empty terminal output recovers a finalized answer without replaying inference', async () => {
+  const item = message('Synthetic completed answer carried by item.done.');
+  const f = fixture([[created, delta('Synthetic provisional answer.'),
+    { type: 'response.output_item.done', output_index: 0, item }, done([])]]);
+  await f.run();
+  assert.equal(f.state.turn.answer, item.content[0].text);
+  assert.equal(f.requests.length, 1);
+});
+
+test('synthetic empty terminal reconstructs finalized messages by output index rather than arrival order', async () => {
+  const first = message('Synthetic first.', { id: 'synthetic-first-finalized' });
+  const second = message('Synthetic second.', { id: 'synthetic-second-finalized' });
+  const f = fixture([[created, { type: 'response.output_item.done', output_index: 1, item: second },
+    { type: 'response.output_item.done', output_index: 0, item: first }, done([])]]);
+  await f.run();
+  assert.equal(f.state.turn.answer, 'Synthetic first.Synthetic second.');
+  assert.equal(f.requests.length, 1);
+});
+
+test('synthetic empty terminal output restores completed tool records and opaque continuation only in memory', async () => {
+  const reasoning = { type: 'reasoning', id: 'synthetic-finished-reasoning', summary: [], encrypted_content: 'SYNTHETIC_OPAQUE_ITEM_DONE' };
+  const call = { type: 'function_call', id: 'synthetic-finished-call', call_id: 'synthetic-item-done-call',
+    namespace: 'paperdesk', name: 'search_library', arguments: '{"query":"synthetic"}', status: 'completed' };
+  const item = message('Synthetic answer after the restored tool call.');
+  const f = fixture([[created,
+    { type: 'response.output_item.done', output_index: 0, item: reasoning },
+    { type: 'response.output_item.done', output_index: 1, item: call }, done([])],
+    [created, { type: 'response.output_item.done', output_index: 0, item }, done([])]]);
+  await f.run();
+  assert.equal(f.state.turn.answer, item.content[0].text);
+  assert.equal(f.requests.length, 2);
+  assert.equal(f.toolCalls.length, 1);
+  assert.deepEqual(f.requests[1].body.input.find(value => value.id === reasoning.id), reasoning);
+  assert.deepEqual(f.requests[1].body.input.find(value => value.id === call.id), call);
+  assert.equal(JSON.stringify({ events: f.events, saved: f.saved, turn: f.state.turn }).includes(reasoning.encrypted_content), false);
+});
+
+test('synthetic nonempty terminal output stays authoritative over earlier item.done text', async () => {
+  const earlier = message('Synthetic earlier complete snapshot.');
+  const f = fixture([[created, { type: 'response.output_item.done', output_index: 0, item: earlier }, done([message('Synthetic final correction.')])]]);
+  await f.run();
+  assert.equal(f.state.turn.answer, 'Synthetic final correction.');
+  assert.equal(f.requests.length, 1);
+});
+
+test('synthetic absent terminal status cannot authorize reconstruction of streamed records', async () => {
+  const terminal = done([]); delete terminal.response.status;
+  const f = fixture([[created, { type: 'response.output_item.done', output_index: 0, item: message('Synthetic finalized item.') }, terminal]]);
+  await assert.rejects(f.run());
+  assert.equal(f.requests.length, 1);
+});
+
+for (const [name, item] of [
+  ['reasoning only', { type: 'reasoning', id: 'synthetic-only-reasoning', summary: [], encrypted_content: 'SYNTHETIC_NEVER_VISIBLE' }],
+  ['commentary only', message('Synthetic process note.', { phase: 'commentary' })],
+  ['unfinished call', { type: 'function_call', id: 'synthetic-unfinished-call', call_id: 'synthetic-call', namespace: 'paperdesk', name: 'search_library', arguments: '{"query":"synthetic"}', status: 'incomplete' }],
+]) test(`synthetic ${name} cannot become success from an empty terminal output`, async () => {
+  const f = fixture([[created, { type: 'response.output_item.done', output_index: 0, item }, done([])]]);
+  await assert.rejects(f.run());
+  assert.equal(f.requests.length, 1);
+  assert.equal(f.toolCalls.length, 0);
+});
+
 test('synthetic second tool round replacement keeps prior text and opaque continuation items', async () => {
   const reasoning = { type: 'reasoning', id: 'synthetic-reasoning', summary: [], encrypted_content: 'SYNTHETIC_OPAQUE_REASONING' };
   const commentary = message('Synthetic first-round preamble.', { id: 'synthetic-preamble', phase: 'commentary' });

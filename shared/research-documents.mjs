@@ -48,21 +48,20 @@ export function validCommand(value) {
   return value.name === 'reading-brief' && keys.length === 2 && Object.hasOwn(BRIEF_PURPOSES, value.purpose);
 }
 
-const fileRules = `- 依据当前研究快照（如有）、本轮选入的资料、本主题讨论、本库目录和读者的阅读标记。信息不足时先用可用的历史工具回看讨论，不要凭空补全。
-- 标注每条判断的性质：〔文献〕、〔读者〕、〔推断〕或〔假设〕。读者采纳的假设仍是假设。
-- 不虚构论文、作者、年份、链接或检索结果；未经核实的候选只能作为检索线索，并标“未核实”。
-- 读者没有讨论过的数量、时间、资源和行动权限写“待确认”，不要替读者补成授权。
-- 用执行者无需此前对话也能理解的完整句子，条件和理由具体、可检查；全文以 1500–2500 字为宜，用条目写，不重复铺陈。`;
+const fileRules = `- 依据当前研究快照、选中资料、主题讨论、本库目录与阅读标记；信息不足先回看可用历史，不凭空补全。
+- 判断标〔文献〕〔读者〕〔推断〕或〔假设〕，采纳不等于证实。不虚构论文、作者、年份、链接或检索结果；未核实候选只作检索线索并标“未核实”。
+- 未约定的数量、时间、资源与行动权限写“待确认”，不得补成授权。
+- 写给没看过讨论的执行者：完整句子、具体条件与理由，可检查；先覆盖全部必需小节，遵守本轮篇幅预算，避免重复。`;
 
 /** Requirements the backend appends before the reader's message when a command is used. */
-export function commandInstruction(command, { linked }) {
-  if (command.name === 'notebook') return `应用附加的指令要求（不是读者原话）：读者输入 /记录，明确要求更新这个方向的研究工作稿。researchSnapshot.notebook 是当前完整正文和版本；没有它表示还没有工作稿。工作稿会逐步成为论文项目的起始文件，默认按这些二级标题组织：${WORKING_PAPER_SECTIONS.map(section => `「${section.heading}」（${section.hint}将来用作${section.becomes}）`).join('、')}。结合读者本轮要求、当前正文和讨论，调用一次 update_research_notebook：body 是完整更新后的 Markdown 正文，summary 用一句话写这次改了什么（会显示在版本记录里）。
-- 把新内容放进对应的标题下；读者改过的标题、增删的小节和自己的写法照样保留，不强行改回模板。<!-- … --> 是空小节的提示，写入内容时删掉它，没有内容的小节保留提示。
-- 保留读者的原意、疑问、失败经历和个人判断，未要求删除的旧内容应保留；不要把整份正文概括为短摘要。
-- 「已知」只写有出处的内容，新增引用用本轮实际来源的 Markdown 链接（本库导读写成 /read/导读ID/修订#章节 的相对链接），旧正文引用原样保留，不只写 [L1] 等临时编号。「判断与假设」「实验设想」中没有依据的内容标为〔假设〕或〔待验证〕；没有执行过的实验不写结果。
-- 「阶段记录」每条一行：“- YYYY-MM-DD · 收获或转变”，只记读者明确表达或讨论中确实达成的进展，日期用今天；不替读者宣布完成、成功、创新或转向写论文，不改方向阶段。
-- body 最多 24000 字，不截断旧文来满足限制，超长或意图不明时不调用工具，说明需要怎样缩小修改。无实质变化时不调用。
-- 工具接收的是草稿；回答中简短说明本次变化和仍待确认之处即可，不再重复整份正文。界面保留工具提交的完整草稿供查看或下载，成功写入后才显示已保存。`;
+export function commandInstruction(command, { linked, compact = false, outputTokens = 3000 }) {
+  if (command.name === 'notebook') return `应用附加的指令要求（不是读者原话）：/记录 明确要求更新当前方向工作稿。researchSnapshot.notebook 是完整已存正文和版本，缺省表示尚未创建。按本轮要求与讨论调用一次 update_research_notebook：body 为完整新 Markdown，summary 一句改动说明。
+默认二级标题：${WORKING_PAPER_SECTIONS.map(section => `「${section.heading}」→${section.becomes}：${section.hint}`).join('；')}
+- 新内容归入对应小节，保留读者改过的结构、写法、原意、疑问、失败和判断；未要求删除的旧内容应保留，不概括成短摘要。<!-- … --> 是空节提示，有内容时移除，否则保留。
+- 「已知」附出处；旧引用不改，新引用用本轮实际来源的 Markdown 链接，本库用 /read/导读ID/修订#章节，不只写临时编号。无依据的判断与实验设想标〔假设〕或〔待验证〕，未执行实验不写结果。
+- 阶段记录格式“- YYYY-MM-DD · 收获或转变”，用今天日期，仅记读者明确表达或讨论达成的进展；不宣称完成、成功、创新或转入写作，不改方向阶段。
+- body 最多 24000 字符，不能截断旧文以达限；超长、意图不明或无实质变化不调用，说明如何缩小修改。
+- 工具只交草稿，界面核对版本后才保存。回答简述变化与待确认事项，不重复全文或提前声称保存；完整草稿由界面保留。`;
   if (command.name === 'direction') return linked
     ? `应用附加的指令要求（不是读者原话）：读者输入了 /方向，要求根据最近的讨论更新当前研究方向。先对照研究快照判断哪些确实变了：问题是否需要改写，认识、候选与暂缓方向、尚不确定之处、阶段（stage：broaden 拓宽了解 / narrow 收窄方向 / question 形成研究问题 / validate 准备验证 / write 准备写作）、下一步，以及读者在讨论中明确表达的取舍。
 - 有实质变化：调用一次 propose_research_changes，只包含变化的字段，字段值写完整的新内容；只有读者明确表态的选择才写成 adopted 或 rejected 决定，你的建议放进候选方向。读者已用指令授权，界面会直接写入并保留版本。
@@ -73,20 +72,40 @@ export function commandInstruction(command, { linked }) {
 - 还说不清：不调用工具，直接说明还缺什么，最多提出两个最关键的问题。
 - 正文用几句话说明建立了什么方向、依据和下一步；不要重复全部字段。区分文献、读者观点、推断和假设，不得编造读者兴趣、资源或授权。`;
   const purpose = command.purpose;
+  const characterBudget=Math.max(400,Math.min(1600,Math.floor(outputTokens*.32)));
+  const sectionBudget=Math.max(25,Math.floor((characterBudget-180)/READING_BRIEF.sections.length));
+  const lengthRule=`本轮输出上限${outputTokens} tokens。先交完整九节的最小可执行稿，全文含标题不超过${characterBudget}个中文字符；每节最多1–2条短要点、合计约${sectionBudget}字。把预算均匀留给全部小节，不在前几节长篇展开或重复背景；保留关键条件、来源和权限，未知写待确认。后续可按读者要求扩展，本轮不输出未完待续。`;
+  const concise = {
+    '本轮目的': '问题、原因及所服务子问题。',
+    '已有基础与缺口': '本库、已读和讨论；避免重复。',
+    '需要的材料类型': purpose==='research'?'机制、比较、评测或反例。':'综述、教程、经典或代表论文。',
+    '关注范围与检索表达': '边界、中英关键词及同义词。',
+    '纳入与排除条件': '相关性、可读性、可比性、证据、年份与优先级理由。',
+    '已知线索与比较对象': '身份、版本、比较与反例；未核实标注。',
+    '期望返回': '候选取舍、顺序、前提、来源缺口；入库须授权。',
+    '限制与授权': '数量、时间、资源、权限；未定待确认。',
+    '完成与返回讨论的条件': '交付、停止及新发现返回讨论的条件。',
+  };
+  if (compact) return `应用附加的指令要求（不是读者原话）：/选文（目的：${BRIEF_PURPOSES[purpose].label}）。${BRIEF_PURPOSES[purpose].description}给未见讨论的 Harness 写选文实施文件。信息不足不要输出文件，说明缺口，最多问两题；足够则只输出文件正文，首行“# ${READING_BRIEF.label}：<主题>”，依次保留以下二级标题：
+${READING_BRIEF.sections.map((section,index)=>`## ${index+1}. ${section.title} —— ${concise[section.title]}`).join('\n')}
+${fileRules}
+${lengthRule}`;
   return `应用附加的指令要求（不是读者原话）：读者输入了 /选文（目的：${BRIEF_PURPOSES[purpose].label}）。${BRIEF_PURPOSES[purpose].description}要求生成一份交给外部执行者（Harness，具备检索、审阅和内容制作能力，但没看过此前讨论）的选文实施文件。
 先判断信息是否足以形成可执行的文件：至少要知道想弄清什么、范围大致在哪里${purpose === 'research' ? '，以及它服务当前方向的哪个子问题' : ''}。
 - 不足：不要输出文件，回答不要以 # 开头；说明缺少什么，最多提出两个最关键的问题。
 - 足够：回答本身就是文件。第一行写“# ${READING_BRIEF.label}：<简短主题>”，然后依次使用以下二级标题，可以增加小节但不要省略；读者已用指令授权，界面会直接保存这份文件。
-${READING_BRIEF.sections.map((section, index) => `## ${index + 1}. ${section.title} —— ${section.hint[purpose]}`).join('\n')}
+${READING_BRIEF.sections.map((section, index) => `## ${index + 1}. ${section.title} —— ${compact ? concise[section.title] : section.hint[purpose]}`).join('\n')}
 要求：
 ${fileRules}
+${lengthRule}
 - 只输出文件正文，不在前后加寒暄或额外说明。`;
 }
 
 /** The answer counts as a generated file only when it opens with the file heading. */
 export function readingBriefTitle(markdown) {
-  const match = String(markdown).match(/^\s*#[ \t]+选文实施文件[：:][ \t]*(.+?)[ \t]*#*[ \t]*$/m);
-  return match && String(markdown).trimStart().startsWith('#') ? match[1].trim().slice(0, 200) : null;
+  const firstLine = String(markdown).trimStart().split(/\r?\n/, 1)[0];
+  const match = firstLine.match(/^#[ \t]+选文实施文件[：:][ \t]*(.+?)[ \t]*#*[ \t]*$/);
+  return match?.[1].trim().slice(0, 200) || null;
 }
 
 /** Lenient heading check: a section counts as present when a heading names it. */

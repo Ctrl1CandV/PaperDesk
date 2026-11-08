@@ -1,6 +1,6 @@
 # PaperDesk
 
-本地论文阅读与研究积累平台，支持书架、导读卡、深入阅读、笔记、研究探索和可选 AI 问答。当前版本 **0.1.0**，产品规格 **1.1**；书架包含 **14 篇当前材料、21 个保留修订**。
+本地论文阅读与研究积累平台，支持书架、导读卡、深入阅读、笔记、研究探索和可选 AI 问答。当前版本 **0.1.0**，产品规格 **1.1**；默认书架包含 **18 篇材料**，全部内容保留 **56 个导读修订**。
 
 ![PaperDesk 书架](docs/images/library.png)
 
@@ -44,4 +44,4 @@ npm run test:e2e
 
 审核内容按不可变修订维护；正文哈希、来源身份与旧引用受到保护。打开文章不会自动标记已读。个人记录、模型凭据、原文材料备份与回滚收据不能作为普通缓存清理，见[隐私](docs/development/PRIVACY.md)和 [Git 规则](docs/development/GIT-POLICY.md)。
 
-`node_modules/`、`dist/` 和 `.cache/` 是依赖、构建与开发产物，保持忽略；`private/` 和 `server/config.local.json` 是本地运行数据与配置。部署、同步和云服务仍在当前范围之外。学术归属保留在内容和来源记录中；本项目尚未添加许可证授权。
+`node_modules/`、`dist/` 和 `.cache/` 是依赖、构建与开发产物，保持忽略；`private/` 和 `server/config.local.json` 是本地运行数据与配置。完整探索可通过私人 Git 仓库中的 `research-workspace/` 传递，其他个人记录与凭据保持各自边界，见[探索 Git 传递](docs/development/EXPLORATION-GIT.md)。部署和云同步服务仍在当前范围之外。学术归属保留在内容和来源记录中；开发贡献说明见 [Contributors](CONTRIBUTORS.md)。本项目尚未添加许可证授权。

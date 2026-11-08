@@ -2,6 +2,12 @@
 
 This is an implementation direction, not a claim of visual acceptance. It applies the content, layout, typography and rendered-review requirements below. There is no requirement to copy an earlier interface or install a particular skill bundle.
 
+## Reading workspace — 2026-11-06
+
+Closing the desktop AI panel expands the actual prose into the available space, up to 68rem in a workspace capped at 1920px. Reopening restores the docked columns and 52rem prose limit. At 1100–1199px the closed state restores the chapter/tool sidebar; narrow screens keep the existing drawer and single-column reader. This supersedes the earlier decision to keep prose width unchanged on close. Source content, revision identity and explicit reading marks do not change.
+
+Selection validation errors offer a direct, deliberate **不附带选文，保留问题** action and access to the question's materials. This keeps the question and fixed chapter without sending another request. Connection controls are reserved for connection errors. Unconfirmed sends retain their exact request identity in the in-memory draft across panel close/reopen; this is not durable storage across browser reload.
+
 ## Current implementation — 2026-10-30
 
 Guidance and next steps stay present but quiet: they live in existing places (the chapter list, the contents rail, the article end, one hairline row on the home page) in muted text, never as new highlighted cards. Approved guide prose is unchanged; the interface only reveals reviewed fields such as reading targets and related guides. Day and night themes share one structure. Details and checks are in [project state](PROJECT-STATE.md).

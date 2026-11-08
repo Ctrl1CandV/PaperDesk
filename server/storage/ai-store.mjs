@@ -387,12 +387,12 @@ export function sameScope(conversation, value) {
 
 function includesEvidence(source, saved) {
   if (JSON.stringify(source) === JSON.stringify(saved)) return true;
-  // Later original-unit reads can widen the same source. An earlier proposal
+  // Later guide/original reads can widen the same source. An earlier proposal
   // keeps its exact excerpt, with ranges demonstrably contained in the final one.
-  if (source.kind !== 'original' || saved.kind !== 'original' || !saved.readRanges?.length || !source.readRanges?.length) return false;
+  if (!['guide','original'].includes(source.kind) || source.kind !== saved.kind || !saved.readRanges?.length || !source.readRanges?.length) return false;
   const {text:currentText,readRanges:currentRanges,...currentIdentity}=source;
   const {text:savedText,readRanges:savedRanges,...savedIdentity}=saved;
   if (JSON.stringify(currentIdentity)!==JSON.stringify(savedIdentity)) return false;
   if (!savedRanges.every(range=>currentRanges.some(current=>current.total===range.total && current.start<=range.start && current.end>=range.end))) return false;
-  return savedText.split(/\n\n(?=\[原文单元字符 )/u).every(part=>currentText.includes(part.replace(/^\[原文单元字符 \d+–\d+\/\d+\]\n/u,'')));
+  return savedText.split(/\n\n(?=\[(?:原文单元|导读章节)字符 )/u).every(part=>currentText.includes(part.replace(/^\[(?:原文单元|导读章节)字符 \d+–\d+\/\d+\]\n/u,'')));
 }

@@ -1,7 +1,6 @@
 import { LIMITS, SYSTEM_PROMPT, availableTools } from '../ai/instructions.mjs';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
-import remarkGfm from 'remark-gfm';
 import { readFileSync, realpathSync, statSync } from 'node:fs';
 import { resolve, dirname, relative, isAbsolute, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,10 +12,45 @@ import { utf8Prefix, localResultBudget } from '../ai/prompt-budget.mjs';
 import { guidePromptMetadata } from './prompt-metadata.mjs';
 import { termMatcher, termsIn } from '../../shared/glossary.mjs';
 import { object, reject, isId, isRevision, isText } from '../http/validation.mjs';
+import { normalizeReadingText as normalizeText, readingTextFromMarkdown } from '../../shared/reading-text.mjs';
 
 const sectionUrl = (guide, unit) => `/read/${guide.metadata.id}/${guide.metadata.revision}#${unit.id}`;
-const normalizeText = value => value.replace(/\s+/gu, ' ').trim();
-const nodeText = node => typeof node.value === 'string' ? node.value : (node.children ?? []).map(nodeText).join(['table', 'tableRow', 'list', 'listItem'].includes(node.type) ? '\n' : '');
+const jsonBytes = value => Buffer.byteLength(JSON.stringify(value));
+// Tool JSON is itself a string inside both provider protocols.
+const resultBytes = value => jsonBytes(JSON.stringify(value));
+const mergeRanges = ranges => {
+  const merged = [];
+  for (const range of ranges.sort((a, b) => a.start - b.start)) {
+    const last = merged.at(-1);
+    if (last && range.start <= last.end) last.end = Math.max(last.end, range.end);
+    else merged.push({ ...range });
+  }
+  return merged;
+};
+const guideRanges = (source, unit) => source?.readRanges ?? (source?.text && unit.text.startsWith(source.text) ? [{ start: 0, end: source.text.length, total: unit.text.length }] : []);
+const nextUnread = (ranges, offset = 0) => {
+  for (const range of ranges) if (offset >= range.start && offset < range.end) offset = range.end;
+  return offset;
+};
+function selectedRawRange(unit, selection) {
+  const target = normalizeText(selection);
+  const blocks = unified().use(remarkParse).parse(unit.text).children.map(node => ({
+    start: node.position.start.offset, end: node.position.end.offset,
+    text: readingTextFromMarkdown(unit.text.slice(node.position.start.offset, node.position.end.offset)),
+  })).filter(block => block.text);
+  const combined = blocks.map(block => block.text).join(' '), at = combined.indexOf(target);
+  if (at >= 0) {
+    let offset = 0, start;
+    for (const block of blocks) {
+      if (start === undefined && offset + block.text.length > at) start = block.start;
+      if (start !== undefined && offset + block.text.length >= at + target.length) return { start, end: block.end };
+      offset += block.text.length + 1;
+    }
+  }
+  // Legacy Markdown selections can contain markup absent from reading text.
+  // Retaining the real whole section is honest; the budget may reject it.
+  return { start: 0, end: unit.text.length };
+}
 export class ContentIndex {
   constructor(validated, options = {}) {
     this.index = options.index ?? new RetrievalIndex(); this.reading = options.reading;
@@ -38,8 +72,7 @@ export class ContentIndex {
       const offsets = [0, ...tree.children.filter(node => node.type === 'heading' && node.depth === 2).map(node => node.position.start.offset)];
       return { ...guide, units: guide.metadata.units.map((unit, index) => {
         const text = guide.body.slice(offsets[index], offsets[index + 1]);
-        const parsed = unified().use(remarkParse).use(remarkGfm).parse(text);
-        return { ...unit, text, renderedText: normalizeText(parsed.children.map(nodeText).join('\n')) };
+        return { ...unit, text, renderedText: readingTextFromMarkdown(text) };
       }) };
   }
   static async load({ rootDir = fileURLToPath(new URL('../../', import.meta.url)), indexFile, readingDirectory } = {}) {
@@ -134,14 +167,19 @@ export class ContentIndex {
     const row = this.index.db.prepare('SELECT value FROM state WHERE key=?').get(`evidence:${generation}:${key}`);
     return row ? JSON.parse(row.value).slice(0, 6) : [];
   }
-  source(guide, unit, sources, text = unit.text) {
+  source(guide, unit, sources, text = unit.text, offset = 0) {
     const url = sectionUrl(guide, unit);
-    const existing = sources.find(source => source.url === url);
-    if (existing) { if (text.length > existing.text.length) existing.text = text; return existing; }
-    if (sources.length >= 64) reject('来源数量超过本轮上限。');
-    const source = { id: `L${sources.filter(item => item.kind === 'guide').length + 1}`, kind: 'guide', bodySha256: guide.metadata.bodySha256, title: `${guide.metadata.title} · ${unit.heading ?? '导读开篇'}`,
+    const existing = sources.find(source => source.kind === 'guide' && source.url === url);
+    if (text !== unit.text.slice(offset, offset + text.length)) reject('导读片段与固定章节范围不一致。');
+    if (!existing && sources.length >= 64) reject('来源数量超过本轮上限。');
+    const source = existing ?? { id: `L${sources.filter(item => item.kind === 'guide').length + 1}`, kind: 'guide', bodySha256: guide.metadata.bodySha256, title: `${guide.metadata.title} · ${unit.heading ?? '导读开篇'}`,
       url, guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: unit.id, text, version: guide.metadata.source.version };
-    sources.push(source); return source;
+    if (text.length) {
+      source.readRanges = mergeRanges([...guideRanges(existing, unit), { start: offset, end: offset + text.length, total: unit.text.length }]);
+      source.text = source.readRanges.length === 1 ? unit.text.slice(source.readRanges[0].start, source.readRanges[0].end)
+        : source.readRanges.map(range => `[导读章节字符 ${range.start}–${range.end}/${range.total}]\n${unit.text.slice(range.start, range.end)}`).join('\n\n');
+    }
+    if (!existing) sources.push(source); return source;
   }
   // Reviewed glossary names for terms mentioned in the sent units; about 1 KB at most.
   termsFor(units) {
@@ -169,43 +207,74 @@ export class ContentIndex {
     if (guide.metadata.bodySha256 !== request.bodySha256) reject('当前页面与后端的文章内容不一致，请重新构建页面并重启后端。', 409);
     const active = guide.units.find(unit => unit.id === request.unitId);
     if (!active) reject('当前章节不存在，请重新选择章节。');
-    if (request.selection && !normalizeText(active.text).includes(normalizeText(request.selection)) && !active.renderedText.includes(normalizeText(request.selection))) reject('选文与当前章节不一致，请重新选择；公式或跨章节文字可直接写入问题。');
+    if (request.selection && !normalizeText(active.text).includes(normalizeText(request.selection)) && !active.renderedText.includes(normalizeText(request.selection))) reject('选文与当前章节不一致，请重新选择；公式或跨章节文字可直接写入问题。', 400, 'selection_mismatch');
     const evidence = this.evidenceFor(`guide:${request.guideId}/${request.revision}:${request.unitId}`);
     const sectionUnits = [...new Set([guide.units[0], active])];
     const guideBytes = Buffer.byteLength(guide.body);
-    let units = guide.body.length <= LIMITS.contextChars && guideBytes <= 5000 ? guide.units : sectionUnits;
-    let metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence, this.termsFor(units)));
-    // Reserve room before selecting the guide scope, including metadata, question,
-    // history and subsequent evidence. Final provider preflight remains authoritative.
-    const tools = config.toolsEnabled === false ? [] : availableTools(Boolean(request.webSearch && config.searchAvailable));
-    const textBudget = () => {
-      const fixedBytes = Buffer.byteLength(metadataJson + SYSTEM_PROMPT + JSON.stringify(tools) + request.question + (request.selection ?? '')) + 2000;
-      return Math.min(5000, Math.max(0, (config.contextTokenLimit ?? 32768) - (config.maxOutputTokens ?? 3000) - fixedBytes - 10000));
-    };
-    let contextBytes = textBudget();
-    const scope = guide.body.length <= LIMITS.contextChars && guideBytes <= contextBytes ? 'full-guide' : 'section';
-    if (scope === 'section' && units !== sectionUnits) {
-      units = sectionUnits; metadataJson = JSON.stringify(guidePromptMetadata(guide.metadata, units, evidence, this.termsFor(units))); contextBytes = textBudget();
-    }
-    if (contextBytes < 512) reject('问题和必要资料超过本机的上下文预算，请缩短输入或调整本机模型上下文预算。', 413);
-    if (units.length > 64) reject('导读章节数量超过本轮来源预算，请选择章节模式。', 413);
-    if (units.reduce((sum, unit) => sum + unit.text.length, 0) > LIMITS.contextChars) reject('当前章节超过上下文预算，请选择较短章节。', 413);
-    const guideRanges = [];
-    const sources = units.map(unit => {
-      const limit = scope === 'full-guide' ? contextBytes : Math.floor(contextBytes * (units.length === 1 ? 1 : unit.id === active.id ? .7 : .3));
-      const text = scope === 'full-guide' ? unit.text : utf8Prefix(unit.text, limit);
-      guideRanges.push({ unitId: unit.id, start: 0, end: text.length, total: unit.text.length, excerptOnly: text.length < unit.text.length });
-      return this.source(guide, unit, [], text);
-    });
-    metadataJson = JSON.stringify({ ...JSON.parse(metadataJson), guideRanges, guideScope: guideRanges.some(range => range.excerptOnly) ? '导读预算内节选；不是完整章节。可按需补读。' : '所列导读章节文本完整。' });
-    sources.forEach((source, index) => { source.id = `L${index + 1}`; });
+    const selectionRange = request.selection ? selectedRawRange(active, request.selection) : undefined;
+    const selectionBytes = selectionRange ? Buffer.byteLength(active.text.slice(selectionRange.start, selectionRange.end)) : 0;
+    const minimumTextBytes = selectionRange ? selectionBytes + (sectionUnits.length > 1 ? 256 : 0) : 512;
     let historyChars = 0;
     const history = [];
     for (const turn of previous.filter(turn => turn.status === 'complete').slice(-6).reverse()) {
       const length = turn.question.length + turn.answer.length;
-      if (historyChars + length > LIMITS.historyChars || Buffer.byteLength(JSON.stringify([...history.flatMap(item => [item.question, item.answer]), turn.question, turn.answer])) > 4000) break;
+      const candidate = [turn, ...history].flatMap(item => [{ role: 'user', content: item.question }, { role: 'assistant', content: item.answer }]);
+      if (historyChars + length > LIMITS.historyChars || jsonBytes(candidate) > 4000) break;
       history.unshift(turn); historyChars += length;
     }
+    // Charge the actual bounded history and escaped metadata/source envelope.
+    // Keep a separate tool-result allowance; the final adapter check remains strict.
+    // Research/command additions are already deducted by the calling layer.
+    const tools = config.toolsEnabled === false ? [] : availableTools(Boolean(request.webSearch && config.searchAvailable));
+    const hardInputLimit = (config.contextTokenLimit ?? 32768) - (config.maxOutputTokens ?? 3000);
+    const projected = new Map();
+    const render = (units, scope, textBytes) => {
+      const activeStart = selectionRange?.start ?? 0;
+      const activeText = scope === 'section' ? utf8Prefix(active.text.slice(activeStart), Math.max(selectionBytes, Math.floor(textBytes * (units.length === 1 ? 1 : .7)))) : active.text;
+      const otherBytes = Math.max(0, textBytes - Buffer.byteLength(activeText));
+      const ranges = [], sources = units.map(unit => {
+        const start = scope === 'section' && unit.id === active.id ? activeStart : 0;
+        const text = scope === 'full-guide' ? unit.text : unit.id === active.id ? activeText : utf8Prefix(unit.text, otherBytes);
+        ranges.push({ unitId: unit.id, start, end: start + text.length, total: unit.text.length, excerptOnly: start > 0 || text.length < unit.text.length });
+        return this.source(guide, unit, [], text, start);
+      });
+      sources.forEach((source, index) => { source.id = `L${index + 1}`; });
+      if (!projected.has(units)) projected.set(units, guidePromptMetadata(guide.metadata, units, evidence, this.termsFor(units)));
+      const base = projected.get(units);
+      const citations = base.citations.filter(citation => sources.some(source => source.text.includes(citation.url)));
+      const metadata = { ...base, citations,
+        metadataProjection: { ...base.metadataProjection, omittedCitations: guide.metadata.citations.length - citations.length,
+          citationScope: 'only-sent-guide-ranges', note: `${base.metadataProjection.note} 引用清单进一步限定为实际发送片段中完整出现的URL；未读章节中的引用标签没有发送。` }, guideRanges: ranges,
+        guideScope: ranges.some(range => range.excerptOnly) ? '导读预算内节选；不是完整章节。可按需补读。' : '所列导读章节文本完整。' };
+      const content = JSON.stringify({ researchSnapshot: null, metadata, activeUnit: request.unitId, selection: request.selection ?? '', sources });
+      const messages = [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content },
+        ...history.flatMap(turn => [{ role: 'user', content: turn.question }, { role: 'assistant', content: turn.answer }]), { role: 'user', content: request.question }];
+      // 2 KB covers scope prose, protocol differences and the normal 512-byte
+      // framing allowance; do not count a fictitious 10 KB of missing history.
+      return { sources, metadataJson: JSON.stringify(metadata), bytes: jsonBytes({ messages, tools }) + 2000 };
+    };
+    let scope = guide.body.length <= LIMITS.contextChars && guideBytes <= 5000 ? 'full-guide' : 'section';
+    let units = scope === 'full-guide' ? guide.units : sectionUnits;
+    if (units.length > 64) { scope = 'section'; units = sectionUnits; }
+    let selected = render(units, scope, Math.max(5000, minimumTextBytes));
+    if (scope === 'full-guide' && selected.bytes > hardInputLimit) { scope = 'section'; units = sectionUnits; }
+    let minimum = render(units, scope, minimumTextBytes);
+    while (history.length && minimum.bytes > hardInputLimit) { history.shift(); minimum = render(units, scope, minimumTextBytes); }
+    // The desired tool allowance yields to required evidence. A large private
+    // attachment must not be rejected just to reserve hypothetical tool text.
+    const reserveTarget = Number.isSafeInteger(config.initialContextReserveBytes) && config.initialContextReserveBytes >= 0 ? config.initialContextReserveBytes : 4000;
+    const reserve = tools.length ? Math.min(reserveTarget, Math.max(0, hardInputLimit - minimum.bytes)) : 0;
+    const inputLimit = hardInputLimit - reserve;
+    if (minimum.bytes > hardInputLimit) reject('问题和必要资料超过本机的上下文预算，请缩短输入或调整本机模型上下文预算。选文所需的真实导读片段未被截掉。', 413);
+    if (scope === 'section') {
+      let low = minimumTextBytes, high = Math.max(5000, minimumTextBytes);
+      while (low < high) {
+        const middle = Math.ceil((low + high) / 2), candidate = render(units, scope, middle);
+        if (candidate.bytes <= inputLimit) low = middle; else high = middle - 1;
+      }
+      selected = render(units, scope, low);
+    }
+    const { sources, metadataJson } = selected;
     const context = { guideId: request.guideId, revision: request.revision, bodySha256: request.bodySha256, unitId: request.unitId,
       selection: request.selection ?? '', scope, metadataJson,
       historyTurnIds: history.map(turn => turn.id), webSearch: request.webSearch, model: config.modelId, toolEvents: [], catalogDigest: this.catalogDigest, indexGeneration: this.generation };
@@ -215,17 +284,71 @@ export class ContentIndex {
     const generation = context.indexGeneration ?? this.generation;
     if (['search_sources', 'read_source_unit', 'resolve_source_locator'].includes(name)) return this.runOriginal(name, args, sources, generation, context);
     if (name === 'read_section') {
-      object(args, ['guideId', 'revision', 'unitId']);
-      if (!isId(args.guideId) || !isRevision(args.revision) || !isId(args.unitId)) reject('章节工具参数无效。');
+      object(args, ['guideId', 'revision', 'unitId'], ['offset', 'maxChars']);
+      if (!isId(args.guideId) || !isRevision(args.revision) || !isId(args.unitId)
+        || args.offset !== undefined && (!Number.isSafeInteger(args.offset) || args.offset < 0 || args.offset > 1000000)
+        || args.maxChars !== undefined && (!Number.isSafeInteger(args.maxChars) || args.maxChars < 1 || args.maxChars > 16000)) reject('章节工具参数无效。');
       const pinned = this.index.db.prepare('SELECT value FROM state WHERE key=?').get(`catalog:${generation}`);
       if (pinned && !JSON.parse(pinned.value).entries.some(entry => entry.guideId === args.guideId && entry.revision === args.revision)) return { error: '该导读修订不在本轮固定目录中。' };
       const guide = this.get(args.guideId, args.revision), unit = guide?.units.find(item => item.id === args.unitId);
       if (!unit) return { error: '指定的文章章节不存在。请用 search_library 返回的精确 guideId/revision/unitId，不得猜测章节。' };
-      if (unit.text.length > 16000) return { error: '章节超过工具的 16000 字预算。请在对应章节中新建问答。' };
-      const preview = this.source(guide, unit, []);
-      const output = { source: preview, coverage: guide.metadata.coverage, sourceIdentity: guide.metadata.source, evidence: this.evidenceFor(`guide:${args.guideId}/${args.revision}:${args.unitId}`, generation) };
-      if (Buffer.byteLength(JSON.stringify(output)) > localResultBudget(context) / 1.12) return { error: '剩余资料预算不足以完整补读这个导读章节；未把未读部分加入证据。可在该章节开始较聚焦的新问题，或用原文工具按范围补读。' };
-      output.source = this.source(guide, unit, sources); return output;
+      const existing = sources.find(source => source.kind === 'guide' && source.url === sectionUrl(guide, unit));
+      const known = guideRanges(existing, unit), requestedOffset = args.offset ?? 0;
+      if (requestedOffset > unit.text.length || requestedOffset && /[\uDC00-\uDFFF]/u.test(unit.text[requestedOffset]) && /[\uD800-\uDBFF]/u.test(unit.text[requestedOffset - 1])) return { error: '导读偏移超出章节范围；请使用上一次返回的nextOffset。' };
+      const start = nextUnread(known, requestedOffset);
+      const firstGap = nextUnread(known);
+      if (start >= unit.text.length) return { sourceRef: existing?.id, alreadyRead: true, readRanges: known, nextOffset: firstGap < unit.text.length ? firstGap : null,
+        excerptOnly: firstGap < unit.text.length, scope: '请求位置之后的导读文本此前已读取；本次没有加入新证据。' };
+      let coverage = { coverage: guide.metadata.coverage, sourceIdentity: guide.metadata.source };
+      const identity = { guideId: guide.metadata.id, revision: guide.metadata.revision, bodySha256: guide.metadata.bodySha256 };
+      let initialMetadata;
+      try { initialMetadata = JSON.parse(context.metadataJson ?? '{}'); } catch { /* No reusable initial identity. */ }
+      if (context.guideId === identity.guideId && context.revision === identity.revision && context.bodySha256 === identity.bodySha256
+        && initialMetadata?.coverage && initialMetadata.source?.id === guide.metadata.source.id) {
+        coverage = { coverageRef: { ...identity, location: 'initial.metadata.coverage', sourceIdentityLocation: 'initial.metadata.source' } };
+      } else {
+        const at = (context.toolEvents ?? []).findIndex(event => {
+          try { const value = JSON.parse(event.resultJson); return value.coverage && value.source?.guideId === identity.guideId && value.source?.revision === identity.revision && value.source?.bodySha256 === identity.bodySha256; }
+          catch { return false; }
+        });
+        if (at >= 0) coverage = { coverageRef: { ...identity, toolEventIndex: at, location: 'coverage', sourceIdentityLocation: 'sourceIdentity' } };
+      }
+      const sourceId = existing?.id ?? `L${sources.filter(source => source.kind === 'guide').length + 1}`;
+      let sourceRef;
+      if (existing && coverage.coverageRef?.location === 'initial.metadata.coverage' && initialMetadata.guideRanges?.some(range => range.unitId === unit.id)) {
+        sourceRef = { sourceId, location: 'initial.sources' };
+      } else if (existing) {
+        for (const [at, event] of (context.toolEvents ?? []).entries()) {
+          let value; try { value = JSON.parse(event.resultJson); } catch { continue; }
+          if (value.source?.id === sourceId && value.source.guideId === guide.metadata.id) { sourceRef = { sourceId, toolEventIndex: at, location: 'source' }; break; }
+          const index = value.results?.findIndex(item => item.source?.id === sourceId && item.source.guideId === guide.metadata.id) ?? -1;
+          if (index >= 0) { sourceRef = { sourceId, toolEventIndex: at, resultIndex: index, location: 'results.source' }; break; }
+        }
+      }
+      const evidence = this.evidenceFor(`guide:${args.guideId}/${args.revision}:${args.unitId}`, generation);
+      const render = text => {
+        const range = { start, end: start + text.length, total: unit.text.length };
+        const readRanges = mergeRanges([...known, range]);
+        const next = nextUnread(readRanges, range.end), earliest = nextUnread(readRanges);
+        const nextOffset = next < unit.text.length ? next : earliest < unit.text.length ? earliest : null;
+        const fullSource = this.source(guide, unit, [], text, start); fullSource.id = sourceId;
+        const source = sourceRef ? { id: sourceId, kind: 'guide', text, readRanges: text.length ? [range] : [] } : fullSource;
+        return { source, ...(sourceRef ? { sourceRef } : {}), ...coverage, evidence, range, requestedOffset, excerptOnly: earliest < unit.text.length, nextOffset, indexGeneration: generation,
+          scope: '仅range新增片段；sourceRef/coverageRef复用已发送身份及覆盖限制，未读空隙不是证据。' };
+      };
+      // Do not resend a later already-read interval or silently fill the gap before it.
+      const later = known.find(range => range.start > start);
+      const available = unit.text.slice(start, Math.min(start + (args.maxChars ?? 16000), later?.start ?? unit.text.length));
+      const budget = localResultBudget(context);
+      let low = 0, high = Buffer.byteLength(available);
+      while (low < high) {
+        const middle = Math.ceil((low + high) / 2), candidate = render(utf8Prefix(available, middle));
+        if (resultBytes(candidate) <= budget) low = middle; else high = middle - 1;
+      }
+      const output = render(utf8Prefix(available, low));
+      if (!output.source.text || resultBytes(output) > budget) return { error: '本轮剩余预算不足以补读该导读片段，未把未读文本计作证据。请缩小问题或开始新问答。', indexGeneration: generation };
+      this.source(guide, unit, sources, output.source.text, start);
+      return output;
     }
     if (name === 'search_library') {
       object(args, ['query']);
@@ -238,14 +361,14 @@ export class ContentIndex {
         return { results: docs.slice(0, count).map(({ guide, unit }) => {
           const text = utf8Prefix(unit.text, bytes), source = this.source(guide, unit, [], text);
           source.id = sources.find(item => item.url === source.url)?.id ?? 'L' + (++nextId);
-          return { source, excerptOnly: text.length < unit.text.length, range: { start: 0, end: text.length, total: unit.text.length } };
+          return { source, excerptOnly: text.length < unit.text.length, range: { start: 0, end: text.length, total: unit.text.length }, nextOffset: text.length < unit.text.length ? text.length : null };
         }), candidateCount: hits.length, returnedCount: count, omittedCount: hits.length - count, indexGeneration: generation,
           scope: '固定代次的导读候选节选；范围见range。按本轮预算限制候选，不代表全面文献检索；可按需补读。' };
       };
       let count = hits.length, bytes = 500, output = render(count, bytes);
-      while (Buffer.byteLength(JSON.stringify(output)) > budget && bytes > 80) { bytes = Math.max(80, Math.floor(bytes / 2)); output = render(count, bytes); }
-      while (Buffer.byteLength(JSON.stringify(output)) > budget && count > 0) output = render(--count, bytes);
-      if (Buffer.byteLength(JSON.stringify(output)) > budget) return { error: '本轮剩余预算不足以加入更多导读候选；已有来源保持。' };
+      while (resultBytes(output) > budget && bytes > 80) { bytes = Math.max(80, Math.floor(bytes / 2)); output = render(count, bytes); }
+      while (resultBytes(output) > budget && count > 0) output = render(--count, bytes);
+      if (resultBytes(output) > budget) return { error: '本轮剩余预算不足以加入更多导读候选；已有来源保持。' };
       output.results.forEach((item, at) => { item.source.id = this.source(docs[at].guide, docs[at].unit, sources, item.source.text).id; });
       return output;
 

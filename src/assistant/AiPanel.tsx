@@ -19,7 +19,8 @@ import { Answer, AnswerIdentity, PreviousAnswer, Sources, TurnMaterial } from '.
 import './ai.css';
 
 type QuestionMaterial = { unitId: string; selection?: string };
-type SessionDraft = { question: string; conversationId?: string; webSearch: boolean; material?: QuestionMaterial; selectedMaterials?: MaterialSelection };
+type PendingRequest = { input: AskInput; accepted: boolean };
+type SessionDraft = { question: string; conversationId?: string; webSearch: boolean; material?: QuestionMaterial; selectedMaterials?: MaterialSelection; pendingRequest?: PendingRequest };
 export type TopicRequest = { explorationId: string; question?: string; notice?: string; nonce: number };
 /** A prepared question for a topic; applied once, after the panel is ready. */
 export type ResearchRequest = { explorationId: string; question: string; artifactIds?: string[]; autoSend?: boolean; nonce: number };
@@ -96,7 +97,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
   const [connecting, setConnecting] = useState(true);
   const [connectionError, setConnectionError] = useState('');
   const [error, setErrorValue] = useState('');
-  const [preflightFailure, setPreflightFailure] = useState<{ status: number; quick: boolean }>();
+  const [preflightFailure, setPreflightFailure] = useState<{ status: number; code?: string; quick: boolean; uncertain?: boolean }>();
   function setError(value: string) { setPreflightFailure(undefined); setErrorValue(value); }
   const [notice, setNotice] = useState('');
   const [quickRetry, setQuickRetry] = useState<{ question: string; turn?: AiTurn }>();
@@ -123,7 +124,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
   const alive = useRef(true), connectGeneration = useRef(0);
   const statusVersion = useRef(0);
   const connectedId = useRef(conversationId);
-  const pendingRequest = useRef<{ input: AskInput; accepted: boolean } | undefined>(undefined);
+  const pendingRequest = useRef<PendingRequest | undefined>(cached?.pendingRequest);
   const input = useRef<HTMLTextAreaElement>(null), messages = useRef<HTMLDivElement>(null);
   const nearBottom = useRef(true), fileInput = useRef<HTMLInputElement>(null);
   const currentUnit = guide?.units.find(item => item.id === unitId) ?? guide?.units[0];
@@ -168,11 +169,11 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
   }, [researchRequest?.nonce, connecting]);
 
   useEffect(() => {
-    if (question || selectedMaterials.notes.length || selectedMaterials.artifacts.length) keepDraft(draftKey, { question, conversationId, webSearch, material, selectedMaterials } satisfies SessionDraft);
+    if (question || selectedMaterials.notes.length || selectedMaterials.artifacts.length) keepDraft(draftKey, { question, conversationId, webSearch, material, selectedMaterials, pendingRequest: pendingRequest.current } satisfies SessionDraft);
     else clearDraft(draftKey);
     conversationSelections.set(guideKey, conversationId);
     if (exploration) writeSession(`paperdesk-ai-conversation:${guideKey}`, conversationId ?? '');
-  }, [draftKey, guideKey, question, conversationId, webSearch, material, selectedMaterials]);
+  }, [draftKey, guideKey, question, conversationId, webSearch, material, selectedMaterials, sending, preflightFailure]);
   useEffect(() => {
     alive.current = true; void connect();
     return () => { alive.current = false; connectGeneration.current++; controller.current?.abort(); transfer.current?.abort(); };
@@ -392,12 +393,12 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     } catch (reason) {
       if (alive.current) {
         requestRejected = !acceptedId && !abort.signal.aborted && reason instanceof AiApiError && reason.status >= 400 && reason.status < 600;
-        if (requestRejected) {
+        if (!acceptedId) {
           // This attempt was rejected before an accepted event. Keep the
           // composer instead of presenting a fabricated interrupted answer.
           setTurns(current => current.filter(turn => turn.id !== localId));
-          setError(errorText(reason));
-          setPreflightFailure({ status: (reason as AiApiError).status, quick: Boolean(quickQuestion) });
+          setError(abort.signal.aborted ? '已停止等待。请求状态尚未确认；可刷新历史核对，重发会沿用本次请求编号。' : errorText(reason));
+          setPreflightFailure({ status: reason instanceof AiApiError ? reason.status : 0, code: reason instanceof AiApiError ? reason.code : undefined, quick: Boolean(quickQuestion), uncertain: !requestRejected });
         } else {
           update(turn => ({ ...turn, status: 'interrupted' }));
           setError(abort.signal.aborted ? '已停止接收回答。问题仍保留；刷新对话可确认服务端最终保存的内容。' : errorText(reason));
@@ -434,6 +435,12 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     if (value && !material && currentUnit) setMaterial({ unitId: currentUnit.id, selection });
     if (!value) setMaterial(undefined);
     setQuestion(value);
+  }
+  function omitSelection() {
+    if (!unit || locked) return;
+    setMaterial({ unitId: unit.id }); pendingRequest.current = undefined; setError('');
+    setNotice('已取消附带选文，问题仍保留；再次发送时会使用这篇导读和固定章节。');
+    input.current?.focus();
   }
   turnsRef.current = turns;
   async function runCommand(turn: AiTurn, owner = connectedId.current) {
@@ -568,7 +575,16 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
       {hasRunning && !sending && <div className="ai-service-state"><p>这段对话仍标记为处理中，可能来自另一个页面或中断的连接。刷新后可恢复已保存内容。</p><button type="button" disabled={busy} className="ai-inline-action" onClick={() => void refresh()}>刷新对话</button></div>}
     </div>
     <form className="ai-composer" onSubmit={event => { event.preventDefault(); void send(); }}>
-      {error && <div className="ai-error" role="alert">{preflightFailure && <><strong>提问准备失败</strong><p>{preflightFailure.status === 413 ? '本轮请求未发送给模型。' : preflightFailure.status >= 500 ? '本次提问未能正常开始，服务返回了错误。' : '本次提问请求未被接收。'}{preflightFailure.quick ? '原有问题草稿仍保留。' : '问题保留在输入框中，可调整后重新发送。'}</p></>}<p>{error}</p>{preflightFailure && !preflightFailure.quick && <button type="button" disabled={locked || !ready || hasRunning || selectionTooLong || !question.trim() || question.length > 6000} onClick={() => void send()}>重新发送</button>}{conversationId && <button type="button" disabled={locked} onClick={() => void refresh()}>刷新对话</button>}{preflightFailure?.status !== 413 && <button type="button" disabled={locked} onClick={() => void connect()}>重试连接</button>}<button type="button" disabled={locked} onClick={() => setSettingsOpen(true)}>AI 设置</button></div>}
+      {error && <div className="ai-error" role="alert">
+        {preflightFailure && <><strong>{preflightFailure.uncertain ? '请求状态尚未确认' : '提问准备失败'}</strong><p>{preflightFailure.uncertain ? '尚未收到接收确认，可刷新历史核对。重发会沿用本次请求编号，服务端会核对已有请求。' : preflightFailure.status === 413 ? '本轮请求未发送给模型。' : preflightFailure.status >= 500 ? '本次提问未能正常开始，服务返回了错误。' : '本次提问请求未被接收。'}{preflightFailure.quick ? '原有问题草稿仍保留。' : '问题保留在输入框中，可调整后重新发送。'}</p></>}
+        <p>{error}</p>
+        {preflightFailure?.code === 'selection_mismatch' && questionSelection && <button type="button" disabled={locked} onClick={omitSelection}>不附带选文，保留问题</button>}
+        {preflightFailure && guide && <button type="button" disabled={locked} onClick={() => setMaterialOpen(true)}>调整提问资料</button>}
+        {preflightFailure && !preflightFailure.quick && <button type="button" disabled={locked || !ready || hasRunning || selectionTooLong || !question.trim() || question.length > 6000} onClick={() => void send()}>重新发送</button>}
+        {conversationId && <button type="button" disabled={locked} onClick={() => void refresh()}>刷新对话</button>}
+        {preflightFailure?.status !== 413 && preflightFailure?.code !== 'selection_mismatch' && <button type="button" disabled={locked} onClick={() => void connect()}>重试连接</button>}
+        {preflightFailure?.code !== 'selection_mismatch' && <button type="button" disabled={locked} onClick={() => setSettingsOpen(true)}>AI 设置</button>}
+      </div>}
       {notice && <p className="ai-notice" role="status">{notice}</p>}
       {loginPending && <p className="ai-notice" role="status">正在等待 ChatGPT 授权。完成或取消这次登录后即可发送，问题草稿仍保留。</p>}
       {selectionTooLong && <p className="ai-error" role="alert">选文超过 12,000 字符。请打开“资料”，选择“不附带选文”，或改用较短的当前选文；没有自动截断。</p>}
@@ -593,7 +609,7 @@ function AiPanelContent({ guide, unitId, selection, exploration, suggestedQuesti
     {materialOpen && guide && unit && <Dialog title="本次提问资料" className="ai-material-dialog ai-small-dialog" onClose={() => setMaterialOpen(false)}>
       <p className="ai-guide-title">{guide.metadata.title}<span>导读 r{guide.metadata.revision} · {unit.heading ?? '阅读起点'}</span></p>
       <dl className="ai-material-list"><div><dt>随问题发送</dt><dd>本篇导读（按本轮预算可能仅发送开篇与提问章节，必要时为节选）、来源与覆盖说明，以及预算内最多 6 轮近期对话。精确范围保存在每轮「提问时的资料」中。</dd></div><div><dt>按需取证</dt><dd>提问后可检索已明确导入的固定原文文本，来源区分导读、原文与网页摘录；未取得或未核验的部分会保留缺口。</dd></div><div><dt>不包含</dt><dd>{exploration ? '其他探索、未选笔记和阅读历史；不会自动下载原论文。' : '个人笔记、探索记录和阅读历史；不会自动下载原论文。'}</dd></div></dl>
-      {questionSelection && <section className="ai-selected-material"><h3>附带选文</h3><blockquote>{questionSelection}</blockquote><button type="button" className="ai-inline-action" disabled={locked} onClick={() => setMaterial({ unitId: unit.id })}>不附带选文</button></section>}
+      {questionSelection && <section className="ai-selected-material"><h3>附带选文</h3><blockquote>{questionSelection}</blockquote><button type="button" className="ai-inline-action" disabled={locked} onClick={omitSelection}>不附带选文</button></section>}
       <p className="ai-fine-print">AI 可以继续查找本地书库与相关导读章节。改变阅读位置不会替换正在编辑或已发出问题的资料。</p>
       {status?.provider === 'chatgpt' && status.apiConfigured && status.chatgpt.fallbackToApi && <p className="ai-fine-print">订阅或此应用额度用尽时，同一问题与资料会转交已配置的备用 API，可能产生 API 费用。</p>}
     </Dialog>}

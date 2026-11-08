@@ -102,11 +102,29 @@ export function Library({ home = false }: { home?: boolean }) {
   const [storageError, setStorageError] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const layoutRef = useRef<HTMLDivElement>(null);
+  const returningRow = useRef<string | undefined>(undefined);
   const entries = contentRepository.list();
   const guideMark = (id: string) => { const status = marks.guides.get(id)?.status; return !status || status === 'unread' ? 'unmarked' : status; };
   const filtered = entries.filter(({ guide }) => (category === 'all' || (category === 'survey' ? guide.metadata.type === 'survey' : guide.metadata.type !== 'survey')) && matchesTitleOrTopic(guide, query) && (!markFilter || guideMark(guide.metadata.id) === markFilter));
   const selected = filtered.find(entry => entry.guide.metadata.id === selectedId);
   const detailOpen = Boolean(selected);
+  useLayoutEffect(() => {
+    if (detailOpen || !returningRow.current) return;
+    const id = returningRow.current;
+    returningRow.current = undefined;
+    // Closing the preview changes every shelf row's width and the page height.
+    // Recheck after that reflow and navigation's focus restore, so scroll
+    // anchoring cannot leave the focused article outside the viewport.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => {
+        const row = document.getElementById(`choose-${id}`);
+        if (!row || document.activeElement !== row) return;
+        const bounds = row.getBoundingClientRect();
+        if (bounds.top < 0 || bounds.bottom > window.innerHeight) row.scrollIntoView({ block: 'nearest' });
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [detailOpen]);
   useLayoutEffect(() => {
     const layout = layoutRef.current;
     const row = selected && document.getElementById(`choose-${selected.guide.metadata.id}`);
@@ -175,6 +193,7 @@ export function Library({ home = false }: { home?: boolean }) {
   }
   function returnToList() {
     const id = selected?.guide.metadata.id;
+    returningRow.current = id;
     change({ article: null }, false, { focusId: `choose-${id}`, scrollToId: `choose-${id}` });
   }
   const latest = [...resumes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];

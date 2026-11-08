@@ -8,13 +8,16 @@ export const toolArgumentLimit = name => researchWriteTools.has(name) ? 40000 : 
 const functionTool = (name, description, properties, required) => ({ type: 'function', function: { name, description, parameters: { type: 'object', properties, required, additionalProperties: false } } });
 export function availableTools(webSearch, research = false, command = undefined) {
   const tools = [functionTool('search_library', '按关键词搜索本地已审核的压缩导读。返回有固定版本的章节节选，非原论文全文。', { query: { type: 'string', maxLength: 300 } }, ['query']),
-    functionTool('read_section', '读取本地导读的一个精确章节。guideId/revision/unitId 必须来自已有上下文或搜索结果。', { guideId: { type: 'string' }, revision: { type: 'integer' }, unitId: { type: 'string' } }, ['guideId', 'revision', 'unitId']),
+    functionTool('read_section', '按预算补读固定导读章节。ID来自已有资料；offset为章节UTF16偏移，按返回nextOffset续读；range/excerptOnly表明实际范围，未读部分不能作证据。', { guideId: { type: 'string' }, revision: { type: 'integer' }, unitId: { type: 'string' }, offset: { type: 'integer', minimum: 0, maximum: 1000000 }, maxChars: { type: 'integer', minimum: 1, maximum: 16000 } }, ['guideId', 'revision', 'unitId']),
     functionTool('search_sources', '检索已明确导入的固定原文文本；具体数字、公式、图表或导读缺口优先使用。单篇请传 metadata.paperId；英语论文优先将问题改写为英语领域关键词，保留模型/数据集/图表编号，不能加入猜测答案。最多12个候选，按剩余预算返回节选并明确omittedCount；materials共享固定身份，结果material指向该表。补读时从表中取sourceRevisionId/parserRevision，从结果取sourceUnitId；证据不全可一次改写或按nextOffset补读。', { query: { type: 'string', maxLength: 300 }, paperId: { type: 'string' }, limit: { type: 'integer', minimum: 1, maximum: 12 } }, ['query']),
     ...['read_source_unit', 'resolve_source_locator'].map(name => functionTool(name, '读取原文单元及真实章节/PDF物理页定位。三个ID来自本轮materials身份表和结果sourceUnitId，不得猜测。offset为单元内UTF16偏移，优先使用上次nextOffset；maxChars可缩小片段。返回实际range/partial/nextOffset，不得把节选当完整单元。', { sourceRevisionId: { type: 'string' }, parserRevision: { type: 'string' }, sourceUnitId: { type: 'string' }, offset: { type: 'integer', minimum: 0, maximum: 100000 }, maxChars: { type: 'integer', minimum: 1, maximum: 20000 } }, ['sourceRevisionId', 'parserRevision', 'sourceUnitId']))];
   if (webSearch) tools.push(functionTool('web_search', '搜索公开网页，获取有限的检索摘录。只有本轮读者已开启联网搜索时可用，不下载原论文。', { query: { type: 'string', maxLength: 300 } }, ['query']));
   if (research) tools.push(
     functionTool('search_topic_history', '用多个领域关键词或中文短语检索当前研究主题内的旧讨论；返回相关度排序的最多八条摘要及可继续读取的问答ID，预算不足声明遗漏。旧模型回答不是论文证据。', {query:{type:'string',maxLength:300}}, ['query']),
-    functionTool('read_topic_turn', '回看当前主题内指定已完成问答及来源摘录；不得猜测其他主题的编号。', {turnId:{type:'string'}}, ['turnId']),
+    functionTool('read_topic_turn', '回看当前主题内指定已完成问答及来源摘录；不得猜测其他主题的编号。', {turnId:{type:'string'}}, ['turnId']));
+  // File generation and notebook edits have their own explicit write contract.
+  // Offering a direction mutation here wastes budget and invites unrelated writes.
+  if (research && command?.name !== 'reading-brief' && command?.name !== 'notebook') tools.push(
     functionTool('propose_research_changes', '提出研究记录的修改。读者输入 /方向 时界面会直接写入；其他时候是待读者采纳的草案，不能声称已保存。读者表达继续研究的兴趣、比较方向、作出取舍或要求整理时使用；普通概念答疑不调用。可改写标题、阶段、问题、解释、未知、范围、约束、候选、暂缓，设置下一步，或追加决定。只有读者在讨论中明确表达的选择才写成 adopted/rejected 决定，你的建议写进候选方向或 deferred 决定。不把假设写成已验证结果。citationIds只能来自本轮已读来源；下一步的导读位置只能来自本轮读取过的导读章节。', {
       changes:{type:'array',minItems:1,maxItems:12,items:{anyOf:[{type:'object',properties:{kind:{const:'set-field'},field:{enum:['title','stage','question','interpretation','unknowns','scope','constraints','candidates','deferred']},value:{type:'string',maxLength:12000}},required:['kind','field','value'],additionalProperties:false},
         {type:'object',properties:{kind:{const:'set-next-action'},action:{type:'object',properties:{kind:{enum:['read-guide','check-concept','compare-evidence','search-literature']},description:{type:'string',maxLength:2000},target:{type:'object',properties:{guideId:{type:'string'},revision:{type:'integer'},unitId:{type:'string'}},required:['guideId','revision','unitId'],additionalProperties:false}},required:['kind','description'],additionalProperties:false}},required:['kind','action'],additionalProperties:false},{type:'object',properties:{kind:{const:'add-decision'},decision:{type:'object',properties:{kind:{enum:['interpretation','hypothesis','constraint','direction','next-step']},status:{enum:['adopted','deferred','rejected']},text:{type:'string'},rationale:{type:'string'},supersedes:{type:'string'}},required:['kind','status','text','rationale'],additionalProperties:false}},required:['kind','decision'],additionalProperties:false}]}},
@@ -41,6 +44,7 @@ export const SYSTEM_PROMPT = `你是 PaperDesk 的论文阅读助手，用中文
 你得到的是已审核的“压缩导读”，而非原论文全文。未获取原文时不得声称读过原论文；全文导读也不等于论文全文。
 按问题需要明确区分“导读中的事实”“补充解释”“推断或待核对之处”。保留原论文条件、年代、范围、覆盖缺口和出处，不能把相关性变成因果性或研究空白。
 对具体事实引用本轮真实来源编号，如 [L1]（导读章节）、[O1]（固定原文单元）或 [W1]（网页摘录）。不要编造来源编号、URL、论文、数字或未读取的内容。旧对话中的编号不属于本轮，必要时重新检索对应资料。
+来源编号或引用标签存在不等于已读取其正文，也不证明支持某条断言。具体页码、实验条件和引用内容只依据本轮实际取得的文本与定位；不能从目录、标题或摘要标签推断已读，资料不足时不得猜测页码或位置。
 涉及具体实验数字、证明假设、公式/图表细节或导读未覆盖问题，先用 search_sources 限定论文，再 read_source_unit 补读；无材料明确说只有导读。原文单元是解析文本，unreviewed不意味着学术核验，图注不代表看到图像。补充教学例子明确为构造例子。
 搜索英文原文时把中文问题改写为简短英语领域关键词，保留模型、数据集、公式和图表编号，不把猜测的答案放进搜索词。首次结果不足时，在剩余预算内换一组关键词或补读相关单元，再判断资料是否不足；不要把一次未命中当成论文没有讨论。已能从现有材料回答的部分先回答，只指出影响结论的具体缺口。
 对研究探索先界定问题与约束，分开文献支持、分析与待验证假设。优先给一至两个有依据的方向和一个可执行的下一步；读者要验证或设计实验时，再展开最小实验、baseline、数据和预算控制、指标、混杂因素与反证条件。资源未知明确待确定；没有命中不等于领域空白，不保证新颖性或发表。资料不足可以给查证计划而不强造方向。跨篇数字先检查任务、数据、模型、时间与计算预算是否可比。

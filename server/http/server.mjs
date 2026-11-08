@@ -22,7 +22,7 @@ export function checkBrowserRequest(request, token, requireToken = true) {
   if (requireToken) {
     const provided = request.headers['x-paperdesk-token'];
     if (typeof provided !== 'string' || Buffer.byteLength(provided) !== Buffer.byteLength(token)
-      || !timingSafeEqual(Buffer.from(provided), Buffer.from(token))) reject('AI 会话令牌已失效，请刷新页面。', 403);
+      || !timingSafeEqual(Buffer.from(provided), Buffer.from(token))) reject('AI 会话令牌已失效，请重试连接。问题草稿仍保留。', 403, 'connection_stale');
   }
 }
 async function readJson(request, limit) {
@@ -351,7 +351,7 @@ export function createAiServer(dependencies) {
         if (response.headersSent && !response.writableEnded) response.end();
       }
     } catch (error) {
-      if (!response.headersSent) json(response, error instanceof PublicError ? error.status : 500, { message: publicMessage(error) });
+      if (!response.headersSent) json(response, error instanceof PublicError ? error.status : 500, { message: publicMessage(error), ...(error instanceof PublicError && error.code ? { code: error.code } : {}) });
       else if (!response.writableEnded) response.end();
     }
   });

@@ -8,7 +8,7 @@ export const STAGE_LABELS: Readonly<Record<ResearchStage,{label:string;doing:str
 export const READING_BRIEF: Readonly<{label:string;fileName:string;sections:ReadingBriefSection[]}>;
 export function parseCommand(text:string):ParsedCommand|null;
 export function validCommand(value:unknown):value is ResearchCommand;
-export function commandInstruction(command:ResearchCommand, options:{linked:boolean}):string;
+export function commandInstruction(command:ResearchCommand, options:{linked:boolean;compact?:boolean;outputTokens?:number}):string;
 export function readingBriefTitle(markdown:string):string|null;
 export function checkDocumentSections(markdown:string):{present:string[];missing:string[]};
 export function documentPreamble(input:{purpose?:BriefPurpose;savedAt:string;containerTitle:string;workflows?:{path:string;sha256:string}[]}):string;

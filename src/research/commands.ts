@@ -47,11 +47,16 @@ export async function commandOutcome(turn: AiTurn, linked?: Exploration): Promis
   if (command.name === 'direction') {
     if (turn.context?.directionDraft) { const record = await createdFrom(turn.id); return record ? { kind: 'direction-created', record } : { kind: 'pending' }; }
     const proposal = turn.context?.researchProposals?.[0];
-    if (!proposal || !linked) return { kind: 'declined' };
-    return linked.research?.appliedProposalIds.includes(proposal.id) ? { kind: 'direction-updated', record: linked, proposal } : { kind: 'pending' };
+    if (!proposal) return { kind: 'declined' };
+    const owner = await personalStore.get('explorations', proposal.explorationId);
+    return owner?.research?.appliedProposalIds.includes(proposal.id) ? { kind: 'direction-updated', record: owner, proposal } : { kind: 'pending' };
   }
   if (!briefTopic(turn)) return { kind: 'declined' };
-  const owner = linked ?? (await personalStore.list('explorations')).find(item => item.research?.artifacts?.some(artifact => artifact.sourceTurnId === turn.id));
+  const topic = turn.context?.researchSnapshot?.explorationId;
+  const scope = turn.context?.conversationScope as { kind?: string; explorationId?: string } | undefined;
+  const originalTopic = topic ?? (scope?.kind === 'exploration' ? scope.explorationId : undefined);
+  const owner = originalTopic ? await personalStore.get('explorations', originalTopic)
+    : (await personalStore.list('explorations')).find(item => item.research?.artifacts?.some(artifact => artifact.sourceTurnId === turn.id));
   const artifact = owner?.research?.artifacts?.find(item => item.sourceTurnId === turn.id);
   return owner && artifact ? { kind: 'brief-saved', record: owner, artifact, missing: checkDocumentSections(artifact.body).missing } : { kind: 'pending' };
 }
@@ -78,19 +83,27 @@ export async function applyCommandTurn(turn: AiTurn, { linked, conversation, con
       // The discussion that led here travels with the new direction as a short, labeled excerpt.
       const earlier = conversation.filter(item => item.id !== turn.id && item.status === 'complete' && item.answer && !item.context?.command);
       const seedDiscussion = guide && conversationId && earlier.length ? createSeedDiscussion({ conversationId, guideId: guide.metadata.id, revision: guide.metadata.revision, guideTitle: guide.metadata.title, turns: earlier }) : undefined;
-      const base = createExploration();
+      // The turn already has a stable UUID: concurrent history replays must create the same record.
+      const base = { ...createExploration(), id: turn.id };
       const fields = { ...base, title: draft.title.trim(), question: draft.question.trim(), status: 'exploring' as const, interpretation: draft.interpretation, unknowns: draft.unknowns, nextAction: draft.nextAction,
         research: { ...emptyResearchState(), scope: draft.scope, constraints: draft.constraints, candidates: draft.candidates, deferred: draft.deferred, stage: draft.stage, createdFromTurnId: turn.id, ...(seedDiscussion ? { seedDiscussion } : {}) } };
       // The working paper starts from what the discussion established, written by the same turn.
       const body = appendStageEntry(templateFromRecord(fields), new Date().toLocaleDateString('sv-SE'), `建立方向：${fields.question}`);
       const notebook = appendNotebookVersion(undefined, body, { author: 'assistant', sourceTurnId: turn.id, note: '由 /方向 建立方向时整理' });
-      const record = await personalStore.saveExploration({ ...fields, research: { ...fields.research, notebook } }, null);
+      let record: Exploration;
+      try { record = await personalStore.saveExploration({ ...fields, research: { ...fields.research, notebook } }, null); }
+      catch (error) {
+        const committed = await createdFrom(turn.id);
+        if (!committed) throw error;
+        record = committed;
+      }
       return { kind: 'direction-created', record };
     }
     const candidate = turn.context?.researchProposals?.[0];
-    if (!candidate || !linked) return { kind: 'declined' };
+    if (!candidate) return { kind: 'declined' };
     const proposal = validateResearchProposal(candidate);
-    if (proposal.explorationId !== linked.id || proposal.sourceTurnId !== turn.id) return { kind: 'declined' };
+    if (proposal.explorationId !== turn.context?.researchSnapshot?.explorationId || proposal.sourceTurnId !== turn.id) throw Error('这份方向更新没有一致的原方向快照，未保存。');
+    if (linked && proposal.explorationId !== linked.id) throw Error('这份更新属于另一个研究方向，未保存。');
     const record = await personalStore.adoptResearchProposal(proposal);
     return { kind: 'direction-updated', record, proposal };
   }
@@ -102,16 +115,12 @@ export async function applyCommandTurn(turn: AiTurn, { linked, conversation, con
   if (snapshotTopic && scopeTopic && snapshotTopic !== scopeTopic) throw new Error('这份选文回答的方向身份不一致，未保存。');
   const originalTopic = snapshotTopic ?? scopeTopic;
   if (originalTopic && linked && linked.id !== originalTopic) throw new Error('这份选文回答属于另一个方向，未保存。');
-  let owner = originalTopic ? await personalStore.get('explorations', originalTopic)
-    : linked ?? (await personalStore.list('explorations')).find(item => item.research?.artifacts?.some(artifact => artifact.sourceTurnId === turn.id));
+  const owner = originalTopic ? await personalStore.get('explorations', originalTopic)
+    : (await personalStore.list('explorations')).find(item => item.research?.artifacts?.some(artifact => artifact.sourceTurnId === turn.id));
   if (originalTopic && !owner) throw new Error('原来关联的研究方向已不存在；回答仍保留在 AI 历史中，未建立新的阅读积累。');
-  if (!owner) {
-    // A learning goal without a direction gets its own entry under 阅读积累.
-    const base = createExploration();
-    const goal = turn.question.replace(/^\s*\/(选文|brief)(\s+(积累|推进))?/u, '').trim();
-    owner = await personalStore.saveExploration({ ...base, title: titleFromQuestion(topic), question: goal || topic, research: { ...emptyResearchState(), purpose: 'accumulation' } }, null);
-  }
-  const current = await personalStore.get('explorations', owner.id) ?? owner;
+  // A later UI association cannot change the destination of an already completed unlinked request.
+  const goal = turn.question.replace(/^\s*\/(选文|brief)(\s+(积累|推进))?/u, '').trim();
+  const current = owner ?? { ...createExploration(), id: turn.id, title: titleFromQuestion(topic), question: goal || topic, research: { ...emptyResearchState(), purpose: 'accumulation' as const } };
   const { record, artifact } = await saveReadingBrief(current, turn, command.purpose, topic);
   return { kind: 'brief-saved', record, artifact, missing: checkDocumentSections(artifact.body).missing };
 }

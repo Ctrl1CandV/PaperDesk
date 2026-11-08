@@ -13,6 +13,7 @@ import { TermHint } from './TermHint';
 import { remarkTerms } from './remark-terms';
 import { englishGlossaryMatcher, glossaryMatcher } from '../content/glossary';
 import { isSafeExternalUrl } from '../../shared/content-policy.mjs';
+import { readingMathText } from '../../shared/reading-text.mjs';
 
 function textOf(children: ReactNode): string {
   return Children.toArray(children).map(child => typeof child === 'string' || typeof child === 'number' ? String(child) : isValidElement<{ children?: ReactNode }>(child) ? textOf(child.props.children) : '').join('');
@@ -24,10 +25,10 @@ function citationDisplay(label: string) {
 export function Formula({ source, display, language = 'zh' }: { source: string; display: boolean; language?: 'zh' | 'en' }) {
   try {
     const html = katex.renderToString(source, { displayMode: display, trust: false, strict: 'error', throwOnError: true, maxExpand: 200, maxSize: 20, macros: {} });
-    if (!display) return <span className="inline-formula" dangerouslySetInnerHTML={{ __html: html }} />;
-    return <span className="formula-block"><span className="formula-scroll" role="region" tabIndex={0} aria-label={language === 'en' ? 'Formula, horizontally scrollable' : '公式，可横向滚动'} dangerouslySetInnerHTML={{ __html: html }} /><span className="overflow-hint">{language === 'en' ? 'Long formulas can scroll horizontally; focus and use the arrow keys.' : '长公式可横向滚动，键盘聚焦后用方向键查看。'}</span></span>;
+    if (!display) return <span className="inline-formula" data-reading-text={readingMathText(source)} dangerouslySetInnerHTML={{ __html: html }} />;
+    return <span className="formula-block" data-reading-text={readingMathText(source, true)}><span className="formula-scroll" role="region" tabIndex={0} aria-label={language === 'en' ? 'Formula, horizontally scrollable' : '公式，可横向滚动'} dangerouslySetInnerHTML={{ __html: html }} /><span className="overflow-hint">{language === 'en' ? 'Long formulas can scroll horizontally; focus and use the arrow keys.' : '长公式可横向滚动，键盘聚焦后用方向键查看。'}</span></span>;
   } catch {
-    return <span className="formula-error">{language === 'en' ? 'Formula could not be displayed:' : '公式未能显示：'}<code>{source}</code></span>;
+    return <span className="formula-error" data-reading-text={readingMathText(source, display)}>{language === 'en' ? 'Formula could not be displayed:' : '公式未能显示：'}<code>{source}</code></span>;
   }
 }
 export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCitation, language = 'zh' }: {
@@ -54,7 +55,7 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
       a: ({ href, children }) => {
         if (!href) return <span>{children}</span>;
         const citation = guide.metadata.citations.find(item => item.url === href);
-        if (citation) { const label = textOf(children); return <button id={`${unitId}-citation-${citationIndex++}`} className="citation-button" aria-label={label} title={label} onClick={event => onCitation(citation, label, event.currentTarget)}><span aria-hidden="true" className="citation-display">{citationDisplay(label)}<span className="citation-arrow">↗</span></span><span className="visually-hidden">{children}</span></button>; }
+        if (citation) { const label = textOf(children); return <button id={`${unitId}-citation-${citationIndex++}`} className="citation-button" data-reading-text={label} aria-label={label} title={label} onClick={event => onCitation(citation, label, event.currentTarget)}><span aria-hidden="true" className="citation-display">{citationDisplay(label)}<span className="citation-arrow">↗</span></span><span className="visually-hidden">{children}</span></button>; }
         const related = contentRepository.resolveRelated(guide, href);
         if (related) return <AppLink id={`${unitId}-related-${href.replace('.md', '')}`} to={related}>{children}<span aria-hidden="true"> →</span></AppLink>;
         return <span>{children}</span>;
@@ -62,7 +63,7 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
       img: ({ src, alt, title }) => {
         const figure = typeof src === 'string' ? contentRepository.figure(guide.metadata.id, guide.metadata.revision, src) : undefined;
         const asset = typeof src === 'string' ? guide.metadata.assets.find(item => item.path === src) : undefined;
-        return figure ? <PaperFigure figure={{ ...figure, alt: alt || asset?.alt || figure.alt, rights: asset?.rights || figure.rights }} caption={title ?? undefined} language={language} /> : <span className="content-fallback">{alt ? `${language === 'en' ? 'Image' : '图片'}：${alt}` : (language === 'en' ? 'No local image available' : '未提供可显示的本地图片')}</span>;
+        return figure ? <PaperFigure figure={{ ...figure, alt: alt || asset?.alt || figure.alt, rights: asset?.rights || figure.rights }} caption={title ?? undefined} language={language} /> : <span className="content-fallback" data-reading-ignore>{alt ? `${language === 'en' ? 'Image' : '图片'}：${alt}` : (language === 'en' ? 'No local image available' : '未提供可显示的本地图片')}</span>;
       },
       pre: ({ children }) => <div className="code-block">{children}</div>,
       code: ({ className, children }) => {

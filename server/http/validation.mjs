@@ -4,9 +4,9 @@ import { canonicalResearch, validateResearchSnapshot, validateResearchProposal, 
 import { validateResearchMaterials } from '../../shared/research-materials.mjs';
 import { validCommand } from '../../shared/research-documents.mjs';
 export class PublicError extends Error {
-  constructor(message, status = 400) { super(message); this.status = status; }
+  constructor(message, status = 400, code) { super(message); this.status = status; if (code) this.code = code; }
 }
-export const reject = (message, status) => { throw new PublicError(message, status); };
+export const reject = (message, status, code) => { throw new PublicError(message, status, code); };
 export const isUuid = value => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 export const isId = value => typeof value === 'string' && /^[a-z0-9][a-z0-9-]{0,99}$/.test(value);
 export const isHash = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
@@ -97,7 +97,7 @@ export function validateSource(source) {
   if (!/^[LWO][1-9]\d{0,3}$/.test(source.id) || !['guide', 'web', 'original'].includes(source.kind)
     || !isText(source.title, 1000, 1) || !isText(source.text, 100000)
     || source.version !== undefined && source.version !== null && !isText(source.version, 100)) reject('来源快照无效。');
-  if (source.kind !== 'original' && originalFields.some(key => Object.hasOwn(source, key))) reject('来源类型与原文字段不一致。');
+  if (source.kind !== 'original' && originalFields.some(key => key !== 'readRanges' && Object.hasOwn(source, key)) || source.kind === 'web' && source.readRanges !== undefined) reject('来源类型与原文字段不一致。');
   if (source.kind === 'original') {
     if (!source.id.startsWith('O') || !safeWebUrl(source.url) || !isText(source.paperId, 200, 1) || !isId(source.sourceRevisionId)
       || !isHash(source.materialSha256) || !isHash(source.parserRevision) || !isId(source.sourceUnitId)
@@ -121,6 +121,15 @@ export function validateSource(source) {
   } else if (source.kind === 'guide') {
     if (!source.id.startsWith('L') || !isId(source.guideId) || !isRevision(source.revision) || !isId(source.unitId)
       || source.url !== `/read/${source.guideId}/${source.revision}#${source.unitId}`) reject('导读来源定位无效。');
+    if (source.readRanges !== undefined) {
+      if (!Array.isArray(source.readRanges) || !source.readRanges.length || source.readRanges.length > 32) reject('导读读取范围无效。');
+      let previousEnd = -1, total;
+      for (const range of source.readRanges) {
+        object(range, ['start', 'end', 'total']);
+        if (![range.start, range.end, range.total].every(Number.isSafeInteger) || range.start < 0 || range.end <= range.start || range.end > range.total || range.total > 1000000 || range.start <= previousEnd || total !== undefined && total !== range.total) reject('导读读取范围无效。');
+        previousEnd = range.end; total = range.total;
+      }
+    }
   } else if (!source.id.startsWith('W') || !safeWebUrl(source.url) || source.guideId !== undefined || source.revision !== undefined || source.unitId !== undefined) reject('网页来源定位无效。');
 }
 // A snapshot is deliberately data-only. Metadata is preserved as a bounded JSON string,

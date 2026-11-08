@@ -33,7 +33,7 @@ function Compare({ conflict, onClose }: { conflict: ExplorationFileConflict; onC
 
 /** Application-wide controller; only research/backup pages display routine status. */
 export function ExplorationSync() {
-  const location = useLocation(), [state, setState] = useState(explorationFileState), [open, setOpen] = useState<ExplorationFileConflict>();
+  const location = useLocation(false), [state, setState] = useState(explorationFileState), [open, setOpen] = useState<ExplorationFileConflict>();
   useEffect(() => { const unsubscribe = subscribeExplorationFiles(() => setState(explorationFileState())); const stop = startExplorationFileSync(); return () => { unsubscribe(); stop(); }; }, []);
   const relevant = location.startsWith('/explore') || location.startsWith('/backup');
   if (!relevant && state.phase !== 'conflict') return null;

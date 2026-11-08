@@ -47,6 +47,7 @@ function assertGuideContext(prepared, guide, active) {
     const unit = guide.units.find(item => item.id === range.unitId), source = prepared.sources.find(item => item.unitId === range.unitId);
     assert.equal(range.start, 0); assert.equal(range.total, unit.text.length);
     assert.equal(source.text, unit.text.slice(0, range.end));
+    assert.deepEqual(source.readRanges, [{ start: range.start, end: range.end, total: range.total }]);
     assert.equal(range.excerptOnly, range.end < range.total);
   }
   assert.equal(metadata.metadataProjection.scope, 'bibliography-and-selected-guide-units');
@@ -56,6 +57,8 @@ function assertGuideContext(prepared, guide, active) {
   assert.equal(metadata.metadataProjection.omittedReadingTargets + (metadata.orientation?.readingTargets.length ?? 0), guide.metadata.orientation?.readingTargets.length ?? 0);
   assert.equal(metadata.metadataProjection.omittedCitations + metadata.citations.length, guide.metadata.citations.length);
   for (const citation of metadata.citations) assert.deepEqual(citation, guide.metadata.citations.find(item => item.url === citation.url));
+  assert.equal(metadata.metadataProjection.citationScope, 'only-sent-guide-ranges');
+  assert.ok(metadata.citations.every(citation => prepared.sources.some(source => source.text.includes(citation.url))));
 }
 
 function finalResponse(provider) {

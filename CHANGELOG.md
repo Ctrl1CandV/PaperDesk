@@ -1,5 +1,14 @@
 # Changelog
 
+## Assistant reliability and adaptive reading — 2026-11-08
+
+- Fixed passage validation across formulas, tables and paragraph boundaries, and official ChatGPT streams whose terminal output array is empty after completed output items.
+- Budgeted real guide/research context and pending structured writes; added range-based guide reads and compact, complete reading-selection files without raising saved model limits.
+- Preserved drafts and request identity across panel reopening, made research saves atomic and idempotent, and retained the original direction when saving historical results.
+- Expanded prose when the AI panel closes; fixed library return visibility and duplicate navigation restoration.
+- Recorded the 2026-11-06 checks: 582 Node tests, 224 browser tests, 75 related browser rechecks and real-provider checks. See [verification and limitations](docs/research/assistant-reliability-2026-11-06.md).
+- Updated the project overview and added AI contribution credit.
+
 ## Workflow completion and cleanup — 2026-11-05
 
 - Completed the missed `agent-evaluation-survey` at r2 with the guide-writing workflow; all 18 shelf guides now carry this round's revision.

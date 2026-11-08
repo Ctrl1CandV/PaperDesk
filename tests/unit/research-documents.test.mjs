@@ -29,12 +29,28 @@ test('command requirements ask the model to judge readiness, keep sections and n
   assert.match(commandInstruction({ name: 'direction' }, { linked: true }), /propose_research_changes/);
 });
 
+test('reading-file instructions allocate the actual output budget across every required section', () => {
+  for (const purpose of ['accumulation','research']) for (const compact of [false,true]) {
+    const text=commandInstruction({name:'reading-brief',purpose},{linked:purpose==='research',compact,outputTokens:3000});
+    for (const section of READING_BRIEF.sections) assert.ok(text.includes(section.title));
+    assert.match(text,/3000 tokens/); assert.match(text,/不超过960个中文字符/);
+    assert.match(text,/每节最多1–2条短要点/); assert.match(text,/不在前几节长篇展开/);
+    assert.match(text,/保留关键条件、来源和权限/); assert.match(text,/待确认/);
+    assert.doesNotMatch(text,/1500–2500/);
+  }
+  assert.match(commandInstruction({name:'reading-brief',purpose:'research'},{linked:true,compact:true,outputTokens:1800}),/不超过576个中文字符/);
+});
+
 test('only an answer that opens with the file heading counts as a generated file', () => {
   const full = `# ${READING_BRIEF.label}：SYNTHETIC 多智能体通信\n\n${READING_BRIEF.sections.map((section, index) => `## ${index + 1}. ${section.title}\n\nSYNTHETIC`).join('\n\n')}`;
   assert.equal(readingBriefTitle(full), 'SYNTHETIC 多智能体通信');
   assert.deepEqual(checkDocumentSections(full).missing, []);
   assert.equal(readingBriefTitle('信息还不够：你想弄清通信协议还是评测？'), null);
   assert.equal(readingBriefTitle(`先说明一下。\n\n# ${READING_BRIEF.label}：SYNTHETIC`), null);
+  assert.equal(readingBriefTitle(`# SYNTHETIC 还需要讨论\n\n# ${READING_BRIEF.label}：SYNTHETIC 示例标题`), null);
+  assert.equal(readingBriefTitle(`# SYNTHETIC 说明\n\n\`\`\`markdown\n# ${READING_BRIEF.label}：SYNTHETIC 示例\n\`\`\``), null);
+  assert.equal(readingBriefTitle(`# ${READING_BRIEF.label}：   \n\nSYNTHETIC 正文`), null);
+  assert.equal(readingBriefTitle(`\n\t# ${READING_BRIEF.label}: SYNTHETIC Windows 标题 ###\r\n\r\nSYNTHETIC 正文`), 'SYNTHETIC Windows 标题');
   assert.equal(checkDocumentSections(`# x\n\n## ${READING_BRIEF.sections[0].title}`).missing.length, READING_BRIEF.sections.length - 1);
   const header = documentPreamble({ purpose: 'research', savedAt: '2026-10-29T00:00:00.000Z', containerTitle: 'SYNTHETIC 方向', workflows: [{ path: 'docs/content/workflows/CONTENT-WORKFLOW.md', sha256: 'b'.repeat(64) }] });
   assert.match(header, /推进研究方向“SYNTHETIC 方向”/); assert.match(header, /未明确允许的行动一律视为待确认/); assert.match(header, /CONTENT-WORKFLOW\.md/);

@@ -99,9 +99,10 @@ function settingsResultDefaults(result: AiSettingsResult): AiSettingsResult {
   return { settings: settingsDefaults(result.settings), status: statusDefaults(result.status) };
 }
 export class AiApiError extends Error {
-  constructor(message: string, public status = 0) { super(message); this.name = 'AiApiError'; }
+  constructor(message: string, public status = 0, public code?: string) { super(message); this.name = 'AiApiError'; }
 }
 async function responseError(response: Response): Promise<never> {
+  let code: string | undefined;
   let message = response.status === 404 || response.status === 502
     ? '尚未连接到本机 AI 服务。启动服务后可以重试，草稿仍会保留。'
     : response.status === 403 ? '连接凭据已更新，请重试连接后再操作。'
@@ -111,12 +112,15 @@ async function responseError(response: Response): Promise<never> {
     // Only the local API's structured, sanitized errors are shown, never an HTML error page.
     if (typeof value?.error === 'string') message = value.error.slice(0, 1000);
     else if (typeof value?.message === 'string') message = value.message.slice(0, 1000);
+    if (typeof value?.code === 'string' && /^[a-z_]{1,64}$/.test(value.code)) code = value.code;
   } catch { /* Keep the local fallback. */ }
-  throw new AiApiError(message, response.status);
+  throw new AiApiError(message, response.status, code);
 }
 export async function getAiStatus(signal?: AbortSignal): Promise<AiStatus> {
+  const deadline = AbortSignal.timeout(5000);
+  const requestSignal = signal ? AbortSignal.any([signal, deadline]) : deadline;
   let response: Response;
-  try { response = await fetch(`${ROOT}/status`, { signal, cache: 'no-store' }); }
+  try { response = await fetch(`${ROOT}/status`, { signal: requestSignal, cache: 'no-store' }); }
   catch (error) {
     if (signal?.aborted) throw error;
     throw new AiApiError('尚未连接到本机 AI 服务。可以先写下问题，启动服务后重试。');
@@ -131,13 +135,36 @@ export async function getAiStatus(signal?: AbortSignal): Promise<AiStatus> {
 }
 
 export function aiClient(token: string) {
+  let currentToken = token;
+  async function authorizedFetch(path: string, options: RequestInit = {}): Promise<Response> {
+    const send = () => fetch(`${ROOT}${path}`, { ...options, cache: 'no-store',
+      headers: { ...options.headers, 'x-paperdesk-token': currentToken } });
+    let response = await send();
+    if (response.status === 403) {
+      // Only this explicit local rejection guarantees that neither a write nor
+      // inference started. Never replay ambiguous network or provider failures.
+      let stale = false;
+      try { stale = (await response.clone().json()).code === 'connection_stale'; } catch { /* Other 403s remain errors. */ }
+      if (stale) {
+        await response.body?.cancel();
+        currentToken = (await getAiStatus(options.signal ?? undefined)).csrfToken;
+        response = await send();
+      }
+    }
+    return response;
+  }
   async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const response = await fetch(`${ROOT}${path}`, {
-      ...options, cache: 'no-store', headers: { 'x-paperdesk-token': token, ...options.headers },
-    });
-    if (!response.ok) return responseError(response);
-    if (response.status === 204) return undefined as T;
-    return response.json();
+    const deadline = AbortSignal.timeout(path.startsWith('/import') ? 180000 : path === '/settings/chatgpt' || /^\/chatgpt\/(models|check|connect)/.test(path) ? 75000 : 15000);
+    const signal = options.signal ? AbortSignal.any([options.signal, deadline]) : deadline;
+    try {
+      const response = await authorizedFetch(path, { ...options, signal });
+      if (!response.ok) return await responseError(response);
+      if (response.status === 204) return undefined as T;
+      return await response.json();
+    } catch (error) {
+      if (options.signal?.aborted || error instanceof AiApiError) throw error;
+      throw new AiApiError(deadline.aborted ? '本机 AI 服务响应超时。草稿仍保留，可以重试连接。' : '未能读取本机 AI 服务，请重试连接。草稿仍保留。');
+    }
   }
   async function transferFile(file: File, signal?: AbortSignal, preview = false): Promise<AiBackupPreview | { counts: AiBackupPreview['counts'] }> {
     const prefix = await file.slice(0, 4096).text();
@@ -178,7 +205,7 @@ export function aiClient(token: string) {
       // fallback is for browsers without the local File System Access API.
       const picker = (window as unknown as { showSaveFilePicker?: (options: unknown) => Promise<{ createWritable(): Promise<WritableStream<Uint8Array>> }> }).showSaveFilePicker;
       const handle = picker ? await picker.call(window, { suggestedName: 'paperdesk-ai-backup-v3.ndjson', types: [{ description: 'AI 对话分块备份', accept: { 'application/x-ndjson': ['.ndjson'] } }] }) : null;
-      const response = await fetch(`${ROOT}/export/stream`, { signal, cache: 'no-store', headers: { 'x-paperdesk-token': token } });
+      const response = await authorizedFetch('/export/stream', { signal });
       if (!response.ok) return responseError(response);
       if (!response.body) throw new AiApiError('浏览器未提供备份数据流。');
       if (handle) { await response.body.pipeTo(await handle.createWritable(), { signal }); return null; }
@@ -198,8 +225,9 @@ export function aiClient(token: string) {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(backup),
     }),
     async ask(input: AskInput, signal: AbortSignal, onEvent: (event: AiEvent) => void): Promise<void> {
-      const response = await fetch(`${ROOT}/ask`, {
-        method: 'POST', signal, headers: { 'content-type': 'application/json', 'x-paperdesk-token': token },
+      const deadline = AbortSignal.timeout(195000);
+      const response = await authorizedFetch('/ask', {
+        method: 'POST', signal: AbortSignal.any([signal, deadline]), headers: { 'content-type': 'application/json' },
         body: JSON.stringify(input),
       });
       if (!response.ok) return responseError(response);
@@ -221,12 +249,13 @@ export function aiClient(token: string) {
           let boundary: number;
           while ((boundary = buffer.indexOf('\n')) >= 0) {
             receive(buffer.slice(0, boundary)); buffer = buffer.slice(boundary + 1);
+            if (ended) break;
           }
-          if (done) break;
+          if (done || ended) break;
         }
-        if (buffer.trim()) receive(buffer);
+        if (!ended && buffer.trim()) receive(buffer);
         if (!ended) throw new AiApiError('回答连接已中断，请刷新对话恢复已保存内容。');
-      } finally { reader.releaseLock(); }
+      } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
     },
   };
 }

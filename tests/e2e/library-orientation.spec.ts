@@ -8,7 +8,8 @@ const revision = catalog.currentRevisions as Record<string, number>;
 const archivedGuideIds = new Set<string>(catalog.archivedGuideIds ?? []);
 const shelfEntries = catalog.entries.filter(entry => revision[entry.guideId] === entry.revision && !archivedGuideIds.has(entry.guideId));
 const currentMetadata = shelfEntries
-  .map(entry => JSON.parse(readFileSync(resolve('content', entry.metadataFile), 'utf8')) as { id: string; type: string });
+  .map(entry => JSON.parse(readFileSync(resolve('content', entry.metadataFile), 'utf8')) as { id: string; type: string; units: { heading: string | null }[] });
+const instructgptHeadings = currentMetadata.find(metadata => metadata.id === 'instructgpt')!.units.flatMap(unit => unit.heading ? [unit.heading] : []);
 const paperCount = currentMetadata.filter(metadata => metadata.type !== 'survey').length;
 const lastGuide = [...shelfEntries]
   .sort((a, b) => a.recommendation.rank - b.recommendation.rank).at(-1)!;
@@ -44,7 +45,7 @@ test('title/topic search excludes incidental mentions and filtering clears the p
   const selectedURL = page.url();
   await page.getByRole('link', { name: '开始导读' }).click();
   await expect(page).toHaveURL(new RegExp(`/read/instructgpt/${revision.instructgpt}$`));
-  await expect(page.locator('.prose')).toContainText('三个阶段各自解决一个问题');
+  await expect(page.locator('.prose').getByRole('heading', { level: 2 })).toHaveText(instructgptHeadings);
   // Body rendering and the debounced resume write are separate asynchronous
   // steps. Establish the saved-position prerequisite before expecting Continue.
   await expect.poll(() => page.evaluate(async current => Boolean(await (await import('/src/records/store.ts')).personalStore.get('resume', `instructgpt/${current}`)), revision.instructgpt)).toBe(true);

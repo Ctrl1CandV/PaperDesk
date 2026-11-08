@@ -44,18 +44,24 @@ export function validateEvidenceRefs(refs) {
     assert(s.version === undefined || s.version === null || text(s.version,1000));
     if(s.kind === 'guide') {
       assert(/^L/.test(s.id) && validLocalId(s.guideId) && validRevision(s.revision) && validLocalId(s.unitId) && s.url === `/read/${s.guideId}/${s.revision}#${s.unitId}` && (s.bodySha256 === undefined || hash(s.bodySha256)));
-      assert(!['paperId','sourceRevisionId','materialSha256','parserRevision','sourceUnitId','locator','gaps','verification','readRanges'].some(k=>Object.hasOwn(s,k)));
+      assert(!['paperId','sourceRevisionId','materialSha256','parserRevision','sourceUnitId','locator','gaps','verification'].some(k=>Object.hasOwn(s,k)));
+      if(s.readRanges!==undefined) validateEvidenceRanges(s.readRanges,1000000);
     } else {
       assert(safeResearchUrl(s.url) && s.guideId === undefined && s.revision === undefined && s.unitId === undefined && s.bodySha256 === undefined);
       if(s.kind === 'web') assert(/^W/.test(s.id) && !['paperId','sourceRevisionId','materialSha256','parserRevision','sourceUnitId','locator','gaps','verification','readRanges'].some(k=>Object.hasOwn(s,k)));
       else {
         assert(/^O/.test(s.id) && text(s.paperId,200) && s.paperId && validLocalId(s.sourceRevisionId) && hash(s.materialSha256) && hash(s.parserRevision) && validLocalId(s.sourceUnitId));
         validateResearchLocator(s.locator);assert(['unreviewed','text-checked','visually-checked'].includes(s.verification) && Array.isArray(s.gaps) && s.gaps.length<=20 && s.gaps.every(g=>text(g,1000)));
-        if(s.readRanges!==undefined){assert(Array.isArray(s.readRanges)&&s.readRanges.length<=32);let end=-1,total;for(const r of s.readRanges){researchObject(r,['start','end','total']);assert([r.start,r.end,r.total].every(Number.isSafeInteger)&&r.start>=0&&r.end>r.start&&r.end<=r.total&&r.total<=100000&&r.start>end&&(total===undefined||total===r.total));end=r.end;total=r.total;}}
+        if(s.readRanges!==undefined) validateEvidenceRanges(s.readRanges,100000);
       }
     }
     assert(JSON.stringify(s).length <= 130000);
   }
+}
+function validateEvidenceRanges(ranges,maximum) {
+  assert(Array.isArray(ranges)&&ranges.length>0&&ranges.length<=32);
+  let end=-1,total;
+  for(const range of ranges){researchObject(range,['start','end','total']);assert([range.start,range.end,range.total].every(Number.isSafeInteger)&&range.start>=0&&range.end>range.start&&range.end<=range.total&&range.total<=maximum&&range.start>end&&(total===undefined||total===range.total));end=range.end;total=range.total;}
 }
 export const validLocalId=value=>typeof value === 'string' && /^[a-z0-9][a-z0-9-]{0,99}$/.test(value);
 export const validRevision=value=>Number.isSafeInteger(value)&&value>0;

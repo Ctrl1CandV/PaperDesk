@@ -1,5 +1,6 @@
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import catalog from '../../content/catalog.json' with { type: 'json' };
 import type { AiStatus } from '../../src/assistant/api';
 
@@ -8,6 +9,12 @@ import type { AiStatus } from '../../src/assistant/api';
 test.use({ serviceWorkers: 'block' });
 const unexpectedRequests = new WeakMap<BrowserContext, string[]>();
 const reader = `/read/agent-survey/${catalog.currentRevisions['agent-survey']}`;
+const readerEntry = catalog.entries.find(entry => entry.guideId === 'agent-survey' && entry.revision === catalog.currentRevisions['agent-survey'])!;
+const readerMetadata = JSON.parse(readFileSync(new URL(`../../content/${readerEntry.metadataFile}`, import.meta.url), 'utf8')) as { units: { id: string; heading: string | null }[] };
+const firstChapter = readerMetadata.units[3].id, nextChapter = readerMetadata.units[4].id;
+// The retained r1 supplies a reviewed Mermaid diagram for renderer regression.
+// Current-revision layout and original-figure coverage use `reader` and Transformer below.
+const diagramReader = '/read/agent-survey/1';
 test.beforeEach(async ({ context, baseURL }) => {
   const unexpected: string[] = [];
   unexpectedRequests.set(context, unexpected);
@@ -44,20 +51,24 @@ async function settledAnchor(page: Page, id: string) {
   await expect.poll(() => page.locator(`#${id}`).evaluate(node => node.getBoundingClientRect().top)).toBeLessThan(150);
 }
 
-for (const width of [1440, 1280, 1920, 2560]) test(`reader keeps three visible columns and stable prose when AI closes at ${width}px`, async ({ page }) => {
+for (const width of [1100, 1200, 1280, 1440, 1920, 2560]) test(`reader expands its prose when AI closes and restores the dock at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 1000 });
   await page.goto(reader);
   await ready(page);
   const sidebar = page.locator('.reading-sidebar'), prose = page.locator('.prose'), assistant = page.locator('.reader-assistant-slot');
-  await expect(sidebar).toBeInViewport();
   await expect(assistant).toBeInViewport();
-  const left = (await sidebar.boundingBox())!, middle = (await prose.boundingBox())!, right = (await assistant.boundingBox())!;
-  expect(left.x + left.width).toBeLessThan(middle.x);
+  const middle = (await prose.boundingBox())!, right = (await assistant.boundingBox())!;
+  if (width >= 1200) {
+    await expect(sidebar).toBeInViewport();
+    const left = (await sidebar.boundingBox())!;
+    expect(left.x + left.width).toBeLessThan(middle.x);
+  } else await expect(sidebar).toBeHidden();
   expect(middle.x + middle.width).toBeLessThan(right.x);
   expect(right.x + right.width).toBeLessThanOrEqual(width);
   expect(middle.width).toBeGreaterThan(360);
   expect(middle.width).toBeLessThanOrEqual(833);
   if (width >= 1440) {
+    const left = (await sidebar.boundingBox())!;
     expect(right.width).toBeGreaterThan(380);
     expect(left.width).toBeGreaterThan(210);
     const workspaceShare = (right.x + right.width - left.x) / width;
@@ -69,9 +80,17 @@ for (const width of [1440, 1280, 1920, 2560]) test(`reader keeps three visible c
   await capture(page, `reader-${width}-open`);
   await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
   await expect(assistant).toHaveCount(0);
+  await expect(sidebar).toBeInViewport();
   const closed = (await prose.boundingBox())!;
-  expect(Math.abs(closed.x - middle.x)).toBeLessThan(1);
-  expect(Math.abs(closed.width - middle.width)).toBeLessThan(1);
+  const paragraph = (await prose.locator('p').first().boundingBox())!;
+  expect(closed.width).toBeGreaterThan(middle.width + 80);
+  expect(Math.abs(paragraph.width - closed.width)).toBeLessThan(1);
+  expect(paragraph.width).toBeGreaterThan(middle.width + 80);
+  expect(closed.width).toBeLessThanOrEqual(1089);
+  if (width >= 1440) expect(closed.width).toBeGreaterThan(900);
+  await expect(page.locator('.reading-sidebar .reading-tools')).toHaveCSS('position', 'static');
+  await noOverflow(page);
+  await capture(page, `reader-${width}-closed`);
   await page.locator('#reader-ai-action').click();
   await expect(assistant).toBeVisible();
   const reopened = (await prose.boundingBox())!;
@@ -80,7 +99,7 @@ for (const width of [1440, 1280, 1920, 2560]) test(`reader keeps three visible c
   await noOverflow(page);
 });
 
-test('1150px keeps the compact chapter navigation after closing its docked AI panel', async ({ page }) => {
+test('1150px restores its chapter and tool sidebar when the AI dock closes', async ({ page }) => {
   await page.setViewportSize({ width: 1150, height: 900 });
   await page.goto(reader);
   await ready(page);
@@ -90,25 +109,64 @@ test('1150px keeps the compact chapter navigation after closing its docked AI pa
   expect(tools.x).toBeGreaterThanOrEqual(main.x + main.width);
   expect(tools.x + tools.width).toBeLessThanOrEqual(1150);
   expect(dock.y + dock.height).toBeLessThanOrEqual(tools.y);
-  await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
-  const toolsAfterClose = (await page.locator('.reading-tools').boundingBox())!;
-  expect(toolsAfterClose.x).toBeGreaterThanOrEqual(main.x + main.width);
-  await expect(page.locator('.reading-sidebar')).toBeHidden();
-  const contents = page.locator('.mobile-contents');
-  await expect(contents.locator('summary')).toBeVisible();
+  await expect(page.locator('.mobile-contents summary')).toBeVisible();
   await capture(page, 'reader-1150-compact-navigation');
-  await contents.locator('summary').click();
-  await contents.locator('a[href="#u03"]').click();
-  await expect(page).toHaveURL(/#u03$/);
-  await expect(contents).not.toHaveAttribute('open', '');
-  await settledAnchor(page, 'u03');
+  await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
+  const sidebar = page.locator('.reading-sidebar');
+  await expect(sidebar).toBeInViewport();
+  await expect(sidebar.locator('.reading-tools')).toHaveCSS('position', 'static');
+  await expect(page.locator('.mobile-contents summary')).toBeHidden();
+  expect((await page.locator('.reading-main').boundingBox())!.width).toBeGreaterThan(main.width);
+  await sidebar.locator(`a[href="#${firstChapter}"]`).click();
+  await expect(page).toHaveURL(new RegExp(`#${firstChapter}$`));
+  await settledAnchor(page, firstChapter);
   await noOverflow(page);
   await capture(page, 'reader-1150-chapter');
 });
 
-for (const width of [390, 320]) test(`${width}px reading and maximum font controls contain long content without page overflow`, async ({ page }) => {
+for (const width of [390, 1440]) test(`${width}px figures, formulas and tables stay contained through AI toggles`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 });
+  await page.goto(`/read/transformer/${catalog.currentRevisions.transformer}`);
+  await ready(page);
+  const prose = page.locator('.prose');
+  const assertMediaContained = async () => {
+    const article = (await prose.boundingBox())!;
+    for (const selector of ['.paper-figure-frame', '.formula-scroll', '.table-scroll']) {
+      const media = prose.locator(selector);
+      expect(await media.count()).toBeGreaterThan(0);
+      for (const node of await media.all()) {
+        const box = (await node.boundingBox())!;
+        expect(box.x).toBeGreaterThanOrEqual(article.x - 1);
+        expect(box.x + box.width).toBeLessThanOrEqual(article.x + article.width + 1);
+      }
+    }
+    await noOverflow(page);
+  };
+  if (width >= 1100) {
+    await assertMediaContained();
+    await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
+  }
+  await assertMediaContained();
+  const closedWidth = (await prose.boundingBox())!.width;
+  const figure = prose.locator('.paper-figure').first();
+  await figure.scrollIntoViewIfNeeded();
+  await expect.poll(() => figure.locator('img').evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  await capture(page, `reader-transformer-${width}-closed-figure`);
+  await prose.locator('.table-scroll').first().scrollIntoViewIfNeeded();
+  await capture(page, `reader-transformer-${width}-closed-table`);
+  await page.locator('#reader-ai-action').click();
+  await expect(page.locator('#reader-assistant')).toBeVisible();
+  await assertMediaContained();
+  if (width < 1100) {
+    await page.getByRole('button', { name: '收起 AI 解读', exact: true }).click();
+    expect((await prose.boundingBox())!.width).toBe(closedWidth);
+    await noOverflow(page);
+  }
+});
+
+for (const width of [390, 320]) test(`${width}px retained diagram guide and maximum font controls contain long content without page overflow`, async ({ page }) => {
   await page.setViewportSize({ width, height: 844 });
-  await page.goto(reader);
+  await page.goto(diagramReader);
   await ready(page);
   await noOverflow(page);
   await capture(page, `reader-${width}-normal`);
@@ -134,9 +192,9 @@ for (const width of [390, 320]) test(`${width}px reading and maximum font contro
 
 test('source dialog preserves the focused citation and reading position on return', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(`${reader}#u03`);
+  await page.goto(`${reader}#${firstChapter}`);
   await ready(page);
-  const citation = page.locator('#u03 .citation-button').first();
+  const citation = page.locator(`#${firstChapter} .citation-button`).first();
   await citation.scrollIntoViewIfNeeded();
   await citation.focus();
   const before = await page.evaluate(() => scrollY);
@@ -153,27 +211,27 @@ test('source dialog preserves the focused citation and reading position on retur
 
 test('native same-document fragments keep distinct Back and Forward reading positions', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(`${reader}#u03`);
+  await page.goto(`${reader}#${firstChapter}`);
   await ready(page);
-  await settledAnchor(page, 'u03');
+  await settledAnchor(page, firstChapter);
   await page.evaluate(() => { (window as Window & { syntheticDocumentMarker?: string }).syntheticDocumentMarker = 'synthetic-native-fragment'; window.scrollBy(0, 420); });
   const firstPosition = await page.evaluate(() => scrollY);
-  await page.goto(`${reader}#u04`);
+  await page.goto(`${reader}#${nextChapter}`);
   expect(await page.evaluate(() => (window as Window & { syntheticDocumentMarker?: string }).syntheticDocumentMarker)).toBe('synthetic-native-fragment');
-  await settledAnchor(page, 'u04');
+  await settledAnchor(page, nextChapter);
   await page.evaluate(() => window.scrollBy(0, 180));
   const secondPosition = await page.evaluate(() => scrollY);
   await page.goBack();
-  await expect(page).toHaveURL(/#u03$/);
+  await expect(page).toHaveURL(new RegExp(`#${firstChapter}$`));
   await expect.poll(async () => Math.abs((await page.evaluate(() => scrollY)) - firstPosition)).toBeLessThan(5);
   await page.goForward();
-  await expect(page).toHaveURL(/#u04$/);
+  await expect(page).toHaveURL(new RegExp(`#${nextChapter}$`));
   await expect.poll(async () => Math.abs((await page.evaluate(() => scrollY)) - secondPosition)).toBeLessThan(5);
 });
 
-test('actual reader typography, middle diagram, final section and HELM table are inspectable', async ({ page, context }, testInfo) => {
+test('actual reader typography, retained teaching diagram, final section and current HELM table are inspectable', async ({ page, context }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(reader);
+  await page.goto(diagramReader);
   await ready(page);
   const session = await context.newCDPSession(page);
   await session.send('DOM.enable'); await session.send('CSS.enable');
