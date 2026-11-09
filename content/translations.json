@@ -55,6 +55,485 @@
         }
       ],
       "bodySha256": "33acad2ed9739662ed1b497510772e8a8c496645d25cc3e6fd694227455997be"
+    },
+    {
+      "guideId": "toolformer",
+      "revision": 1,
+      "language": "en",
+      "title": "Toolformer: How Tool Calls Become a Learnable Behavior",
+      "bodyFile": "guides/toolformer.r1.en.md",
+      "assets": [],
+      "bodySha256": "cf56e7ae06e8c48127612d6226efd28efa925f18d277e3b86073e7a5838bb9da"
+    },
+    {
+      "guideId": "chain-of-thought",
+      "revision": 1,
+      "language": "en",
+      "title": "Chain-of-Thought: How Intermediate Steps Change Language Models' Problem Solving",
+      "bodyFile": "guides/chain-of-thought.r1.en.md",
+      "assets": [],
+      "bodySha256": "fcbbdead9dffbc23c82dcdeb4e3d4c8e57232ac91779004e0a74468c436d5e46"
+    },
+    {
+      "guideId": "agent-memory-survey",
+      "revision": 2,
+      "language": "en",
+      "title": "Agent Memory Survey: How Past Information Shapes the Next Decision",
+      "bodyFile": "guides/agent-memory-survey.r2.en.md",
+      "assets": [],
+      "bodySha256": "01134125c654375d3d4698253304fe3c0b15676c27cfccbd564494b968c1de8b"
+    },
+    {
+      "guideId": "react",
+      "revision": 3,
+      "language": "en",
+      "title": "ReAct: Bringing Reasoning, Acting, and Environmental Feedback into a Loop",
+      "bodyFile": "guides/react.r3.en.md",
+      "assets": [
+        {
+          "path": "assets/react/figure-1-trajectories.webp",
+          "alt": "Four question-answering trajectories compare direct answering, reasoning, acting, and ReAct. Below, acting alone repeats an unsuccessful pickup, while ReAct finds a pepper shaker and places it in a drawer. Colors identify useful information, errors, and thoughts.",
+          "rights": "Yao et al., original paper Figure 1; the CC BY 4.0 license record is carried forward from r2 and was not independently verified online for this revision."
+        },
+        {
+          "path": "assets/react/figure-3-scaling.webp",
+          "alt": "Bar charts compare prompting and fine-tuning across model sizes on HotpotQA exact match, with separate colors for Standard, CoT, Act, and ReAct; the fine-tuning chart has no 540B bars.",
+          "rights": "Yao et al., original paper Figure 3; the CC BY 4.0 license record is carried forward from r2 and was not independently verified online for this revision."
+        }
+      ],
+      "bodySha256": "60494c5671f871e5d55ec43104cbc8b7c3d1da621b3e160c3a2f588b191ee492"
+    },
+    {
+      "guideId": "streamingllm",
+      "revision": 2,
+      "language": "en",
+      "title": "StreamingLLM: How a Bounded Cache Supports Continuous Input",
+      "bodyFile": "guides/streamingllm.r2.en.md",
+      "assets": [],
+      "bodySha256": "61657add0a5926ab217407aba5e8e17c83ccbc7907fd4775755cf8d00c5c6c95"
+    },
+    {
+      "guideId": "concept-drift-survey",
+      "revision": 2,
+      "language": "en",
+      "title": "Concept Drift: When Old Patterns Fail and How Systems Adapt",
+      "bodyFile": "guides/concept-drift-survey.r2.en.md",
+      "assets": [],
+      "bodySha256": "cc90481e41b16f6c5f8ea00af466e23b58652c3f6f93623351923d0fe14cc972"
+    },
+    {
+      "guideId": "reflexion",
+      "revision": 1,
+      "language": "en",
+      "title": "Reflexion: Turning Failure Feedback into Experience for the Next Action",
+      "bodyFile": "guides/reflexion.r1.en.md",
+      "assets": [],
+      "bodySha256": "c6caf241b99e54b0a2b3f07fdc2b76088912aedcdea97fc40154e799326d0a31"
+    },
+    {
+      "guideId": "rag",
+      "revision": 3,
+      "language": "en",
+      "title": "RAG: Giving Generative Models Access to External Knowledge",
+      "bodyFile": "guides/rag.r3.en.md",
+      "assets": [
+        {
+          "path": "assets/rag/figure-1-architecture.webp",
+          "alt": "RAG architecture: query encoding and maximum inner product search retrieve passages; the original input and each passage enter a shared generator, whose outputs are marginalized. Training feedback updates the query encoder and generator.",
+          "rights": "Patrick Lewis, Ethan Perez and coauthors, NeurIPS 2020, original Figure 1. Cropped from the official conference PDF; no explicit reproduction permission was found in the conference record. The arXiv record carries the default non-exclusive distribution license, which does not grant republication rights. Cited only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/rag/figure-2-document-posterior.webp",
+          "alt": "Five-document posterior heatmap for a Hemingway clue: document 2 contributes more near Sun, and document 1 near the start of A Farewell to Arms; relevant passages appear at left.",
+          "rights": "Patrick Lewis, Ethan Perez and coauthors, NeurIPS 2020, original Figure 2. Cropped from the official conference PDF; no explicit reproduction permission was found in the conference record. The arXiv record carries the default non-exclusive distribution license, which does not grant republication rights. Cited only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/rag/figure-3-retrieval-count.webp",
+          "alt": "Three retrieval-count panels show NQ exact match, NQ answer recall, and MS-MARCO BLEU-1 and ROUGE-L; more candidates improve recall while generation metrics follow different trends.",
+          "rights": "Patrick Lewis, Ethan Perez and coauthors, NeurIPS 2020, original Figure 3. Cropped from the official conference PDF; no explicit reproduction permission was found in the conference record. The arXiv record carries the default non-exclusive distribution license, which does not grant republication rights. Cited only for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "6d453404b1c1b297bf37539c04893bad5a7c27e76416ad15b8b25c3c48a38a5b"
+    },
+    {
+      "guideId": "multi-agent-collaboration-survey",
+      "revision": 2,
+      "language": "en",
+      "title": "Multi-Agent Collaboration Survey: Comparing Division of Work Through Collaboration Channels",
+      "bodyFile": "guides/multi-agent-collaboration-survey.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/multi-agent-collaboration-survey/figure-1-two-channels.webp",
+          "alt": "Two channels in a question-answering system: a proponent responds to a user, an opponent disagrees and asks two research assistants about environmental impact and stability, then returns an answer. Orange arrows mark a competitive, rule-based, decentralized channel; green arrows mark a cooperative, role-based, centralized channel.",
+          "rights": "Tran et al., arXiv:2501.06322v1, Figure 1. The default arXiv non-exclusive distribution license grants no redistribution rights; included only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/multi-agent-collaboration-survey/figure-2-framework.webp",
+          "alt": "The collaboration framework: three agents at left each have perception, model, adapters, objective and action; channel types, structures and strategies occupy the center; early, middle and late exchanges appear at right; a green coordination and orchestration arrow points toward the channel area.",
+          "rights": "Tran et al., arXiv:2501.06322v1, Figure 2. The default arXiv non-exclusive distribution license grants no redistribution rights; included only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/multi-agent-collaboration-survey/figure-3-collaboration-types.webp",
+          "alt": "Examples of collaboration types: an editor, translator, researcher and verifier cooperate on academic writing; defense and prosecution seek opposing outcomes in a courtroom simulation; policy supporters and opponents compromise on some issues and compete on others.",
+          "rights": "Tran et al., arXiv:2501.06322v1, Figure 3. The default arXiv non-exclusive distribution license grants no redistribution rights; included only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/multi-agent-collaboration-survey/figure-5-communication-structures.webp",
+          "alt": "Three communication structures: centralized examples include federated distributed training, a star with an aggregator, and an LLM-equipped aggregator; decentralized user and item agents exchange feedback; a hierarchical CAMEL diagram shows starting points, options and critic selection.",
+          "rights": "Tran et al., arXiv:2501.06322v1, Figure 5. The default arXiv non-exclusive distribution license grants no redistribution rights; included only for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "7311390d33cb9a93d997a30b2b743c9d427380b1e893ce9d8f135a211284b1ed"
+    },
+    {
+      "guideId": "agentbench",
+      "revision": 2,
+      "language": "en",
+      "title": "AgentBench: Measuring Agents in Eight Interactive Environments",
+      "bodyFile": "guides/agentbench.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/agentbench/figure-2-benchmark-overview.webp",
+          "alt": "Seven real-world challenges and an agent–environment loop connect to eight task environments.",
+          "rights": "Liu et al., arXiv:2308.03688v2, Figure 2, CC BY 4.0; cited for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/agentbench/figure-4-eight-environments.webp",
+          "alt": "Eight panels show tasks, action spaces, observations, and screenshots for the benchmark environments.",
+          "rights": "Liu et al., arXiv:2308.03688v2, Figure 4, CC BY 4.0; cited for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/agentbench/figure-1-overall-scores.webp",
+          "alt": "A radar chart compares selected models across eight environments; a bar chart ranks 27 models and marks category means.",
+          "rights": "Liu et al., arXiv:2308.03688v2, Figure 1, CC BY 4.0; cited for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "bf6a1d0e065f6dd058be5df703b275555a455fc189c9e94732e484cf02bae269"
+    },
+    {
+      "guideId": "multi-agent-communication-survey",
+      "revision": 2,
+      "language": "en",
+      "title": "A Survey of Multi-Agent Communication: Who Sends What to Whom, and When",
+      "bodyFile": "guides/multi-agent-communication-survey.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/multi-agent-communication-survey/figure-1-communication-framework.webp",
+          "alt": "Three panels compare general surveys, domain surveys and the system-level and within-system communication framework.",
+          "rights": "Yan et al., arXiv:2502.14321v3, Figure 1. arXiv's default non-exclusive distribution license does not grant republication rights; included only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/multi-agent-communication-survey/figure-3-architectures.webp",
+          "alt": "Five diagrams depict flat, hierarchical, team, society and hybrid communication architectures.",
+          "rights": "Yan et al., arXiv:2502.14321v3, Figure 3. arXiv's default non-exclusive distribution license does not grant republication rights; included only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/multi-agent-communication-survey/figure-4-goals.webp",
+          "alt": "Four panels depict direct cooperation, cooperation through debate, competition and mixed communication goals.",
+          "rights": "Yan et al., arXiv:2502.14321v3, Figure 4. arXiv's default non-exclusive distribution license does not grant republication rights; included only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/multi-agent-communication-survey/figure-6-strategies.webp",
+          "alt": "Three diagrams depict sequential talk, simultaneous talk and simultaneous talk with a summarizer.",
+          "rights": "Yan et al., arXiv:2502.14321v3, Figure 6. arXiv's default non-exclusive distribution license does not grant republication rights; included only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/multi-agent-communication-survey/figure-9-content.webp",
+          "alt": "A classification divides communication content into explicit language and code, and implicit behavioral and environmental signals.",
+          "rights": "Yan et al., arXiv:2502.14321v3, Figure 9. arXiv's default non-exclusive distribution license does not grant republication rights; included only for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "93c292d4c17d7353285c57877029b7e0ed78d07dffb184cc1f958498931f0cc8"
+    },
+    {
+      "guideId": "gpt3",
+      "revision": 2,
+      "language": "en",
+      "title": "GPT-3: How Pretraining Supports Few-Shot Learning in Context",
+      "bodyFile": "guides/gpt3.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/gpt3/figure-g36-translation-format.webp",
+          "alt": "Supplementary Figure G.36 shows German-to-English translation: a German sentence ending in an equals sign is the context, and the English translation below a dividing line is the target completion.",
+          "rights": "Brown, Mann et al., Language Models are Few-Shot Learners, NeurIPS 2020 supplement Figure G.36. Cropped from the fixed conference PDF. The conference entry provides no explicit image republication permission; an open license is not assumed. Used only for personal academic reference in a private repository, with attribution retained."
+        },
+        {
+          "path": "assets/gpt3/figure-1-1-scaling.webp",
+          "alt": "Figure 1.1 has three panels: zero-, one- and few-shot SuperGLUE scores across model sizes; demonstration counts for the 175B model; and 42 accuracy benchmarks with individual light lines and aggregate heavy lines.",
+          "rights": "Brown, Mann et al., Language Models are Few-Shot Learners, NeurIPS 2020 main paper Figure 1.1. Cropped from the fixed conference PDF. The conference entry provides no explicit image republication permission; an open license is not assumed. Used only for personal academic reference in a private repository, with attribution retained."
+        },
+        {
+          "path": "assets/gpt3/figure-c2-contamination.webp",
+          "alt": "Supplementary Figure C.2 plots the fraction of each benchmark classified clean against the percentage performance change on its clean subset relative to the full set; most points lie near zero, with larger deviations for DROP, QuAC and word reversal.",
+          "rights": "Brown, Mann et al., Language Models are Few-Shot Learners, NeurIPS 2020 supplement Figure C.2. Cropped from the fixed conference PDF. The conference entry provides no explicit image republication permission; an open license is not assumed. Used only for personal academic reference in a private repository, with attribution retained."
+        }
+      ],
+      "bodySha256": "3336a3b733b6c44bb921115bf7fbb4869b8a1d2087d5b005e63f0c6085712d35"
+    },
+    {
+      "guideId": "autogen",
+      "revision": 2,
+      "language": "en",
+      "title": "AutoGen: Organizing Multi-Agent Communication into Executable Collaboration",
+      "bodyFile": "guides/autogen.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/autogen/figure-1-overview.webp",
+          "alt": "AutoGen overview: configurable agent capabilities on the left, multi-agent and hierarchical conversation topologies in the middle, and a conversation with a human changing the request on the right",
+          "rights": "Wu et al., arXiv:2308.08155v2, Figure 1. The arXiv abstract page identifies the license as Creative Commons Attribution 4.0 (CC BY 4.0), permitting reproduction and distribution with attribution."
+        },
+        {
+          "path": "assets/autogen/figure-2-conversation-programming.webp",
+          "alt": "Conversation programming: built-in agents and unified interfaces at the top, developer code defining agents and registering replies in the middle, and runtime message and reply flow below",
+          "rights": "Wu et al., arXiv:2308.08155v2, Figure 2. The arXiv abstract page identifies the license as Creative Commons Attribution 4.0 (CC BY 4.0), permitting reproduction and distribution with attribution."
+        },
+        {
+          "path": "assets/autogen/figure-9-alfworld-two-three-agents.webp",
+          "alt": "ALFWorld agent designs: a two-agent assistant and executor on the left, and a three-agent version adding a commonsense grounding agent on the right",
+          "rights": "Wu et al., arXiv:2308.08155v2, Figure 9. The arXiv abstract page identifies the license as Creative Commons Attribution 4.0 (CC BY 4.0), permitting reproduction and distribution with attribution."
+        },
+        {
+          "path": "assets/autogen/figure-12-group-chat.webp",
+          "alt": "Dynamic group chat in three steps: the manager selects a speaker, requests a response, and broadcasts it to the other participants",
+          "rights": "Wu et al., arXiv:2308.08155v2, Figure 12. The arXiv abstract page identifies the license as Creative Commons Attribution 4.0 (CC BY 4.0), permitting reproduction and distribution with attribution."
+        }
+      ],
+      "bodySha256": "ab46ca8893af89b9f51ce68f87733276a1fd1e1387c9de76b613f094fe4a0008"
+    },
+    {
+      "guideId": "camel",
+      "revision": 2,
+      "language": "en",
+      "title": "CAMEL: How Two Roles Keep a Conversation Moving",
+      "bodyFile": "guides/camel.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/camel/figure-1-role-playing.webp",
+          "alt": "A human idea and role assignment pass through a task specifier to a conversation between AI user and AI assistant.",
+          "rights": "Guohao Li et al., NeurIPS 2023, Figure 1. The arXiv v2 page states CC BY 4.0; retain authors, title and source when reproducing."
+        },
+        {
+          "path": "assets/camel/figure-8-termination.webp",
+          "alt": "Two doughnut charts show five conversation termination reasons for AI Society and Code.",
+          "rights": "Guohao Li et al., NeurIPS 2023, Appendix Figure 8. The arXiv v2 page states CC BY 4.0; retain authors, title and source when reproducing."
+        },
+        {
+          "path": "assets/camel/figure-9-prompt-ablation.webp",
+          "alt": "Two doughnut charts compare termination reasons for Prompt V2 and Prompt V1 plus Task Planner, with blue for the completion marker and orange for role reversal.",
+          "rights": "Guohao Li et al., NeurIPS 2023, Appendix Figure 9. The arXiv v2 page states CC BY 4.0; retain authors, title and source when reproducing."
+        },
+        {
+          "path": "assets/camel/figure-10-flake.webp",
+          "alt": "A bar chart compares counts of messages beginning I will across three prompt settings, lowest for the original and highest with a task planner.",
+          "rights": "Guohao Li et al., NeurIPS 2023, Appendix Figure 10. The arXiv v2 page states CC BY 4.0; retain authors, title and source when reproducing."
+        }
+      ],
+      "bodySha256": "b2383cfb3fd22d8dbaa2fab4a668a56974634673e3d707f4a1e626ae29f2b365"
+    },
+    {
+      "guideId": "llm-evaluation-survey",
+      "revision": 2,
+      "language": "en",
+      "title": "Evaluating Large Language Models: Define the Measurement Before Interpreting the Score",
+      "bodyFile": "guides/llm-evaluation-survey.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/llm-evaluation-survey/figure-1-structure.webp",
+          "alt": "Survey structure: an LLM evaluation root branches into what, where and how to evaluate, summary and grand challenges, with topics and cited papers on the right.",
+          "rights": "Chang et al., arXiv:2307.03109v1, Figure 1, CC BY 4.0; attributed and quoted for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/llm-evaluation-survey/figure-2-paper-trend.webp",
+          "alt": "Line chart of collected evaluation papers, near zero to three through 2022, around two in January 2023 and about 33 after June 2023.",
+          "rights": "Chang et al., arXiv:2307.03109v1, Figure 2, CC BY 4.0; attributed and quoted for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/llm-evaluation-survey/figure-3-evaluation-process.webp",
+          "alt": "Four boxes labeled Model, What (Task), Where (Data), and How (Process), connected left to right by arrows.",
+          "rights": "Chang et al., arXiv:2307.03109v1, Figure 3, CC BY 4.0; attributed and quoted for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "63e02f2d7aec8815ba77554b986ceb5aff85183a669f3fee9b3a368491b34386"
+    },
+    {
+      "guideId": "helm",
+      "revision": 3,
+      "language": "en",
+      "title": "HELM: How a Model Score Is Made",
+      "bodyFile": "guides/helm.r3.en.md",
+      "assets": [
+        {
+          "path": "assets/helm/figure-7-adaptation.webp",
+          "alt": "Figure 7 compares joint and separate multiple-choice adaptation. The joint prompt presents an answered anatomy example and four choices, then generates D. Separate prompts pair the question with individual candidates for probability scoring.",
+          "rights": "Liang et al., Holistic Evaluation of Language Models, Figure 7; the arXiv 2211.09110v2 page states Creative Commons Attribution 4.0 International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/."
+        },
+        {
+          "path": "assets/helm/figure-17-calibration.webp",
+          "alt": "Figure 17 groups eight predictions by probability to calculate an ECE of 0.225, and selects the three highest probabilities to illustrate selective classification accuracy of 2/3.",
+          "rights": "Liang et al., Holistic Evaluation of Language Models, Figure 17; the arXiv 2211.09110v2 page states Creative Commons Attribution 4.0 International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/."
+        }
+      ],
+      "bodySha256": "e07d134382458631718a44a82eb3954f2a0c3d4c1b46ea5cae07896a105db350"
+    },
+    {
+      "guideId": "instructgpt",
+      "revision": 3,
+      "language": "en",
+      "title": "InstructGPT: How Human Feedback Shapes Model Responses",
+      "bodyFile": "guides/instructgpt.r3.en.md",
+      "assets": [
+        {
+          "path": "assets/instructgpt/figure-2-training-pipeline.webp",
+          "alt": "Three-stage training pipeline: human demonstrations train an SFT response model; ranked candidate responses train an RM; a policy generates new responses scored by the RM and is updated with PPO. Blue arrows indicate feedback used for training.",
+          "rights": "Ouyang et al., Training language models to follow instructions with human feedback, arXiv:2203.02155v1, Figure 2. The default arXiv nonexclusive distribution license does not grant republication rights; cited only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/instructgpt/figure-1-preference.webp",
+          "alt": "Figure 1 plots human preference win rate against 175B SFT by parameter count. GPT, prompted GPT, SFT, PPO and PPO-ptx curves rise across training approaches; both PPO curves exceed GPT at each size. A dashed line marks 50%, with 95% confidence intervals.",
+          "rights": "Ouyang et al., Training language models to follow instructions with human feedback, arXiv:2203.02155v1, Figure 1. The default arXiv nonexclusive distribution license does not grant republication rights; cited only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/instructgpt/figure-4-behavior.webp",
+          "alt": "Figure 4 compares rates of correctly attempting a task, following explicit constraints, closed-domain hallucination and appropriate assistant language. PPO models do better on tasks and constraints and hallucinate less than GPT, though SFT's hallucination bar is lower; vertical scales differ.",
+          "rights": "Ouyang et al., Training language models to follow instructions with human feedback, arXiv:2203.02155v1, Figure 4. The default arXiv nonexclusive distribution license does not grant republication rights; cited only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/instructgpt/figure-33-pretraining-mix.webp",
+          "alt": "Figure 33 plots pretraining loss coefficient on a logarithmic horizontal axis. DROP and SQuADv2 F1 rise on the left, where dashed lines mark GPT baselines; validation reward falls sharply at very large coefficients on the right.",
+          "rights": "Ouyang et al., Training language models to follow instructions with human feedback, arXiv:2203.02155v1, Figure 33. The default arXiv nonexclusive distribution license does not grant republication rights; cited only for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "d7a19a7f5dbb2cf8fbc93d08aeb544219163c5324dd262bb18b52496035b4568"
+    },
+    {
+      "guideId": "tau-bench",
+      "revision": 2,
+      "language": "en",
+      "title": "τ-bench: How Far Is One Success from Reliable Service?",
+      "bodyFile": "guides/tau-bench.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/tau-bench/figure-1-setup-and-trajectory.webp",
+          "alt": "Information boundaries in τ-bench: tools, agent, and user on the left; an airline conversation and tool calls on the right",
+          "rights": "Yao et al., τ-bench, arXiv 2406.12045v1, Figure 1. The arXiv abstract page states CC BY 4.0, permitting copying and redistribution with attribution."
+        },
+        {
+          "path": "assets/tau-bench/figure-2-components.webp",
+          "alt": "Four τ-bench construction components: an order record, API functions, policy excerpts, and a task instruction with annotations",
+          "rights": "Yao et al., τ-bench, arXiv 2406.12045v1, Figure 2. The arXiv abstract page states CC BY 4.0, permitting copying and redistribution with attribution."
+        },
+        {
+          "path": "assets/tau-bench/figure-4-passk-curves.webp",
+          "alt": "Retail pass^k and pass@k curves against trial count: solid curves fall and dashed curves rise",
+          "rights": "Yao et al., τ-bench, arXiv 2406.12045v1, Figure 4. The arXiv abstract page states CC BY 4.0, permitting copying and redistribution with attribution."
+        },
+        {
+          "path": "assets/tau-bench/figure-5-failure-breakdown.webp",
+          "alt": "Donut chart of 36 failed trajectories: wrong argument 33.3%, wrong information 22.2%, wrong decision 25.0%, partial resolution 19.4%",
+          "rights": "Yao et al., τ-bench, arXiv 2406.12045v1, Figure 5. The arXiv abstract page states CC BY 4.0, permitting copying and redistribution with attribution."
+        }
+      ],
+      "bodySha256": "81f438b0b4030c2ce43f658a0fddbc1872335b0eb851717aed040e2f99d9cc24"
+    },
+    {
+      "guideId": "agent-survey",
+      "revision": 3,
+      "language": "en",
+      "title": "Agent Survey: How Language Models Enter Environments and Act Over Time",
+      "bodyFile": "guides/agent-survey.r3.en.md",
+      "assets": [
+        {
+          "path": "assets/agent-survey/figure-2-architecture.webp",
+          "alt": "Unified agent architecture: profile, memory, planning, and action beneath an LLM controller",
+          "rights": "Wang et al., arXiv:2308.11432v7, Figure 2. The arXiv v7 page states CC BY 4.0; figure number and attribution are retained for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/agent-survey/figure-3-planning-paths.webp",
+          "alt": "Single-path and multiple-path reasoning, including chains, sampled paths, and a branching tree",
+          "rights": "Wang et al., arXiv:2308.11432v7, Figure 3. The arXiv v7 page states CC BY 4.0; figure number and attribution are retained for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/agent-survey/figure-4-capability-eras.webp",
+          "alt": "Capability acquisition across machine learning, LLM, and agent eras",
+          "rights": "Wang et al., arXiv:2308.11432v7, Figure 4. The arXiv v7 page states CC BY 4.0; figure number and attribution are retained for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/agent-survey/figure-5-applications-evaluation.webp",
+          "alt": "Application domains and subjective and objective evaluation strategies",
+          "rights": "Wang et al., arXiv:2308.11432v7, Figure 5. The arXiv v7 page states CC BY 4.0; figure number and attribution are retained for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "d42dc8d39891ba8e35bce452cffaede3f27a83f3040fdda424db493d34516c18"
+    },
+    {
+      "guideId": "llm-survey",
+      "revision": 2,
+      "language": "en",
+      "title": "A Survey of Large Language Models: A Map from Training and Use to Agents",
+      "bodyFile": "guides/llm-survey.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/llm-survey/figure-2-lifecycle.webp",
+          "alt": "Pre-training, mid-training, supervised fine-tuning and reward-based reinforcement learning above; utilization and capability evaluation below.",
+          "rights": "Wayne Xin Zhao et al., A Survey of Large Language Models, Frontiers of Computer Science 2026, Figure 2. The fixed PDF states CC BY 4.0 on pages 26–27, with no separate figure rights notice. License: https://creativecommons.org/licenses/by/4.0/. Caption cropped and image transcoded; figure content unchanged."
+        },
+        {
+          "path": "assets/llm-survey/figure-3-data-pipeline.webp",
+          "alt": "Three columns show general, specialized and synthetic sources; deduplication, filtering, privacy processing and tokenization; and data mixtures across training stages.",
+          "rights": "Wayne Xin Zhao et al., A Survey of Large Language Models, Frontiers of Computer Science 2026, Figure 3. The fixed PDF states CC BY 4.0 on pages 26–27, with no separate figure rights notice. License: https://creativecommons.org/licenses/by/4.0/. Caption cropped and image transcoded; figure content unchanged."
+        },
+        {
+          "path": "assets/llm-survey/figure-4-post-training.webp",
+          "alt": "A base model learns from general and long-reasoning instructions and is updated using preference and reasoning feedback; a dotted loop indicates iteration.",
+          "rights": "Wayne Xin Zhao et al., A Survey of Large Language Models, Frontiers of Computer Science 2026, Figure 4. The fixed PDF states CC BY 4.0 on pages 26–27, with no separate figure rights notice. License: https://creativecommons.org/licenses/by/4.0/. Caption cropped and image transcoded; figure content unchanged."
+        },
+        {
+          "path": "assets/llm-survey/figure-5-utilization.webp",
+          "alt": "A colored method tree branches into basic prompting, advanced reasoning and RAG, agent systems, and efficient deployment, with representative methods at right.",
+          "rights": "Wayne Xin Zhao et al., A Survey of Large Language Models, Frontiers of Computer Science 2026, Figure 5. The fixed PDF states CC BY 4.0 on pages 26–27, with no separate figure rights notice. License: https://creativecommons.org/licenses/by/4.0/. Caption cropped and image transcoded; figure content unchanged."
+        }
+      ],
+      "bodySha256": "a92805643cdc0d6384e4c03224e53e8e6c4e1b76011240035bd9e2ae7b1f6927"
+    },
+    {
+      "guideId": "agent-evaluation-survey",
+      "revision": 2,
+      "language": "en",
+      "title": "Agent Evaluation Survey: Define the System Before Interpreting the Score",
+      "bodyFile": "guides/agent-evaluation-survey.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/agent-evaluation-survey/figure-1-survey-map.webp",
+          "alt": "Survey tree rooted at Agent Evaluation, branching into capability evaluation (planning and multi-step reasoning, function calling and tool use, self-reflection, memory), application evaluation (web, software engineering, science, conversational services), generalist agent evaluation, evaluation frameworks (development frameworks and Gym-like environments), and discussion (trends and emerging directions); boxes at right list representative benchmarks.",
+          "rights": "Figure 1 from the original paper by Asaf Yehudai and colleagues, arXiv:2503.16416v1, licensed CC BY-NC-SA 4.0; attributed here for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "5c56671dda0e2d61411cde1dbfedc070be6c94ff724c1020c9df1027b4296cc8"
+    },
+    {
+      "guideId": "agentprune",
+      "revision": 2,
+      "language": "en",
+      "title": "AgentPrune: Which Agent Messages Can We Stop Sending?",
+      "bodyFile": "guides/agentprune.r2.en.md",
+      "assets": [
+        {
+          "path": "assets/agentprune/figure-3-random-pruning.webp",
+          "alt": "Two box plots show MMLU accuracy against randomly removed spatial or temporal connections; some low-pruning results exceed the reference line and performance falls at higher pruning rates.",
+          "rights": "Guibin Zhang et al., Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems, arXiv:2410.02506v1, Figure 3. The default arXiv non-exclusive distribution license grants no redistribution rights; quoted only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/agentprune/figure-4-communication-pruning.webp",
+          "alt": "A before-and-after comparison of communication among three thinkers and a summarizer; some same-round connections and cross-round history are removed, with message token counts marked.",
+          "rights": "Guibin Zhang et al., Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems, arXiv:2410.02506v1, Figure 4. The default arXiv non-exclusive distribution license grants no redistribution rights; quoted only for personal academic reading in a private repository."
+        },
+        {
+          "path": "assets/agentprune/figure-30-temporal-pruning.webp",
+          "alt": "Five HumanEval roles communicate across rounds, with previous-round nodes in blue and next-round nodes in green; dense connections on the left become selected paths on the right.",
+          "rights": "Guibin Zhang et al., Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems, arXiv:2410.02506v1, Figure 30. The default arXiv non-exclusive distribution license grants no redistribution rights; quoted only for personal academic reading in a private repository."
+        }
+      ],
+      "bodySha256": "e6537f95b58669728e28f09086a581926a94da736ec1f165321f1cd946a52aa6"
     }
   ]
 }

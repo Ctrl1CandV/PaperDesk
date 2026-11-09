@@ -1,0 +1,9 @@
+# Agent memory survey r2: English translation note
+
+This is an author translation, not an independent review or reader acceptance.
+
+- **Inputs:** `content/guides/agent-memory-survey.r2.md`, its revision 2 metadata, and `content/glossary-en.json`. No fixed source material was supplied; no paper pages or figures were independently opened for this translation. The original v1 HTML and PDF locators, including physical pages 8, 11, and 20, are retained from the Chinese guide. Its description of earlier source and figure inspection is attributed to that guide's author, not claimed as work done for this translation.
+- **Terminology:** task, trial, and step preserve the distinctions in the guide; textual and parametric memory distinguish explicit model input from parameter updates. Writing, management, and reading retain the three operation categories. Five new cards cover ReAct, Reflexion, textual memory, parametric memory, and knowledge editing; RAG already has an English card.
+- **Examples:** The equipment troubleshooting, boundary-condition, and reference-retrieval examples work in English without changes to their substantive scenarios. The guide's teaching examples and evidential-risk analysis remain identified as such.
+- **Checks:** `node scripts/content/translation-work.mjs check agent-memory-survey` passed: 2,607 words, 8.8 negations per 1,000 words, one caveat template, five glossary additions. A separate local count found 18,104 characters including whitespace and eight H2 headings. An initial check warned about dense negation; prose was revised and the final check produced no warning.
+- **Remaining uncertainty:** Terminology and claims have been checked against the Chinese guide, not independently against the paper or its cited works. The automated check cannot establish translation fidelity, scholarly accuracy, or reading quality. No build, merge, visual inspection, or reader acceptance was performed.

@@ -1,6 +1,6 @@
-# English reading pilot
+# English reading
 
-The reader can display an English-only version of the central guide prose for revisions that have a reviewed translation. This is a pilot, not a second authoritative content library.
+The reader can display an English-only version of the central guide prose for revisions that have a reviewed translation. It began as a two-guide pilot and now covers every current revision; it is still a presentation layer, not a second authoritative content library.
 
 ## Scope
 
@@ -13,15 +13,9 @@ The reader can display an English-only version of the central guide prose for re
 
 ## Current coverage
 
-- `transformer` r5: `content/guides/transformer.r5.en.md`
-- `rag-survey` r5: `content/guides/rag-survey.r5.en.md`
+Every current revision on the shelf has an English body (24 guides); `tests/integration/english-translations.test.mjs` fails if a current revision lacks one. The two pilot translations are `transformer` r5 and `rag-survey` r5. The other 22 were first drafted in a 2026-11 batch; 15 of those drafts summarized instead of translating, and they were retranslated in full on 2026-11-09 (see [the batch note](../research/english-retranslation-2026-11-09.md)).
 
-The English bodies follow the Chinese section order and were checked against the fixed English papers. Their author notes are:
-
-- `docs/research/transformer-r5-en-review.md`
-- `docs/research/rag-survey-r5-en-review.md`
-
-`docs/research/english-translation-independent-review.md` is a limited independent spot-check; it is not a full translation review or reader acceptance.
+The English bodies follow the Chinese section order. Each guide has an author note `docs/research/<id>-r<N>-en-review.md`; the pilot notes are `transformer-r5-en-review.md` and `rag-survey-r5-en-review.md`. `docs/research/english-translation-independent-review.md` is a limited independent spot-check of the pilot; it is not a full translation review or reader acceptance. No reader has yet accepted the 22 later English versions.
 
 ## Content contract
 
@@ -46,10 +40,11 @@ The English view is a presentation layer over the same guide identity. Notes, re
 - `npm test` includes a translation-structure check.
 - `tests/e2e/english-reading.spec.ts` covers the toggle, English body, figures and term card in a normal browser environment.
 - The current sandbox cannot bind the local loopback server, so the Playwright web-server run was not available. A headless Chromium check against the built static assets verified the transformer and RAG toggles, English prose, all figures, English term cards and a 390 px simulated viewport without horizontal overflow. This is a rendered-build check, not a live-server or physical-device test.
+- 2026-11-09: the same rendered-build method was used to view English and Chinese GPT-3 and English AgentBench pages at 1440 px and a 390 px simulated viewport: tables keep numbers and words whole and scroll when wide, and figure rights sit behind the folded “Source and permission” control.
 
 ## Producing more translations
 
-Follow section 13 of the [guide-writing workflow](../content/workflows/GUIDE-WRITING.md). Each translation is prepared in `.cache/translation-work/<id>/` and checked with `node scripts/content/translation-work.mjs check <id>`, which validates against a temporary manifest and glossary and reports negation density; the integrator then runs `merge`. Several translations can therefore be written at once without editing `content/translations.json` or `content/glossary-en.json` directly.
+Follow section 13 of the [guide-writing workflow](../content/workflows/GUIDE-WRITING.md). Each translation is prepared in `.cache/translation-work/<id>/` and checked with `node scripts/content/translation-work.mjs check <id>`, which validates against a temporary manifest and glossary and reports length and negation density; the integrator then runs `merge`. Length is the ratio of English prose words to Chinese prose characters, with link targets, figure lines, code and display math removed on both sides. Complete translations measure 0.43–0.57 with no section below 0.37; `check` fails below 0.38 and warns below 0.41 or when a section falls below 0.31. A passing ratio is a prompt for review, not proof of completeness: compare the two versions section by section. Several translations can therefore be written at once without editing `content/translations.json` or `content/glossary-en.json` directly.
 
 ## Next increment
 

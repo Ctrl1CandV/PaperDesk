@@ -1,0 +1,9 @@
+# Reflexion r1 English translation note
+
+This is an author translation, not an independent review or reader acceptance.
+
+- **Inputs:** `content/guides/reflexion.md`, `content/guides/reflexion.json`, and the existing English glossary. No fixed source material was supplied, and no browsing was performed. The guide cites the NeurIPS 2023 camera-ready PDF, especially §1–5 and Appendix B.1, PDF pp. 1–9 and 14; those pages were not independently consulted for this translation. The metadata records an earlier source review, which is not a check performed here.
+- **Terminology:** Retained Reflexion, Actor, Evaluator, self-reflection, ReAct, CoT, trial, and pass@1. Distinguished retained verbal experience from parameter updates and internal tests from final hidden-test evaluation. The glossary adds nine cards.
+- **Examples and links:** The tool-acquisition teaching example is language-independent and remains explicitly illustrative; no wordplay adaptation was needed. The guide's `helm.md` and `agent-survey.md` links are expressed as pinned `/read/helm/1` and `/read/agent-survey/1` routes, respectively, to address the same revision-1 targets under the translation validator. The teaching diagram and formula remain identified as such.
+- **Checks:** `node scripts/content/translation-work.mjs check reflexion` passed: 2,059 words, 9.2 negations per 1,000 words, one caveat template, nine English glossary additions. A separate local count found 15,764 Unicode code points including whitespace and six H2 headings. An initial check rejected the original relative guide links; a subsequent check passed but warned about density, and the final prose revision removed that warning.
+- **Remaining uncertainty:** Fidelity to the Chinese guide is an author assessment; the original PDF, underlying experiments, source claims, and figure pixels were not independently checked. No independent translation review or reader acceptance has taken place.

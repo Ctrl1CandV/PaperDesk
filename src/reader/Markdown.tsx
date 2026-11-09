@@ -68,7 +68,7 @@ export const Markdown = memo(function Markdown({ guide, markdown, unitId, onCita
       pre: ({ children }) => <div className="code-block">{children}</div>,
       code: ({ className, children }) => {
         const source = String(children).trimEnd();
-        if (className === 'language-mermaid') return <Diagram source={source} />;
+        if (className === 'language-mermaid') return <Diagram source={source} language={language} />;
         if (className?.includes('language-math')) return <Formula source={source} display={className.includes('math-display')} language={language} />;
         return <code className={className}>{children}</code>;
       },

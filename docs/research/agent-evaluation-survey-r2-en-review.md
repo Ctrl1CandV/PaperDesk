@@ -1,0 +1,10 @@
+# Agent evaluation survey r2: English translation note
+
+- **Basis:** The complete Chinese r2 body and metadata, and the English-edition and glossary instructions in the guide-writing workflow. The translation retains the Chinese edition's pinned arXiv v1 locators, cited abstracts, publication record and image attribution; this translation pass did not independently reread the paper or benchmark abstracts.
+- **Terminology:** Task, environment and metrics name the three components; outcome, step and trajectory distinguish evidence levels. Benchmark and framework names follow the Chinese edition. English glossary additions link to this pinned guide revision.
+- **Examples:** Blue Falcon Airlines, its policy, order, four runs and probability calculation retain the invented Chinese-edition examples; no language-dependent wordplay required adaptation.
+- **Checks:** Compare structure, image, links, tables, numeric conditions and formula with r2; run the translation-work check. The original benchmark claims and current product features were not independently verified in this pass.
+- **Uncertainty:** The Chinese quick-reference table calls the company benchmark “TheCompany,” while its main text calls it “TheAgentCompany”; both are preserved for integration review. The survey's early-2025 framework snapshot and the Chinese edition's other stated coverage limits remain applicable.
+
+This is an author translation and self-check, not an independent review or an experimental reproduction.
+- Retranslation, 2026-11-09: the earlier English body summarized away explanatory sentences. It was retranslated paragraph by paragraph from the Chinese edition (Claude, author check only); it now has 9239 words, prose ratio 0.52 and 4 negations per 1,000 words. Links, figures, numbers and section structure still follow the Chinese edition; the terminology and example notes above still apply. The quick-reference table names TheAgentCompany in full where the Chinese edition abbreviates it. Not independently reviewed or reader-accepted.

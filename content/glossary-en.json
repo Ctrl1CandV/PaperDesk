@@ -587,6 +587,1363 @@
         "label": "RAGAS paper",
         "url": "https://arxiv.org/abs/2309.15217"
       }
+    },
+    {
+      "id": "toolformer",
+      "term": "Toolformer",
+      "aliases": [
+        "Toolformer"
+      ],
+      "field": "Language models · tool use",
+      "explain": "Toolformer is a method for training a language model to use external tools. It generates candidate API calls, executes them, and retains calls whose results improve prediction of the original continuation before fine-tuning the model on the resulting text.",
+      "guide": "/read/toolformer/1#u02"
+    },
+    {
+      "id": "self-supervised-learning",
+      "term": "self-supervised learning",
+      "aliases": [
+        "self-supervised learning",
+        "Self-supervised"
+      ],
+      "field": "Machine learning · training",
+      "explain": "Self-supervised learning derives a training signal from the data itself rather than relying on a separate human label for every example. In Toolformer, continuation loss supplies a filtering signal for candidate calls, while people still define tools, demonstrations, and selection rules.",
+      "guide": "/read/toolformer/1#u02"
+    },
+    {
+      "id": "negative-log-likelihood",
+      "term": "negative log-likelihood",
+      "aliases": [
+        "negative log-likelihood"
+      ],
+      "field": "Language modeling · training objective",
+      "explain": "Negative log-likelihood measures how poorly a probability model predicts observed data: assigning higher probability to the observed outcome gives a lower loss. Toolformer weights continuation-token losses to compare candidate tool responses with baselines.",
+      "guide": "/read/toolformer/1#u03"
+    },
+    {
+      "id": "zero-shot",
+      "term": "zero-shot evaluation",
+      "aliases": [
+        "zero-shot evaluation",
+        "zero-shot prompting",
+        "Zero-shot"
+      ],
+      "field": "Machine learning · evaluation",
+      "explain": "Zero-shot evaluation tests a model on a task without providing examples of that task in the test prompt. In Toolformer, this setup still follows fine-tuning on data containing tool calls.",
+      "guide": "/read/toolformer/1#u04"
+    },
+    {
+      "id": "chain-of-thought",
+      "term": "chain-of-thought prompting",
+      "aliases": [
+        "chain-of-thought",
+        "Chain-of-Thought",
+        "CoT"
+      ],
+      "full": "Chain-of-Thought Prompting",
+      "field": "Language models · prompting",
+      "explain": "Chain-of-thought prompting supplies examples that include intermediate reasoning steps as well as answers. The model can then generate steps before answering a new question; the written steps can still contain errors.",
+      "guide": "/read/chain-of-thought/1#u01"
+    },
+    {
+      "id": "greedy-decoding",
+      "term": "greedy decoding",
+      "aliases": [
+        "greedy decoding"
+      ],
+      "field": "Language models · generation",
+      "explain": "Greedy decoding selects the highest-probability next token at each generation step. Each choice conditions the next, so the resulting sequence is produced one local choice at a time.",
+      "guide": "/read/chain-of-thought/1#u03"
+    },
+    {
+      "id": "length-generalization",
+      "term": "length generalization",
+      "aliases": [
+        "length generalization"
+      ],
+      "field": "Language models · evaluation",
+      "explain": "Length generalization is performance on inputs or operations longer than those shown in examples. The paper tests whether models can extend demonstrated symbolic procedures to longer instances.",
+      "guide": "/read/chain-of-thought/1#u05"
+    },
+    {
+      "id": "react",
+      "term": "ReAct",
+      "aliases": [
+        "ReAct"
+      ],
+      "field": "Language agents · interaction",
+      "explain": "ReAct combines reasoning, actions, and observations in an agent's interaction process. An action can obtain feedback that informs a later reasoning step.",
+      "guide": "/read/agent-memory-survey/2#u03"
+    },
+    {
+      "id": "reflexion",
+      "term": "Reflexion",
+      "aliases": [
+        "Reflexion"
+      ],
+      "field": "Language agents · experience",
+      "explain": "Reflexion turns feedback after an attempt into textual experience that can inform a later attempt. The survey uses it to illustrate the use of experience across trials.",
+      "guide": "/read/agent-memory-survey/2#u03"
+    },
+    {
+      "id": "textual-memory",
+      "term": "textual memory",
+      "aliases": [
+        "textual memory",
+        "Textual memory"
+      ],
+      "field": "Agent memory · representation",
+      "explain": "Textual memory provides retained information explicitly as text to a model. The text may be selected by retrieval, including a vector index, before it is supplied.",
+      "guide": "/read/agent-memory-survey/2#u04"
+    },
+    {
+      "id": "parametric-memory",
+      "term": "parametric memory",
+      "aliases": [
+        "parametric memory",
+        "Parametric memory"
+      ],
+      "field": "Agent memory · representation",
+      "explain": "Parametric memory influences later model outputs through changes to model parameters. Fine-tuning and targeted knowledge editing are two approaches discussed in the survey.",
+      "guide": "/read/agent-memory-survey/2#u04"
+    },
+    {
+      "id": "knowledge-editing",
+      "term": "knowledge editing",
+      "aliases": [
+        "knowledge editing",
+        "Knowledge editing"
+      ],
+      "field": "Language models · parameter updates",
+      "explain": "Knowledge editing targets a specific fact for modification in a model. Preserving unrelated knowledge while making the change remains a challenge.",
+      "guide": "/read/agent-memory-survey/2#u04"
+    },
+    {
+      "id": "cot-self-consistency",
+      "term": "CoT self-consistency",
+      "aliases": [
+        "CoT-SC",
+        "CoT self-consistency"
+      ],
+      "field": "Language models · sampling",
+      "explain": "CoT self-consistency samples several reasoning trajectories for one question and selects the most frequent answer. In the ReAct paper, it also serves as a component of fallback strategies with different sampling costs.",
+      "guide": "/read/react/3#combination"
+    },
+    {
+      "id": "alfworld",
+      "term": "ALFWorld",
+      "aliases": [
+        "ALFWorld"
+      ],
+      "field": "Interactive agents · benchmark",
+      "explain": "ALFWorld is a text-based simulated household environment where an agent navigates and manipulates objects to complete goals. Its long tasks require tracking local observations and subgoals.",
+      "guide": "/read/react/3#u04"
+    },
+    {
+      "id": "webshop",
+      "term": "WebShop",
+      "aliases": [
+        "WebShop"
+      ],
+      "field": "Interactive agents · benchmark",
+      "explain": "WebShop is a research shopping environment in which an agent searches products, selects options, and takes a purchase action to satisfy a natural-language request. Its evaluation includes attribute coverage and complete success.",
+      "guide": "/read/react/3#webshop"
+    },
+    {
+      "id": "hotpotqa",
+      "term": "HotpotQA",
+      "aliases": [
+        "HotpotQA"
+      ],
+      "field": "Question answering · benchmark",
+      "explain": "HotpotQA is a question-answering dataset whose questions often require combining information from multiple Wikipedia passages. The ReAct experiments use exact match to score answers.",
+      "guide": "/read/react/3#u03"
+    },
+    {
+      "id": "fever",
+      "term": "FEVER",
+      "aliases": [
+        "FEVER"
+      ],
+      "field": "Fact verification · benchmark",
+      "explain": "FEVER is a fact-verification dataset with claims labeled supported, refuted, or insufficiently evidenced. In the ReAct experiments, the model receives the claim without supporting passages and may search Wikipedia.",
+      "guide": "/read/react/3#demonstrations"
+    },
+    {
+      "id": "react-im",
+      "term": "ReAct-IM",
+      "aliases": [
+        "ReAct-IM"
+      ],
+      "field": "Interactive agents · ablation",
+      "explain": "ReAct-IM is an ablation in the ReAct paper that uses dense, external-feedback-style thoughts inspired by Inner Monologue. It is compared with ReAct's flexible sparse thoughts on ALFWorld.",
+      "guide": "/read/react/3#u04"
+    },
+    {
+      "id": "helm",
+      "term": "HELM",
+      "aliases": [
+        "HELM"
+      ],
+      "full": "Holistic Evaluation of Language Models",
+      "field": "Language models · evaluation",
+      "explain": "HELM organizes language model evaluation around scenarios, adaptation and multiple metrics. Its taxonomy makes both the selected tests and gaps in coverage visible.",
+      "guide": "/read/helm/3#u01"
+    },
+    {
+      "id": "expected-calibration-error",
+      "term": "expected calibration error",
+      "aliases": [
+        "expected calibration error",
+        "ECE"
+      ],
+      "full": "Expected Calibration Error",
+      "field": "Model evaluation · calibration",
+      "explain": "Expected calibration error summarizes how far predicted confidence differs from observed correctness. A finite-sample estimate groups predictions and weights each group's discrepancy by its share of the sample; its value depends on the grouping.",
+      "guide": "/read/helm/3#calibration"
+    },
+    {
+      "id": "selective-classification",
+      "term": "selective classification",
+      "aliases": [
+        "selective classification"
+      ],
+      "field": "Model evaluation · uncertainty",
+      "explain": "Selective classification evaluates predictions the model handles after selecting them by confidence, while allowing it to abstain on the rest. Its accuracy should be interpreted together with the fraction of examples retained.",
+      "guide": "/read/helm/3#calibration"
+    },
+    {
+      "id": "mmlu",
+      "term": "MMLU",
+      "aliases": [
+        "MMLU"
+      ],
+      "full": "Measuring Massive Multitask Language Understanding",
+      "field": "Language models · benchmark",
+      "explain": "MMLU is a benchmark of multiple-choice questions spanning many subjects. HELM uses an anatomy question to illustrate how a scenario provides an input and candidate references.",
+      "guide": "/read/helm/3#u02"
+    },
+    {
+      "id": "hellaswag",
+      "term": "HellaSwag",
+      "aliases": [
+        "HellaSwag"
+      ],
+      "field": "Language models · benchmark",
+      "explain": "HellaSwag tests commonsense completion by asking a model to select a plausible continuation from candidates. HELM uses it to show how multiple-choice adaptation can strongly change a score.",
+      "guide": "/read/helm/3#prompt-evidence"
+    },
+    {
+      "id": "attention-sink",
+      "term": "attention sink",
+      "aliases": [
+        "attention sink",
+        "attention sinks"
+      ],
+      "field": "Language models · attention",
+      "explain": "An attention sink is a token that receives substantial attention from later positions. StreamingLLM retains initial sink tokens to help stabilize attention allocation during streaming.",
+      "guide": "/read/streamingllm/2#u03"
+    },
+    {
+      "id": "kv-cache",
+      "term": "KV cache",
+      "aliases": [
+        "KV cache"
+      ],
+      "field": "Language models · inference",
+      "explain": "A KV cache stores keys and values computed for earlier tokens at each model layer. Later queries can reuse them when calculating attention instead of recomputing the whole history.",
+      "guide": "/read/streamingllm/2#u01"
+    },
+    {
+      "id": "streamingllm",
+      "term": "StreamingLLM",
+      "aliases": [
+        "StreamingLLM"
+      ],
+      "field": "Language models · streaming inference",
+      "explain": "StreamingLLM keeps a few initial token states and a rolling window of recent states in a bounded KV cache. It also handles positions so that a model can continue processing a stream while retaining a limited context.",
+      "guide": "/read/streamingllm/2#u04"
+    },
+    {
+      "id": "rope",
+      "term": "RoPE",
+      "aliases": [
+        "RoPE"
+      ],
+      "full": "Rotary Position Embedding",
+      "field": "Language models · position representation",
+      "explain": "RoPE applies position-dependent rotations to representations used in attention. StreamingLLM stores keys before this transformation and applies it according to their current cache positions.",
+      "guide": "/read/streamingllm/2#u04"
+    },
+    {
+      "id": "alibi",
+      "term": "ALiBi",
+      "aliases": [
+        "ALiBi"
+      ],
+      "full": "Attention with Linear Biases",
+      "field": "Language models · position representation",
+      "explain": "ALiBi incorporates distance-dependent biases into attention scores. StreamingLLM uses consecutive cache distances when applying these biases across retained positions.",
+      "guide": "/read/streamingllm/2#u04"
+    },
+    {
+      "id": "streameval",
+      "term": "StreamEval",
+      "aliases": [
+        "StreamEval"
+      ],
+      "field": "Language models · evaluation",
+      "explain": "StreamEval is a synthetic streaming question-answering dataset used in the paper. Information arrives in lines, and periodic questions ask about relatively recent information.",
+      "guide": "/read/streamingllm/2#u06"
+    },
+    {
+      "id": "zero-sink",
+      "term": "Zero Sink",
+      "aliases": [
+        "Zero Sink"
+      ],
+      "field": "Language models · attention",
+      "explain": "Zero Sink adds one to the softmax denominator, equivalent to an extra attention position with zero key and value. This gives attention weight a destination outside the actual content tokens.",
+      "guide": "/read/streamingllm/2#u07"
+    },
+    {
+      "id": "concept-drift",
+      "term": "concept drift",
+      "aliases": [
+        "concept drift"
+      ],
+      "field": "Machine learning · nonstationary data",
+      "explain": "Concept drift describes a change over time in the distribution generating inputs and labels. The survey distinguishes changes in the input distribution from changes in the conditional relationship between inputs and labels.",
+      "guide": "/read/concept-drift-survey/2#u01"
+    },
+    {
+      "id": "real-concept-drift",
+      "term": "real concept drift",
+      "aliases": [
+        "real concept drift",
+        "real drift"
+      ],
+      "field": "Machine learning · nonstationary data",
+      "explain": "Real concept drift changes the conditional distribution of labels given inputs. It can occur even when the input distribution remains unchanged.",
+      "guide": "/read/concept-drift-survey/2#u01"
+    },
+    {
+      "id": "virtual-drift",
+      "term": "virtual drift",
+      "aliases": [
+        "virtual drift"
+      ],
+      "field": "Machine learning · nonstationary data",
+      "explain": "In the survey's main definition, virtual drift changes the input distribution while the conditional distribution of labels given inputs remains unchanged. Earlier literature also uses the term differently.",
+      "guide": "/read/concept-drift-survey/2#u01"
+    },
+    {
+      "id": "incremental-drift",
+      "term": "incremental drift",
+      "aliases": [
+        "incremental drift"
+      ],
+      "field": "Machine learning · drift types",
+      "explain": "Incremental drift moves a concept through a sequence of intermediate concepts. It differs from a transition in which old and new concepts alternate.",
+      "guide": "/read/concept-drift-survey/2#u02"
+    },
+    {
+      "id": "gradual-drift",
+      "term": "gradual drift",
+      "aliases": [
+        "gradual drift"
+      ],
+      "field": "Machine learning · drift types",
+      "explain": "Gradual drift can involve old and new concepts alternating during a transition. This differs from incremental movement through intermediate concepts.",
+      "guide": "/read/concept-drift-survey/2#u02"
+    },
+    {
+      "id": "reservoir-sampling",
+      "term": "reservoir sampling",
+      "aliases": [
+        "reservoir sampling",
+        "Reservoir sampling"
+      ],
+      "field": "Data streams · sampling",
+      "explain": "Reservoir sampling maintains a bounded sample representing a stream observed so far. Its retention goal differs from a recent window and does not inherently prioritize the current concept.",
+      "guide": "/read/concept-drift-survey/2#u04"
+    },
+    {
+      "id": "cusum",
+      "term": "CUSUM",
+      "aliases": [
+        "CUSUM"
+      ],
+      "full": "Cumulative Sum",
+      "field": "Change detection · sequential analysis",
+      "explain": "CUSUM accumulates deviations in a monitored signal and raises an alarm when the resulting statistic crosses a threshold. Its choice of signal and thresholds affects detection speed and errors.",
+      "guide": "/read/concept-drift-survey/2#u05"
+    },
+    {
+      "id": "page-hinkley",
+      "term": "Page–Hinkley",
+      "aliases": [
+        "Page–Hinkley"
+      ],
+      "field": "Change detection · sequential analysis",
+      "explain": "The Page–Hinkley approach accumulates evidence of change using deviations relative to a mean. Its alarm depends on the resulting detection statistic.",
+      "guide": "/read/concept-drift-survey/2#u05"
+    },
+    {
+      "id": "statistical-process-control",
+      "term": "statistical process control",
+      "aliases": [
+        "statistical process control",
+        "Statistical process control"
+      ],
+      "field": "Change detection · monitoring",
+      "explain": "Statistical process control monitors a signal against a baseline to distinguish normal, warning, and out-of-control states. In drift detection the signal can be a classifier's error rate.",
+      "guide": "/read/concept-drift-survey/2#u05"
+    },
+    {
+      "id": "adwin",
+      "term": "ADWIN",
+      "aliases": [
+        "ADWIN"
+      ],
+      "field": "Data streams · change detection",
+      "explain": "ADWIN compares subwindows within a changing window and discards the older part when a sufficiently large statistical difference is found. The survey discusses bounded input signals.",
+      "guide": "/read/concept-drift-survey/2#u05"
+    },
+    {
+      "id": "cvfdt",
+      "term": "CVFDT",
+      "aliases": [
+        "CVFDT"
+      ],
+      "field": "Data streams · adaptive trees",
+      "explain": "CVFDT monitors whether decision-tree splits remain useful on a recent window. It builds candidate subtrees and can replace a tree region when a candidate performs better on new data.",
+      "guide": "/read/concept-drift-survey/2#u06"
+    },
+    {
+      "id": "dynamic-weighted-majority",
+      "term": "Dynamic Weighted Majority",
+      "aliases": [
+        "Dynamic Weighted Majority"
+      ],
+      "field": "Data streams · ensembles",
+      "explain": "Dynamic Weighted Majority manages an ensemble of experts, reducing weights for recent errors and adding or removing experts according to its rules. The ensemble can thus change as performance changes.",
+      "guide": "/read/concept-drift-survey/2#u06"
+    },
+    {
+      "id": "prequential-evaluation",
+      "term": "prequential evaluation",
+      "aliases": [
+        "prequential evaluation",
+        "Prequential evaluation",
+        "prequential",
+        "test-then-train"
+      ],
+      "field": "Data streams · evaluation",
+      "explain": "Prequential, or test-then-train, evaluation tests each arriving example with the current model before using that example for training. This preserves the order in which prediction and feedback become available.",
+      "guide": "/read/concept-drift-survey/2#u07"
+    },
+    {
+      "id": "ram-hours",
+      "term": "RAM-Hours",
+      "aliases": [
+        "RAM-Hours"
+      ],
+      "field": "Machine learning · resource measurement",
+      "explain": "RAM-Hours combines memory consumption with the duration of use. The survey uses it to compare resource costs alongside predictive performance in an experiment.",
+      "guide": "/read/concept-drift-survey/2#u08"
+    },
+    {
+      "id": "flora-drift",
+      "term": "FLORA",
+      "aliases": [
+        "FLORA"
+      ],
+      "field": "Data streams · adaptive learning",
+      "explain": "The FLORA family uses windows to illustrate the trade-off between retaining evidence and forgetting outdated examples when concepts change.",
+      "guide": "/read/concept-drift-survey/2#u04"
+    },
+    {
+      "id": "adwin-bagging",
+      "term": "ADWIN Bagging",
+      "aliases": [
+        "ADWIN Bagging"
+      ],
+      "field": "Data streams · ensembles",
+      "explain": "ADWIN Bagging is one of the ensemble methods compared in the survey's Random RBF stream experiment. The comparison reports predictive performance alongside resource use.",
+      "guide": "/read/concept-drift-survey/2#u08"
+    },
+    {
+      "id": "leveraging-bagging",
+      "term": "Leveraging Bagging",
+      "aliases": [
+        "Leveraging Bagging"
+      ],
+      "field": "Data streams · ensembles",
+      "explain": "Leveraging Bagging is an ensemble method included in the survey's Random RBF comparison. In that setting it uses substantially more RAM-Hours while the ensemble methods perform better.",
+      "guide": "/read/concept-drift-survey/2#u08"
+    },
+    {
+      "id": "pass-at-one",
+      "term": "pass@1",
+      "aliases": [
+        "pass@1"
+      ],
+      "field": "Code generation · evaluation",
+      "explain": "Pass@1 measures success for a single submitted candidate under a specified evaluation procedure. In the Reflexion programming experiments, internal testing and revision can precede the final candidate's hidden-test evaluation.",
+      "guide": "/read/reflexion/1#u03"
+    },
+    {
+      "id": "humaneval",
+      "term": "HumanEval",
+      "aliases": [
+        "HumanEval"
+      ],
+      "field": "Code generation · benchmark",
+      "explain": "HumanEval evaluates generated programs on programming problems using tests. Reflexion reports final submission results and also studies a subset converted to Rust.",
+      "guide": "/read/reflexion/1#u03"
+    },
+    {
+      "id": "mbpp",
+      "term": "MBPP",
+      "aliases": [
+        "MBPP"
+      ],
+      "field": "Code generation · benchmark",
+      "explain": "MBPP is a benchmark of programming problems used to evaluate generated code. The reported Reflexion Python result on it is lower than the GPT-4 baseline, illustrating that the process need not improve every dataset.",
+      "guide": "/read/reflexion/1#u03"
+    },
+    {
+      "id": "agentbench",
+      "term": "AgentBench",
+      "aliases": [
+        "AgentBench"
+      ],
+      "field": "Agent evaluation · benchmark",
+      "explain": "AgentBench evaluates language models as agents interacting with eight text-accessible environments. Its scores combine different task metrics, and its finish reasons help diagnose how runs end.",
+      "guide": "/read/agentbench/2#environments",
+      "source": {
+        "label": "AgentBench v2",
+        "url": "https://arxiv.org/pdf/2308.03688v2"
+      }
+    },
+    {
+      "id": "pomdp",
+      "term": "partially observable Markov decision process",
+      "aliases": [
+        "partially observable Markov decision process",
+        "POMDP"
+      ],
+      "full": "Partially Observable Markov Decision Process",
+      "field": "Decision making · formalization",
+      "explain": "A partially observable Markov decision process describes an agent acting in an environment whose full state it cannot observe directly. Actions change the state, and observations provide information for subsequent decisions.",
+      "guide": "/read/agentbench/2#interaction"
+    },
+    {
+      "id": "mind2web",
+      "term": "Mind2Web",
+      "aliases": [
+        "Mind2Web"
+      ],
+      "field": "Agent evaluation · web tasks",
+      "explain": "Mind2Web provides web tasks with recorded reference interactions. AgentBench adapts its cross-domain data to test whether a model selects the reference element and operation at each step.",
+      "guide": "/read/agentbench/2#environments"
+    },
+    {
+      "id": "tau-bench",
+      "term": "τ-bench",
+      "aliases": [
+        "τ-bench"
+      ],
+      "full": "Tool-Agent-User Interaction Benchmark",
+      "field": "Agent evaluation · benchmark",
+      "explain": "τ-bench evaluates an agent interacting with a simulated user and database tools under domain-specific policies. It scores final states and required outputs, and measures consistency over repeated trials.",
+      "guide": "/read/tau-bench/2#setup",
+      "source": {
+        "label": "Original paper",
+        "url": "https://arxiv.org/pdf/2406.12045v1#page=3"
+      }
+    },
+    {
+      "id": "pass-hat-k",
+      "term": "pass^k",
+      "aliases": [
+        "pass^k"
+      ],
+      "field": "Agent evaluation · reliability",
+      "explain": "Pass^k is the probability that all k independent trials of a task succeed, averaged across tasks. It describes repeated reliability rather than the chance of finding at least one successful attempt.",
+      "guide": "/read/tau-bench/2#passk",
+      "source": {
+        "label": "Original paper",
+        "url": "https://arxiv.org/pdf/2406.12045v1#page=4"
+      }
+    },
+    {
+      "id": "pass-at-k",
+      "term": "pass@k",
+      "aliases": [
+        "pass@k"
+      ],
+      "field": "Evaluation · multiple attempts",
+      "explain": "Pass@k measures the chance that at least one of k independent attempts succeeds. It is useful when multiple candidate solutions can be tried and verified.",
+      "guide": "/read/tau-bench/2#passk",
+      "source": {
+        "label": "τ-bench paper",
+        "url": "https://arxiv.org/pdf/2406.12045v1#page=4"
+      }
+    },
+    {
+      "id": "function-calling",
+      "term": "function calling",
+      "aliases": [
+        "function calling",
+        "function-calling"
+      ],
+      "field": "Language agents · tool use",
+      "explain": "Function calling lets a model select a provided function and supply arguments in a structured interface. In τ-bench the agent chooses between a tool call and a message to the user at each turn.",
+      "guide": "/read/tau-bench/2#protocol",
+      "source": {
+        "label": "τ-bench paper",
+        "url": "https://arxiv.org/pdf/2406.12045v1#page=6"
+      }
+    },
+    {
+      "id": "autogen",
+      "term": "AutoGen",
+      "aliases": [
+        "AutoGen"
+      ],
+      "field": "Multi-agent systems · framework",
+      "explain": "AutoGen is a framework for building applications as conversations among configurable agents. Agents can use language models, human input, tools, or combinations of these to produce replies.",
+      "guide": "/read/autogen/2#architecture",
+      "source": {
+        "label": "AutoGen paper",
+        "url": "https://arxiv.org/abs/2308.08155v2"
+      }
+    },
+    {
+      "id": "conversable-agent",
+      "term": "conversable agent",
+      "aliases": [
+        "conversable agent",
+        "conversable agents"
+      ],
+      "field": "Multi-agent systems · agent design",
+      "explain": "A conversable agent sends and receives messages, maintains context from its exchanges, and responds using configured capabilities. In AutoGen those capabilities can come from a model, a human, tools, or a combination.",
+      "guide": "/read/autogen/2#agents"
+    },
+    {
+      "id": "conversation-programming",
+      "term": "conversation programming",
+      "aliases": [
+        "conversation programming",
+        "Conversation programming"
+      ],
+      "field": "Multi-agent systems · programming",
+      "explain": "Conversation programming organizes an application around agents' message exchanges. Computation produces replies, while control flow determines when and in what order those computations occur.",
+      "guide": "/read/autogen/2#programming"
+    },
+    {
+      "id": "autogen-grounding-agent",
+      "term": "grounding agent",
+      "aliases": [
+        "grounding agent"
+      ],
+      "field": "Multi-agent systems · feedback",
+      "explain": "In AutoGen's ALFWorld application, a grounding agent supplies commonsense facts to help the assistant avoid repeated errors. It provides information through the executor rather than selecting the next action itself.",
+      "guide": "/read/autogen/2#flow"
+    },
+    {
+      "id": "group-chat-manager",
+      "term": "GroupChatManager",
+      "aliases": [
+        "GroupChatManager"
+      ],
+      "field": "Multi-agent systems · orchestration",
+      "explain": "GroupChatManager coordinates a dynamic group conversation in AutoGen. It selects a speaker, collects that agent's reply, and broadcasts the reply to the other participants.",
+      "guide": "/read/autogen/2#groupchat"
+    },
+    {
+      "id": "optiguide",
+      "term": "OptiGuide",
+      "aliases": [
+        "OptiGuide"
+      ],
+      "field": "Operations research · code analysis",
+      "explain": "OptiGuide answers questions about optimization solutions by generating and executing code and interpreting the results. The AutoGen example divides coordination, writing, and safety checking among agents.",
+      "guide": "/read/autogen/2#flow"
+    },
+    {
+      "id": "autogen-auto-reply",
+      "term": "auto-reply",
+      "aliases": [
+        "auto-reply"
+      ],
+      "field": "Multi-agent systems · control flow",
+      "explain": "Auto-reply lets an agent receiving a message generate and send a response automatically unless a termination condition is met. Reply functions can use a language model, human input, tools, or custom logic.",
+      "guide": "/read/autogen/2#programming"
+    },
+    {
+      "id": "camel-role-playing",
+      "term": "CAMEL role-playing",
+      "aliases": [
+        "CAMEL role-playing"
+      ],
+      "field": "Multi-agent systems · framework",
+      "explain": "CAMEL role-playing assigns a task and distinct roles to conversational agents. An AI user generates instructions and an AI assistant responds, using shared conversation history until a stopping condition is reached.",
+      "guide": "/read/camel/2#framework",
+      "source": {
+        "label": "CAMEL paper",
+        "url": "https://arxiv.org/abs/2303.17760v2"
+      }
+    },
+    {
+      "id": "inception-prompting",
+      "term": "inception prompting",
+      "aliases": [
+        "inception prompting",
+        "Inception Prompting"
+      ],
+      "field": "Multi-agent systems · prompting",
+      "explain": "Inception prompting establishes task specification, agent roles and communication rules before role-playing begins. The agents then prompt each other within that protocol.",
+      "guide": "/read/camel/2#prompting",
+      "source": {
+        "label": "CAMEL paper",
+        "url": "https://arxiv.org/abs/2303.17760v2"
+      }
+    },
+    {
+      "id": "task-specifier",
+      "term": "task specifier",
+      "aliases": [
+        "task specifier",
+        "Task Specifier"
+      ],
+      "field": "Multi-agent systems · task design",
+      "explain": "In CAMEL, a task specifier expands a preliminary idea and role assignment into a concrete task. Its additions are generated assumptions that may require confirmation against the person's intent.",
+      "guide": "/read/camel/2#task",
+      "source": {
+        "label": "CAMEL paper",
+        "url": "https://arxiv.org/abs/2303.17760v2"
+      }
+    },
+    {
+      "id": "role-flipping",
+      "term": "role flipping",
+      "aliases": [
+        "role flipping",
+        "Role flipping"
+      ],
+      "field": "Multi-agent systems · failure mode",
+      "explain": "Role flipping occurs when conversational agents reverse their assigned responsibilities. In CAMEL, an assistant that begins instructing the user triggers a termination condition.",
+      "guide": "/read/camel/2#failures",
+      "source": {
+        "label": "CAMEL paper",
+        "url": "https://arxiv.org/abs/2303.17760v2"
+      }
+    },
+    {
+      "id": "flake-reply",
+      "term": "flake reply",
+      "aliases": [
+        "flake reply",
+        "flake messages"
+      ],
+      "field": "Multi-agent systems · failure mode",
+      "explain": "A flake reply promises future action without providing the requested concrete work. CAMEL counts messages beginning with 'I will...' as an approximate surface indicator of such replies.",
+      "guide": "/read/camel/2#failures",
+      "source": {
+        "label": "CAMEL paper",
+        "url": "https://arxiv.org/abs/2303.17760v2"
+      }
+    },
+    {
+      "id": "agentprune",
+      "term": "AgentPrune",
+      "aliases": [
+        "AgentPrune"
+      ],
+      "field": "Multi-agent systems · communication",
+      "explain": "AgentPrune learns scores for permitted messages between agents, then prunes spatial and temporal connections once and reuses the resulting structure. Task feedback and a low-rank preference guide the learning stage.",
+      "guide": "/read/agentprune/2#u03",
+      "source": {
+        "label": "Original paper",
+        "url": "https://arxiv.org/abs/2410.02506v1"
+      }
+    },
+    {
+      "id": "policy-gradient",
+      "term": "policy gradient",
+      "aliases": [
+        "policy gradient",
+        "policy gradients"
+      ],
+      "field": "Machine learning · optimization",
+      "explain": "A policy gradient updates the parameters of a stochastic policy using feedback from its sampled actions. AgentPrune treats choosing a communication graph as an action and uses task scores to guide graph selection.",
+      "guide": "/read/agentprune/2#policy-gradient"
+    },
+    {
+      "id": "nuclear-norm",
+      "term": "nuclear norm",
+      "aliases": [
+        "nuclear norm",
+        "nuclear norms"
+      ],
+      "field": "Linear algebra · matrix optimization",
+      "explain": "The nuclear norm of a matrix is the sum of its singular values. AgentPrune uses it as a tractable substitute for rank in a regularization objective; it does not directly count edges.",
+      "guide": "/read/agentprune/2#low-rank"
+    },
+    {
+      "id": "one-shot-pruning",
+      "term": "one-shot pruning",
+      "aliases": [
+        "one-shot pruning",
+        "One-shot pruning"
+      ],
+      "field": "Multi-agent systems · graph optimization",
+      "explain": "One-shot pruning finalizes a sparse structure in a single pruning step. In AgentPrune, high-scoring original connections are retained after a short learning phase and reused in later work.",
+      "guide": "/read/agentprune/2#one-shot-pruning"
+    },
+    {
+      "id": "multi-query-training",
+      "term": "multi-query training",
+      "aliases": [
+        "multi-query training",
+        "Multi-query training"
+      ],
+      "field": "Multi-agent systems · training protocol",
+      "explain": "Multi-query training learns a communication structure using feedback on an initial set of questions, then reuses the pruned structure on later questions. Reuse can amortize learning costs across short tasks.",
+      "guide": "/read/agentprune/2#temporal-reuse"
+    },
+    {
+      "id": "directed-acyclic-graph",
+      "term": "directed acyclic graph",
+      "aliases": [
+        "directed acyclic graph",
+        "DAG"
+      ],
+      "field": "Graph theory · execution order",
+      "explain": "A directed acyclic graph has directed edges and no directed cycle. Its nodes can be topologically ordered so that dependencies are processed before the nodes that use them.",
+      "guide": "/read/agentprune/2#u01"
+    },
+    {
+      "id": "natural-language-inference",
+      "term": "natural language inference",
+      "aliases": [
+        "natural language inference",
+        "Natural language inference",
+        "NLI"
+      ],
+      "field": "Natural language processing · evaluation task",
+      "explain": "Natural language inference asks whether a hypothesis follows from a premise. Evaluations can also include contradiction and cases where the premise leaves the hypothesis undetermined.",
+      "guide": "/read/llm-evaluation-survey/2#u01"
+    },
+    {
+      "id": "out-of-distribution-robustness",
+      "term": "out-of-distribution robustness",
+      "aliases": [
+        "out-of-distribution robustness",
+        "OOD robustness"
+      ],
+      "field": "Model evaluation · robustness",
+      "explain": "Out-of-distribution robustness concerns performance when evaluation inputs differ from the distribution used for training. The type of shift and the test data determine what the result can tell us.",
+      "guide": "/read/llm-evaluation-survey/2#what-risks"
+    },
+    {
+      "id": "benchmark-contamination",
+      "term": "benchmark contamination",
+      "aliases": [
+        "benchmark contamination",
+        "training data contamination"
+      ],
+      "field": "Model evaluation · data quality",
+      "explain": "Benchmark contamination occurs when test material enters model training or otherwise influences development. A high score can then reflect exposure as well as the ability the benchmark was intended to test.",
+      "guide": "/read/llm-evaluation-survey/2#u05"
+    },
+    {
+      "id": "bertscore",
+      "term": "BERTScore",
+      "aliases": [
+        "BERTScore"
+      ],
+      "field": "Text generation · evaluation metric",
+      "explain": "BERTScore compares generated text with a reference using contextual representations from a pretrained language model. Its semantic similarity score can overlook small but important factual differences.",
+      "guide": "/read/llm-evaluation-survey/2#u03"
+    },
+    {
+      "id": "rouge",
+      "term": "ROUGE",
+      "aliases": [
+        "ROUGE"
+      ],
+      "field": "Text generation · evaluation metric",
+      "explain": "ROUGE is a family of overlap-based metrics commonly used to compare generated summaries with reference text. Overlapping words or sequences give an incomplete picture of factual accuracy.",
+      "guide": "/read/llm-evaluation-survey/2#u03"
+    },
+    {
+      "id": "rewoo",
+      "term": "ReWOO",
+      "aliases": [
+        "ReWOO"
+      ],
+      "field": "Language agents · planning",
+      "explain": "ReWOO separates advance planning from tool observations: a model produces a plan, tools fill in its results, and an answer is generated afterward. This reduces repeated model calls while limiting adaptation during execution.",
+      "guide": "/read/agent-survey/3#planning"
+    },
+    {
+      "id": "mechanism-engineering",
+      "term": "mechanism engineering",
+      "aliases": [
+        "mechanism engineering"
+      ],
+      "field": "Language agents · capability acquisition",
+      "explain": "Mechanism engineering designs runtime modules, rules, and interactions that help an agent acquire or use capabilities. Examples include feedback loops, accumulated experience, and multi-agent debate.",
+      "guide": "/read/agent-survey/3#capability"
+    },
+    {
+      "id": "generalized-human-alignment",
+      "term": "generalized human alignment",
+      "aliases": [
+        "generalized human alignment"
+      ],
+      "field": "Language agents · alignment",
+      "explain": "Generalized human alignment is the survey's term for aligning agents with different human values for different purposes, including simulated behavior used to study adverse outcomes.",
+      "guide": "/read/agent-survey/3#challenges"
+    },
+    {
+      "id": "reinforcement-learning-from-human-feedback",
+      "term": "reinforcement learning from human feedback",
+      "aliases": [
+        "reinforcement learning from human feedback",
+        "RLHF"
+      ],
+      "field": "Machine learning · alignment",
+      "explain": "A training approach that uses human judgments to guide reinforcement learning. Here comparisons train a reward model whose scores guide a response policy.",
+      "guide": "/read/instructgpt/3#u03"
+    },
+    {
+      "id": "supervised-fine-tuning",
+      "term": "supervised fine-tuning",
+      "aliases": [
+        "supervised fine-tuning",
+        "SFT"
+      ],
+      "field": "Machine learning · training",
+      "explain": "Further training on labeled examples. In this paper a language model learns to predict human demonstration responses given prompts.",
+      "guide": "/read/instructgpt/3#sft"
+    },
+    {
+      "id": "reward-model",
+      "term": "reward model",
+      "aliases": [
+        "reward model",
+        "reward models"
+      ],
+      "field": "Machine learning · feedback",
+      "explain": "A model that assigns a scalar score to a prompt and response. Here it learns relative human preferences from ranked candidate responses.",
+      "guide": "/read/instructgpt/3#reward-model"
+    },
+    {
+      "id": "proximal-policy-optimization",
+      "term": "proximal policy optimization",
+      "aliases": [
+        "proximal policy optimization",
+        "PPO"
+      ],
+      "field": "Machine learning · reinforcement learning",
+      "explain": "A policy optimization method that uses sampled actions and a constrained objective to limit overly large updates. The paper applies it to response generation.",
+      "guide": "/read/instructgpt/3#ppo"
+    },
+    {
+      "id": "value-function",
+      "term": "value function",
+      "aliases": [
+        "value function",
+        "value functions"
+      ],
+      "field": "Machine learning · reinforcement learning",
+      "explain": "An estimate of expected future return from a state. In this paper it helps estimate advantages for generated prefixes during PPO training.",
+      "guide": "/read/instructgpt/3#ppo"
+    },
+    {
+      "id": "kl-divergence",
+      "term": "KL divergence",
+      "aliases": [
+        "KL divergence",
+        "Kullback–Leibler divergence",
+        "Kullback-Leibler divergence"
+      ],
+      "field": "Machine learning · probability",
+      "explain": "A measure of how one probability distribution differs from a reference distribution. The paper uses it to penalize policy deviation from the supervised starting point.",
+      "guide": "/read/instructgpt/3#objective"
+    },
+    {
+      "id": "alignment-tax",
+      "term": "alignment tax",
+      "aliases": [
+        "alignment tax"
+      ],
+      "field": "Machine learning · evaluation",
+      "explain": "A performance cost on other tasks associated with training for alignment. The paper studies task regressions after PPO and mitigation using pretraining updates.",
+      "guide": "/read/instructgpt/3#alignment-tax"
+    },
+    {
+      "id": "few-shot-learning",
+      "term": "few-shot learning",
+      "aliases": [
+        "few-shot learning",
+        "few-shot"
+      ],
+      "field": "Language models · prompting",
+      "explain": "Few-shot learning uses a small number of task examples to adapt behavior. In GPT-3, these examples appear in the prompt and model parameters remain fixed.",
+      "guide": "/read/gpt3/2#u03"
+    },
+    {
+      "id": "language-model-perplexity",
+      "term": "perplexity",
+      "aliases": [
+        "perplexity",
+        "perplexities"
+      ],
+      "field": "Language models · evaluation",
+      "explain": "Perplexity summarizes how much probability a language model assigns to observed text, using the exponential of average negative log probability. Lower perplexity indicates better prediction of the evaluated text.",
+      "guide": "/read/gpt3/2#u05"
+    },
+    {
+      "id": "meta-learning",
+      "term": "meta-learning",
+      "aliases": [
+        "meta-learning"
+      ],
+      "field": "Machine learning · adaptation",
+      "explain": "Meta-learning studies how a system can acquire an ability to adapt quickly to tasks. GPT-3 interprets pretraining as an outer process and the use of examples in context as a possible form of inner adaptation.",
+      "guide": "/read/gpt3/2#u04"
+    },
+    {
+      "id": "ngram",
+      "term": "N-gram",
+      "aliases": [
+        "N-gram",
+        "13-gram"
+      ],
+      "field": "Language models · evaluation",
+      "explain": "An N-gram is a sequence of N consecutive units, such as words. GPT-3's contamination audit looks for matching word sequences between evaluation samples and candidate training text.",
+      "guide": "/read/gpt3/2#u06"
+    },
+    {
+      "id": "closed-book-question-answering",
+      "term": "closed-book question answering",
+      "aliases": [
+        "closed-book question answering",
+        "closed-book factual question answering"
+      ],
+      "field": "Language models · evaluation",
+      "explain": "Closed-book question answering asks a model to answer without a retrieved article at answer time. It can still use knowledge learned in pretraining and any demonstrations allowed by the evaluation setup.",
+      "guide": "/read/gpt3/2#u05"
+    },
+    {
+      "id": "rag-sequence",
+      "term": "RAG-Sequence",
+      "aliases": [
+        "RAG-Sequence"
+      ],
+      "field": "Retrieval-augmented generation · probability model",
+      "explain": "RAG-Sequence scores a whole output under each retrieved document and then combines those probabilities using retrieval weights. Each latent document path remains fixed across the output.",
+      "guide": "/read/rag/3#u03"
+    },
+    {
+      "id": "rag-token",
+      "term": "RAG-Token",
+      "aliases": [
+        "RAG-Token"
+      ],
+      "field": "Retrieval-augmented generation · probability model",
+      "explain": "RAG-Token mixes document-conditioned next-token probabilities at each output position. It uses the initially retrieved candidates rather than searching again for every token.",
+      "guide": "/read/rag/3#u03"
+    },
+    {
+      "id": "maximum-inner-product-search",
+      "term": "maximum inner product search",
+      "aliases": [
+        "maximum inner product search",
+        "MIPS"
+      ],
+      "field": "Information retrieval · search",
+      "explain": "Maximum inner product search finds vectors with large inner products against a query vector. Original RAG uses approximate search to select candidate passage vectors from its index.",
+      "guide": "/read/rag/3#components"
+    },
+    {
+      "id": "document-posterior",
+      "term": "document posterior",
+      "aliases": [
+        "document posterior",
+        "posterior responsibility"
+      ],
+      "field": "Retrieval-augmented generation · probability",
+      "explain": "A document posterior expresses a candidate's relative contribution after observing an output or token. It combines the retrieval prior with the probability of the observed text under that document.",
+      "guide": "/read/rag/3#posterior"
+    },
+    {
+      "id": "centralized-training-decentralized-execution",
+      "term": "CTDE",
+      "aliases": [
+        "CTDE",
+        "centralized training with decentralized execution"
+      ],
+      "full": "Centralized training with decentralized execution",
+      "field": "Multi-agent learning · Training",
+      "explain": "Agents can use global information during training while choosing actions independently at execution time. The survey describes a global critic as a way to stabilize learning.",
+      "guide": "/read/multi-agent-communication-survey/2#background"
+    },
+    {
+      "id": "illocutionary-misfire",
+      "term": "Illocutionary misfire",
+      "aliases": [
+        "illocutionary misfire"
+      ],
+      "full": "Illocutionary misfire",
+      "field": "Multi-agent communication · Speech acts",
+      "explain": "A communication fails because its intended force or assumptions are misunderstood, for example when a request is treated as a command. An agent may then act without the required conditions or perform an unintended action.",
+      "guide": "/read/multi-agent-communication-survey/2#paradigm"
+    },
+    {
+      "id": "mid-training",
+      "term": "mid-training",
+      "aliases": [
+        "mid-training"
+      ],
+      "field": "Language models · training",
+      "explain": "A targeted training stage between general pre-training and post-training. It can emphasize mathematical, coding, long-context, or interactive material while updating model parameters.",
+      "guide": "/read/llm-survey/2#mid-training"
+    },
+    {
+      "id": "grouped-query-attention",
+      "term": "grouped-query attention",
+      "aliases": [
+        "grouped-query attention",
+        "GQA"
+      ],
+      "field": "Language models · attention",
+      "explain": "A form of attention in which groups of query heads share key and value heads. It reduces key–value cache size compared with separate keys and values for every head.",
+      "guide": "/read/llm-survey/2#architecture"
+    },
+    {
+      "id": "multi-query-attention",
+      "term": "multi-query attention",
+      "aliases": [
+        "multi-query attention",
+        "MQA"
+      ],
+      "field": "Language models · attention",
+      "explain": "An attention arrangement in which multiple query heads share one set of keys and values. This reduces key–value cache traffic during incremental generation.",
+      "guide": "/read/llm-survey/2#architecture"
+    },
+    {
+      "id": "multi-head-latent-attention",
+      "term": "multi-head latent attention",
+      "aliases": [
+        "multi-head latent attention",
+        "MLA"
+      ],
+      "field": "Language models · attention",
+      "explain": "An attention design that compresses keys and values into a lower-dimensional latent representation. It reduces the representation stored per position in the attention cache.",
+      "guide": "/read/llm-survey/2#architecture"
+    },
+    {
+      "id": "mixture-of-experts",
+      "term": "mixture of experts",
+      "aliases": [
+        "mixture of experts",
+        "MoE"
+      ],
+      "field": "Language models · architecture",
+      "explain": "A structure with multiple expert modules and a router that selects a subset for each token. Total parameter capacity can grow while each token activates only part of it.",
+      "guide": "/read/llm-survey/2#architecture"
+    },
+    {
+      "id": "group-relative-policy-optimization",
+      "term": "group relative policy optimization",
+      "aliases": [
+        "group relative policy optimization",
+        "GRPO"
+      ],
+      "field": "Language models · post-training",
+      "explain": "A policy optimization method that samples a group of responses to the same prompt and derives relative advantages from their rewards. It avoids a separate value model but still needs generated samples and informative feedback.",
+      "guide": "/read/llm-survey/2#optimization"
+    },
+    {
+      "id": "rejection-sampling-fine-tuning",
+      "term": "rejection sampling fine-tuning",
+      "aliases": [
+        "rejection sampling fine-tuning",
+        "RFT"
+      ],
+      "field": "Language models · post-training",
+      "explain": "A method that generates candidate responses, filters them using an acceptance criterion, and trains on the retained examples with a supervised objective. Generation and filtering can also be repeated during training.",
+      "guide": "/read/llm-survey/2#optimization"
+    },
+    {
+      "id": "online-policy-distillation",
+      "term": "online policy distillation",
+      "aliases": [
+        "online policy distillation",
+        "OPD"
+      ],
+      "field": "Language models · post-training",
+      "explain": "A student generates its own sequences and learns from a teacher's probability distribution at the prefixes it reaches. The teacher provides token-level feedback on student-generated contexts.",
+      "guide": "/read/llm-survey/2#optimization"
+    },
+    {
+      "id": "speculative-decoding",
+      "term": "speculative decoding",
+      "aliases": [
+        "speculative decoding"
+      ],
+      "field": "Language models · deployment",
+      "explain": "A smaller draft model proposes tokens that a target model verifies in parallel. With the appropriate acceptance and correction rule, sampling preserves the target model's distribution.",
+      "guide": "/read/llm-survey/2#deployment"
+    },
+    {
+      "id": "test-time-scaling",
+      "term": "test-time scaling",
+      "aliases": [
+        "test-time scaling"
+      ],
+      "field": "Language models · inference",
+      "explain": "Allocating additional computation when solving a task, for example through more samples, longer reasoning, or search. Its effect depends on how the additional computation is organized and evaluated.",
+      "guide": "/read/llm-survey/2#inference"
+    },
+    {
+      "id": "collaboration-channel",
+      "term": "collaboration channel",
+      "aliases": [
+        "collaboration channel",
+        "collaboration channels"
+      ],
+      "field": "Multi-agent systems · collaboration",
+      "explain": "In this survey, a collaboration channel is an interaction characterized by its participants, type, structure and strategy. A difference in any one attribute defines a different channel.",
+      "guide": "/read/multi-agent-collaboration-survey/2#definition"
+    },
+    {
+      "id": "multi-agent-coopetition",
+      "term": "coopetition",
+      "aliases": [
+        "coopetition"
+      ],
+      "field": "Multi-agent systems · collaboration",
+      "explain": "Coopetition combines cooperation on some tasks or objectives with competition on others. The survey discusses negotiation and mixture of experts as examples, with important differences between their mechanisms.",
+      "guide": "/read/multi-agent-collaboration-survey/2#types"
+    },
+    {
+      "id": "multi-agent-orchestration",
+      "term": "multi-agent orchestration",
+      "aliases": [
+        "static orchestration",
+        "dynamic orchestration",
+        "multi-agent orchestration"
+      ],
+      "field": "Multi-agent systems · coordination",
+      "explain": "Orchestration arranges collaboration channels and their dependencies. Static orchestration fixes the workflow in advance; dynamic orchestration can create or adjust it at runtime.",
+      "guide": "/read/multi-agent-collaboration-survey/2#orchestration"
+    },
+    {
+      "id": "bfcl",
+      "term": "BFCL",
+      "aliases": [
+        "BFCL"
+      ],
+      "field": "Agent evaluation · tool use",
+      "explain": "BFCL evaluates function calling, including tool selection and argument generation. Later versions add organizational tools and multi-turn, multi-step state management.",
+      "guide": "/read/agent-evaluation-survey/2#capabilities"
+    },
+    {
+      "id": "toolsandbox",
+      "term": "ToolSandbox",
+      "aliases": [
+        "ToolSandbox"
+      ],
+      "field": "Agent evaluation · tool use",
+      "explain": "ToolSandbox evaluates tool-using agents in a stateful environment with dependencies between tools and a simulated user. It checks intermediate and final milestones across dialogue trajectories.",
+      "guide": "/read/agent-evaluation-survey/2#capabilities"
+    },
+    {
+      "id": "planbench",
+      "term": "PlanBench",
+      "aliases": [
+        "PlanBench"
+      ],
+      "field": "Agent evaluation · planning",
+      "explain": "PlanBench evaluates planning across multiple domains. The survey describes its contrast between short-term tactical and long-term strategic planning.",
+      "guide": "/read/agent-evaluation-survey/2#capabilities"
+    },
+    {
+      "id": "llf-bench",
+      "term": "LLF-Bench",
+      "aliases": [
+        "LLF-Bench"
+      ],
+      "field": "Agent evaluation · feedback",
+      "explain": "LLF-Bench evaluates learning from natural-language feedback in interactive decision tasks. It can vary the wording of task instructions and feedback to reduce overfitting to an environment.",
+      "guide": "/read/agent-evaluation-survey/2#capabilities"
+    },
+    {
+      "id": "web-arena",
+      "term": "WebArena",
+      "aliases": [
+        "WebArena"
+      ],
+      "field": "Agent evaluation · web tasks",
+      "explain": "WebArena evaluates agents on tasks in operational websites. The survey discusses it as part of the move toward more realistic web environments.",
+      "guide": "/read/agent-evaluation-survey/2#web-swe"
+    },
+    {
+      "id": "swe-bench",
+      "term": "SWE-bench",
+      "aliases": [
+        "SWE-bench"
+      ],
+      "field": "Agent evaluation · software engineering",
+      "explain": "SWE-bench asks agents to solve issues drawn from real repositories by modifying code. Verification tests assess the resulting changes, and different versions vary in selection and test quality.",
+      "guide": "/read/agent-evaluation-survey/2#web-swe"
+    },
+    {
+      "id": "scienceagentbench",
+      "term": "ScienceAgentBench",
+      "aliases": [
+        "ScienceAgentBench"
+      ],
+      "field": "Agent evaluation · science",
+      "explain": "ScienceAgentBench evaluates individual scientific tasks drawn from peer-reviewed papers. Its tasks require self-contained outputs that can be assessed individually.",
+      "guide": "/read/agent-evaluation-survey/2#science-conversation"
+    },
+    {
+      "id": "core-bench",
+      "term": "CORE-Bench",
+      "aliases": [
+        "CORE-Bench"
+      ],
+      "field": "Agent evaluation · reproducibility",
+      "explain": "CORE-Bench tests computational reproducibility by asking agents to reproduce published results using supplied code and data. Its criterion concerns reproduction rather than the validity of a new discovery.",
+      "guide": "/read/agent-evaluation-survey/2#science-conversation"
+    },
+    {
+      "id": "gaia",
+      "term": "GAIA",
+      "aliases": [
+        "GAIA"
+      ],
+      "field": "Agent evaluation · generalist tasks",
+      "explain": "GAIA comprises human-authored questions that combine skills such as reasoning, multimodal understanding, web navigation and tool use. It tests whether these abilities work together on concrete problems.",
+      "guide": "/read/agent-evaluation-survey/2#generalist"
+    },
+    {
+      "id": "trajectory-evaluation",
+      "term": "trajectory evaluation",
+      "aliases": [
+        "trajectory evaluation"
+      ],
+      "field": "Agent evaluation · process",
+      "explain": "Trajectory evaluation assesses an agent's sequence of actions, including their order, dependencies and recovery. A reference trajectory is one possible path, so a strict match can exclude other valid solutions.",
+      "guide": "/read/agent-evaluation-survey/2#granularity"
     }
   ]
 }

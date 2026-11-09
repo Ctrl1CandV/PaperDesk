@@ -46,6 +46,17 @@
 .paper-figure-caption { display:block; color:var(--ink); }
 .paper-figure-source { display:block; font-size:12px; color:var(--muted); }
 .paper-figure-source a { color:var(--accent); text-decoration:none; white-space:nowrap; }
+.paper-figure-meta { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 14px; margin-top:4px; font-size:12px; }
+.paper-figure-meta > a { color:var(--accent); text-decoration:none; white-space:nowrap; }
+.paper-figure-meta > a:hover { text-decoration:underline; }
+.paper-figure-rights { flex:1 1 auto; min-width:0; }
+.paper-figure-rights summary { display:inline; cursor:pointer; color:var(--muted); list-style:none; }
+.paper-figure-rights summary::-webkit-details-marker { display:none; }
+.paper-figure-rights summary::after { content:" ▾"; font-size:10px; }
+.paper-figure-rights[open] summary::after { content:" ▴"; }
+.paper-figure-rights summary:hover { color:var(--accent); }
+.paper-figure-rights summary:focus-visible { outline:2px solid var(--focus); outline-offset:2px; border-radius:2px; }
+.paper-figure-rights .paper-figure-source { margin-top:4px; line-height:1.7; overflow-wrap:anywhere; }
 .paper-figure.compact { margin:20px 0 0; }
 .paper-figure.compact .paper-figure-frame { padding:10px; }
 .paper-figure.compact .paper-figure-frame img { max-height:320px; }

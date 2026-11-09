@@ -33,11 +33,26 @@ try {
   const guide = guides.find(item => item.metadata.id === id && item.metadata.revision === entry.revision);
   if (!guide) throw new Error(`${id} r${entry.revision} is not in the catalog`);
   const text = body.toString('utf8'), words = text.split(/\s+/).filter(Boolean).length;
-  // Negations per 1 000 words. The approved English samples sit near 6–7.
+  // Negations per 1 000 words. Complete English versions sit at 3–9.
   const negations = (text.match(/\b(not|cannot|can't|isn't|aren't|doesn't|don't)\b/gi) ?? []).length;
   const density = Math.round(negations * 10000 / words) / 10;
   const templates = (text.match(/\b(not necessarily|does not mean|do not mean|does not prove|does not show|should not be read as|is not evidence|no guarantee)\b/gi) ?? []).length;
-  console.log(`${id} r${entry.revision} en: ${words} words (Chinese body ${guide.body.length} characters); negations ${density} per 1 000 words (samples ≈ 6–7); caveat templates ${templates}; ${additions.length} English glossary additions (${additions.filter(item => known.has(item.id)).length} already present).`);
+  // English words per Chinese character of prose, overall and per section. Complete
+  // translations sit at 0.43–0.57 overall (the approved samples at 0.43–0.45) and above
+  // 0.36 in every section; a lower ratio means explanation was summarized away.
+  // Only prose is compared: link targets, figure lines, code and display math are the
+  // same in both languages, and a long URL would otherwise count as dozens of Chinese
+  // characters but one English word.
+  const prose = value => value.replace(/```[\s\S]*?```/g, '').replace(/\$\$[\s\S]*?\$\$/g, '').replace(/^!\[.*$/gm, '').replace(/\]\([^)]*\)/g, ']');
+  const wordsIn = value => prose(value).split(/\s+/).filter(Boolean).length;
+  const charsIn = value => prose(value).replace(/\s+/g, '').length;
+  const zhSections = guide.body.split(/\n(?=## )/), enSections = text.split(/\n(?=## )/);
+  const ratio = wordsIn(text) / charsIn(guide.body);
+  const thin = zhSections.map((section, index) => ({ index, ratio: wordsIn(enSections[index] ?? '') / charsIn(section), heading: (enSections[index] ?? '').split('\n')[0].replace(/^#+\s*/, '') })).filter(item => item.ratio < 0.31);
+  console.log(`${id} r${entry.revision} en: ${words} words (Chinese prose ${charsIn(guide.body)} characters, prose ratio ${ratio.toFixed(2)}; complete translations 0.43–0.57); negations ${density} per 1 000 words (complete translations 3–9); caveat templates ${templates}; ${additions.length} English glossary additions (${additions.filter(item => known.has(item.id)).length} already present).`);
+  if (ratio < 0.38) throw new Error(`English body is a condensed version (prose ratio ${ratio.toFixed(2)} < 0.38). Translate every paragraph in full per GUIDE-WRITING.md §13.`);
+  if (ratio < 0.41) console.log('Warning: the English body is shorter than complete translations; compare section by section for omitted explanation.');
+  for (const item of thin) console.log(`Warning: section ${item.index} "${item.heading}" is condensed (prose ratio ${item.ratio.toFixed(2)} < 0.31).`);
   if (density > 10) console.log('Warning: dense negation. Apply GUIDE-WRITING.md §4.4 in English: state each condition once, inside the conclusion.');
   if (density < 3) console.log('Warning: almost no qualifying conditions remain. Check that the Chinese guide’s necessary conditions survived translation.');
   if (templates > 4) console.log('Warning: repeated caveat templates ("not necessarily", "does not mean" …) read like a reviewer’s notes.');

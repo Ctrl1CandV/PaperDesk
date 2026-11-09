@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import { isSafeDiagram } from '../../shared/content-policy.mjs';
 import { useActiveTheme } from '../app/theme';
 
-export function Diagram({ source }: { source: string }) {
+export function Diagram({ source, language = 'zh' }: { source: string; language?: 'zh' | 'en' }) {
   const id = `diagram-${useId().replace(/[^a-z0-9]/gi, '')}`;
   const [svg, setSvg] = useState('');
   const [failed, setFailed] = useState(false);
@@ -29,12 +29,12 @@ export function Diagram({ source }: { source: string }) {
     return () => { cancelled = true; };
   }, [id, source, activeTheme]);
   return <figure className="teaching-diagram">
-    <figcaption><span className="figure-label">教学示意</span><span>组成之间的联系 · 非原论文图</span></figcaption>
-    {failed ? <p role="status">图示暂时无法绘制，可阅读下方文字流程与相邻讲解。</p> :
-      <div className="diagram-scroll" role="region" tabIndex={0} aria-label="教学流程图，可横向滚动" aria-busy={!svg}>
-        {svg ? <div dangerouslySetInnerHTML={{ __html: svg }} /> : <p className="diagram-loading">正在绘制流程图…</p>}
+    <figcaption><span className="figure-label">{language === 'en' ? 'Teaching diagram' : '教学示意'}</span><span>{language === 'en' ? 'Connections between components · not an original-paper figure' : '组成之间的联系 · 非原论文图'}</span></figcaption>
+    {failed ? <p role="status">{language === 'en' ? 'The diagram could not be drawn; read the text flow and the nearby explanation.' : '图示暂时无法绘制，可阅读下方文字流程与相邻讲解。'}</p> :
+      <div className="diagram-scroll" role="region" tabIndex={0} aria-label={language === 'en' ? 'Teaching flowchart, horizontally scrollable' : '教学流程图，可横向滚动'} aria-busy={!svg}>
+        {svg ? <div dangerouslySetInnerHTML={{ __html: svg }} /> : <p className="diagram-loading">{language === 'en' ? 'Drawing flowchart…' : '正在绘制流程图…'}</p>}
       </div>}
-    <p className="overflow-hint">图示可横向滚动，键盘聚焦后用方向键查看。</p>
-    <details className="diagram-text"><summary>查看文字流程</summary><ul>{steps.map((step, index) => <li key={index}>{step}</li>)}</ul></details>
+    <p className="overflow-hint">{language === 'en' ? 'Diagrams can scroll horizontally; focus and use the arrow keys.' : '图示可横向滚动，键盘聚焦后用方向键查看。'}</p>
+    <details className="diagram-text"><summary>{language === 'en' ? 'View text flow' : '查看文字流程'}</summary><ul>{steps.map((step, index) => <li key={index}>{step}</li>)}</ul></details>
   </figure>;
 }

@@ -1,0 +1,10 @@
+# GPT-3 r2 English translation: author check
+
+This is an author translation and self-check, not an independent review.
+
+- Sources consulted: the complete Chinese r2 body and metadata, the English-edition workflow, existing English glossary matches, and targeted searches in the locally available NeurIPS 2020 main and supplement text for the English WiC example, English data share and learning-rate schedule. Citations and source locators follow the Chinese edition.
+- Terminology: retain the paper's zero-shot, one-shot, few-shot, in-context learning, autoregressive and closed-book terminology; distinguish relative percent changes from percentage points. Added cards cover few-shot learning, perplexity, meta-learning, N-grams and closed-book question answering.
+- Adapted examples: the Chinese pretraining sentence and token-table example are rendered as English river text; they remain invented teaching examples. The German–English prompt, numerical exercises and paper's English `outfitter` example are retained. No model outputs are claimed for teaching values.
+- Checks: section structure, links, images and numbers were compared with the Chinese edition; the translation-work check is the mechanical validation. Image rights retain the private academic-reference restriction.
+- Uncertainty and limits: targeted source searches are not a complete independent source or translation audit; experiments were not reproduced and no rendered-page or independent review was performed. The original edition's source rounding and contamination-audit conditions are retained.
+- Retranslation, 2026-11-09: the earlier English body summarized away explanatory sentences. It was retranslated paragraph by paragraph from the Chinese edition (Claude, author check only); it now has 10758 words, prose ratio 0.57 and 3.5 negations per 1,000 words. Links, figures, numbers and section structure still follow the Chinese edition; the terminology and example notes above still apply. Not independently reviewed or reader-accepted.

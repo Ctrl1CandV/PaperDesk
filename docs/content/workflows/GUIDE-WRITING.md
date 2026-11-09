@@ -430,22 +430,36 @@ node scripts/content/translation-work.mjs check <id>    # 作者运行，不改�
 node scripts/content/translation-work.mjs merge <id>    # 整合者运行
 ```
 
-`check` 会校验结构（一个 H1、`##` 数量与中文修订一致、只用中文修订已声明的引用和图片、正文不含汉字），并报告英文否定词密度。两篇样例（`transformer.r5.en.md`、`rag-survey.r5.en.md`）约为每千词 6–7 个；超过 10 或低于 3 时会给出警告。
+`check` 会校验结构（一个 H1、`##` 数量与中文修订一致、只用中文修订已声明的引用和图片、正文不含汉字），并报告篇幅比值和英文否定词密度。篇幅比值只比较正文：链接地址、图片行、代码块和独立公式在两种语言里相同，先去掉再数（否则一条长链接在中文里算上百个字、在英文里只算一个词，短导读会被误判为压缩）。现有 24 篇完整英文版的比值在 0.43–0.57 之间（两篇样例 `transformer.r5.en.md`、`rag-survey.r5.en.md` 为 0.45、0.43），否定词在每千词 3–9 个之间；比值低于 0.38 直接失败，否定词超过 10 或低于 3 时警告。
 
 ### 写法
 
-1. **翻译意思，不翻译句子。** 按第四节的标准写英文：每节开头交代要回答的问题，一段讲一件事，条件只在结论处说一次。英文版读起来应该像一篇用英文写的导读，而不是逐句对照的译文。中文里为照顾读者添加的解释（例如“词元”是什么）在英文里同样保留。
-2. **术语跟论文走。** 使用原论文的英文术语（scaled dot-product attention、encoder–decoder attention、label smoothing）。导读自己的说法（例如“交叉注意力”）可以用通行的英文名，但第一次出现时说明它对应论文里的哪个概念。
-3. **例子要在英文里成立。** 中文版的教学例子如果依赖中文（同一个英文词对应两个不同的中文词），不要在英文版里用“想象中的中文译文的英文注释”勉强保留；改用论文自己的语言或数据。语言无关的例子（虚构的档案问答、手算数值）可以直接沿用。
+1. **英文版是完整译文，不是摘要。** 中文版的每一段在英文版里都要有对应的段落，解释性的句子同样要译：比喻（“可以把它想成几条平行路线”）、举例（“写到第一个书名时……写到第二个书名时……”）、每节开头交代问题的句子、段落之间的承接。只保留公式、数字和结论的“压缩版”会把导读变回罗列事实，这正是导读要避免的写法。篇幅可以用来自查：完整英文版的正文词数约为中文正文字数的 0.43–0.57 倍，每一节都不低于 0.37。`check` 在全文比值低于 0.38 时直接报错，低于 0.41 或某一节低于 0.31 时警告。比值只是线索：2026 年 11 月有一批英文版每段都在，句子却被逐句删短（比值 0.39），“交代问题的开场句”和“表格前的引导句”整句缺失；判断是否完整，仍要逐节对照段落和句子。
+
+   > 不好（压缩成事实罗列）：“Each parallel latent path keeps the same $z$ for the whole sentence; the model does not hard-select one document in advance. If sentence probabilities are 0.4 and 0.8 under two documents weighted 0.7 and 0.3, the mixture is 0.52.”
+   >
+   > 好（逐段译出解释）：“The inner product always uses the same $z$. Picture several parallel routes: route 1 evaluates the whole sentence under document 1, route 2 under document 2, and the route probabilities are combined at the end. The model never commits to a single document in advance; ‘one document throughout the sentence’ describes the structure inside each latent route.”
+
+2. **翻译意思，不翻译句子。** 按第四节的标准写英文：每节开头交代要回答的问题，一段讲一件事，条件只在结论处说一次。英文版读起来应该像一篇用英文写的导读，而不是逐句对照的译文。中文里为照顾读者添加的解释（例如“词元”是什么）在英文里同样保留。
+3. **术语跟论文走。** 使用原论文的英文术语（scaled dot-product attention、encoder–decoder attention、label smoothing）。导读自己的说法（例如“交叉注意力”）可以用通行的英文名，但第一次出现时说明它对应论文里的哪个概念。
+4. **例子要在英文里成立。** 中文版的教学例子如果依赖中文（同一个英文词对应两个不同的中文词），不要在英文版里用“想象中的中文译文的英文注释”勉强保留；改用论文自己的语言或数据。语言无关的例子（虚构的档案问答、手算数值）可以直接沿用。
 
    > 不好：“translating *They reached the river bank* as *They arrived at the riverbank*… the target shown here is an English word-by-word gloss of an imagined Chinese output.”
    >
    > 好：“translating *They reached the river bank* into German as *Sie erreichten das Ufer*… German separates the two senses of *bank*: a river bank is *Ufer*, while a financial bank is *Bank*.”（论文本身测试的就是英德翻译。）
 
    改了例子，就把所有用到它的段落一起改（右移输入、遮罩表、多头例子），并在文末覆盖说明里写清新例子的身份。
-4. **不要把中文版没有的保留意见加进来，也不要删掉中文版必要的条件。** 翻译时最常见的两种走样，一是把语气改得更犹豫（“may possibly”“not necessarily”成串），二是把“仅在开发集”“每类只抽了 50 条”之类的条件译丢。
-5. **数字、公式、链接一律照中文修订。** 发现中文版有错时，不要只在英文版里改；记在核对记录里，由整合者决定是否发布新的中文修订。表格能更清楚时可以调整排版（例如把合在一列的两项成本分开），但不能新增原表没有的数字。
-6. **图的 `alt` 和图注重新用英文写**，描述图本身；`rights` 照中文意思写英文版。
+5. **不要把中文版没有的保留意见加进来，也不要删掉中文版必要的条件。** 翻译时最常见的两种走样，一是把语气改得更犹豫（“may possibly”“not necessarily”成串），二是把“仅在开发集”“每类只抽了 50 条”之类的条件译丢。
+
+   中文里“不等于”“不能说明”“并不意味着”这类否定句，逐字译成 “does not mean / does not prove / not necessarily” 会连成一串审稿意见。先看中文要说的是什么，再用肯定句写出这个意思，条件保留在原位：
+
+   > 不好：“Complete does not mean the answer was correct.”
+   >
+   > 好：“Complete only means that the task ended through the normal flow; whether the answer was correct is judged separately.”
+
+   改写时不能替原文加判断。“标准的形成是协商过程，不是技术优劣的自然结果”可以写成 “a standard forms through negotiation; it is not the natural outcome of technical merit”；写成 “technical merit alone has rarely decided which one wins” 就多出了中文没有的历史判断。改完再跑一次 `check`：否定词低于 3 说明条件可能被改丢了，回到中文逐句核对。
+6. **数字、公式、链接一律照中文修订。** 发现中文版有错时，不要只在英文版里改；记在核对记录里，由整合者决定是否发布新的中文修订。表格能更清楚时可以调整排版（例如把合在一列的两项成本分开），但不能新增原表没有的数字。
+7. **图的 `alt` 和图注重新用英文写**，描述图本身；`rights` 照中文意思写英文版。
 
 ### 英文术语卡
 
@@ -455,7 +469,8 @@ node scripts/content/translation-work.mjs merge <id>    # 整合者运行
 
 ### 自查
 
-- [ ] `node scripts/content/translation-work.mjs check <id>` 通过，否定词密度在 3–10 之间。
+- [ ] `node scripts/content/translation-work.mjs check <id>` 通过：正文篇幅比值不低于 0.41、没有某一节低于 0.31 的警告，否定词密度在 3–10 之间，套话式保留意见不超过 4 处。
+- [ ] 逐节对照中文：每一段解释、比喻、例子和承接句都有对应的英文。
 - [ ] 通读一遍英文：不看中文也能读懂，每个例子在英文里讲得通。
 - [ ] 抽查核心章节和实验部分的数字、公式，与中文修订和原论文一致。
 - [ ] 中文版的必要条件都还在；没有新增中文版没有的结论。

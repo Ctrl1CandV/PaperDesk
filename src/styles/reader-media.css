@@ -92,10 +92,15 @@
   font-size:.88em;
   line-height:1.8
 }
+/* Prose may break anywhere, but in a cell that would let the table's minimum
+   width collapse and split numbers such as 44.1 or words such as WebQuestions.
+   Cells wrap only at normal opportunities; a wide table scrolls instead. */
 .table-scroll th,.table-scroll td {
   border:1px solid var(--line);
   text-align:left;
-  padding:12px 16px
+  padding:12px 16px;
+  overflow-wrap:normal;
+  word-break:normal
 }
 .table-scroll th {
   background:var(--surface-muted);

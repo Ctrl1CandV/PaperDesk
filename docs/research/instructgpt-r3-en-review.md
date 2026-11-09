@@ -1,0 +1,8 @@
+# InstructGPT r3 English translation note
+
+Author translation, not independent review. Sources consulted: the complete Chinese r3 body and metadata, and section 13 of the guide-writing workflow. The edition preserves the fixed arXiv v1 locators and the PPO v2 citation from the Chinese guide; the original papers were not independently reread for this translation.
+
+Terminology follows the guide and paper: supervised fine-tuning (SFT), reward model (RM), proximal policy optimization (PPO), advantage, KL divergence and pretraining mix. The fictional reading-room notice is translated as Greenfield Reading Room; its conditions, candidate summaries and numerical examples are retained throughout, rather than replaced with a paper example.
+
+Checks: author compared the translation against the supplied body and metadata, including image attribution, data counts, formulas, test conditions and links. Automated structural validation is reported in the delivery response. No independent fact review, training reproduction, figure inspection or rendered-page review was performed in this translation pass; the Chinese revision's source and figure-review statements describe its own earlier work. Translation accuracy and complete claim preservation remain subject to independent review.
+- Retranslation, 2026-11-09: the earlier English body summarized away explanatory sentences. It was retranslated paragraph by paragraph from the Chinese edition (Claude, author check only); it now has 11110 words, prose ratio 0.56 and 4.4 negations per 1,000 words. Links, figures, numbers and section structure still follow the Chinese edition; the terminology and example notes above still apply. Not independently reviewed or reader-accepted.

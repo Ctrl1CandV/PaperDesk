@@ -1,5 +1,13 @@
 # Changelog
 
+## Complete English versions and reading fixes — 2026-11-09
+
+- English versions now cover all 24 current guides. Fifteen drafts that had summarized away explanatory sentences were retranslated paragraph by paragraph from the Chinese revisions; nine were kept after section-by-section comparison.
+- Table cells no longer break numbers and words; tables wider than the column scroll inside their container.
+- Under each original figure, the full rights text now sits behind a folded “来源与许可 / Source and permission” control next to the source link; the enlarged view still shows it in full.
+- The translation check now compares prose only (link targets, figures, code and display math removed), with thresholds recalibrated to complete translations; the writing workflow adds guidance on rendering Chinese negations without adding claims.
+- Build passes; 581 Node tests pass (1 skipped). Rendered-build screenshots at 1440 px and a simulated 390 px viewport were reviewed; no live-server browser tests or physical-device tests. See [the batch note](docs/research/english-retranslation-2026-11-09.md).
+
 ## Assistant reliability and adaptive reading — 2026-11-08
 
 - Fixed passage validation across formulas, tables and paragraph boundaries, and official ChatGPT streams whose terminal output array is empty after completed output items.

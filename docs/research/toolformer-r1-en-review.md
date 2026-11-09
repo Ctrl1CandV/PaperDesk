@@ -1,0 +1,9 @@
+# Toolformer r1 English translation note
+
+This is an author translation, not an independent review or reader acceptance.
+
+- **Sources used:** `content/guides/toolformer.md`, its revision 1 metadata, and `content/glossary-en.json`. No fixed English source material was supplied; the linked NeurIPS main paper and supplement were not opened or independently checked. The translation preserves the Chinese guide's locators: main paper §§1–4 and 6, PDF pages 1–9, and supplement §§A.1, E and G, PDF pages 1, 5 and 7–9.
+- **Terminology:** Used “continuation loss,” “negative log-likelihood,” “self-supervised,” “zero-shot,” and “base model”; retained API, CCNet, GPT-J and Atlas names. Added four English glossary cards for Toolformer, self-supervised learning, negative log-likelihood and zero-shot evaluation.
+- **Examples and links:** The invented pen-box example and original teaching diagram work in English without changing their substance. The Chinese guide's relative `helm.md` and `agent-survey.md` links were converted to pinned revision 1 reader routes; no `/read/` links were present in the source body. Metadata declares no images.
+- **Checks:** `node scripts/content/translation-work.mjs check toolformer` initially rejected the source's relative guide links; after pinning them, it passed with 2,108 words, 8.1 negations per 1,000 words, zero caveat templates and four glossary additions. A local text comparison found seven H2 headings and the same 13 distinct external citation URLs, with none missing or added. English body: 15,850 characters including whitespace.
+- **Remaining uncertainty:** Translation fidelity and paper facts have not received independent review; the cited paper pages and experimental claims were not rechecked against the original. No experiment was reproduced and no rendered-page or reader review was performed.
