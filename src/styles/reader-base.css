@@ -70,7 +70,7 @@ a:hover {
   padding:0 40px
 }
 .brand {
-  font-size:21px;
+  font-size:20px;
   letter-spacing:-.7px;
   font-weight:650;
   color:var(--ink);
@@ -83,7 +83,7 @@ a:hover {
 }
 .brand-mark {
   font-family:Georgia,serif;
-  font-size:31px;
+  font-size:32px;
   font-weight:bold;
   line-height:34px;
   border:1px solid var(--line);
@@ -152,7 +152,7 @@ a:hover {
   padding:0 10px 13px
 }
 .toc-heading span {
-  font-size:9px;
+  font-size:12px;
   font-weight:400;
   letter-spacing:1.6px;
   color:var(--muted)
@@ -184,7 +184,7 @@ nav li a[aria-current] {
   background:var(--surface-selected)
 }
 .toc-number {
-  font-size:10px;
+  font-size:12px;
   font-variant-numeric:tabular-nums;
   padding-top:2px;
   color:var(--muted)
@@ -257,7 +257,7 @@ nav li a[aria-current] {
   overflow-wrap:anywhere
 }
 .prose h1 {
-  font-size:34px;
+  font-size:32px;
   letter-spacing:-.7px;
   line-height:1.5;
   font-weight:650;
@@ -266,7 +266,7 @@ nav li a[aria-current] {
   text-wrap:pretty
 }
 .prose h2 {
-  font-size:25px;
+  font-size:24px;
   line-height:1.6;
   font-weight:650;
   color:var(--heading);

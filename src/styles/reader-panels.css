@@ -38,7 +38,7 @@
   gap:10px
 }
 .eyebrow {
-  font-size:10px;
+  font-size:12px;
   letter-spacing:1.3px;
   color:var(--muted)
 }
@@ -49,16 +49,16 @@
   color:var(--muted)
 }
 .close-source span {
-  font-size:23px;
+  font-size:24px;
   margin-left:14px;
   vertical-align:-2px
 }
 .source-dialog h2 {
-  font-size:25px;
+  font-size:24px;
   margin:15px 0 24px
 }
 .source-locator {
-  font-size:21px;
+  font-size:20px;
   font-weight:600;
   line-height:1.6;
   margin:0 0 24px
@@ -134,7 +134,7 @@
   padding:64px 32px
 }
 .library-page>h1 {
-  font-size:38px;
+  font-size:32px;
   font-weight:600;
   line-height:1.5;
   color:var(--ink);
@@ -161,7 +161,7 @@
   text-decoration:none
 }
 .guide-entry h2 {
-  font-size:21px;
+  font-size:20px;
   font-weight:600;
   line-height:1.7;
   margin:10px 0

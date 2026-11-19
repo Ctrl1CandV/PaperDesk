@@ -1,7 +1,7 @@
 .exploration-page { max-width: 1800px; margin: 0 auto; padding: 48px clamp(24px, 2.5vw, 64px) 96px; overflow-wrap: anywhere; font-size: 16px; line-height: 1.85; }
 .exploration-page h1 { margin: 10px 0 16px; font-size: clamp(30px, 2.8vw, 40px); font-weight: 700; line-height: 1.4; color: var(--heading); letter-spacing: -.8px; }
-.exploration-page h2 { margin: 0 0 18px; font-size: 23px; line-height: 1.55; font-weight: 700; color: var(--heading); }
-.exploration-page h3 { font-size: 19px; line-height: 1.7; font-weight: 600; }
+.exploration-page h2 { margin: 0 0 18px; font-size: 24px; line-height: 1.55; font-weight: 700; color: var(--heading); }
+.exploration-page h3 { font-size: 20px; line-height: 1.7; font-weight: 600; }
 .exploration-page p { margin: 0 0 18px; white-space: pre-wrap; }
 .exploration-page > section { margin-top: 40px; }
 .exploration-page-heading { display: flex; justify-content: space-between; gap: 24px; align-items: center; }
@@ -16,7 +16,7 @@
 .exploration-lens-card:last-child { border-right: 0; }
 .exploration-lens-card > .exploration-text-link { margin-top: auto; }
 .exploration-lens-rank { color: var(--accent); font-size: 12px; letter-spacing: .6px; }
-.exploration-lens-card h3 { margin: 14px 0; font-size: 21px; font-weight: 700; }
+.exploration-lens-card h3 { margin: 14px 0; font-size: 20px; font-weight: 700; }
 .exploration-lens-card h3 a { color: var(--ink); }
 .exploration-lens-card h3 span { color: var(--muted); font-weight: 400; font-size: 16px; }
 .exploration-lens-card p { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
@@ -28,12 +28,12 @@
 .exploration-toggle { display: flex; gap: 8px; align-items: center; min-height: 44px; font-size: 13px; color: var(--muted); }
 .exploration-toggle input { width: 16px; height: 16px; accent-color: var(--accent); }
 .exploration-empty { padding: 26px 28px; border-left: 3px solid var(--line-strong); background: var(--surface-soft); }
-.exploration-empty h3 { font-size: 17px; margin: 0 0 10px; }
+.exploration-empty h3 { font-size: 16px; margin: 0 0 10px; }
 .exploration-empty p { color: var(--muted); font-size: 14px; }
 .exploration-empty a { font-size: 14px; }
 .exploration-record-row { padding: 26px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 20px; color: inherit; background: var(--surface); }
 .exploration-record-row:hover { text-decoration: none; background: var(--surface-hover); }
-.exploration-record-row h3 { margin: 10px 0 8px; font-size: 22px; font-weight: 700; color: var(--heading); }
+.exploration-record-row h3 { margin: 10px 0 8px; font-size: 20px; font-weight: 700; color: var(--heading); }
 .exploration-record-row p { margin: 0; font-size: 14px; color: var(--muted); }
 .exploration-record-row > span { color: var(--accent); }
 .exploration-row-meta { display: flex; gap: 16px; align-items: center; color: var(--muted); font-size: 12px; }
@@ -53,7 +53,7 @@
 .exploration-reading-sequence p { font-size: 14px; color: var(--muted); margin: 8px 0 0; }
 .exploration-reading-target { font-size: 14px; min-height: 44px; display: inline-flex; align-items: center; }
 .exploration-prompt { background: var(--surface-muted); border: 1px solid var(--line) !important; border-radius: 10px; padding: 26px 28px; }
-.exploration-prompt h2 { margin-top: 12px; font-size: 22px; }
+.exploration-prompt h2 { margin-top: 12px; font-size: 20px; }
 .exploration-prompt .primary-action { margin-top: 5px; }
 .exploration-next-reading { background: var(--surface-selected); border-left: 3px solid var(--accent) !important; padding: 24px 27px !important; }
 .exploration-next-reading h2 { margin: 8px 0 12px; }
@@ -64,7 +64,7 @@
 .exploration-detail-actions, .exploration-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 18px 0 28px; }
 .exploration-secondary, .exploration-form-actions > button:not(.primary-action) { min-height: 44px; border: 1px solid var(--line); border-radius: 7px; padding: 9px 15px; font-size: 13px; background: var(--surface); }
 .exploration-question { margin: 28px 0; padding-left: 22px; border-left: 3px solid var(--accent); }
-.exploration-question p { font-size: 23px; line-height: 1.8; color: var(--ink); margin: 10px 0 0; }
+.exploration-question p { font-size: 24px; line-height: 1.8; color: var(--ink); margin: 10px 0 0; }
 .exploration-origin { padding: 12px 0 22px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 .exploration-origin summary { min-height: 44px; cursor: pointer; }
 .exploration-origin p { margin: 6px 0; }
@@ -86,7 +86,7 @@
 .exploration-source-identity { font-size: 14px; }
 .exploration-thinking { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; border-block: 1px solid var(--line); padding: 30px 0 10px; }
 .exploration-thinking > div + div { border-left: 1px solid var(--line); padding-left: 36px; }
-.exploration-thinking h2 { font-size: 19px; }
+.exploration-thinking h2 { font-size: 20px; }
 .exploration-thinking p + h2 { margin-top: 28px; }
 .exploration-record-footer { font-size: 12px; line-height: 1.85; color: var(--muted); margin-top: 24px !important; }
 .exploration-saved { color: var(--success); padding: 8px 0; font-size: 14px; }
@@ -108,13 +108,13 @@
 .exploration-dialog > .exploration-small { margin: 12px 0 20px; }
 .exploration-destination { margin-bottom: 24px; }
 .exploration-editor-evidence { margin: 0 !important; }
-.exploration-editor-evidence > h3 { font-size: 17px; margin: 0 0 15px; }
+.exploration-editor-evidence > h3 { font-size: 16px; margin: 0 0 15px; }
 .exploration-editor-evidence > div + div { margin-top: 26px; }
 .exploration-editor-evidence label { margin-top: 12px; }
 .exploration-remove { min-height: 44px; color: var(--danger); font-size: 13px; padding: 8px 0; }
 .exploration-remove:hover { color: var(--danger-hover); }
 .exploration-attachment-context { padding: 16px 20px; border-radius: 7px; background: var(--surface-muted); }
-.exploration-attachment-context h3 { font-size: 17px; margin: 0 0 10px; }
+.exploration-attachment-context h3 { font-size: 16px; margin: 0 0 10px; }
 .exploration-attachment-context p { font-size: 14px; margin: 0 0 8px; }
 .exploration-save-error { padding: 18px 20px; border: 1px solid var(--danger); border-radius: 7px; color: var(--danger); background: var(--danger-bg); font-size: 14px; }
 .exploration-save-error p { margin: 0 0 12px; }
@@ -124,7 +124,7 @@
 .exploration-edit-panel > h2 { margin-bottom: 22px; }
 @media (max-width: 800px) {
   .exploration-page { padding: 28px 20px 56px; font-size: 16px; }
-  .exploration-page h1 { font-size: 29px; line-height: 1.45; margin-top: 10px; }
+  .exploration-page h1 { font-size: 28px; line-height: 1.45; margin-top: 10px; }
   .exploration-page h2 { font-size: 20px; }
   .exploration-page-heading { display: block; }
   .exploration-page-heading > .primary-action { margin-top: 20px; }

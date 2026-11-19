@@ -7,6 +7,7 @@
 | 理解元数据、正文和不可变修订 | [内容契约](CONTENT.md) |
 | 制作导读与深读讲解 | [内容生产工作流](workflows/CONTENT-WORKFLOW.md) |
 | 处理原文定位、公式与教学图 | [来源与图示](workflows/SOURCES-AND-VISUALS.md) |
+| 为一篇导读准备组会汇报稿 | [汇报稿](workflows/PRESENTATION.md) |
 | 校验、导入、恢复或回滚内容 | [内容更新](CONTENT-UPDATES.md) |
 | 明确辅助发现的边界 | [辅助发现](ASSISTED-DISCOVERY.md) |
 | 阅读现有公共学习路线 | [记忆与动态决策路线](LEARNING-ROUTE.md) |

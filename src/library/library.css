@@ -1,50 +1,34 @@
 /* Room for the reading brief, with deliberate outer margins on large windows. */
 .library-workspace { container:library / inline-size; max-width:none; min-height:calc(100dvh - 68px); padding:38px var(--workspace-gutter) 64px; background:var(--workspace-background); }
 .library-heading,.library-layout,.home-resume { width:100%; max-width:1920px; margin-inline:auto; }
-.library-heading { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:28px; }
-.library-heading h1 { margin:0; font-size:30px; line-height:1.5; font-weight:700; color:var(--heading); letter-spacing:-.5px; }
-.library-explore-link { white-space:nowrap; }
+.library-heading { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:18px; }
+.library-heading h1 { margin:0; font-size:28px; line-height:1.4; font-weight:700; color:var(--heading); letter-spacing:-.5px; }
 .library-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:28px; align-items:start; }
 .library-workspace.has-selection .library-layout { grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr); }
 .library-shelf { min-width:0; }
-.library-search-box { position:relative; }
-.library-search-box>svg { position:absolute; width:18px; height:18px; left:16px; top:15px; color:var(--muted); pointer-events:none; }
-.library-search-box .library-search { max-width:none; width:100%; min-height:48px; padding:11px 44px; border:1px solid var(--line-strong); border-radius:8px; background:var(--surface); font-size:14px; }
+/* Search, type and reading status share one row, so the shelf starts on the first screen. */
+.library-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:14px; }
+.library-search-box { position:relative; flex:1 1 280px; min-width:0; }
+.library-search-box>svg { position:absolute; width:18px; height:18px; left:14px; top:13px; color:var(--muted); pointer-events:none; }
+.library-search-box .library-search { max-width:none; width:100%; min-height:44px; padding:8px 40px; border:1px solid var(--line-strong); border-radius:8px; background:var(--surface); font-size:14px; line-height:1.6; }
 .library-search-box input::placeholder { color:var(--muted); opacity:1; }
 .library-search-box input::-webkit-search-cancel-button { display:none; }
 .library-search-box button { position:absolute; top:2px; right:2px; width:44px; height:44px; color:var(--muted); font-size:22px; }
-.library-categories { display:flex; gap:6px; margin-top:18px; }
-.library-categories button { display:flex; align-items:center; justify-content:center; gap:10px; min-width:96px; min-height:42px; padding:8px 18px; border-radius:6px; color:var(--muted); font-size:14px; }
+.library-categories { display:flex; gap:2px; padding:3px; border:1px solid var(--line); border-radius:8px; background:var(--surface-soft); }
+.library-categories button { display:flex; align-items:center; justify-content:center; gap:8px; min-width:76px; min-height:36px; padding:6px 14px; border-radius:6px; color:var(--muted); font-size:14px; }
 .library-categories button span { font-size:12px; font-family:var(--font-data); }
-.library-categories button[aria-pressed=true] { color:var(--accent); background:var(--surface); box-shadow:0 1px 4px var(--control-shadow); font-weight:600; }
-.library-result-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:22px 1px 12px; }
-.library-result-count { display:flex; gap:8px; margin:0; color:var(--muted); font-size:12px; line-height:1.8; }
-.library-mark-filter select { min-height:32px; padding:3px 6px; border:1px solid transparent; border-radius:5px; background:transparent; color:var(--muted); font-size:12px; }
-.library-mark-filter select:hover { border-color:var(--line); background:var(--surface); }
-.guide-card-marks { display:block; font-family:var(--font-body); font-size:12px; color:var(--muted); word-break:keep-all; }
-.library-workspace .guide-list { margin:0; display:grid; gap:10px; grid-template-columns:minmax(0,1fr); }
-.library-workspace .guide-entry { position:relative; display:flex; flex-direction:column; align-items:stretch; gap:0; width:100%; min-width:0; text-align:left; padding:22px 26px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink); box-shadow:0 1px 2px var(--card-shadow); scroll-margin-top:24px; transition:border-color 140ms ease,background-color 140ms ease; }
-.library-workspace .guide-entry:hover { border-color:var(--control-border); background:var(--surface-hover); }
-.library-workspace .guide-entry[aria-pressed=true] { background:var(--surface-selected); border-color:var(--selected-border); box-shadow:inset 3px 0 var(--accent); }
-.guide-card-meta { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:12px; line-height:1.6; }
-.guide-card-meta>span:first-child { display:inline-flex; gap:7px; align-items:center; }
-.guide-card-meta svg { width:15px; height:15px; flex:none; }
-.guide-card-meta>span:last-child { font-family:var(--font-data); }
-.library-workspace .guide-entry h2 { margin:9px 0 14px; color:var(--heading); font-weight:400; }
-.guide-card-name { display:block; font-size:23px; font-weight:700; line-height:1.45; letter-spacing:-.3px; }
-.guide-card-subtitle { display:block; margin-top:4px; font-size:15px; line-height:1.75; font-weight:400; color:var(--ink); }
-.guide-card-summary { display:block; margin:0 0 12px; font-size:14px; line-height:1.8; color:var(--muted); }
-.guide-card-purpose { display:none; font-size:14px; line-height:1.85; color:var(--ink); }
-.library-workspace .guide-entry>.guide-card-bottom { margin:0; width:100%; }
-.library-workspace .guide-card-bottom { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:0; font-size:12px; line-height:1.8; color:var(--muted); }
-.guide-card-bottom>span:first-child { min-width:0; overflow-wrap:anywhere; }
-.guide-card-arrow { color:var(--accent); font-size:17px; flex:none; }
+.library-categories button[aria-pressed=true] { color:var(--heading); background:var(--surface); box-shadow:0 1px 3px var(--control-shadow); font-weight:600; }
+.library-categories button[aria-pressed=true] span { color:var(--accent); }
+.library-result-row { display:flex; align-items:center; gap:14px; margin:0; }
+.library-result-count { display:flex; gap:8px; margin:0; color:var(--muted); font-size:13px; line-height:1.8; white-space:nowrap; }
+.library-mark-filter select { min-height:44px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink); font-size:14px; }
+.library-mark-filter select:hover { border-color:var(--control-border); }
 .library-preview { container:brief / inline-size; position:relative; margin-top:var(--preview-offset,0px); min-width:0; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:0 6px 24px var(--preview-shadow); scroll-margin-top:24px; }
 .library-preview[hidden] { display:none; }
 .article-orientation { min-width:0; overflow-wrap:anywhere; }
 .orientation-masthead { padding:24px 28px 0; }
 .orientation-title-row { display:flex; align-items:center; flex-wrap:wrap; gap:10px 14px; position:relative; padding-right:40px; }
-.article-orientation h2 { margin:0; color:var(--heading); font-size:32px; line-height:1.35; font-weight:700; letter-spacing:-.5px; }
+.article-orientation h2 { margin:0; color:var(--heading); font-size:28px; line-height:1.35; font-weight:700; letter-spacing:-.5px; }
 .orientation-kind { padding:3px 8px; border-radius:5px; background:var(--surface-soft); color:var(--muted); font-size:12px; line-height:1.6; font-weight:600; }
 .orientation-close { position:absolute; right:-10px; top:-3px; display:grid; place-items:center; width:44px; height:44px; border-radius:6px; color:var(--muted); }
 .orientation-close:hover { background:var(--surface-muted); color:var(--heading); }
@@ -56,7 +40,7 @@
 .orientation-ranking { display:inline-block; margin-inline-start:12px; vertical-align:baseline; }
 .orientation-ranking a { display:inline-flex; align-items:baseline; gap:8px; padding:3px 8px; border:1px solid var(--line); border-radius:4px; color:var(--accent); font-size:12px; line-height:1.7; white-space:nowrap; text-decoration:none; }
 .orientation-ranking a:hover { border-color:var(--control-border); color:var(--accent); background:var(--surface-hover); }
-.ranking-edition { color:var(--muted); font-size:11px; }
+.ranking-edition { color:var(--muted); font-size:12px; }
 .orientation-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px 18px; margin-top:20px; padding:18px 0; border-block:1px solid var(--line); }
 .orientation-actions .primary-action { min-height:44px; min-width:144px; justify-content:space-between; padding:10px 18px; border:1px solid var(--accent); background:var(--accent); color:var(--surface); font-size:14px; border-radius:6px; gap:22px; }
 .orientation-actions .primary-action:hover { background:var(--accent-hover); text-decoration:none; }
@@ -64,16 +48,18 @@
 .orientation-resume { flex:1 1 200px; margin:0; font-size:13px; line-height:1.7; color:var(--muted); }
 .orientation-marks { flex:1 0 100%; margin:-4px 0 0; font-size:12px; line-height:1.7; color:var(--muted); }
 .orientation-body { padding:24px 28px 0; }
-.orientation-body h3 { margin:0 0 10px; font-size:19px; font-weight:700; line-height:1.55; color:var(--heading); }
+.orientation-body h3 { margin:0 0 8px; font-size:16px; font-weight:700; line-height:1.55; color:var(--heading); }
 .orientation-prose section+section { margin-top:24px; }
 .orientation-prose p + p { margin-top:12px; }
 .orientation-prose p { margin:0; font-size:16px; line-height:1.75; color:var(--ink); }
 .orientation-outline { margin-top:26px; padding:22px 0; border-top:1px solid var(--line); }
 .orientation-section-heading { display:flex; align-items:baseline; justify-content:space-between; gap:20px; }
-.orientation-section-heading h3 { font-size:17px; }
+.orientation-section-heading h3 { font-size:16px; }
+.orientation-talk { min-height:44px; padding:8px 14px; border:1px solid var(--line); border-radius:6px; font-size:14px; white-space:nowrap; }
+.orientation-talk:hover { border-color:var(--selected-border); background:var(--surface-hover); text-decoration:none; }
 .orientation-section-heading>span { font-size:12px; color:var(--muted); }
 .orientation-outline ol { display:grid; grid-template-columns:1fr 1fr; align-items:start; gap:3px 14px; padding:0; margin:0; list-style:none; }
-.outline-aim { margin:-6px 8px 8px 36px; font-size:12.5px; line-height:1.7; color:var(--muted); }
+.outline-aim { margin:-6px 8px 8px 36px; font-size:12px; line-height:1.7; color:var(--muted); }
 .orientation-related { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; padding:0 0 18px; }
 .orientation-related h3 { margin:0; font-size:13px; font-weight:600; color:var(--muted); }
 .orientation-related ul { display:flex; flex-wrap:wrap; gap:4px 16px; margin:0; padding:0; list-style:none; }
@@ -97,15 +83,17 @@
 .home-resume .text-action { font-size:13px; white-space:nowrap; }
 .library-workspace .empty-state { background:var(--surface); border-color:var(--line); }
 .library-workspace :is(button,a,input):focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
-.library-workspace #orientation-title:focus-visible { outline:2px solid var(--focus); outline-offset:5px; border-radius:2px; }
+/* The title takes focus only so a screen reader announces the opened brief; it is not a control. */
+.library-workspace #orientation-title:focus { outline:none; }
 @media(min-width:1200px) {
-  .library-heading,.library-layout,.home-resume { width:85%; max-width:1632px; }
-  .library-workspace:not(.has-selection) .guide-entry { display:grid; grid-template-columns:104px minmax(240px,.8fr) minmax(0,1.2fr) minmax(180px,.65fr); gap:28px; align-items:center; min-height:128px; }
-  .library-workspace:not(.has-selection) .guide-card-meta { flex-direction:column; gap:10px; }
-  .library-workspace:not(.has-selection) .guide-entry h2 { margin:0; }
-  .library-workspace:not(.has-selection) .guide-card-summary { grid-column:2; }
-  .library-workspace:not(.has-selection) .guide-card-purpose { display:block; }
-  .library-workspace:not(.has-selection) .guide-card-bottom { font-size:12px; padding-left:24px; border-left:1px solid var(--line); min-height:48px; }
+  /* Rows get most of the window: the purpose column needs room to stay on one or two lines. */
+  .library-heading,.library-layout,.home-resume { width:94%; max-width:1800px; }
+  /* The type tabs already carry the count; keep it for assistive technology and free the row. */
+  .library-workspace.has-selection .library-result-count { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  /* The narrower list puts search on its own line, type and reading status below it. */
+  .library-workspace.has-selection .library-search-box { flex-basis:100%; }
+  .library-workspace.has-selection .library-categories { flex:1; }
+  .library-workspace.has-selection .library-categories button { flex:1; min-width:0; padding-inline:8px; white-space:nowrap; }
 }
 @container brief (max-width:520px) {
   .orientation-masthead { padding:24px 24px 0; }
@@ -117,13 +105,13 @@
 @media(max-width:1100px) and (min-width:801px) {
   .library-workspace { padding-inline:24px; }
   .library-workspace.has-selection .library-layout { gap:20px; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); }
-  .library-workspace .guide-entry { padding:18px; }
 }
 @media(max-width:800px) {
   .library-workspace { padding:26px 20px 44px; min-height:calc(100dvh - 64px); }
-  .library-heading { margin-bottom:22px; }
-  .library-heading h1 { font-size:26px; }
-  .library-explore-link { font-size:12px; }
+  .library-heading { margin-bottom:14px; }
+  .library-heading h1 { font-size:24px; }
+  .library-categories { flex:1; }
+  .library-result-row { flex:1 0 100%; justify-content:space-between; }
   .library-layout,.library-workspace.has-selection .library-layout { display:block; }
   .library-workspace.has-selection .library-shelf,.library-workspace.has-selection .library-heading,.library-workspace.has-selection .home-resume { display:none; }
   .library-preview { display:none; margin-top:0; scroll-margin-top:0; }
@@ -131,9 +119,7 @@
   .library-workspace.has-selection { padding:0 0 28px; background:var(--surface); }
   .orientation-close { display:none; }
   .library-workspace .orientation-back { display:flex; width:max-content; margin:8px 22px 0; font-size:13px; }
-  .library-workspace .guide-entry { padding:19px 20px; }
-  .guide-card-name { font-size:21px; }
-  .library-categories button { min-width:0; flex:1; padding-inline:12px; }
+  .library-categories button { min-width:0; min-height:40px; flex:1; padding-inline:12px; }
   .orientation-masthead { padding:18px 22px 0; }
   .orientation-body { padding:24px 22px 0; }
   .orientation-actions { gap:12px 20px; }
@@ -150,3 +136,38 @@
   .library-workspace .orientation-back { display:flex; width:max-content; margin:8px 22px 0; }
 }
 @media(prefers-reduced-motion:reduce) { .library-workspace * { transition:none!important; scroll-behavior:auto!important; } }
+
+/* One shelf: every article is an aligned row on a single surface, in shelf order. Collections only feed search. */
+.library-workspace .guide-list { display:grid; grid-template-columns:minmax(0,1fr); margin:0; border:1px solid var(--line); border-radius:10px; background:var(--surface); overflow:hidden; }
+.library-workspace .guide-entry { position:relative; display:grid; grid-template-columns:minmax(0,1fr); align-items:start; gap:4px 14px; width:100%; min-width:0; padding:14px 20px; border:0; border-radius:0; background:transparent; color:var(--ink); text-align:left; scroll-margin-top:24px; transition:background-color 140ms ease; }
+.library-workspace .guide-entry + .guide-entry { border-top:1px solid var(--line); }
+.library-workspace .guide-entry:hover { background:var(--surface-hover); }
+.library-workspace .guide-entry[aria-pressed=true] { background:var(--surface-selected); box-shadow:inset 3px 0 var(--accent); }
+.guide-card-main { display:block; min-width:0; }
+.guide-card-source { display:inline-flex; align-items:center; gap:6px; }
+.guide-card-source svg { width:14px; height:14px; flex:none; }
+.library-workspace .guide-entry h3 { margin:0; color:var(--heading); font-weight:400; }
+.guide-card-name { display:inline; font-size:18px; font-weight:700; line-height:1.4; letter-spacing:-.2px; }
+.guide-card-subtitle { display:block; margin-top:1px; font-size:14px; line-height:1.6; color:var(--ink); }
+.guide-card-purpose { font-size:14px; line-height:1.7; color:var(--ink); }
+.guide-card-bottom { display:flex; flex-wrap:wrap; align-items:center; gap:2px 14px; font-size:12px; line-height:1.7; color:var(--muted); }
+.guide-card-marks { color:var(--ink); }
+.guide-entry[data-status="read"] .guide-card-marks { color:var(--success); }
+.guide-card-talk { padding:0 7px; border:1px solid var(--selected-border); border-radius:9px; color:var(--accent); }
+@media(min-width:1200px) {
+  /* Browsing: title, what the article lets you do, and its source and marks on one line. */
+  .library-workspace:not(.has-selection) .guide-entry { grid-template-columns:minmax(220px,.8fr) minmax(0,1.3fr) minmax(160px,.45fr); align-items:center; gap:28px; min-height:72px; padding:12px 24px; }
+  .library-workspace:not(.has-selection) .guide-card-bottom { flex-direction:column; align-items:flex-end; gap:2px; text-align:right; }
+  /* With a brief open the shelf is navigation: one roomy row per article with its title, subtitle and source line. */
+  .library-workspace.has-selection .library-layout { grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); }
+  .library-workspace.has-selection .guide-entry { gap:6px; min-height:88px; padding:16px 24px; align-content:center; }
+  .library-workspace.has-selection .guide-card-purpose { display:none; }
+  .library-workspace.has-selection .guide-card-bottom { margin-left:0; }
+  .library-workspace.has-selection .guide-card-name { font-size:17px; }
+  .library-workspace.has-selection .guide-card-subtitle { margin-top:2px; font-size:14px; color:var(--muted); }
+}
+@media(max-width:1199px) { .guide-card-purpose { display:none; } }
+@media(max-width:800px) {
+  .library-workspace .guide-entry { padding:14px 16px; gap:2px 12px; }
+  .guide-card-name { font-size:17px; }
+}

@@ -6,6 +6,16 @@ Exploration-scoped conversations accept optional per-turn guide attachments, a f
 
 This extends the accepted specification 1.1 reader. The 2026-10-27 upgrade preserves prior guide revisions and personal record meanings while adding reviewed r2 guides, explicit storage migrations and new backup formats. The refined panel/settings interface passed reader acceptance on 2026-10-25; that is historical interface acceptance, not validation of the later storage upgrade, answer quality or long-running provider reliability.
 
+## Faster answers from the article — 2026-11-14
+
+Three small changes aim at one thing: an ordinary question about the section on screen should be answered in a single model round.
+
+- **The whole section when it fits.** The first excerpt used to stop at about 5000 UTF-8 bytes, so a long section arrived as its first third and the model had to call `read_section`. The target is now the whole section in question (from the selection onward) plus a short opening, up to 24000 bytes. Text beyond the former excerpt may not use the 4000 bytes kept for a later evidence round, and the final per-request budget is unchanged, so a small `contextTokenLimit` still yields the former excerpt. Measured on three current guides: at 32768 the excerpts are as before; at 65536 every sampled section is sent whole (for example 3612 of 3612 characters instead of 1563).
+- **Default budget.** A fresh configuration now uses `contextTokenLimit: 65536` (the example file too). The estimate still counts UTF-8 bytes, so this is at most about 30–45 thousand real tokens. An existing `server/config.local.json` keeps whatever value it already has; raise it there to get whole sections.
+- **Instructions.** The shared prompt now asks for the conclusion in the first paragraph, for a judgement plus one weak point and one next step when the reader offers an idea, and for no tool call that merely confirms text already supplied. Other sentences were shortened so the prompt is the same size as before (4928 serialized bytes).
+
+In the panel, one-click questions and the selection actions send through the same `/ask` request as a typed question, with the passage on screen at that moment; see [UX](UX.md). None of this was checked against a real model in this round.
+
 ## Research and decisions
 
 Official repositories were inspected through the GitHub connector; the design borrows patterns, not source code or dependencies:
@@ -67,7 +77,7 @@ The settings are persisted in **`server/config.local.json`**, which can also be 
   "chatgptFallbackToApi": true,
   "toolsEnabled": true,
   "maxOutputTokens": 3000,
-  "contextTokenLimit": 32768,
+  "contextTokenLimit": 65536,
   "storageCapacityMiB": 512,
   "minimumFreeMiB": 32,
   "timeoutMs": 120000,
@@ -77,7 +87,7 @@ The settings are persisted in **`server/config.local.json`**, which can also be 
 
 `baseURL` is the API prefix; the backend appends `/chat/completions`. Set the actual provider URL, credential and model locally. HTTPS is required except for loopback HTTP. The model must support streaming Chat Completions and, with `toolsEnabled: true`, function tools. OpenAI-compatible endpoints vary; this does not guarantee that every ModelID supports this protocol. A Responses-only model is not supported by this adapter. Set `toolsEnabled: false` deliberately for plain streaming Q&A; that also disables library tools and web search. Unsupported tool calls are never silently dropped.
 
-`contextTokenLimit` accepts 8192–1048576 (default 32768); choose it for the actual model rather than assuming the model name establishes capacity. Preflight counts serialized payload UTF-8 bytes plus 512 framing units, then reserves `maxOutputTokens` (128–8192, default 3000). The stored `utf8-bytes-upper-bound` value is a conservative estimate for byte-level tokenizers, not measured provider usage or a universal bound for every compatible endpoint. Oversized evidence causes a clear error with retained sources, not silent pruning. The API adapter sends `max_tokens`; the current ChatGPT adapter only reserves output space locally and does not guarantee an exact upstream output-token cap. Transport, visible-answer and timeout limits remain separate guards.
+`contextTokenLimit` accepts 8192–1048576 (default 65536; 32768 before 2026-11-14); choose it for the actual model rather than assuming the model name establishes capacity. Preflight counts serialized payload UTF-8 bytes plus 512 framing units, then reserves `maxOutputTokens` (128–8192, default 3000). The stored `utf8-bytes-upper-bound` value is a conservative estimate for byte-level tokenizers, not measured provider usage or a universal bound for every compatible endpoint. Oversized evidence causes a clear error with retained sources, not silent pruning. The API adapter sends `max_tokens`; the current ChatGPT adapter only reserves output space locally and does not guarantee an exact upstream output-token cap. Transport, visible-answer and timeout limits remain separate guards.
 
 `storageCapacityMiB` accepts 256–16384 (default 512); `minimumFreeMiB` accepts 32–16384 (default 32). These backend-only settings are not personal IndexedDB limits. Stop the local service before manually changing runtime storage limits, then restart; storage limits are captured when the store opens. The usage counter includes serialized conversation/turn data and running-turn reservations, not SQLite pages, indexes, journals, backups or temporary copies. Budget extra disk for migration, export and staged import; 32 MiB is a guard threshold, not sufficient working space for every large backup.
 

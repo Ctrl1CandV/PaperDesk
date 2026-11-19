@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 import type { Guide } from '../content/types';
-import { AiPanel, type TopicRequest } from '../assistant/AiPanel';
+import { AiPanel, type AskRequest, type TopicRequest } from '../assistant/AiPanel';
 import '../styles/reader-assistant.css';
 
 // Keep one panel mounted when the viewport changes so an active answer survives.
-export function ReaderAssistant({ guide, unitId, selection, wide, topicRequest, onClose }: {
-  guide: Guide; unitId: string; selection?: string; wide: boolean; topicRequest?: TopicRequest; onClose: () => void;
+export function ReaderAssistant({ guide, unitId, selection, wide, topicRequest, askRequest, onClose }: {
+  guide: Guide; unitId: string; selection?: string; wide: boolean; topicRequest?: TopicRequest; askRequest?: AskRequest; onClose: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const readingOverflow = useRef(document.body.style.overflow);
@@ -66,7 +66,7 @@ export function ReaderAssistant({ guide, unitId, selection, wide, topicRequest, 
         if (event.target !== event.currentTarget) return;
         event.preventDefault(); dismiss.current();
       }}>
-      <AiPanel guide={guide} unitId={unitId} selection={selection} topicRequest={topicRequest} onClose={onClose} />
+      <AiPanel guide={guide} unitId={unitId} selection={selection} topicRequest={topicRequest} askRequest={askRequest} onClose={onClose} />
     </dialog>
   </aside>;
 }

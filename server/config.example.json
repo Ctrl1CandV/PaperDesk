@@ -7,7 +7,7 @@
   "chatgptFallbackToApi": true,
   "toolsEnabled": true,
   "maxOutputTokens": 3000,
-  "contextTokenLimit": 32768,
+  "contextTokenLimit": 65536,
   "storageCapacityMiB": 512,
   "minimumFreeMiB": 32,
   "timeoutMs": 120000,

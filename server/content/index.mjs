@@ -16,6 +16,8 @@ import { normalizeReadingText as normalizeText, readingTextFromMarkdown } from '
 
 const sectionUrl = (guide, unit) => `/read/${guide.metadata.id}/${guide.metadata.revision}#${unit.id}`;
 const jsonBytes = value => Buffer.byteLength(JSON.stringify(value));
+// Upper bound for the guide text sent with a question before any tool call.
+const INITIAL_SECTION_BYTES = 24000;
 // Tool JSON is itself a string inside both provider protocols.
 const resultBytes = value => jsonBytes(JSON.stringify(value));
 const mergeRanges = ranges => {
@@ -230,7 +232,8 @@ export class ContentIndex {
     const projected = new Map();
     const render = (units, scope, textBytes) => {
       const activeStart = selectionRange?.start ?? 0;
-      const activeText = scope === 'section' ? utf8Prefix(active.text.slice(activeStart), Math.max(selectionBytes, Math.floor(textBytes * (units.length === 1 ? 1 : .7)))) : active.text;
+      // The section being asked about comes first; the opening keeps a small share for orientation.
+      const activeText = scope === 'section' ? utf8Prefix(active.text.slice(activeStart), Math.max(selectionBytes, units.length === 1 ? textBytes : Math.max(Math.floor(textBytes * .7), textBytes - 1500))) : active.text;
       const otherBytes = Math.max(0, textBytes - Buffer.byteLength(activeText));
       const ranges = [], sources = units.map(unit => {
         const start = scope === 'section' && unit.id === active.id ? activeStart : 0;
@@ -256,6 +259,11 @@ export class ContentIndex {
     let scope = guide.body.length <= LIMITS.contextChars && guideBytes <= 5000 ? 'full-guide' : 'section';
     let units = scope === 'full-guide' ? guide.units : sectionUnits;
     if (units.length > 64) { scope = 'section'; units = sectionUnits; }
+    // Aim to send the whole section in question (from the selection onward) plus a short opening,
+    // so an ordinary question is answered without a reading round. The budget below still decides.
+    // `initialGuideBytes` is an internal knob (not a saved setting) for callers that need a tight first excerpt.
+    const desiredTextBytes = Math.max(5000, minimumTextBytes, Math.min(Number.isSafeInteger(config.initialGuideBytes) ? config.initialGuideBytes : INITIAL_SECTION_BYTES,
+      Buffer.byteLength(active.text.slice(selectionRange?.start ?? 0)) + (sectionUnits.length > 1 ? Math.min(1500, Buffer.byteLength(guide.units[0].text)) : 0)));
     let selected = render(units, scope, Math.max(5000, minimumTextBytes));
     if (scope === 'full-guide' && selected.bytes > hardInputLimit) { scope = 'section'; units = sectionUnits; }
     let minimum = render(units, scope, minimumTextBytes);
@@ -267,10 +275,11 @@ export class ContentIndex {
     const inputLimit = hardInputLimit - reserve;
     if (minimum.bytes > hardInputLimit) reject('问题和必要资料超过本机的上下文预算，请缩短输入或调整本机模型上下文预算。选文所需的真实导读片段未被截掉。', 413);
     if (scope === 'section') {
-      let low = minimumTextBytes, high = Math.max(5000, minimumTextBytes);
+      let low = minimumTextBytes, high = desiredTextBytes;
       while (low < high) {
         const middle = Math.ceil((low + high) / 2), candidate = render(units, scope, middle);
-        if (candidate.bytes <= inputLimit) low = middle; else high = middle - 1;
+        // Text beyond the ordinary excerpt may not use the room kept for a later evidence round.
+        if (candidate.bytes <= inputLimit - (tools.length && middle > Math.max(5000, minimumTextBytes) ? 4000 : 0)) low = middle; else high = middle - 1;
       }
       selected = render(units, scope, low);
     }

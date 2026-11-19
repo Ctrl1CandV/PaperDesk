@@ -7,6 +7,7 @@ import type { Exploration, ReadingStatus, ResumeRecord } from '../records/types'
 import { marksText, useReadingMarks, type ReadingMarks } from '../records/reading-marks';
 import { libraryBrief, publicationName, sourceVersionLabel } from './briefs';
 import { venueRanking } from './venueRankings';
+import { collectionForQuery, collectionTerms } from './collections';
 import { PaperFigure } from '../reader/PaperFigure';
 import './library.css';
 
@@ -29,9 +30,12 @@ function DocumentIcon({ survey = false }: { survey?: boolean }) {
   </svg>;
 }
 export function matchesTitleOrTopic(guide: GuideSummary, query: string) {
+  // A query that is exactly a category word (“通信”) means that reading collection.
+  const named = collectionForQuery(query);
+  if (named) return named.guideIds.includes(guide.metadata.id);
   const terms = normalized(query).split(' ').filter(Boolean);
   const fields = [guide.metadata.title, guide.metadata.paperTitle, guide.metadata.orientation?.shortTitle ?? '',
-    ...(guide.metadata.orientation?.topics.flatMap(topic => [topic.label, ...topic.aliases]) ?? [])].map(normalized);
+    ...(guide.metadata.orientation?.topics.flatMap(topic => [topic.label, ...topic.aliases]) ?? []), ...collectionTerms(guide)].map(normalized);
   return terms.every(term => fields.some(field => /^[a-z0-9-]+$/i.test(term) ? field.split(/[^a-z0-9-]+/i).some(word => word === term) : field.includes(term)));
 }
 
@@ -54,6 +58,7 @@ function Orientation({ guide, resumes, marks, returnToList, openRelated }: { gui
   const venue = publicationName(bibliography?.venue) || (bibliography?.publicationKind === 'preprint' ? '预印本' : '');
   const ranking = venueRanking(metadata);
   const recorded = marksText(marks, metadata.id, metadata.source);
+  const talk = contentRepository.presentationInfo(metadata.id, metadata.revision);
   const aims = new Map(orientation?.readingTargets.map(target => [target.unitId, target]) ?? []);
   const related = metadata.related.map(item => contentRepository.list().find(entry => entry.guide.metadata.id === item.guideId)?.guide).filter((item): item is GuideSummary => Boolean(item));
   return <section className="article-orientation" aria-labelledby="orientation-title">
@@ -66,6 +71,7 @@ function Orientation({ guide, resumes, marks, returnToList, openRelated }: { gui
         {canResume && <p className="orientation-resume" title={resumeUnit?.heading ?? undefined}>上次读到：{resumeLabel ?? '阅读起点'}{!currentResume && <span> · 导读修订 {resume.revision}</span>}</p>}
         <AppLink id={`start-${metadata.id}`} className="primary-action" to={canResume ? `/read/${resume.guideId}/${resume.revision}` : `/read/${metadata.id}/${metadata.revision}`}>{canResume ? '继续阅读' : '开始导读'} <span aria-hidden="true">→</span></AppLink>
         {canResume && <AppLink className="text-action" to={`/read/${metadata.id}/${metadata.revision}#${guide.units[0].id}`}>{currentResume ? '从头阅读' : `从头阅读第 ${metadata.revision} 版`}</AppLink>}
+        {talk && <AppLink id={`present-${metadata.id}`} className="text-action orientation-talk" to={`/present/${metadata.id}/${metadata.revision}`}>组会汇报 · {talk.minutes} 分钟</AppLink>}
         {recorded && <p className="orientation-marks">{recorded}</p>}
       </div>
     </header>
@@ -199,29 +205,33 @@ export function Library({ home = false }: { home?: boolean }) {
   const latest = [...resumes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
   const resumeGuide = latest && contentRepository.getSummary(latest.guideId, latest.revision);
   return <main id="main-content" data-navigation-pending={resumesLoading} className={`library-page library-workspace${detailOpen ? ' has-selection' : ''}`}>
-    <header className="library-heading"><h1>阅读书架</h1><AppLink className="text-action library-explore-link" to="/explore">探索 <span aria-hidden="true">↗</span></AppLink></header>
+    <header className="library-heading"><h1>阅读书架</h1></header>
     {(latest || direction) && <div className="home-resume">
       {latest && <div className="home-resume-item"><span className="eyebrow">上次停留</span><p>{resumeGuide?.metadata.orientation?.shortTitle ?? resumeGuide?.metadata.title ?? '原阅读版本暂不可用'}</p><AppLink className="text-action" to={`/read/${latest.guideId}/${latest.revision}`}>继续阅读 →</AppLink></div>}
       {direction?.nextAction && <div className="home-resume-item"><span className="eyebrow">方向《{direction.title}》的下一步</span><p>{direction.nextAction.description}</p><AppLink className="text-action" to={`/explore/questions/${direction.id}`}>查看方向 →</AppLink></div>}
     </div>}
     {storageError && <p className="status-error" role="status">本地位置暂时无法读取，仍可浏览和阅读。</p>}
     <div ref={layoutRef} className="library-layout"><section className="library-shelf" aria-label="选择文章">
-      <label className="visually-hidden" htmlFor="library-search">查找文章</label><div className="library-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input ref={searchRef} id="library-search" type="search" className="library-search" value={query} onChange={event => change({ q: event.target.value || null, article: null }, true)} placeholder="搜索标题或主要主题" />{query && <button aria-label="清除搜索" onClick={() => { change({ q: null, article: null }, true); searchRef.current?.focus(); }}>×</button>}</div>
+      <div className="library-toolbar"><label className="visually-hidden" htmlFor="library-search">查找文章</label><div className="library-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input ref={searchRef} id="library-search" type="search" className="library-search" value={query} onChange={event => change({ q: event.target.value || null, article: null }, true)} placeholder="搜索标题、主题或类别，如“通信”“评价”" />{query && <button aria-label="清除搜索" onClick={() => { change({ q: null, article: null }, true); searchRef.current?.focus(); }}>×</button>}</div>
       <div className="library-categories" role="group" aria-label="文章类型">{categories.map(([value, label]) => <button id={`library-type-${value}`} key={value} aria-pressed={category === value} onClick={() => change({ type: value === 'all' ? null : value, article: null })}>{label}<span>{entries.filter(({ guide }) => value === 'all' || (value === 'survey' ? guide.metadata.type === 'survey' : guide.metadata.type !== 'survey')).length}</span></button>)}</div>
-      <div className="library-result-row"><p className="library-result-count" role="status">{query ? `“${query}” · ` : ''}{markFilter ? `${markFilters.find(([value]) => value === markFilter)?.[1]} · ` : ''}{filtered.length} 篇文章</p>
-        <label className="library-mark-filter"><span className="visually-hidden">按导读阅读状态筛选</span><select value={markFilter ?? ''} onChange={event => change({ mark: event.target.value || null, article: null }, true)}><option value="">全部阅读状态</option>{markFilters.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label></div>
-      <div className="guide-list">{filtered.map(({ guide, recommendation }) => {
+      <div className="library-result-row"><p className="library-result-count" role="status">{filtered.length < entries.length ? `${query ? `“${query}” · ` : ''}${markFilter ? `${markFilters.find(([value]) => value === markFilter)?.[1]} · ` : ''}${filtered.length} 篇文章` : ''}</p>
+        <label className="library-mark-filter"><span className="visually-hidden">按导读阅读状态筛选</span><select value={markFilter ?? ''} onChange={event => change({ mark: event.target.value || null, article: null }, true)}><option value="">全部阅读状态</option>{markFilters.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label></div></div>
+      {filtered.length > 0 && <div className="guide-list">{filtered.map(({ guide }) => {
         const { metadata } = guide, orientation = metadata.orientation;
         const title = titleParts(orientation?.shortTitle ?? metadata.title);
-        return <button key={metadata.id} id={`choose-${metadata.id}`} className="guide-entry" aria-label={`${orientation?.shortTitle ?? metadata.title}，查看导学`} aria-pressed={selected?.guide.metadata.id === metadata.id} aria-expanded={selected?.guide.metadata.id === metadata.id} aria-controls="article-preview" onClick={() => select(metadata.id)}>
-          <span className="guide-card-meta"><span><DocumentIcon survey={metadata.type === 'survey'} />{typeLabel(metadata.type)}</span><span>{orientation?.bibliography.year ?? '年份待补充'}{marksText(marks, metadata.id, metadata.source) && <span className="guide-card-marks">{marksText(marks, metadata.id, metadata.source)}</span>}</span></span>
-          <h2><span className="guide-card-name">{title.name}</span>{title.subtitle && <span className="guide-card-subtitle">{title.subtitle}</span>}</h2>
-          {!title.subtitle && <span className="guide-card-summary">{orientation?.summary ?? metadata.purpose}</span>}
+        const recorded = marksText(marks, metadata.id, metadata.source);
+        const status = marks.guides.get(metadata.id)?.status;
+        const bibliography = orientation?.bibliography;
+        const venue = publicationName(bibliography?.venue) || (bibliography?.publicationKind === 'preprint' ? '预印本' : '');
+        return <button key={metadata.id} id={`choose-${metadata.id}`} className="guide-entry" data-status={status} aria-label={`${orientation?.shortTitle ?? metadata.title}，查看导学`} aria-pressed={selected?.guide.metadata.id === metadata.id} aria-expanded={selected?.guide.metadata.id === metadata.id} aria-controls="article-preview" onClick={() => select(metadata.id)}>
+          <span className="guide-card-main">
+            <h3><span className="guide-card-name">{title.name}</span>{title.subtitle && <span className="guide-card-subtitle">{title.subtitle}</span>}</h3>
+          </span>
           <span className="guide-card-purpose">{orientation?.value ?? metadata.purpose}</span>
-          <span className="guide-card-bottom"><span>{orientation?.topics.map(topic => topic.label).join(' / ') ?? recommendation.reason}</span><span className="guide-card-arrow" aria-hidden="true">↗</span></span>
+          <span className="guide-card-bottom"><span className="guide-card-source"><DocumentIcon survey={metadata.type === 'survey'} />{typeLabel(metadata.type)} · {[venue, bibliography?.year].filter(Boolean).join(' ') || '年份待补充'}</span>{recorded && <span className="guide-card-marks">{recorded}</span>}{contentRepository.presentationInfo(metadata.id, metadata.revision) && <span className="guide-card-talk">有汇报稿</span>}</span>
         </button>;
-      })}</div>
-      {!filtered.length && <div className="empty-state"><h2>没有匹配的文章</h2><p>{markFilter ? '当前阅读状态下没有文章。' : '当前只匹配标题和主要主题。可以换一个主题，或查看全部文章。'}</p><button className="secondary-action" onClick={() => change({ q: null, type: null, mark: null, article: null })}>查看全部文章</button></div>}
+      })}</div>}
+      {!filtered.length && <div className="empty-state"><h2>没有匹配的文章</h2><p>{markFilter ? '当前阅读状态下没有文章。' : '当前匹配标题、主要主题和类别（基础、通信、评价）。可以换一个词，或查看全部文章。'}</p><button className="secondary-action" onClick={() => change({ q: null, type: null, mark: null, article: null })}>查看全部文章</button></div>}
     </section><aside id="article-preview" className="library-preview" hidden={!selected} aria-label="文章导学" onKeyDown={event => { if (event.key === 'Escape' && !event.defaultPrevented && !(event.target instanceof Element && event.target.closest('dialog'))) { event.preventDefault(); event.stopPropagation(); returnToList(); } }}>{selected && <Orientation key={`${selected.guide.metadata.id}/${selected.guide.metadata.revision}`} guide={selected.guide} resumes={resumes} marks={marks} returnToList={returnToList} openRelated={openRelated} />}</aside></div>
   </main>;
 }

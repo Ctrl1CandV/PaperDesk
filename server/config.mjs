@@ -4,7 +4,7 @@ import { validReasoningEffort } from './ai/reasoning.mjs';
 
 export function normalizeConfig(input = {}) {
   object(input, [], ['baseURL', 'apiKey', 'modelId', 'chatgptModelId', 'chatgptReasoningEffort', 'chatgptFallbackToApi', 'toolsEnabled', 'maxOutputTokens', 'contextTokenLimit', 'storageCapacityMiB', 'minimumFreeMiB', 'timeoutMs', 'search']);
-  const config = { baseURL: '', apiKey: '', modelId: '', chatgptModelId: '', chatgptReasoningEffort: '', chatgptFallbackToApi: true, toolsEnabled: true, maxOutputTokens: 3000, contextTokenLimit: 32768, storageCapacityMiB: 512, minimumFreeMiB: 32, timeoutMs: 120000, search: { apiKey: '' }, ...input };
+  const config = { baseURL: '', apiKey: '', modelId: '', chatgptModelId: '', chatgptReasoningEffort: '', chatgptFallbackToApi: true, toolsEnabled: true, maxOutputTokens: 3000, contextTokenLimit: 65536, storageCapacityMiB: 512, minimumFreeMiB: 32, timeoutMs: 120000, search: { apiKey: '' }, ...input };
   object(config.search, [], ['apiKey']);
   config.search = { apiKey: '', ...config.search };
   for (const key of ['baseURL', 'apiKey', 'modelId', 'chatgptModelId']) if (typeof config[key] !== 'string' || config[key].length > (key === 'apiKey' ? 4096 : 200) || /[\r\n]/.test(config[key])) throw new PublicError('AI 后端配置格式无效。', 503);

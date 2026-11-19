@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { validateLibraryBriefs } from '../../server/content/brief-validation.mjs';
 import { validateGlossary } from '../../shared/glossary.mjs';
 import { validateTranslations } from '../../server/content/translations.mjs';
+import { validatePresentations } from '../../server/content/presentations.mjs';
 
 try {
   const { summary, guides } = await validateContent();
@@ -15,6 +16,8 @@ try {
   console.log(`Glossary valid: ${termCount} reviewed terms.`);
   const translations = await validateTranslations({ guides });
   console.log(`English translations valid: ${translations.guides} guide(s), ${translations.glossary} term(s).`);
+  const presentations = await validatePresentations({ guides });
+  console.log(`Talk outlines valid: ${presentations.length} presentation(s), ${presentations.reduce((sum, item) => sum + item.stops, 0)} stop(s).`);
 } catch (error) {
   console.error(`Content validation failed: ${error.message}`);
   process.exitCode = 1;

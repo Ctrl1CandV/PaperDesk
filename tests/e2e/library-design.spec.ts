@@ -31,13 +31,15 @@ const centeredBrowse = async (page: Page) => {
   const viewportWidth = await page.evaluate(() => document.documentElement.clientWidth);
   const layout = (await page.locator('.library-layout').boundingBox())!;
   expect(Math.abs(layout.x + layout.width / 2 - viewportWidth / 2)).toBeLessThan(2);
-  expect(layout.width).toBeLessThanOrEqual(1632);
+  expect(layout.width).toBeLessThanOrEqual(1800);
   if (viewportWidth >= 1024) {
     // Balance useful space against outer margins; more width is not always better.
     expect(layout.width / viewportWidth).toBeGreaterThan(viewportWidth >= 1200 ? .63 : .88);
-    expect(layout.width / viewportWidth).toBeLessThan(viewportWidth >= 1200 ? .82 : .96);
+    // The single-list shelf takes more of the window so each row's purpose fits on fewer lines.
+    expect(layout.width / viewportWidth).toBeLessThan(viewportWidth >= 1200 ? .9 : .96);
   }
-  for (const selector of ['.library-heading', '.library-shelf', '.library-search-box']) {
+  // Search, type and status now share one toolbar row; the row as a whole spans the shelf.
+  for (const selector of ['.library-heading', '.library-shelf', '.library-toolbar']) {
     const bounds = (await page.locator(selector).boundingBox())!;
     expect(Math.abs(bounds.x - layout.x)).toBeLessThan(2);
     expect(Math.abs(bounds.width - layout.width)).toBeLessThan(2);
@@ -123,7 +125,8 @@ test('wide browsing and the preview follow each article at a stable open-state r
       expect(originalWidth - rowWidth).toBeGreaterThan(100);
     } else expect(Math.abs(rowWidth - openWidth)).toBeLessThan(2);
     const before = await page.evaluate(() => scrollY);
-    if (index > 0) expect(before).toBeGreaterThan(300);
+    // Compact open-state rows put the middle article much nearer the top than the former tall cards.
+    if (index > 0) expect(before).toBeGreaterThan(50);
     // The card can be taller than the viewport; dispatch the already-selected action
     // without Playwright first scrolling its row's center into view.
     await row.dispatchEvent('click');
@@ -222,12 +225,13 @@ test('centered browsing and wider two-column reading reflow across wide, narrow 
       const list = (await page.locator('.library-shelf').boundingBox())!;
       const card = (await page.locator('.library-preview').boundingBox())!;
       const layout = (await page.locator('.library-layout').boundingBox())!;
-      expect(card.x).toBeGreaterThan(width * .4);
+      // The wider shelf starts closer to the edge, so the brief begins a little further left.
+      expect(card.x).toBeGreaterThan(width * .38);
       expect(card.width).toBeGreaterThan(list.width);
       expect(card.width).toBeGreaterThanOrEqual(340);
       if (width >= 1440) expect(card.width).toBeGreaterThan(580);
       expect(layout.width / width).toBeGreaterThan(width >= 1200 ? .63 : .88);
-      expect(layout.width / width).toBeLessThan(width >= 1200 ? .82 : .96);
+      expect(layout.width / width).toBeLessThan(width >= 1200 ? .9 : .96);
       expect(Math.abs(layout.width - fullListWidth)).toBeLessThan(2);
       expect(Math.abs(card.x + card.width - layout.x - layout.width)).toBeLessThan(2);
       expect(list.x + list.width).toBeLessThanOrEqual(card.x);

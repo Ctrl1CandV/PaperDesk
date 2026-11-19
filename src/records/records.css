@@ -1,6 +1,6 @@
 .records-page { width: min(1680px, calc(100% - 96px)); margin: 48px auto 96px; }
 .records-page h1 { margin: 10px 0 18px; font-size: clamp(30px, 2.8vw, 40px); font-weight: 700; line-height: 1.4; color: var(--heading); letter-spacing: -.8px; }
-.records-page h2 { color: var(--heading); font-size: 22px; font-weight: 700; line-height: 1.5; }
+.records-page h2 { color: var(--heading); font-size: 20px; font-weight: 700; line-height: 1.5; }
 .records-intro { max-width: 760px; font-size: 1rem; line-height: 1.85; color: var(--muted); }
 .records-muted { color: var(--muted); font-size: .92rem; line-height: 1.8; }
 .records-section { margin-top: 32px; padding: 28px 30px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
@@ -54,14 +54,14 @@
 .notes-page .entry-meta { flex-wrap: wrap; gap: 6px 16px; line-height: 1.8; }
 .notes-page .note-text { margin: 24px 0; font-size: 18px; line-height: 1.9; color: var(--ink); }
 .note-excerpt { padding: 18px 22px; background: var(--surface-soft); }
-.note-excerpt .eyebrow { font-size: 11px; }
+.note-excerpt .eyebrow { font-size: 12px; }
 .note-excerpt .saved-quote { margin: 8px 0 0; padding: 0 0 0 16px; background: transparent; max-height: 260px; }
 .note-entry-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 .note-entry-footer > a { font-size: 14px; line-height: 1.8; min-height: 44px; display: inline-flex; align-items: center; }
 .note-entry-footer .form-actions { margin: 0; }
 .accumulation-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--line); padding-top: 22px; margin-top: 36px; color: var(--muted); font-size: 13px; line-height: 1.8; }
 @media (max-width: 800px) {
-  .records-page h1, .notes-page h1 { font-size: 29px; }
+  .records-page h1, .notes-page h1 { font-size: 28px; }
   .notes-page { padding: 28px 20px 70px; }
   .accumulation-heading { align-items: flex-start; flex-direction: column; gap: 20px; }
   .notes-tools { flex-wrap: wrap; gap: 14px; }
@@ -82,5 +82,5 @@
   .records-removal { padding: 24px 0 0; align-items: flex-start; flex-direction: column; gap: 16px; }
   .records-conflict { padding: 12px; }
   .notes-page .note-entry { padding: 20px 16px; }
-  .notes-page .note-text { font-size: 17px; }
+  .notes-page .note-text { font-size: 16px; }
 }

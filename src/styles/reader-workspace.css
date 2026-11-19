@@ -21,21 +21,21 @@ html { scroll-padding-block:28px 140px; }
 /* The authored target for the current section, tucked under its contents entry. */
 .toc-aim { margin:6px 0 10px; padding:0 8px 0 38px; font-size:12px; line-height:1.75; color:var(--muted); }
 .toc-aim p { margin:0; }
-.toc-aim span { display:block; color:var(--accent); font-size:11px; }
+.toc-aim span { display:block; color:var(--accent); font-size:12px; }
 .toc-aim .toc-aim-limit { margin-top:4px; }
 .reading-lens { margin:16px 0 0; padding:12px 12px 0; border-top:1px solid var(--line); font-size:12px; line-height:1.75; color:var(--muted); }
 .reading-lens summary { min-height:32px; display:flex; align-items:center; cursor:pointer; list-style-position:inside; }
 .reading-lens summary:hover { color:var(--accent); }
 .reading-lens ul { margin:4px 0 6px; padding-left:16px; }
 .reading-lens li+li { margin-top:6px; }
-.toc-number { min-width:16px; font-family:var(--font-data); font-size:10px; font-weight:400; }
+.toc-number { min-width:16px; font-family:var(--font-data); font-size:12px; font-weight:400; }
 .sidebar-footer { margin-top:18px; padding:14px 12px 0; }
 .article-topline { min-height:0; margin-bottom:10px; }
 .article-labels { flex-wrap:wrap; gap:8px; font-size:12px; line-height:1.7; letter-spacing:0; }
 .article-labels span+span:before { margin-right:8px; }
 .prose { line-height:1.9; line-break:strict; }
 .prose h1 { font-size:32px; line-height:1.48; letter-spacing:-.65px; font-weight:700; margin-bottom:28px; text-wrap:balance; word-break:keep-all; overflow-wrap:anywhere; }
-.prose h2 { font-size:25px; font-weight:700; line-height:1.55; margin-bottom:22px; text-wrap:balance; word-break:keep-all; overflow-wrap:anywhere; }
+.prose h2 { font-size:24px; font-weight:700; line-height:1.55; margin-bottom:22px; text-wrap:balance; word-break:keep-all; overflow-wrap:anywhere; }
 .prose h3 { font-size:20px; font-weight:700; }
 .prose p { margin-bottom:24px; }
 .prose section+section { margin-top:44px; padding-top:36px; }
@@ -43,7 +43,7 @@ html { scroll-padding-block:28px 140px; }
 .prose strong { font-weight:700; }
 .citation-button { display:inline; font-size:12px; line-height:1.8; padding:2px 5px; margin-inline:2px; border:0; border-radius:4px; background:var(--surface-soft); color:var(--muted); box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 .citation-button:hover { background:var(--surface-selected); color:var(--accent); }
-.citation-arrow { font-size:10px; margin-left:3px; }
+.citation-arrow { font-size:12px; margin-left:3px; }
 .reading-footer { margin-top:48px; padding-top:22px; }
 .reading-close { flex:1 0 100%; display:grid; gap:6px; }
 .reading-footer .reading-close p { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; margin:0; font-size:13px; }
@@ -78,8 +78,8 @@ html { scroll-padding-block:28px 140px; }
   .reader-layout { display:block; margin:0; padding:0 0 145px; max-width:none; background:var(--surface); }
   .reading-main { border:0; border-radius:0; padding:24px 22px; }
   .prose { line-height:1.9; }
-  .prose h1 { font-size:27px; line-height:1.5; }
-  .prose h2 { font-size:23px; line-height:1.6; }
+  .prose h1 { font-size:28px; line-height:1.5; }
+  .prose h2 { font-size:24px; line-height:1.6; }
   .prose h3 { font-size:20px; }
   .prose section+section { margin-top:34px; padding-top:28px; }
   .mobile-tools { background:var(--surface); padding-inline:22px; }

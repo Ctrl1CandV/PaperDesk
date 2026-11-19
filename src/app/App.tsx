@@ -9,6 +9,7 @@ import { NotesPage } from '../notes/Notes';
 import { BackupPage } from '../records/BackupPage';
 import { ExplorePage, LensPage, ExplorationPage } from '../exploration';
 import { PacketDialog } from '../handoff/PacketDialog';
+import { PresentationPage } from '../presentation/PresentationPage';
 import type { Exploration } from '../records/types';
 import type { Guide } from '../content/types';
 import { ExplorationSync } from '../records/ExplorationSync';
@@ -44,7 +45,7 @@ function ReadingAssignments() {
 }
 
 function Header({ pathname }: { pathname: string }) {
-  const library = pathname === '/' || pathname === '/library' || pathname.startsWith('/read/');
+  const library = pathname === '/' || pathname === '/library' || pathname.startsWith('/read/') || pathname.startsWith('/present/');
   return <header className="site-header"><div className="header-inner">
     <AppLink to="/" className="brand"><span className="brand-mark" aria-hidden="true">p<span>.</span></span><span className="brand-name">PaperDesk</span></AppLink>
     <div className="header-right"><nav className="header-navigation" aria-label="主导航"><AppLink to="/library" current={library}>书架</AppLink><AppLink to="/explore" current={pathname.startsWith('/explore')}>探索</AppLink><AppLink to="/notes" current={pathname === '/notes'}>笔记</AppLink><AppLink to="/backup" current={pathname === '/backup'}>备份</AppLink></nav><ThemeToggle /></div>
@@ -87,10 +88,12 @@ export function App() {
   const pathname = location.split(/[?#]/)[0];
   const [packet, setPacket] = useState<Exploration>();
   const match = /^\/read\/([a-z0-9-]+)\/(\d+)$/.exec(pathname);
+  const talk = /^\/present\/([a-z0-9-]+)\/(\d+)$/.exec(pathname);
   const lens = /^\/explore\/lenses\/([a-z0-9-]+)$/.exec(pathname);
   const question = /^\/explore\/questions\/([a-z0-9-]+)$/.exec(pathname);
   let page;
   if (match) page = <GuidePage key={`${match[1]}/${match[2]}`} id={match[1]} revision={Number(match[2])} />;
+  else if (talk) page = <PresentationPage key={`${talk[1]}/${talk[2]}`} guideId={talk[1]} revision={Number(talk[2])} />;
   else if (pathname === '/' || pathname === '/library') page = <Library key={pathname} home={pathname === '/'} />;
   else if (pathname === '/notes') page = <NotesPage />;
   else if (pathname === '/backup') page = <BackupPage />;

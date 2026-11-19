@@ -1,0 +1,205 @@
+/* Talk pages: one mind map shown to the group, unfolded as it is told, with a script below for the speaker.
+   Branch colours only tell the parts apart; burgundy stays the action colour. */
+:root { --talk-1:#87394c; --talk-2:#85560f; --talk-3:#2c6f73; --talk-4:#47609a; --talk-5:#7a4c8f; --talk-6:#4f7340; }
+:root[data-theme="dark"] { --talk-1:#e0909f; --talk-2:#dbb06a; --talk-3:#7cc4c6; --talk-4:#9fb4e6; --talk-5:#c9a2dc; --talk-6:#a6cb95; }
+[data-part="0"] { --part:var(--talk-1); } [data-part="1"] { --part:var(--talk-2); } [data-part="2"] { --part:var(--talk-3); }
+[data-part="3"] { --part:var(--talk-4); } [data-part="4"] { --part:var(--talk-5); } [data-part="5"] { --part:var(--talk-6); }
+
+.talk-page { box-sizing:border-box; width:100%; max-width:1920px; margin-inline:auto; padding:20px var(--workspace-gutter) 72px; }
+.talk-missing { max-width:760px; padding-top:56px; }
+.talk-missing h1 { margin:18px 0; font-size:28px; color:var(--heading); }
+.talk-missing p { font-size:16px; line-height:1.8; }
+.talk-missing code { font:13px var(--font-data); padding:2px 5px; border-radius:4px; background:var(--surface-soft); overflow-wrap:anywhere; }
+
+/* Header: what this is and how long; the map below is the page. */
+.talk-header { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px 32px; padding-bottom:14px; }
+.talk-back { display:inline-flex; align-items:center; min-height:32px; font-size:13px; }
+.talk-heading h1 { display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 14px; margin:2px 0 4px; font-size:26px; line-height:1.3; font-weight:700; letter-spacing:-.4px; color:var(--heading); }
+.talk-heading h1 span { padding:3px 9px; border-radius:5px; background:var(--surface-selected); color:var(--accent); font-size:13px; font-weight:600; letter-spacing:0; }
+.talk-meta { display:flex; flex-wrap:wrap; gap:4px 18px; margin:0; font-size:13px; color:var(--muted); }
+.talk-meta span + span::before { content:'·'; margin-right:18px; color:var(--line-strong); }
+.talk-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; }
+.talk-toggle { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 6px; font-size:14px; color:var(--ink); cursor:pointer; white-space:nowrap; }
+.talk-print { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:8px 14px; border:1px solid var(--line); border-radius:6px; background:var(--surface); font-size:14px; color:var(--ink); }
+.talk-print:hover { border-color:var(--control-border); color:var(--heading); }
+
+/* The overview: the thesis, the whole map at reading size, and the order and time of the talk. */
+.talk-overview { padding:26px 32px 18px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:0 1px 2px var(--shadow-color); }
+.talk-thesis { max-width:58em; margin:0 auto; text-align:center; font-size:18px; line-height:1.7; color:var(--heading); text-wrap:balance; }
+.talk-thesis span { margin-right:12px; font-size:13px; font-weight:600; color:var(--accent); }
+.talk-map-frame.is-fit { display:flex; justify-content:center; padding:22px 0 14px; overflow:hidden; }
+.talk-map-frame.is-outline { padding:16px 0 6px; }
+.talk-map.is-overview { flex:none; overflow:visible; }
+/* The order of the talk, read left to right. */
+.talk-route { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px 0; margin:6px 0 0; padding:14px 0 0; border-top:1px solid var(--line); list-style:none; font-size:14px; font-weight:600; color:var(--heading); }
+.talk-route li { display:inline-flex; align-items:center; }
+.talk-route li + li::before { content:'→'; margin:0 14px; font-weight:400; color:var(--muted); }
+.talk-route li[data-part]::after { order:-1; content:''; width:8px; height:8px; margin-right:7px; border-radius:50%; background:var(--part); }
+.talk-route li[data-part]::before { order:-2; }
+
+/* The story: a map that follows the reader on the left, the stop being told on the right. */
+.talk-story { display:grid; grid-template-columns:minmax(0,42fr) minmax(0,58fr); gap:28px; align-items:start; margin-top:28px; }
+.talk-story-map { position:sticky; top:16px; height:calc(100dvh - 32px); border:1px solid var(--line); border-radius:14px; background:var(--panel-background); overflow:hidden; }
+.talk-story-map .talk-stage-map { position:absolute; inset:0; }
+.talk-stage-map { position:relative; min-width:0; min-height:0; overflow:hidden; }
+.talk-stage-map.is-outline { overflow-y:auto; padding:8px 20px; }
+.talk-map.is-stage { position:absolute; inset:0; overflow:visible; }
+.map-camera { transform-origin:0 0; }
+.talk-story-content { min-width:0; padding:4px clamp(24px,3vw,48px) 24px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+.talk-section { padding:36px 0; scroll-margin-top:16px; font-size:16px; }
+.talk-section + .talk-section,.talk-part + .talk-section { border-top:1px solid var(--line); }
+.talk-section h2,.talk-section h3 { margin:.45em 0 0; font-size:24px; line-height:1.35; font-weight:700; color:var(--heading); text-wrap:balance; }
+.talk-section :is(h2,h3):focus,.talk-part-head h2:focus { outline:none; }
+.talk-section .stop-lead { font-size:18px; }
+.talk-section .stop-points { margin-top:0; }
+.talk-section.is-closing .stop-points { margin-top:1.4em; }
+.stop-body { display:grid; gap:1.4em; margin-top:1.4em; }
+.stop-body .stop-figure img { max-height:460px; width:auto; }
+.talk-section[aria-current="step"] h3 { color:var(--accent); }
+.talk-part { border-top:1px solid var(--line); }
+.talk-part-head { padding:44px 0 4px; scroll-margin-top:16px; }
+.talk-part-head h2 { margin:.3em 0 .25em; font-size:28px; line-height:1.3; font-weight:700; color:var(--heading); }
+.talk-part-head h2::before { content:''; display:inline-block; width:.4em; height:.4em; margin-right:.4em; border-radius:50%; background:var(--part); vertical-align:.12em; }
+.talk-part-head > p:last-child { margin:0; font-size:16px; line-height:1.7; color:var(--muted); }
+.talk-part .talk-section:first-of-type { border-top:0; }
+
+/* The map. Stops and key terms sit on their branch line; parts and the root are pills. */
+.talk-map { overflow:visible; }
+.talk-edge { stroke:var(--part,var(--line-strong)); stroke-width:2; stroke-linecap:round; opacity:.75; }
+.talk-edge.edge-part { stroke-width:3; opacity:.85; }
+.talk-edge.edge-point { stroke-width:1.25; opacity:.5; }
+.talk-node { transform:var(--to); }
+.talk-node text { font-family:var(--font-body); fill:var(--ink); }
+.talk-node:is([role="button"],[role="link"]) { cursor:pointer; }
+.talk-node:focus { outline:none; }
+.talk-node:focus-visible > rect:first-child { stroke:var(--focus); stroke-width:3; }
+.node-root > rect { fill:var(--accent); }
+.node-root > text { fill:var(--surface); font-size:18px; font-weight:700; }
+.node-root.is-current > rect { stroke:color-mix(in srgb,var(--accent) 35%,var(--surface)); stroke-width:6; paint-order:stroke; }
+.node-part > rect { fill:color-mix(in srgb,var(--part) 12%,var(--surface)); stroke:color-mix(in srgb,var(--part) 55%,var(--surface)); stroke-width:1.5; }
+.node-part > text { fill:var(--heading); font-size:16px; font-weight:600; }
+.node-part:hover > rect { fill:color-mix(in srgb,var(--part) 22%,var(--surface)); stroke:var(--part); }
+.node-fold circle { fill:var(--surface); stroke:var(--part); stroke-width:1.5; }
+.node-fold text { font-size:12px; font-weight:600; fill:var(--part); }
+.node-fold-dot { fill:var(--surface); stroke:var(--part); stroke-width:1.5; }
+.node-stop line { stroke:var(--part); stroke-width:2; stroke-linecap:round; }
+.node-stop .node-hit { fill:transparent; }
+.node-stop > text { font-size:15px; font-weight:500; fill:var(--heading); }
+.node-stop:hover .node-hit { fill:var(--surface-hover); }
+.node-stop.is-current .node-hit { fill:color-mix(in srgb,var(--part) 16%,var(--surface)); }
+.node-stop.is-current line { stroke-width:3.5; }
+.node-stop.is-current > text { font-weight:700; }
+.node-point line { stroke:var(--part); stroke-width:1.25; opacity:.55; }
+.node-point .node-hit { fill:transparent; }
+.node-point text { font-size:13px; fill:var(--muted); }
+.node-point.is-current-point text { fill:var(--heading); }
+.node-point.is-current-point line { opacity:1; }
+.talk-edge.is-trail { opacity:1; stroke-width:3; }
+.talk-edge.edge-part.is-trail { stroke-width:4; }
+.talk-node.is-dim,.talk-edge.is-dim { opacity:.32; }
+@media(prefers-reduced-motion:no-preference) {
+  /* Opening a branch slides what is already drawn into its new place; new nodes fade in where they land. */
+  /* Highlights ease in rather than snap. */
+  .talk-node :is(rect,line,circle),.talk-node > text { transition:fill 240ms ease, stroke 240ms ease, stroke-width 240ms ease; }
+  .talk-edge { transition:opacity 240ms ease, stroke-width 240ms ease; }
+  .talk-node { transition:opacity 240ms ease; }
+  /* The following map: the camera glides; nodes slide to their new places; a new node grows out of its parent and its edge draws in. */
+  .map-camera { transition:transform 720ms cubic-bezier(.22,.8,.24,1); }
+  .is-stage .talk-node { transition:transform 560ms cubic-bezier(.22,.8,.24,1), opacity 320ms ease 80ms; }
+  @starting-style { .is-stage .talk-node { transform:var(--from); opacity:0; } }
+  .is-stage .talk-edge { transition:d 560ms cubic-bezier(.22,.8,.24,1), opacity 240ms ease, stroke-width 240ms ease; animation:talk-draw 560ms cubic-bezier(.22,.8,.24,1) backwards; }
+  /* The overview draws itself once, from the centre outward. */
+  .is-overview .talk-node { animation:talk-fade 380ms ease backwards; }
+  .is-overview .node-part { animation-delay:120ms; }
+  .is-overview .node-stop { animation-delay:300ms; }
+  .is-overview .node-point { animation-delay:480ms; }
+  .is-overview .talk-edge { animation:talk-draw 420ms ease-out backwards; }
+  .is-overview .edge-stop { animation-delay:180ms; }
+  .is-overview .edge-point { animation-delay:360ms; }
+}
+@keyframes talk-fade { from { opacity:0; } }
+@keyframes talk-draw { from { stroke-dasharray:1; stroke-dashoffset:1; } to { stroke-dasharray:1; stroke-dashoffset:0; } }
+.talk-outline-tree { width:100%; margin:0; padding:0; list-style:none; }
+.talk-outline-tree > li { padding:10px 0 10px 14px; border-left:3px solid var(--part); }
+.talk-outline-tree > li + li { margin-top:10px; }
+.talk-outline-tree ol { margin:4px 0 0; padding:0; list-style:none; }
+.talk-outline-tree .outline-part { display:flex; justify-content:space-between; gap:12px; margin:0; font-size:16px; color:var(--heading); }
+.talk-outline-tree button { display:flex; justify-content:space-between; gap:12px; width:100%; min-height:44px; padding:8px 0; text-align:left; font-size:15px; color:var(--ink); }
+.talk-outline-tree :is(.outline-part,button) span:last-child { font-size:13px; color:var(--muted); }
+.talk-outline-tree button[aria-pressed="true"] { color:var(--accent); font-weight:600; }
+.talk-outline-tree li li p { margin:-6px 0 6px; font-size:13px; line-height:1.7; color:var(--muted); }
+
+.talk-paper { margin:.4em 0 0; font-size:14px; line-height:1.5; color:var(--muted); }
+.talk-footer { margin:28px 0 0; font-size:13px; line-height:1.8; color:var(--muted); }
+.talk-footer p { margin:0; }
+
+/* Stop content, shared by the card and the script. Sizes are in em so the card can scale on a projected screen. */
+.stop-kicker { display:flex; flex-wrap:wrap; align-items:center; gap:.2em 1.1em; margin:0; font-size:max(12px,.82em); color:var(--muted); }
+.stop-part { display:inline-flex; align-items:center; gap:.5em; font-weight:600; color:var(--part,var(--accent)); }
+.stop-part::before { content:''; width:.6em; height:.6em; border-radius:.15em; background:currentColor; }
+.stop-lead { margin:.6em 0 0; padding-left:.8em; border-left:.2em solid var(--part,var(--accent)); max-width:44em; font-size:1.15em; line-height:1.6; color:var(--heading); }
+.stop-figure { margin:0; }
+.stop-figure img { display:block; max-width:100%; height:auto; margin:0 auto; padding:.6em; border:1px solid var(--line); border-radius:.5em; background:#fff; }
+.stop-figure figcaption { margin-top:.6em; text-align:center; font-size:max(12px,.85em); line-height:1.6; color:var(--muted); }
+.stop-points { display:grid; grid-template-columns:repeat(auto-fit,minmax(15em,1fr)); gap:.9em 1.6em; margin:0; }
+.stop-points > div { min-width:0; padding-left:.85em; border-left:2px solid color-mix(in srgb,var(--part,var(--accent)) 45%,transparent); }
+.stop-points dt { font-weight:700; color:var(--heading); }
+.stop-points dd { margin:.15em 0 0; line-height:1.65; color:var(--ink); }
+.stop-table { overflow-x:auto; }
+.stop-table table { width:100%; border-collapse:collapse; font-size:.95em; line-height:1.5; }
+.stop-table thead th { padding:.45em .8em; border-bottom:2px solid var(--part,var(--line-strong)); text-align:left; font-size:.9em; font-weight:600; color:var(--muted); white-space:nowrap; }
+.stop-table tbody th,.stop-table td { padding:.55em .8em; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+.stop-table tbody th { font-weight:600; color:var(--heading); white-space:nowrap; }
+.stop-table tbody tr:last-child :is(th,td) { border-bottom:0; }
+/* A two- or three-character term never breaks into a column of single characters. */
+.stop-table td.is-short { white-space:nowrap; }
+.stop-table-note { margin:.8em 0 0; font-size:max(12px,.88em); line-height:1.6; color:var(--muted); }
+.stop-sources { display:flex; flex-wrap:wrap; align-items:center; gap:.3em 1.2em; margin-top:1.3em; font-size:max(12px,.85em); }
+.stop-sources a { color:var(--muted); text-decoration:underline; text-decoration-color:var(--line-strong); text-underline-offset:.25em; }
+.stop-sources a:hover { color:var(--accent); }
+.stop-guide { min-height:32px; padding:.2em .7em; border:1px solid var(--line); border-radius:1em; color:var(--accent); font-size:inherit; }
+.stop-guide:hover { border-color:var(--selected-border); background:var(--surface-selected); }
+.stop-notes { margin-top:1.3em; padding:.9em 1.1em; border-radius:8px; background:var(--panel-background); font-size:14px; line-height:1.75; }
+.stop-notes > span { font-size:12px; font-weight:600; color:var(--muted); }
+.stop-notes ul { margin:.3em 0 0; padding-left:1.2em; }
+.talk-guide-dialog { width:min(820px,calc(100% - 28px)); }
+.talk-guide-meta { margin:0 0 12px; font-size:13px; color:var(--muted); }
+.talk-guide-prose { --reading-size:17px; }
+
+@media(max-width:1100px) {
+  .talk-page { padding-inline:24px; }
+  .talk-story { display:block; }
+  .talk-story-map { display:none; }
+}
+@media(max-width:760px) {
+  .talk-page { padding:16px 16px 56px; }
+  .talk-heading h1 { font-size:22px; }
+  .talk-back { min-height:44px; }
+  .talk-print { display:none; }
+  .talk-overview { padding:16px; }
+  .talk-thesis { text-align:left; font-size:16px; }
+  .talk-route { justify-content:flex-start; }
+  .talk-route li { padding:0 12px 0 0; }
+  .talk-route li + li { padding-left:12px; }
+  .talk-story { margin-top:20px; }
+  .talk-story-content { padding:0 18px 12px; }
+  .talk-part-head h2 { font-size:24px; }
+  .talk-section h2,.talk-section h3 { font-size:20px; }
+  .talk-section .stop-lead { font-size:16px; }
+  .stop-points { grid-template-columns:1fr; }
+  .stop-table table { min-width:460px; }
+  .stop-table tbody th { white-space:normal; }
+  .stop-sources a { display:inline-block; padding:11px 0; }
+  .stop-guide { min-height:44px; }
+}
+@media print {
+  :root:has(.talk-page) { background:#fff; }
+  :root:has(.talk-page) :is(.site-header,.skip-link,.reading-assignment-notice,.exploration-sync,.talk-actions,.talk-back,.talk-story-map,.stop-guide) { display:none !important; }
+  .talk-page { padding:0; max-width:none; }
+  .talk-overview,.talk-story-content { border:0; padding:0; box-shadow:none; }
+  .talk-story { display:block; }
+  .talk-overview { break-after:page; }
+  .talk-part { break-before:page; }
+  .talk-section { break-inside:avoid; }
+  .talk-map,.stop-figure { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+}

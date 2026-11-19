@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Citation, Guide } from '../content/types';
 import { coverageHint, coverageLabel } from '../content/labels';
 import { contentRepository } from '../content/repository';
@@ -10,7 +11,7 @@ import type { GuideEvidence, GuideState, OriginalState, ReadingStatus, ResumeRec
 import { NoteEditor } from '../notes/Notes';
 import { AddEvidenceDialog } from '../exploration/AddEvidenceDialog';
 import { rememberReaderTopic } from '../exploration/model';
-import type { TopicRequest } from '../assistant/AiPanel';
+import type { AskRequest, TopicRequest } from '../assistant/AiPanel';
 import { PacketDialog, type ReadingContext } from '../handoff/PacketDialog';
 import { Dialog } from '../ui/Dialog';
 import { Markdown } from './Markdown';
@@ -25,7 +26,8 @@ import { libraryBrief } from '../library/briefs';
 type ReadingTarget = NonNullable<Guide['metadata']['orientation']>['readingTargets'][number];
 function Contents({ guide, active, aim, onChoose }: { guide: Guide; active: string; aim?: ReadingTarget; onChoose?: () => void }) {
   const labels = libraryBrief(guide.metadata).chapterLabels;
-  return <nav aria-label="章节目录"><ol>{guide.units.map((unit, index) => <li key={unit.id}>
+  const at = guide.units.findIndex(unit => unit.id === active);
+  return <nav aria-label="章节目录"><ol>{guide.units.map((unit, index) => <li key={unit.id} data-passed={index < at || undefined}>
     <a href={`#${unit.id}`} aria-label={unit.heading ?? '阅读起点'} title={unit.heading ?? '阅读起点'} aria-current={active === unit.id ? 'location' : undefined} onClick={event => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); onChoose?.(); navigate(`#${unit.id}`);
@@ -43,8 +45,8 @@ const navigationLabels: Record<string, string> = {
   '这篇怎样成为以后阅读的起点': '后续阅读的起点',
   '哪些原文值得亲自读': '值得亲读的原文',
 };
-function ReadingActionIcon({ kind }: { kind: 'note' | 'explore' | 'copy' }) {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind === 'note' ? <><path d="M14 4H5v16h14v-9M10 14l1-4 7-7 3 3-7 7-4 1Z" /></> : kind === 'explore' ? <><circle cx="6" cy="5" r="2" /><circle cx="18" cy="12" r="2" /><circle cx="6" cy="19" r="2" /><path d="M6 7v10M8 6c6 0 3 6 8 6" /></> : <><rect x="8" y="8" width="12" height="13" rx="2" /><path d="M16 8V3H3v13h5" /></>}</svg>;
+function ReadingActionIcon({ kind }: { kind: 'note' | 'explore' | 'copy' | 'ask' }) {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind === 'ask' ? <path d="M4 5h16v11H9l-5 4Z" /> : kind === 'note' ? <><path d="M14 4H5v16h14v-9M10 14l1-4 7-7 3 3-7 7-4 1Z" /></> : kind === 'explore' ? <><circle cx="6" cy="5" r="2" /><circle cx="18" cy="12" r="2" /><circle cx="6" cy="19" r="2" /><path d="M6 7v10M8 6c6 0 3 6 8 6" /></> : <><rect x="8" y="8" width="12" height="13" rx="2" /><path d="M16 8V3H3v13h5" /></>}</svg>;
 }
 const statuses: [ReadingStatus, string][] = [['unread', '未读'], ['reading', '阅读中'], ['read', '已读'], ['deferred', '暂缓']];
 // Navigation buffers only; a selected passage is never a saved personal record.
@@ -62,6 +64,7 @@ export function Reader({ guide }: { guide: Guide }) {
   const [englishError, setEnglishError] = useState('');
   const translationAvailable = contentRepository.hasTranslation(guide.metadata.id, guide.metadata.revision);
   const currentRevision = contentRepository.currentRevision(guide.metadata.id);
+  const talkInfo = contentRepository.presentationInfo(guide.metadata.id, guide.metadata.revision);
   const displayGuide = language === 'en' && englishGuide ? englishGuide : guide;
   const displayLanguage = displayGuide.metadata.language === 'en' ? 'en' : 'zh';
   const [selection, setSelection] = useState<ReadingContext | undefined>(buffer?.selection);
@@ -80,6 +83,8 @@ export function Reader({ guide }: { guide: Guide }) {
   const dockedAssistant = assistantWide && assistantOpen;
   const toolsInSidebar = sidebarTools || (assistantWide && !assistantOpen);
   const [topicRequest, setTopicRequest] = useState<TopicRequest>();
+  const [askRequest, setAskRequest] = useState<AskRequest>();
+  const [popover, setPopover] = useState<{ left: number; top: number }>();
   const marks = useReadingMarks();
   useEffect(() => {
     const media = window.matchMedia('(min-width:1100px)');
@@ -104,6 +109,7 @@ export function Reader({ guide }: { guide: Guide }) {
     return () => controller.abort();
   }, [language, translationAvailable, englishGuide, guide.metadata.id, guide.metadata.revision]);
   const ready = useRef(false);
+  const progress = useRef<HTMLSpanElement>(null);
   const openCitation = useCallback((citation: Citation, label: string, trigger: HTMLButtonElement) => setSource({ citation, label, trigger }), []);
   useEffect(() => { readingEditors.set(bufferKey, { selection, noteContext, evidence }); }, [bufferKey, selection, noteContext, evidence]);
   useEffect(() => {
@@ -114,6 +120,8 @@ export function Reader({ guide }: { guide: Guide }) {
     ready.current = false;
     const savePosition = () => { if (last && ready.current) personalStore.setResume(last).catch(() => { if (!cancelled) setStorageError('当前位置暂未保存；阅读仍可继续。请检查本地存储或导出已有记录。'); }); };
     const track = () => {
+      const prose = document.querySelector('.reading-main > .prose');
+      if (prose && progress.current) { const box = prose.getBoundingClientRect(); progress.current.style.setProperty('--read', String(Math.min(1, Math.max(0, (innerHeight * .4 - box.top) / Math.max(1, box.height))))); }
       const unit = guide.units.filter(unit => (document.getElementById(unit.id)?.getBoundingClientRect().top ?? Infinity) < 180).at(-1) ?? guide.units[0];
       setActive(unit.id);
       if (!ready.current) return;
@@ -158,11 +166,40 @@ export function Reader({ guide }: { guide: Guide }) {
     };
     document.addEventListener('selectionchange', capture); return () => document.removeEventListener('selectionchange', capture);
   }, [guide, displayGuide]);
+  useEffect(() => {
+    // A mouse selection inside one section gets its actions beside it; touch keeps the system menu.
+    const place = (event: PointerEvent) => {
+      if (event.pointerType === 'touch' || (event.target instanceof Element && event.target.closest('.selection-popover'))) return;
+      requestAnimationFrame(() => {
+        const chosen = window.getSelection();
+        const section = (node: Node) => (node instanceof Element ? node : node.parentElement)?.closest('.prose section[data-unit]');
+        if (!chosen || chosen.isCollapsed || !chosen.rangeCount || !chosen.toString().trim()) { setPopover(undefined); return; }
+        const range = chosen.getRangeAt(0), start = section(range.startContainer);
+        if (!start || start !== section(range.endContainer)) { setPopover(undefined); return; }
+        const box = range.getBoundingClientRect();
+        const left = Math.max(150, Math.min(document.documentElement.clientWidth - 150, box.left + box.width / 2));
+        setPopover({ left: left + window.scrollX, top: (box.top < 64 ? box.bottom + 10 : box.top - 48) + window.scrollY });
+      });
+    };
+    const clear = () => { if (window.getSelection()?.isCollapsed) setPopover(undefined); };
+    document.addEventListener('pointerup', place); document.addEventListener('selectionchange', clear);
+    return () => { document.removeEventListener('pointerup', place); document.removeEventListener('selectionchange', clear); };
+  }, []);
+  /** Open the assistant on the current selection or section; a prepared question is sent at once. */
+  function askAi(question?: string) {
+    setPopover(undefined); setAssistantOpen(true);
+    setAskRequest({ question, send: Boolean(question), nonce: Date.now() });
+  }
+  // English prose is not the validated guide text, so a selected passage travels inside the question.
+  const explainSelection = () => askAi(language === 'en' && selection ? `请解释这段话：它在说什么、为什么这样说，以及它在这一节里起什么作用。先用两三句话给出结论。\n\n「${selection.text.slice(0, 1200)}」` : '请解释我选中的这段话：它在说什么、为什么这样说，以及它在这一节里起什么作用。先用两三句话给出结论，再补必要的前提。');
   const context = () => selection ?? sectionContext(displayGuide, active);
   const contextHeading = guide.units.find(unit => unit.id === (selection?.unitId ?? active))?.heading ?? '阅读起点';
   const statusLabel = (status?: ReadingStatus) => statuses.find(item => item[0] === status)?.[1] ?? '未记录';
   // Authored reading targets for this section, shown quietly beside the article.
   const aim = guide.metadata.orientation?.readingTargets.find(target => target.unitId === active);
+  const activeIndex = Math.max(0, guide.units.findIndex(unit => unit.id === active));
+  const activeHeading = guide.units[activeIndex]?.heading;
+  const activeLabel = libraryBrief(guide.metadata).chapterLabels[active] ?? navigationLabels[activeHeading ?? ''] ?? activeHeading ?? '阅读起点';
   const lens = readingLens(guide.metadata.type);
   // Link targets are not prose; only words the reader sees count as mentions.
   const terms = useMemo(() => glossaryTermsIn(guide.body.replace(/\]\([^)]*\)/g, ']')), [guide]);
@@ -178,12 +215,12 @@ export function Reader({ guide }: { guide: Guide }) {
     } catch { setStateMessage('保存失败，请重试或检查本地存储。'); } finally { setSaving(false); }
   }
   const controls = <div className="font-controls" role="group" aria-label="正文字号"><span>字号</span><button aria-label="减小字号" disabled={fontSize <= 16} onClick={() => adjustFont(-1)}>A−</button><button aria-label="增大字号" disabled={fontSize >= 22} onClick={() => adjustFont(1)}>A+</button></div>;
-  const readingTools = <div className="reader-action-bar reading-tools" role="group" aria-label="阅读积累"><div className="reading-tool-context"><span>{selection ? '选中文本' : '当前章节'}</span><strong title={contextHeading}>{contextHeading}</strong></div>{selection && <button className="text-action clear-selection" onClick={() => { setSelection(undefined); window.getSelection()?.removeAllRanges(); }}>清除选择</button>}<button id="reader-note-action" className="tool-primary" aria-haspopup="dialog" onClick={() => setNoteContext(context())}><ReadingActionIcon kind="note" /><span>记笔记</span></button><button id="reader-explore-action" className="tool-primary" aria-haspopup="dialog" onClick={() => { const selected = context(); setEvidence({ id: crypto.randomUUID(), provenance: 'guide-excerpt', text: selected.text, target: { guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: selected.unitId }, sources: selected.sources }); }}><ReadingActionIcon kind="explore" /><span>加入探索</span></button><button id="reader-packet-action" className="tool-secondary" aria-haspopup="dialog" onClick={() => setPacket(context())}><ReadingActionIcon kind="copy" /><span>复制上下文</span></button></div>;
+  const readingTools = <div className="reader-action-bar reading-tools" role="group" aria-label="阅读积累"><div className="reading-tool-context"><span>{selection ? '选中文本' : '当前章节'}</span><strong title={contextHeading}>{contextHeading}</strong></div>{selection && <button className="text-action clear-selection" onClick={() => { setSelection(undefined); window.getSelection()?.removeAllRanges(); }}>清除选择</button>}<button id="reader-ask-action" className="tool-primary tool-ask" onClick={() => askAi()} title={selection ? '带着选中的文字向 AI 提问' : '就当前章节向 AI 提问'}><ReadingActionIcon kind="ask" /><span>问 AI</span></button><button id="reader-note-action" className="tool-primary" aria-haspopup="dialog" onClick={() => setNoteContext(context())}><ReadingActionIcon kind="note" /><span>记笔记</span></button><button id="reader-explore-action" className="tool-primary" aria-haspopup="dialog" onClick={() => { const selected = context(); setEvidence({ id: crypto.randomUUID(), provenance: 'guide-excerpt', text: selected.text, target: { guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: selected.unitId }, sources: selected.sources }); }}><ReadingActionIcon kind="explore" /><span>加入探索</span></button><button id="reader-packet-action" className="tool-secondary" aria-haspopup="dialog" onClick={() => setPacket(context())}><ReadingActionIcon kind="copy" /><span>复制上下文</span></button></div>;
   return <>
     <div className={`mobile-tools${dockedAssistant ? ' assistant-mobile-tools' : ''}`}><details className="mobile-contents"><summary>本文目录</summary><Contents guide={guide} active={active} onChoose={() => document.querySelector('.mobile-contents')?.removeAttribute('open')} /></details>{controls}</div>
-    <div className={`reader-layout${dockedAssistant ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span>{guide.units.length - 1} 节</span></div><Contents guide={guide} active={active} aim={aim} /><details className="reading-lens"><summary>读{lens.name}时可以留意</summary><ul>{lens.questions.map(question => <li key={question}>{question}</li>)}</ul></details>{terms.length > 0 && <details className="reading-terms"><summary>本文术语 <span>{terms.length}</span></summary><ul>{terms.map(entry => <li key={entry.id}><TermHint id={entry.id}>{entry.term}</TermHint><span>{entry.zh ?? entry.full}</span></li>)}</ul></details>}<div className="sidebar-footer"><AppLink to="/explore">探索 →</AppLink></div>{toolsInSidebar && readingTools}</aside>
-      <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述解读' : '论文解读'}</span><span>导读修订 {guide.metadata.revision}</span><span title={coverageHint(guide.metadata.coverage.scope) || undefined}>{coverageLabel(guide.metadata.coverage.scope)}</span></div></div>
-        <div className="reading-identity"><a className="reading-original" href={guide.metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 · {guide.metadata.source.version ?? '版本未指定'} ↗</a><div className="reader-heading-actions"><div className="desktop-font">{controls}</div>{translationAvailable && <button type="button" className="reader-language-toggle" aria-pressed={language === 'en'} aria-label={language === 'en' ? '切换回中文' : '切换英文阅读'} title={language === 'en' ? '切换回中文' : 'English reading'} disabled={englishLoading} onClick={() => setLanguage(value => value === 'en' ? 'zh' : 'en')}>{englishLoading ? '…' : language === 'en' ? '中文' : 'English'}</button>}<button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button><button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)} title={`本篇解读 · ${statusLabel(guideState?.status)}；原论文 · ${statusLabel(originalState?.status)}`}><strong>阅读记录</strong><span aria-hidden="true">⌄</span></button></div></div>
+    <div className={`reader-layout${dockedAssistant ? ' with-assistant' : ''}`}><aside className="reading-sidebar"><AppLink to={libraryReturnPath(guide.metadata.id)} className="back-link">← 阅读书架</AppLink><div className="toc-heading">本文目录 <span aria-label={`第 ${activeIndex} 节，共 ${guide.units.length - 1} 节`}>{String(activeIndex).padStart(2, '0')} / {guide.units.length - 1}</span></div><Contents guide={guide} active={active} aim={aim} /><details className="reading-lens"><summary>读{lens.name}时可以留意</summary><ul>{lens.questions.map(question => <li key={question}>{question}</li>)}</ul></details>{terms.length > 0 && <details className="reading-terms"><summary>本文术语 <span>{terms.length}</span></summary><ul>{terms.map(entry => <li key={entry.id}><TermHint id={entry.id}>{entry.term}</TermHint><span>{entry.zh ?? entry.full}</span></li>)}</ul></details>}<div className="sidebar-footer"><AppLink to="/explore">探索 →</AppLink></div>{toolsInSidebar && readingTools}</aside>
+      <main id="main-content" className="reading-main"><AppLink to={libraryReturnPath(guide.metadata.id)} className="reader-mobile-back">← 返回导学与书架</AppLink><div className="article-topline"><div className="article-labels"><span>{guide.metadata.type === 'survey' ? '综述解读' : '论文解读'}</span><span>导读修订 {guide.metadata.revision}</span><span title={coverageHint(guide.metadata.coverage.scope) || undefined}>{coverageLabel(guide.metadata.coverage.scope)}</span><a className="reading-original" href={guide.metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 · {guide.metadata.source.version ?? '版本未指定'} ↗</a></div></div>
+        <div className="reading-identity"><p className="reading-where"><span className="reading-where-number" aria-hidden="true">{String(activeIndex).padStart(2, '0')}</span><span className="visually-hidden">当前章节：</span><span className="reading-where-label">{activeLabel}</span></p><span ref={progress} className="reading-progress" aria-hidden="true" /><div className="reader-heading-actions"><div className="desktop-font">{controls}</div>{translationAvailable && <button type="button" className="reader-language-toggle" aria-pressed={language === 'en'} aria-label={language === 'en' ? '切换回中文' : '切换英文阅读'} title={language === 'en' ? '切换回中文' : 'English reading'} disabled={englishLoading} onClick={() => setLanguage(value => value === 'en' ? 'zh' : 'en')}>{englishLoading ? '…' : language === 'en' ? '中文' : 'English'}</button>}{talkInfo && <AppLink id="reader-talk-action" className="reader-talk-link" to={`/present/${guide.metadata.id}/${guide.metadata.revision}`} title={`按组会汇报整理的导图与讲解页，约 ${talkInfo.minutes} 分钟`}>汇报</AppLink>}<button id="reader-state-action" className="reading-state-trigger" aria-label="阅读记录" aria-haspopup="dialog" onClick={() => setStateOpen(true)} title={`本篇解读 · ${statusLabel(guideState?.status)}；原论文 · ${statusLabel(originalState?.status)}`}><strong>阅读记录</strong><span aria-hidden="true">⌄</span></button><button id="reader-ai-action" className="reader-ai-trigger" aria-expanded={assistantOpen} aria-controls="reader-assistant" onClick={() => setAssistantOpen(value => !value)}>AI 解读 <span aria-hidden="true">{assistantOpen ? '−' : '+'}</span></button></div></div>
         {currentRevision !== undefined && currentRevision !== guide.metadata.revision && <p className="revision-notice">这是保留的旧修订 {guide.metadata.revision}；当前推荐修订 {currentRevision}。<AppLink to={`/read/${guide.metadata.id}/${currentRevision}`}>阅读当前修订</AppLink></p>}
         {storageError && <p className="status-warning" role="status">{storageError}</p>}
         {englishError && <p className="status-warning" role="status">{englishError}</p>}
@@ -196,9 +233,12 @@ export function Reader({ guide }: { guide: Guide }) {
           <div className="reading-footer-links"><AppLink to="#orientation">回到阅读起点 ↑</AppLink><AppLink to="/explore">探索 →</AppLink></div>
         </footer>
       </main>
-      {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={language === 'en' ? undefined : selection?.text} wide={assistantWide} topicRequest={topicRequest} onClose={() => { setAssistantOpen(false); setTopicRequest(undefined); }} />}
+      {assistantOpen && <ReaderAssistant guide={guide} unitId={selection?.unitId ?? active} selection={language === 'en' ? undefined : selection?.text} wide={assistantWide} topicRequest={topicRequest} askRequest={askRequest} onClose={() => { setAssistantOpen(false); setTopicRequest(undefined); }} />}
     </div>
     {!toolsInSidebar && readingTools}
+    {popover && selection && createPortal(<div className="selection-popover" role="toolbar" aria-label="选中文本" style={{ left: popover.left, top: popover.top }} onMouseDown={event => event.preventDefault()}>
+      <button type="button" className="is-primary" onClick={explainSelection}>解释这段</button><button type="button" onClick={() => askAi()}>问 AI</button><button type="button" onClick={() => { setPopover(undefined); setNoteContext(context()); }}>记笔记</button>
+    </div>, document.body)}
     {source && <SourceDialog selection={source} guide={guide} onClose={() => setSource(null)} />}
     {noteContext && <NoteEditor target={{ guideId: guide.metadata.id, revision: guide.metadata.revision, unitId: noteContext.unitId }} quote={noteContext.text} onClose={() => setNoteContext(undefined)} />}
     {evidence && <AddEvidenceDialog evidence={evidence} onClose={() => setEvidence(undefined)} onDiscuss={(record, question) => {

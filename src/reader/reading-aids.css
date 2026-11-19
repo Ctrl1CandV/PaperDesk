@@ -52,7 +52,7 @@
 .paper-figure-rights { flex:1 1 auto; min-width:0; }
 .paper-figure-rights summary { display:inline; cursor:pointer; color:var(--muted); list-style:none; }
 .paper-figure-rights summary::-webkit-details-marker { display:none; }
-.paper-figure-rights summary::after { content:" ▾"; font-size:10px; }
+.paper-figure-rights summary::after { content:" ▾"; font-size:12px; }
 .paper-figure-rights[open] summary::after { content:" ▴"; }
 .paper-figure-rights summary:hover { color:var(--accent); }
 .paper-figure-rights summary:focus-visible { outline:2px solid var(--focus); outline-offset:2px; border-radius:2px; }

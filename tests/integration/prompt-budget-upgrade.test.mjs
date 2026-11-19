@@ -128,7 +128,8 @@ test('three current guides complete budgeted synthetic search/read/final rounds 
         assert.equal(source.text, unit.text.slice(0, range.end));
         assert.equal(range.excerptOnly, range.end < range.total);
       }
-      assert.ok(prepared.sources.reduce((bytes, source) => bytes + Buffer.byteLength(source.text), 0) <= 5000);
+      // The first excerpt may now reach the whole section in question, within the unchanged request budget.
+      assert.ok(prepared.sources.reduce((bytes, source) => bytes + Buffer.byteLength(source.text), 0) <= 24000);
       if (metadata.guideRanges.some(range => range.excerptOnly)) {
         assert.equal(prepared.context.scope, 'section'); assert.match(metadata.guideScope, /节选/);
       }

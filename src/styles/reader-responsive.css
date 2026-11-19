@@ -11,7 +11,7 @@
     padding-inline:24px
   }
   .prose h1 {
-    font-size:30px
+    font-size:28px
   }
   nav li a {
     font-size:12px
@@ -29,7 +29,7 @@
     gap:8px
   }
   .brand-mark {
-    font-size:27px;
+    font-size:28px;
     width:31px;
     height:33px;
     line-height:31px
@@ -90,7 +90,7 @@
     min-height:25px
   }
   .article-labels {
-    font-size:10px;
+    font-size:12px;
     gap:10px
   }
   .article-labels span+span:before {
@@ -101,18 +101,18 @@
     line-height:1.9
   }
   .prose h1 {
-    font-size:27px;
+    font-size:28px;
     line-height:1.5;
     letter-spacing:-.5px;
     margin-bottom:20px
   }
   .prose h2 {
-    font-size:22px;
+    font-size:20px;
     line-height:1.65;
     margin-bottom:20px
   }
   .prose h3 {
-    font-size:19px
+    font-size:20px
   }
   .prose p {
     margin-bottom:22px
@@ -133,7 +133,7 @@
   .teaching-diagram figcaption {
     padding:12px;
     gap:8px;
-    font-size:10px
+    font-size:12px
   }
   .diagram-scroll {
     padding-inline:12px
@@ -142,7 +142,7 @@
     padding:19px 22px 22px
   }
   .source-dialog h2 {
-    font-size:23px;
+    font-size:24px;
     margin:12px 0 20px
   }
   .source-locator {
@@ -152,7 +152,7 @@
     padding:35px 20px
   }
   .library-page>h1 {
-    font-size:29px
+    font-size:28px
   }
   .library-intro {
     font-size:15px

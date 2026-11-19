@@ -1,5 +1,5 @@
 import index from './catalog-index.json';
-import type { Guide, GuideMetadata, GuideSummary, ExplorationSeed } from './types';
+import type { Guide, GuideMetadata, GuideSummary, ExplorationSeed, Presentation } from './types';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 
@@ -16,6 +16,7 @@ const summaries = entries.filter(entry => current[entry.guideId] === entry.revis
 const cache = new Map<string, { guide: Guide; bytes: number }>();
 const pending = new Map<string, { controller: AbortController; promise: Promise<Guide>; readers: number }>();
 const seedCache = new Map<number, ExplorationSeed>();
+const talkCache = new Map<string, Presentation>();
 const CACHE_BYTES = 4 * 1024 * 1024;
 const CACHE_GUIDES = 8;
 let cacheBytes = 0;
@@ -136,6 +137,18 @@ export const contentRepository = {
     const seed = JSON.parse(await checkedText(file.file, file.sha256, 2 * 1024 * 1024, signal)) as ExplorationSeed;
     if (seedCache.size >= 4) seedCache.delete(seedCache.keys().next().value!);
     seedCache.set(revision, seed); return seed;
+  },
+  /** Identity of the talk outline prepared from a revision, when one exists. */
+  presentationInfo(id: string, revision: number) { return byKey.get(`${id}/${revision}`)?.guide.presentation; },
+  async getPresentation(id: string, revision: number, signal?: AbortSignal): Promise<Presentation | undefined> {
+    const key = `${id}/${revision}`, info = byKey.get(key)?.guide.presentation;
+    if (!info) return undefined;
+    if (signal?.aborted) throw new DOMException('已取消读取', 'AbortError');
+    const cached = talkCache.get(key);
+    if (cached) return cached;
+    const talk = JSON.parse(await checkedText(info.path, info.sha256, 2 * 1024 * 1024, signal)) as Presentation;
+    if (talkCache.size >= 4) talkCache.delete(talkCache.keys().next().value!);
+    talkCache.set(key, talk); return talk;
   },
   list() { return summaries; },
   resolveRelated(guide: Guide, link: string) {

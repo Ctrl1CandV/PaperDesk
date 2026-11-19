@@ -89,7 +89,8 @@ for (const provider of ['api', 'chatgpt']) test(`${provider}: a long fixed archi
 
 for (const provider of ['api', 'chatgpt']) test(`${provider}: search then disjoint guide reads retain one source, exact wire ranges and backup history`, async t => {
   const { content, guide, unit, input } = await fixture(t);
-  const request = input(), prepared = prepareAssistantContext(content, request, [], config);
+  // A tight first excerpt leaves an unread tail for the two disjoint reads below.
+  const request = input(), prepared = prepareAssistantContext(content, request, [], { ...config, initialGuideBytes: 5000 });
   const store = new AiStore(':memory:'), restored = new AiStore(':memory:');
   t.after(() => { store.close(); restored.close(); });
   const turn = store.begin(request, prepared.context, prepared.sources).turn;

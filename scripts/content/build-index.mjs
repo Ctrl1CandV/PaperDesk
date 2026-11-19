@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -12,6 +12,13 @@ const catalog = JSON.parse(catalogBytes);
 const translationBytes = await readFile(resolve(root, 'translations.json')).catch(() => undefined);
 const translations = translationBytes ? JSON.parse(translationBytes) : { schemaVersion: 1, guides: [] };
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+// Talk outlines are an optional layer over a guide revision; only their identity enters the index.
+const talks = new Map();
+for (const name of await readdir(resolve(root, 'presentations')).catch(() => [])) {
+  if (!name.endsWith('.json')) continue;
+  const bytes = await readFile(resolve(root, 'presentations', name)), data = JSON.parse(bytes);
+  talks.set(`${data.guideId}/${data.revision}`, { path: `presentations/${name}`, sha256: sha256(bytes), title: data.title, minutes: data.minutes, stops: data.parts.reduce((sum, part) => sum + part.stops.length, 0) });
+}
 // Intrinsic sizes let figures reserve their space before the image arrives.
 function imageSize(bytes) {
   if (bytes.subarray(1, 4).toString('ascii') === 'PNG') return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
@@ -42,7 +49,7 @@ for (const entry of catalog.entries) {
       ...(current && orientation ? { orientation } : {}),
       related: current ? metadata.related ?? [] : [],
       coverage: { limitations: current ? metadata.coverage.limitations : [] } },
-    units, figures, bodyPath: directory + metadata.bodyFile, packageDirectory: directory, ...(english ? { translations: { en: english } } : {}) } });
+    units, figures, bodyPath: directory + metadata.bodyFile, packageDirectory: directory, ...(english ? { translations: { en: english } } : {}), ...(talks.has(`${id}/${revision}`) ? { presentation: talks.get(`${id}/${revision}`) } : {}) } });
 }
 const seeds = {};
 for (const [revision, file] of Object.entries(catalog.exploration.revisions)) {

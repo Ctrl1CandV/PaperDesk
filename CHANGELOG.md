@@ -1,5 +1,31 @@
 # Changelog
 
+## Roomier shelf rows and a calmer talk map — 2026-11-19 (third pass)
+
+- With a brief open, the shelf list is wider and each row taller, showing the title, subtitle and source; search has its own line so the type tabs no longer wrap.
+- The talk page no longer prints a time on each section, branch or route step; the header keeps the total length.
+- The talk map draws itself in, lights the branch under the pointer and the path to the current stop; in the following map new nodes grow out of their parent and edges draw in.
+
+## Wider shelf rows and the following talk map — 2026-11-19 (second pass)
+
+- Shelf rows use more of a wide window (94% of the content width, up to 1800 px).
+- The talk page shows the whole mind map at the top again, then a map on the left that follows the talk as it scrolls: it opens the current branch, folds the others and lights the current stop. The full-screen stage and side card from the first pass are removed.
+
+## One-list shelf and the talk as a map stage — 2026-11-19
+
+- The shelf is one list again: no collection groups, group counts or Explore link beside the title. Typing a category word such as “通信”, “评价” or “基础” finds that reading collection.
+- The talk page is a mind map that fills the screen and opens branch by branch; choosing a stop unfolds its key terms and shows a card with its sentence, figure or table and sources beside the map. Arrow keys walk the talk; fullscreen applies to the map only. The slide-style telling mode, its rail and its timer are removed; a script for the speaker sits below the map.
+- The communication survey talk is now 12 minutes: 3 branches, 7 stops and a closing on the survey's value and limits.
+- Build passes; 585 Node tests pass; all 233 browser tests pass after two shelf tests were updated. Talk content is author-checked only and not rehearsed.
+
+## Collections, reader bar, map talks and quick questions — 2026-11-14
+
+- The shelf is grouped into the three public reading collections, each one surface with its route, count, explicit-mark progress and aligned rows in reading order; one type scale (ten sizes, 12 px minimum) across the app.
+- The reader's tool row is a sticky bar naming the current section with a reading-progress line; the contents count the current section and mark passed ones.
+- Talk pages at `/present/:guideId/:revision` tell one mind map instead of showing slides: the full map and per-stop web content (message, original figure, key terms or table, sources, notes, the full guide section on request), a map pane that follows the reader, and a telling mode that frames each branch and unfolds it stop by stop. Talk outlines (opening, parts of stops, closing) are a validated content layer bound to one guide revision; the first covers the 2025 multi-agent communication survey (4 parts, 13 stops, 15 minutes).
+- Asking from the article: actions beside a mouse selection, one-click questions above the composer and “问 AI” in the reading tools. The first model round receives the whole section in question when the budget allows; new configurations default to a 65536 context budget; the shared instructions ask for the conclusion first and direct feedback on the reader's ideas.
+- Build passes; 585 Node tests and all 231 browser tests pass (browser run through an installed Chrome). Talk content is author-checked only, and the assistant changes were not verified against a real model.
+
 ## Complete English versions and reading fixes — 2026-11-09
 
 - English versions now cover all 24 current guides. Fifteen drafts that had summarized away explanatory sentences were retranslated paragraph by paragraph from the Chinese revisions; nine were kept after section-by-section comparison.

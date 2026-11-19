@@ -1,0 +1,102 @@
+/* 2026-11 refinement layer. Loaded last: one type scale, one page-title size,
+   quiet toolbars with a single accented control. Structure stays in the files above. */
+
+/* Programmatic focus targets (sections, opened titles) are not controls. */
+[tabindex="-1"]:focus { outline:none; }
+
+/* Page titles share one size across the shelf, Explore, Notes and Backup. */
+.exploration-page h1,.records-page h1,.notes-page h1,.platform-page h1 { font-size:28px; line-height:1.4; letter-spacing:-.4px; }
+.eyebrow { letter-spacing:.04em; }
+@media(max-width:800px) {
+  .exploration-page h1,.records-page h1,.notes-page h1,.platform-page h1 { font-size:24px; }
+}
+
+/* Header: the links keep their look and gain a wider pointer and touch area. */
+.header-navigation a { padding-inline:6px; }
+.header-navigation a:last-child { padding-left:25px; }
+.brand { min-height:44px; }
+@media(max-width:800px) {
+  .header-navigation { font-size:13px; gap:4px; }
+  .header-navigation a { justify-content:center; min-width:40px; padding-inline:7px; }
+  .header-navigation a:last-child { margin-left:4px; padding-left:12px; }
+  .header-navigation a:last-child[aria-current]::after { left:12px; }
+  .header-right { gap:6px; }
+  .theme-toggle { width:40px; height:40px; }
+}
+
+/* Reader toolbar: controls of one height and weight; the AI toggle is the accented one. */
+.reading-identity { margin-bottom:22px; padding-bottom:12px; border-bottom:1px solid var(--line); font-size:13px; }
+.reading-identity .reading-original { font-size:13px; }
+.reading-identity .reader-heading-actions { gap:2px; }
+.reading-identity :is(.reader-language-toggle,.reader-talk-link,.reading-state-trigger,.reader-ai-trigger) { display:inline-flex; align-items:center; gap:6px; min-height:36px; padding:6px 10px; border:1px solid transparent; border-radius:6px; background:transparent; font-size:13px; font-weight:400; line-height:1.4; letter-spacing:0; color:var(--ink); white-space:nowrap; text-decoration:none; }
+.reading-identity :is(.reader-language-toggle,.reader-talk-link,.reading-state-trigger):hover:not(:disabled) { background:var(--surface-soft); border-color:transparent; color:var(--heading); }
+.reading-identity .reader-language-toggle[aria-pressed="true"] { background:var(--surface-selected); border-color:transparent; color:var(--accent); }
+.reading-identity .reading-state-trigger { flex:none; }
+.reading-identity .reading-state-trigger strong { font-size:13px; font-weight:400; }
+.reading-identity .reading-state-trigger span { color:var(--muted); }
+.reading-identity .reader-ai-trigger { margin-left:8px; border-color:var(--selected-border); color:var(--accent); font-weight:600; }
+.reading-identity .reader-ai-trigger:hover,.reading-identity .reader-ai-trigger[aria-expanded="true"] { background:var(--surface-selected); border-color:var(--selected-border); }
+.reading-identity .desktop-font { margin-right:6px; padding-right:8px; border-right:1px solid var(--line); }
+.reading-identity .font-controls button { height:36px; min-width:34px; font-size:14px; color:var(--muted); }
+.reading-identity .font-controls button:hover:not(:disabled) { background:var(--surface-soft); color:var(--heading); }
+@media(max-width:800px) {
+  .reading-identity { flex-wrap:wrap; align-items:center; }
+  .reading-identity .reader-heading-actions { flex:1 1 100%; justify-content:flex-start; gap:4px; }
+  .reading-identity :is(.reader-language-toggle,.reader-talk-link,.reading-state-trigger,.reader-ai-trigger) { min-height:44px; padding-inline:12px; }
+  .reading-identity .reader-ai-trigger { margin-left:auto; }
+  .reading-identity .reading-state-trigger { flex:none; }
+}
+
+/* Reading prose: let the browser avoid stranded characters and space mixed scripts where it can. */
+.prose p,.orientation-prose p,.ai-answer p,.notebook-prose p { text-wrap:pretty; }
+.prose,.orientation-prose,.ai-answer,.notebook-prose,.slide { text-autospace:normal; }
+
+/* A disabled send button should not look ready. */
+.ai-panel .ai-send:disabled { border-color:var(--line); background:var(--surface-soft); color:var(--muted); opacity:1; }
+
+/* Asking from the article: actions beside a mouse selection, and one-click questions above the composer. */
+.selection-popover { position:absolute; z-index:20; transform:translateX(-50%); display:flex; gap:2px; padding:4px; border:1px solid var(--line-strong); border-radius:9px; background:var(--surface); box-shadow:0 8px 28px var(--modal-shadow); white-space:nowrap; }
+.selection-popover button { min-height:32px; padding:5px 11px; border-radius:6px; font-size:13px; color:var(--ink); }
+.selection-popover button:hover { background:var(--surface-soft); color:var(--heading); }
+.selection-popover .is-primary { background:var(--accent); color:var(--surface); font-weight:600; }
+.selection-popover .is-primary:hover { background:var(--accent-hover); color:var(--surface); }
+.reader-action-bar.reading-tools .tool-ask { color:var(--accent); font-weight:600; }
+.reader-action-bar.reading-tools .tool-ask svg { color:var(--accent); }
+.ai-quick { display:flex; align-items:center; gap:6px; margin:0 0 8px; overflow-x:auto; scrollbar-width:none; }
+.ai-quick::-webkit-scrollbar { display:none; }
+.ai-quick > span { flex:none; margin-right:2px; font-size:12px; color:var(--muted); }
+.ai-panel .ai-quick button { flex:none; min-height:32px; padding:4px 10px; border:1px solid var(--line); border-radius:16px; background:var(--surface); font-size:13px; line-height:1.4; color:var(--ink); }
+.ai-panel .ai-quick button:hover:not(:disabled) { border-color:var(--selected-border); background:var(--surface-selected); color:var(--accent); }
+.ai-panel .ai-quick button:last-child { border-style:dashed; color:var(--muted); }
+@media(max-width:600px) { .ai-panel .ai-quick button { min-height:40px; padding-inline:12px; } }
+/* The composer starts at two lines and grows with the question, leaving the height to the conversation. */
+.ai-composer { padding:12px 14px 14px; }
+.ai-composer textarea { field-sizing:content; min-height:60px; }
+
+/* Phone-width touch areas for the stand-alone links and controls (inline text links keep their line height). */
+@media(max-width:800px) {
+  .reader-mobile-back,.reading-identity .reading-original { display:inline-flex; align-items:center; min-height:44px; margin-bottom:0; }
+  .orientation-related .text-action { min-height:44px; }
+  .orientation-source a { display:inline-block; padding-block:10px; }
+}
+
+/* Reader bar: sticks to the top of the article column, names the current section and shows how far you are. */
+.reading-main > .reading-identity { position:sticky; top:0; z-index:4; margin-top:-8px; padding:8px 0 10px; background:var(--surface); }
+.reading-where { display:flex; align-items:baseline; gap:10px; min-width:0; margin:0; color:var(--heading); }
+.reading-where-number { flex:none; font:12px var(--font-data); color:var(--accent); }
+.reading-where-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; font-weight:600; }
+.reading-progress { position:absolute; left:0; right:0; bottom:-1px; height:2px; background:linear-gradient(90deg,var(--accent) calc(var(--read,0) * 100%),transparent 0); pointer-events:none; }
+.article-labels .reading-original { margin-left:auto; font-size:12px; }
+.article-labels .reading-original::before { content:none; }
+.article-topline .article-labels { width:100%; }
+.prose section { scroll-margin-top:72px; }
+html:has(.reading-main) { scroll-padding-top:72px; }
+/* Contents: what has been passed reads as done; the current section keeps its accent bar. */
+.reading-sidebar nav li[data-passed] a { color:var(--ink); }
+.reading-sidebar nav li[data-passed] .toc-number { color:color-mix(in srgb,var(--accent) 60%,var(--muted)); }
+.reading-sidebar nav li[data-passed] .toc-number::after { content:''; }
+.toc-heading span { font-family:var(--font-data); }
+@media(max-width:800px) {
+  .reading-main > .reading-identity { top:0; margin-inline:-22px; padding-inline:22px; }
+  .reading-where-label { font-size:13px; }
+}

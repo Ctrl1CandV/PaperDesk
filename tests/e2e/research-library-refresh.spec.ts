@@ -51,11 +51,13 @@ test('the refreshed library exposes 18 readings in seven surveys and eleven pape
   expect(archived).toHaveLength(6);
   await page.goto('/library');
   await expect(page.locator('.guide-entry')).toHaveCount(18);
-  await expect(page.locator('.library-result-count')).toHaveText('18 篇文章');
+  // The full shelf needs no count; a filter states what it left.
+  await expect(page.locator('.library-result-count')).toHaveText('');
   for (const id of archived) await expect(page.locator(`#choose-${id}`)).toHaveCount(0);
 
   await page.locator('#library-type-survey').click();
   await expect(page.locator('.guide-entry')).toHaveCount(7);
+  await expect(page.locator('.library-result-count')).toHaveText('7 篇文章');
   await page.locator('#library-type-paper').click();
   await expect(page.locator('.guide-entry')).toHaveCount(11);
 

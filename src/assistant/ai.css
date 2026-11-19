@@ -27,11 +27,11 @@
 .ai-material-trigger:hover .ai-material-info{background:var(--surface-selected);border-color:var(--accent)}
 .ai-guide-title{color:var(--ink);font-weight:550}
 .ai-guide-title>span{color:var(--muted);margin-top:4px;font-size:12px;display:block}
-.ai-context-label{font-size:11px;color:var(--muted);line-height:1.7;display:block;margin-bottom:3px}
+.ai-context-label{font-size:12px;color:var(--muted);line-height:1.7;display:block;margin-bottom:3px}
 .ai-context-current{color:var(--ink);font-size:13px;line-height:1.7;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;display:block}
 .ai-panel .ai-material-change{background:none;border:0;color:var(--accent);min-height:34px;text-align:left;padding:4px 0;font-size:12px;line-height:1.7}
 .ai-material-change>span{margin-left:4px}
-.ai-material-dialog .ai-guide-title{font-size:17px;line-height:1.7;margin:0 0 20px}
+.ai-material-dialog .ai-guide-title{font-size:16px;line-height:1.7;margin:0 0 20px}
 .ai-material-list{font-size:14px;line-height:1.85;margin:0 0 20px}
 .ai-material-list>div{border-top:1px solid var(--line);padding:14px 0}
 .ai-material-list dt{font-weight:600;margin-bottom:5px}.ai-material-list dd{margin:0;color:var(--muted)}
@@ -77,10 +77,10 @@
 .ai-answer li p{margin:0}
 .ai-answer a,.ai-sources a{color:var(--accent);text-underline-offset:3px;text-decoration:underline}
 .ai-code-block{max-width:100%;overflow:auto}
-.ai-code-block>code{white-space:pre;background:var(--surface-muted);border-radius:5px;padding:10px;font-size:11px;display:block}
+.ai-code-block>code{white-space:pre;background:var(--surface-muted);border-radius:5px;padding:10px;font-size:12px;display:block}
 .ai-answer code{font-family:var(--font-data);font-size:.9em}
 .ai-answer blockquote{border-left:2px solid var(--line-strong);color:var(--muted);margin:12px 0;padding-left:12px}
-.ai-table{max-width:100%;font-size:11px;overflow:auto}
+.ai-table{max-width:100%;font-size:12px;overflow:auto}
 .ai-table table{border-collapse:collapse;width:max-content;min-width:100%}
 .ai-table th,.ai-table td{border:1px solid var(--line);max-width:220px;padding:6px 8px}
 .ai-image-suppressed,.ai-empty-answer{color:var(--muted);font-size:12px;line-height:1.8}
@@ -89,13 +89,13 @@
 .ai-sources ol{margin:12px 0 0;padding:0;list-style:none}
 .ai-sources li{border-top:1px solid var(--line);overflow-wrap:anywhere;padding:10px 0}
 .ai-sources li:focus{outline:2px solid var(--focus);outline-offset:4px;border-radius:2px}
-.ai-answer .ai-citation{font-size:11px;font-family:var(--font-data);background:var(--surface-muted);border-radius:3px;padding:0 3px;text-decoration:none;display:inline-block}
+.ai-answer .ai-citation{font-size:12px;font-family:var(--font-data);background:var(--surface-muted);border-radius:3px;padding:0 3px;text-decoration:none;display:inline-block}
 .ai-source-heading{color:var(--muted);flex-wrap:wrap;gap:7px;margin-bottom:5px;font-size:12px;display:flex}
 .ai-source-id{font-family:var(--font-data);color:var(--accent)}
 .ai-sources li p{max-height:160px;color:var(--muted);white-space:pre-wrap;margin:6px 0 0;overflow:auto}
 .ai-panel .ai-inline-action{color:var(--accent);text-underline-offset:3px;background:0 0;border:0;padding:5px 0;font-size:13px;text-decoration:underline}
 .ai-copy{margin-top:9px}
-.ai-progress{color:var(--muted);align-items:center;gap:8px;padding-top:13px;font-size:11px;display:flex}
+.ai-progress{color:var(--muted);align-items:center;gap:8px;padding-top:13px;font-size:12px;display:flex}
 .ai-progress>span{background:var(--accent);border-radius:50%;width:6px;height:6px}
 .ai-composer{padding:14px;flex:none;margin:0;border-top:1px solid var(--line);background:var(--surface-soft)}
 .ai-input-surface{background:var(--surface);border:1px solid var(--control-border);border-radius:10px;overflow:hidden}
@@ -118,7 +118,7 @@
 .workspace-dialog.ai-settings-dialog{width:min(720px,100% - 28px);padding:28px 36px}
 .ai-small-dialog .workspace-dialog-heading{margin-bottom:20px;padding-bottom:12px;top:-22px}
 .ai-settings-dialog .workspace-dialog-heading{margin-bottom:12px;top:-28px}
-.ai-small-dialog .workspace-dialog-heading h2{font-size:21px}
+.ai-small-dialog .workspace-dialog-heading h2{font-size:20px}
 .ai-settings-dialog .workspace-dialog-heading h2{font-size:24px}.ai-settings-dialog .workspace-dialog-heading button{font-size:24px}
 .ai-small-dialog p{font-size:14px;line-height:1.8}
 .ai-small-dialog button{font-size:14px}
@@ -210,11 +210,11 @@
 .workspace-dialog .ai-panel{border:0;border-radius:0;width:100%;height:100%;min-height:0;position:static}
 @media (width<=600px){.ai-panel{--ai-gap:16px}.ai-panel-heading{padding-top:10px;padding-bottom:6px}.ai-context{padding-bottom:9px}.ai-composer{padding-bottom:max(12px,env(safe-area-inset-bottom))}.ai-composer textarea{min-height:78px;font-size:16px}.ai-answer,.ai-question p{font-size:14px}.ai-context details[open]{max-height:min(440px,calc(100dvh - 340px));scrollbar-gutter:stable;scrollbar-color:var(--control-border) var(--surface-muted)}.ai-empty{padding-top:16px}.workspace-dialog.ai-small-dialog{padding:18px 20px}.ai-small-dialog .workspace-dialog-heading{top:-18px}.ai-field input,.ai-field select{font-size:16px}.ai-model-fields{grid-template-columns:minmax(0,1fr);gap:16px}.ai-fallback-setting{padding:14px}.ai-availability-action{gap:0 12px}.ai-availability-action>span{flex-basis:100%}.ai-settings-status{gap:8px;font-size:12px}.ai-api-heading{display:block}.ai-api-heading>span{display:block;margin-top:5px}}
 @media (height<=700px){.ai-panel-heading{padding-top:10px;padding-bottom:10px}.ai-context{padding-bottom:8px}.ai-composer textarea{min-height:55px;max-height:100px}}
-@media (width<=600px){.ai-provider-tabs button{padding:6px 5px;font-size:13px}.ai-connection-actions>.primary-action,.ai-connection-actions>.secondary-action{width:100%}.ai-availability{padding:14px 16px 8px}.ai-search-permission{padding:15px 16px}.ai-panel .ai-provider-trigger{font-size:11px}.ai-availability-action{gap:0 14px}.ai-fallback-setting{padding:18px 0 0}.ai-settings-dialog .workspace-dialog-heading{top:-18px}}
+@media (width<=600px){.ai-provider-tabs button{padding:6px 5px;font-size:13px}.ai-connection-actions>.primary-action,.ai-connection-actions>.secondary-action{width:100%}.ai-availability{padding:14px 16px 8px}.ai-search-permission{padding:15px 16px}.ai-panel .ai-provider-trigger{font-size:12px}.ai-availability-action{gap:0 14px}.ai-fallback-setting{padding:18px 0 0}.ai-settings-dialog .workspace-dialog-heading{top:-18px}}
 .ai-empty-copy{color:var(--muted);font-size:13px;line-height:1.75;margin:0 0 12px}
 /* Direction link and record preview, kept to one line above the conversation. */
 .ai-topic-picker label{gap:8px}.ai-topic-picker label>span{flex:none;color:var(--muted)}
-.ai-research-line{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font-size:12.5px;line-height:1.7;padding:2px 0 6px}
+.ai-research-line{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font-size:12px;line-height:1.7;padding:2px 0 6px}
 .ai-research-line>strong{flex-basis:100%;color:var(--ink);overflow-wrap:anywhere}
 .ai-research-preview>summary{cursor:pointer;color:var(--muted)}.ai-research-preview[open]{flex-basis:100%;max-height:260px;overflow:auto}
 .ai-research-preview p{color:var(--muted);margin:6px 0;white-space:pre-wrap}
@@ -224,8 +224,8 @@
 .ai-command-menu button[aria-selected=true]:not(:disabled){background:var(--surface-selected)}
 .ai-command-menu button:disabled{cursor:default;opacity:.55}
 .ai-command-token{flex:none;min-width:5.5em;color:var(--accent);font:600 13px/1.7 var(--font-data)}
-.ai-command-text{display:grid;gap:1px;font-size:12.5px;line-height:1.6;color:var(--muted)}.ai-command-text strong{color:var(--ink);font-size:13.5px}
-.ai-command-hint{margin:0 0 8px;padding:6px 10px;border-left:3px solid var(--accent);border-radius:0 6px 6px 0;background:var(--surface-selected);color:var(--ink);font-size:12.5px;line-height:1.7}
+.ai-command-text{display:grid;gap:1px;font-size:12px;line-height:1.6;color:var(--muted)}.ai-command-text strong{color:var(--ink);font-size:14px}
+.ai-command-hint{margin:0 0 8px;padding:6px 10px;border-left:3px solid var(--accent);border-radius:0 6px 6px 0;background:var(--surface-selected);color:var(--ink);font-size:12px;line-height:1.7}
 .ai-command-result{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;background:var(--surface);font-size:13px;line-height:1.75}
 .ai-command-result p{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
 .ai-command-result.is-quiet{border-left-color:var(--line-strong);color:var(--muted)}

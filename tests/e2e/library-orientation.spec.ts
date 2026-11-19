@@ -121,7 +121,8 @@ test('a late article keeps its adjacent preview and reading return position thro
   const enter = page.getByRole('link', { name: '开始导读' });
   await enter.scrollIntoViewIfNeeded(); await enter.focus();
   const before = await page.evaluate(() => scrollY);
-  expect(before).toBeGreaterThan(300);
+  // The single-list shelf is shorter than the grouped one was; the late article still sits well below the top.
+  expect(before).toBeGreaterThan(200);
   await enter.press('Enter');
   await expect(page).toHaveURL(`/read/${lastGuide.guideId}/${lastGuide.revision}`);
   await page.locator('.back-link:visible, .reader-mobile-back:visible').click();
