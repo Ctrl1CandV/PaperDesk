@@ -37,3 +37,23 @@ test('with a brief open, the shelf keeps roomy rows and a toolbar that does not 
   // Each type tab stays on one line.
   for (const tab of await page.locator('.library-categories button').all()) expect((await tab.boundingBox())!.height).toBeLessThan(48);
 });
+
+test('browsing rows are roomy, and a paper without a ranked venue names where it was published', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/library');
+  expect((await page.locator('.guide-entry').first().boundingBox())!.height).toBeGreaterThanOrEqual(96);
+  // A survey first read as a preprint and later published in a journal shows the journal; the row uses its abbreviation.
+  await expect(page.locator('#choose-multi-agent-communication-survey .guide-card-source')).toContainText('Front. Comput. Sci. 2026');
+  await expect(page.locator('#choose-llm-evaluation-survey .guide-card-source')).toContainText('ACM TIST 2024');
+  await expect(page.locator('#choose-autogen .guide-card-source')).toContainText('COLM 2024');
+  await page.goto('/library?article=llm-evaluation-survey');
+  const line = page.locator('.orientation-bibliography p');
+  await expect(line).toContainText('ACM Transactions on Intelligent Systems and Technology 2024');
+  await expect(line).toContainText('导读依据 arXiv v1');
+  await expect(page.locator('.orientation-ranking')).toHaveCount(0);
+  await page.goto('/library?article=helm');
+  await expect(page.locator('.orientation-bibliography p')).toContainText('Transactions on Machine Learning Research (TMLR) 2023');
+  // Still a preprint: said so plainly.
+  await page.goto('/library?article=rag-survey');
+  await expect(page.locator('.orientation-bibliography p')).toContainText('arXiv 预印本 2023');
+});

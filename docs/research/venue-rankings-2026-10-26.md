@@ -20,6 +20,20 @@ ACM Computing Surveys (ISSN 0360-0300) displays **CAS-1 · 2025大类**, for the
 
 This is a secondary-database edition record cross-checked against a university library record, **not direct verification of the official CAS table**. The university page does not state its edition, so it does not independently establish the 2025 date. That distinction is retained in the label's source description. The original `fenqubiao.com` service was not accessible during this check. JCR Q1 and the separate 2026 New Ranking system are not substituted for CAS zones.
 
+## Formal publications checked 2026-11-20
+
+Some guides recorded a preprint or a short venue string. Their formal publications were checked on 2026-11-20 and are kept in `formalPublications` in `src/library/venueRankings.ts`; the immutable guide metadata is unchanged, and the brief says which version the guide teaches from.
+
+| Guide | Formal publication | Source | Label |
+|---|---|---|---|
+| multi-agent-communication-survey | Frontiers of Computer Science 21(7), article 2107352; published online 2026-05-29 | [journal page](https://journal.hep.com.cn/fcs/EN/10.1007/s11704-026-50857-y) | CCF-B (same journal as above) |
+| agentprune | ICLR 2025 | [ICLR proceedings](https://proceedings.iclr.cc/paper_files/paper/2025/hash/bbc461518c59a2a8d64e70e2c38c4a0e-Abstract-Conference.html) | CCF-A |
+| tau-bench | ICLR 2025 | [ICLR proceedings PDF](https://proceedings.iclr.cc/paper_files/paper/2025/file/1b126cc38b8638e07bef37e7b2bb72bf-Paper-Conference.pdf) | CCF-A |
+| autogen | Conference on Language Modeling (COLM) 2024 | [Microsoft Research publication page](https://www.microsoft.com/en-us/research/publication/autogen-enabling-next-gen-llm-applications-via-multi-agent-conversation-framework/) | none: COLM is not in the CCF 2026 directory |
+| llm-evaluation-survey | ACM Transactions on Intelligent Systems and Technology 15(3), article 39, 2024 | [DOI 10.1145/3641289](https://doi.org/10.1145/3641289) | none: TIST is a CCF class C journal (database, data mining and content retrieval; PDF page 34), below the A/B threshold |
+
+The communication survey's journal page also carries a "change history" block whose retraction and correction dates are empty; no retraction notice for this article was found. Recheck the page before citing the journal version. CAMEL (NeurIPS 2023 main track, [proceedings](https://proceedings.neurips.cc/paper/2023/hash/a3621ee907def47c1b952ade25c67698-Abstract-Conference.html)) and AgentBench (ICLR 2024) already recorded their venues; their spellings are now exact aliases, so both show CCF-A. No formal publication was found for the RAG survey (arXiv 2312.10997) or the multi-agent collaboration survey (arXiv 2501.06322; a university repository lists it as peer-reviewed but names no venue and could not be read), so both show "arXiv 预印本". TMLR and Findings of ACL do not appear in the CCF 2026 directory and are written out without a label.
+
 ## Blank entries and maintenance
 
 No verified CCF or CAS label was established for TMLR in this check. It stays blank; this is not a claim that the journal is absent from every classification. The Agent memory survey's stored publication is arXiv, so no journal/conference rating is assigned. Other international quartile systems may be added only with clear edition, category and evidence; none is needed for this release.

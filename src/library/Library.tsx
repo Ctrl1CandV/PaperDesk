@@ -5,8 +5,8 @@ import { AppLink, navigate } from '../app/navigation';
 import { guideKey, personalStore } from '../records/store';
 import type { Exploration, ReadingStatus, ResumeRecord } from '../records/types';
 import { marksText, useReadingMarks, type ReadingMarks } from '../records/reading-marks';
-import { libraryBrief, publicationName, sourceVersionLabel } from './briefs';
-import { venueRanking } from './venueRankings';
+import { libraryBrief, sourceVersionLabel } from './briefs';
+import { publication, venueRanking } from './venueRankings';
 import { collectionForQuery, collectionTerms } from './collections';
 import { PaperFigure } from '../reader/PaperFigure';
 import './library.css';
@@ -55,8 +55,10 @@ function Orientation({ guide, resumes, marks, returnToList, openRelated }: { gui
   const canResume = Boolean(resumeUnit);
   const currentResume = canResume && resume.revision === metadata.revision;
   const resumeLabel = currentResume ? brief.chapterLabels[resume.unitId] ?? resumeUnit?.heading : resumeUnit?.heading;
-  const venue = publicationName(bibliography?.venue) || (bibliography?.publicationKind === 'preprint' ? '预印本' : '');
   const ranking = venueRanking(metadata);
+  // A ranked conference reads well by its short name; journals and unranked venues are written out in full.
+  const published = publication(metadata);
+  const venue = published && (ranking && published.kind === 'conference' ? published.short : published.name);
   const recorded = marksText(marks, metadata.id, metadata.source);
   const talk = contentRepository.presentationInfo(metadata.id, metadata.revision);
   const aims = new Map(orientation?.readingTargets.map(target => [target.unitId, target]) ?? []);
@@ -66,7 +68,7 @@ function Orientation({ guide, resumes, marks, returnToList, openRelated }: { gui
     <header className="orientation-masthead">
       <div className="orientation-title-row"><h2 id="orientation-title" tabIndex={-1}>{title.name}</h2><span className="orientation-kind">{typeLabel(metadata.type)}</span><button className="orientation-close" aria-label="关闭导学" onClick={returnToList}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 12" /></svg></button></div>
       <p className="paper-original-title" lang="en">{metadata.paperTitle}</p>
-      <div className="orientation-bibliography"><p>{bibliography?.authors[0]}{bibliography && bibliography.authors.length > 1 ? ' 等' : ''}{venue && <span> · {venue}</span>}{bibliography?.year && <span> {bibliography.year}</span>}{ranking && <span className="orientation-ranking"><a href={ranking.source} target="_blank" rel="noopener noreferrer" title={ranking.description} aria-label={`${ranking.label} · ${ranking.edition}。${ranking.description}`}><span>{ranking.label}</span><span className="ranking-edition">{ranking.edition}</span></a></span>}</p><a className="text-action" href={metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 <span aria-hidden="true">↗</span></a></div>
+      <div className="orientation-bibliography"><p>{bibliography?.authors[0]}{bibliography && bibliography.authors.length > 1 ? ' 等' : ''}{venue && <span className="orientation-venue" title={published.detail}> · {published.source ? <a href={published.source} target="_blank" rel="noopener noreferrer">{venue}</a> : venue}</span>}{published?.year && <span> {published.year}</span>}{ranking && <span className="orientation-ranking"><a href={ranking.source} target="_blank" rel="noopener noreferrer" title={ranking.description} aria-label={`${ranking.label} · ${ranking.edition}。${ranking.description}`}><span>{ranking.label}</span><span className="ranking-edition">{ranking.edition}</span></a></span>}{published?.basis && <span className="orientation-basis">{published.basis}</span>}</p><a className="text-action" href={metadata.source.url} target="_blank" rel="noopener noreferrer">原论文 <span aria-hidden="true">↗</span></a></div>
       <div className={`orientation-actions${canResume ? ' has-resume' : ''}`}>
         {canResume && <p className="orientation-resume" title={resumeUnit?.heading ?? undefined}>上次读到：{resumeLabel ?? '阅读起点'}{!currentResume && <span> · 导读修订 {resume.revision}</span>}</p>}
         <AppLink id={`start-${metadata.id}`} className="primary-action" to={canResume ? `/read/${resume.guideId}/${resume.revision}` : `/read/${metadata.id}/${metadata.revision}`}>{canResume ? '继续阅读' : '开始导读'} <span aria-hidden="true">→</span></AppLink>
@@ -221,14 +223,13 @@ export function Library({ home = false }: { home?: boolean }) {
         const title = titleParts(orientation?.shortTitle ?? metadata.title);
         const recorded = marksText(marks, metadata.id, metadata.source);
         const status = marks.guides.get(metadata.id)?.status;
-        const bibliography = orientation?.bibliography;
-        const venue = publicationName(bibliography?.venue) || (bibliography?.publicationKind === 'preprint' ? '预印本' : '');
+        const published = publication(metadata);
         return <button key={metadata.id} id={`choose-${metadata.id}`} className="guide-entry" data-status={status} aria-label={`${orientation?.shortTitle ?? metadata.title}，查看导学`} aria-pressed={selected?.guide.metadata.id === metadata.id} aria-expanded={selected?.guide.metadata.id === metadata.id} aria-controls="article-preview" onClick={() => select(metadata.id)}>
           <span className="guide-card-main">
             <h3><span className="guide-card-name">{title.name}</span>{title.subtitle && <span className="guide-card-subtitle">{title.subtitle}</span>}</h3>
           </span>
           <span className="guide-card-purpose">{orientation?.value ?? metadata.purpose}</span>
-          <span className="guide-card-bottom"><span className="guide-card-source"><DocumentIcon survey={metadata.type === 'survey'} />{typeLabel(metadata.type)} · {[venue, bibliography?.year].filter(Boolean).join(' ') || '年份待补充'}</span>{recorded && <span className="guide-card-marks">{recorded}</span>}{contentRepository.presentationInfo(metadata.id, metadata.revision) && <span className="guide-card-talk">有汇报稿</span>}</span>
+          <span className="guide-card-bottom"><span className="guide-card-source"><DocumentIcon survey={metadata.type === 'survey'} />{typeLabel(metadata.type)} · {[published?.short, published?.year].filter(Boolean).join(' ') || '年份待补充'}</span>{recorded && <span className="guide-card-marks">{recorded}</span>}{contentRepository.presentationInfo(metadata.id, metadata.revision) && <span className="guide-card-talk">有汇报稿</span>}</span>
         </button>;
       })}</div>}
       {!filtered.length && <div className="empty-state"><h2>没有匹配的文章</h2><p>{markFilter ? '当前阅读状态下没有文章。' : '当前匹配标题、主要主题和类别（基础、通信、评价）。可以换一个词，或查看全部文章。'}</p><button className="secondary-action" onClick={() => change({ q: null, type: null, mark: null, article: null })}>查看全部文章</button></div>}

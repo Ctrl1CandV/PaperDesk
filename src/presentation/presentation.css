@@ -19,7 +19,6 @@
 .talk-meta { display:flex; flex-wrap:wrap; gap:4px 18px; margin:0; font-size:13px; color:var(--muted); }
 .talk-meta span + span::before { content:'·'; margin-right:18px; color:var(--line-strong); }
 .talk-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; }
-.talk-toggle { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 6px; font-size:14px; color:var(--ink); cursor:pointer; white-space:nowrap; }
 .talk-print { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:8px 14px; border:1px solid var(--line); border-radius:6px; background:var(--surface); font-size:14px; color:var(--ink); }
 .talk-print:hover { border-color:var(--control-border); color:var(--heading); }
 
@@ -159,9 +158,6 @@
 .stop-sources a:hover { color:var(--accent); }
 .stop-guide { min-height:32px; padding:.2em .7em; border:1px solid var(--line); border-radius:1em; color:var(--accent); font-size:inherit; }
 .stop-guide:hover { border-color:var(--selected-border); background:var(--surface-selected); }
-.stop-notes { margin-top:1.3em; padding:.9em 1.1em; border-radius:8px; background:var(--panel-background); font-size:14px; line-height:1.75; }
-.stop-notes > span { font-size:12px; font-weight:600; color:var(--muted); }
-.stop-notes ul { margin:.3em 0 0; padding-left:1.2em; }
 .talk-guide-dialog { width:min(820px,calc(100% - 28px)); }
 .talk-guide-meta { margin:0 0 12px; font-size:13px; color:var(--muted); }
 .talk-guide-prose { --reading-size:17px; }

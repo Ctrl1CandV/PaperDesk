@@ -52,16 +52,16 @@ test('the talk page opens with the whole mind map, then a map that follows the t
   await expect(page).toHaveURL(/#closing$/);
 });
 
-test('each stop carries its figure, sources, notes and the guide section', async ({ page }) => {
+test('each stop carries its figure, sources and the guide section, and no speaker notes', async ({ page }) => {
   await page.goto(`${talk}#architecture`);
   const architecture = page.locator('#architecture');
   await expect(architecture).toBeInViewport();
   await expect(architecture.locator('.stop-figure img')).toHaveJSProperty('complete', true);
   await expect(architecture.locator('.stop-points dt')).toHaveText(['扁平', '层级', '团队', '社会', '混合']);
   await expect(architecture.locator('.stop-sources a').first()).toHaveAttribute('href', /^https:\/\/arxiv\.org\//);
-  await expect(architecture.locator('.stop-notes')).toBeVisible();
-  await page.getByRole('checkbox', { name: '讲稿提示' }).uncheck();
-  await expect(page.locator('.stop-notes')).toHaveCount(0);
+  // The screen is shared with the audience: it shows display material only, no speaker notes.
+  await expect(page.getByText('讲稿提示')).toHaveCount(0);
+  await expect(page.getByRole('checkbox')).toHaveCount(0);
   await architecture.getByRole('button', { name: '导读原文' }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.locator('.talk-guide-prose')).toContainText('扁平架构');

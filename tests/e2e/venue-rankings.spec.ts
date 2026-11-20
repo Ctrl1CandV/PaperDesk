@@ -7,6 +7,12 @@ test('venue references prefer CCF A/B and use a dated CAS major category where a
     ['instructgpt', 'CCF-A', '2026目录'],
     ['transformer', 'CCF-A', '2026目录'],
     ['react', 'CCF-A', '2026目录'],
+    // Venues checked after the guide recorded a preprint or a short venue name.
+    ['camel', 'CCF-A', '2026目录'],
+    ['agentbench', 'CCF-A', '2026目录'],
+    ['agentprune', 'CCF-A', '2026目录'],
+    ['tau-bench', 'CCF-A', '2026目录'],
+    ['multi-agent-communication-survey', 'CCF-B', '2026目录'],
   ];
   for (const [id, label, edition] of cases) {
     await page.goto(`/library?article=${id}`);
@@ -33,7 +39,7 @@ test('venue references prefer CCF A/B and use a dated CAS major category where a
 });
 
 test('unknown venues and preprints stay blank rather than inheriting a ranking from a title mention', async ({ page }) => {
-  for (const id of ['helm', 'multi-agent-communication-survey']) {
+  for (const id of ['helm', 'rag-survey', 'autogen', 'llm-evaluation-survey']) {
     await page.goto(`/library?article=${id}`);
     await expect(page.locator('#orientation-title')).toBeVisible();
     await expect(page.locator('.orientation-ranking')).toHaveCount(0);

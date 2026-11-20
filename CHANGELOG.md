@@ -1,5 +1,11 @@
 # Changelog
 
+## Taller shelf rows, formal venues and a display-only talk page — 2026-11-20
+
+- Shelf rows are taller when no brief is open, and the source column no longer wraps.
+- Papers without a ranking badge show where they were published in full; papers the guide read as preprints show their checked formal venue (FCS, ICLR 2025, COLM 2024, ACM TIST) next to the version the guide uses. CAMEL and AgentBench now show their CCF-A badge.
+- The talk page no longer shows speaker notes or their toggle; it is material for a shared screen.
+
 ## Roomier shelf rows and a calmer talk map — 2026-11-19 (third pass)
 
 - With a brief open, the shelf list is wider and each row taller, showing the title, subtitle and source; search has its own line so the type tabs no longer wrap.

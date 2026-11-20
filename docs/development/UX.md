@@ -2,6 +2,10 @@
 
 This is an implementation direction, not a claim of visual acceptance. It applies the content, layout, typography and rendered-review requirements below. There is no requirement to copy an earlier interface or install a particular skill bundle.
 
+## Taller browsing rows, formal venues, display-only talk page — 2026-11-20
+
+Browsing rows on wide screens are at least 100 px with a wider source column; long journal names use the journal's own abbreviation on the row. In the brief, a venue without a CCF A/B or CAS 1/2 badge is written out in full, and a paper the guide read as a preprint shows its checked formal publication with "导读依据 arXiv …". The talk page is shared on screen, so it carries display material only: speaker notes and their toggle are gone from the page and the handout.
+
 ## Roomier shelf rows beside a brief, no section times, map motion — 2026-11-19 (third pass)
 
 With a brief open on a wide screen, the list now takes 0.9 : 1.1 of the row (was 0.74 : 1.26) and each row is at least 88 px with its title, subtitle and source line; search sits on its own line above the type tabs and reading status. The talk page shows only the total length in its header: the route, the map, the section headings and the phone outline carry no per-section time. The overview draws itself from the centre outward and lights a branch under the pointer; the trail to the current stop is drawn heavier. In the following map, new stops and key terms grow out of their parent while their edges draw in, and the camera glides. All motion is off under reduced-motion settings.

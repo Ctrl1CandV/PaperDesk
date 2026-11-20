@@ -5,8 +5,8 @@
  * 3. 内容的形状决定版式：
  *    - 因为导师要先知道大致讲什么，一篇只有 3 个分支、7 个讲解点，所以页面顶部是一张完整、读得清的导图。
  *    - 因为讲解按导图顺序往下走，所以下面左侧是一张跟着滚动的导图：开场只画主干，讲到哪个分支就展开它、
- *      收起别的，讲到哪一点就点亮它并展开关键词；右侧是这一点的结论、原图或表、出处和讲稿提示。
- *    - 因为讲者备查的讲稿提示不一定要投影，所以它有开关；打印讲义是导图在前、各分支随后。
+ *      收起别的，讲到哪一点就点亮它并展开关键词；右侧是这一点的结论、原图或表和出处。
+ *    - 因为组会是共享屏幕，老师看得到整页，所以页面只放展示材料，不放讲稿提示；打印讲义是导图在前、各分支随后。
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppLink } from '../app/navigation';
@@ -83,7 +83,6 @@ function Talk({ talk, guide }: { talk: Presentation; guide: GuideSummary }) {
   const totalStops = steps.filter(step => step.kind === 'stop').length;
   const indexOf = useCallback((id: string) => steps.findIndex(step => stepId(step, talk) === id), [steps, talk]);
   const [active, setActive] = useState(() => Math.max(0, indexOf(window.location.hash.slice(1))));
-  const [notes, setNotes] = useState(true);
   const [guideUnit, setGuideUnit] = useState<string>();
   const sections = useRef(new Map<number, HTMLElement>());
   const scrolling = useRef(0);
@@ -131,7 +130,6 @@ function Talk({ talk, guide }: { talk: Presentation; guide: GuideSummary }) {
         <p className="talk-meta"><span>{talk.minutes} 分钟</span><span>{talk.parts.length} 个分支 · {totalStops} 个讲解点</span><span>依据导读修订 {talk.revision}</span></p>
       </div>
       <div className="talk-actions">
-        <label className="talk-toggle"><input type="checkbox" checked={notes} onChange={event => setNotes(event.target.checked)} />讲稿提示</label>
         <button type="button" className="talk-print" onClick={() => window.print()} title="导图在前，各分支随后；可在打印对话框里另存为 PDF"><PrintIcon /><span>打印讲义</span></button>
       </div>
     </header>
@@ -157,7 +155,6 @@ function Talk({ talk, guide }: { talk: Presentation; guide: GuideSummary }) {
           <p className="talk-paper" lang="en">{guide.metadata.paperTitle}</p>
           <p className="stop-lead">{talk.opening.message}</p>
           <Sources sources={talk.opening.sources} unitId={talk.opening.unitId} onGuide={setGuideUnit} />
-          {notes && <aside className="stop-notes" aria-label="讲稿提示"><span>讲稿提示</span><ul>{talk.opening.notes.map((note, index) => <li key={index}>{note}</li>)}</ul></aside>}
         </section>
         {talk.parts.map((item, at) => {
           const intro = steps.findIndex(entry => entry.kind === 'part' && entry.part === at);
@@ -175,7 +172,6 @@ function Talk({ talk, guide }: { talk: Presentation; guide: GuideSummary }) {
                 <p className="stop-lead">{stop.message}</p>
                 <div className="stop-body"><Evidence talk={talk} stop={stop} />{stop.points && <Points points={stop.points} />}</div>
                 <Sources sources={stop.sources} unitId={stop.unitId} onGuide={setGuideUnit} />
-                {notes && <aside className="stop-notes" aria-label="讲稿提示"><span>讲稿提示</span><ul>{stop.notes.map((note, noteAt) => <li key={noteAt}>{note}</li>)}</ul></aside>}
               </article>;
             })}
           </section>;
@@ -186,7 +182,6 @@ function Talk({ talk, guide }: { talk: Presentation; guide: GuideSummary }) {
           <p className="stop-lead">{talk.closing.message}</p>
           <Points points={talk.closing.points} />
           <Sources sources={talk.closing.sources} unitId={talk.closing.unitId} onGuide={setGuideUnit} />
-          {notes && <aside className="stop-notes" aria-label="讲稿提示"><span>讲稿提示</span><ul>{talk.closing.notes.map((note, index) => <li key={index}>{note}</li>)}</ul></aside>}
         </section>
       </div>
     </div>
