@@ -45,3 +45,5 @@ npm run test:e2e
 审核内容按不可变修订维护；正文哈希、来源身份与旧引用受到保护。打开文章不会自动标记已读。个人记录、模型凭据、原文材料备份与回滚收据不能作为普通缓存清理，见[隐私](docs/development/PRIVACY.md)和 [Git 规则](docs/development/GIT-POLICY.md)。
 
 `node_modules/`、`dist/` 和 `.cache/` 是依赖、构建与开发产物，保持忽略；`private/` 和 `server/config.local.json` 是本地运行数据与配置。完整探索可通过私人 Git 仓库中的 `research-workspace/` 传递，其他个人记录与凭据保持各自边界，见[探索 Git 传递](docs/development/EXPLORATION-GIT.md)。部署和云同步服务仍在当前范围之外。学术归属保留在内容和来源记录中；开发贡献说明见 [Contributors](CONTRIBUTORS.md)。本项目尚未添加许可证授权。
+
+<!-- channel test -->
